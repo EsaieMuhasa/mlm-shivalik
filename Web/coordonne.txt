@@ -1,0 +1,54 @@
+
+ftps14.us.cloudlogin.co
+psw: 798gYxEUz-
+user: shivalik_shivalikherbals.org 
+
+//DB
+user: shivalik_db1 
+pwd: I45c9cKWv#
+server: localhost
+
+//mail
+webmaister@shivalikherbal.org
+=> RxjA5v5Y5!
+
+
+
+#RewriteEngine On
+#RewriteCond %{HTTPS} off [OR]
+#RewriteCond %{HTTP_HOST} !^www\. [NC]
+#RewriteCond %{HTTP_HOST} ^(?:www\.)?(.+)$ [NC]
+#RewriteRule ^.*$ https://www.%1%{REQUEST_URI} [L,NE,R=301]
+
+
+
+Israël Mr Nice kambale <niceisrael4@gmail.com>
+	
+23 sept. 2021 12:27 (il y a 3 jours)
+	
+À moi
+
+---------- Forwarded message ---------
+From: alain musondoli <alainmusondoli@gmail.com>
+Date: jeu. 23 sept. 2021 à 11:07
+Subject: Fwd: Shivalik
+To: kambale kambale <niceisrael4@gmail.com>
+
+
+
+
+
+
+
+Dear Alain,
+
+Thank you for choosing our services.
+This email contains important data about your web hosting account for domain 'shivalikherbals.org'.
+-------------------------------------------------
+Your account username is: shivalik
+Password is: Shivalibbo85@
+
+You can set your password and access your Control Panel here: https://us.cloudlogin.co/login/account-setup/?key=59450a852515d4a342d4a93
+
+-------------------------------------------------
+Your website will be accessible here: http://shivalikherbals.org or http://www.shivalikherbals.org
