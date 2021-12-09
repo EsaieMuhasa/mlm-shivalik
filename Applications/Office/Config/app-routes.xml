@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE app-routes SYSTEM "../../../Library/lib-dtd-conf.dtd" >
+<app-routes>
+
+ 	<route action="index" module="Dashboard" urlPattern="/office/"/>
+ 	<route action="virtualMoney" module="Dashboard" urlPattern="/office/virtualmoney/"/>
+ 	<route action="requestVirtualMoney" module="Dashboard" urlPattern="/office/virtualmoney/request\.html"/>
+ 	
+ 	<route action="index" module="Profil" urlPattern="/office/profil/"/>
+ 	<route action="photo" module="Profil" urlPattern="/office/profil/photo\.html"/>
+ 	<route action="password" module="Profil" urlPattern="/office/profil/password\.html"/>
+ 	<route action="address" module="Profil" urlPattern="/office/profil/address\.html"/>
+ 	
+ 	<route action="members" module="Members" urlPattern="/office/members/"/>
+ 	<route action="members" module="Members" urlPattern="/office/members/(table|grid)/" paramsNames="affichage"/>
+ 	<route action="members" module="Members" urlPattern="/office/members/([0-9]+)-([0-9]+)\.html" paramsNames="limit,offset"/>
+ 	<route action="members" module="Members" urlPattern="/office/members/(table|grid)/([0-9]+)-([0-9]+)\.html" paramsNames="affichage,limit,offset"/>
+ 	<route action="addMember" module="Members" urlPattern="/office/members/add\.html"/>
+ 	
+ 	<route action="member" module="Members" urlPattern="/office/members/([0-9]+)/" paramsNames="id"/>
+ 	<route action="stateMember" module="Members" urlPattern="/office/members/([0-9]+)/(enable|disable)\.html" paramsNames="id,state"/>
+ 	<route action="upgradeMember" module="Members" urlPattern="/office/members/([0-9]+)/(upgrade)\.html" paramsNames="id,option"/>
+ 	<route action="downlines" module="Members" urlPattern="/office/members/([0-9]+)/(downlines)/" paramsNames="id,option"/>
+ 	<route action="downlines" module="Members" urlPattern="/office/members/([0-9]+)/(downlines)/(left|middle|right|all)\.html" paramsNames="id,option,foot"/>
+
+	<route action="withdrawalsMember" module="Members" urlPattern="/office/members/([0-9]+)/(withdrawals)\.html" paramsNames="id,option"/>
+	<route action="withdrawalsMember" module="Members" urlPattern="/office/members/([0-9]+)/(withdrawals)/([0-9]+)\.html" paramsNames="id,option,requestId"/>
+	
+	
+</app-routes>

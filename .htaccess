@@ -1,0 +1,21 @@
+#pour les fichiers statiques 
+RewriteEngine On
+RewriteCond %{REQUEST_URI} ^/(js|css|img|fonts)/.* 
+RewriteRule ^(js|css|img|fonts)/(.*)$ Web/$1/$2 [L]
+
+RewriteCond %{REQUEST_URI} ^/(offices|grades|users)/.* 
+RewriteRule ^(users|offices|grades)/(.*)$ Web/data/$1/$2 [L]
+RewriteRule ^favicon.icon$ logo.png [L]
+
+#les applications des utilisateurs authentifiers
+RewriteRule ^(member|office|root|admin)/(.*)$ Web/applications.php?subdomain=$1 [QSA,L]
+
+#protection des fichiers sources sensible
+RewriteCond %{REQUEST_URI} ^/(Applications|Library|dompdf|Entities|Errors|includes|Managers|Utilitaires|Validators)/.*
+RewriteRule ^(Applications|Library|dompdf|Entities|Errors|includes|Managers|Utilitaires|Validators)(.*)$ Web/applications.php [L]
+
+#pour tout ce qui n'est pas fichiers publique
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ Web/index.php [L]
+
+ErrorDocument 404 Web/index.php

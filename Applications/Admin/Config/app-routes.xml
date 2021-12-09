@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE app-routes SYSTEM "../../../Library/lib-dtd-conf.dtd" >
+<app-routes>
+ 	<route action="index" module="Dashboard" urlPattern="/admin/"/>
+ 	
+ 	<route action="index" module="Profil" urlPattern="/admin/profil/"/>
+ 	<route action="photo" module="Profil" urlPattern="/admin/profil/photo\.html"/>
+ 	<route action="password" module="Profil" urlPattern="/admin/profil/password\.html"/>
+ 	<route action="address" module="Profil" urlPattern="/admin/profil/address\.html"/>
+ 	
+ 	<route action="members" module="Members" urlPattern="/admin/members/"/>
+ 	<route action="members" module="Members" urlPattern="/admin/members/(table|grid)/" paramsNames="affichage"/>
+ 	<route action="members" module="Members" urlPattern="/admin/members/([0-9]+)-([0-9]+)\.html" paramsNames="limit,offset"/>
+ 	<route action="members" module="Members" urlPattern="/admin/members/(table|grid)/([0-9]+)-([0-9]+)\.html" paramsNames="affichage,limit,offset"/>
+ 	<route action="addMember" module="Members" urlPattern="/admin/members/add\.html"/>
+ 	
+ 	<route action="member" module="Members" urlPattern="/admin/members/([0-9]+)/" paramsNames="id"/>
+ 	<route action="updateMember" module="Members" urlPattern="/admin/members/([0-9]+)/(update)\.html" paramsNames="id,option"/>
+ 	<route action="resetPassword" module="Members" urlPattern="/admin/members/([0-9]+)/(password)\.html" paramsNames="id,option"/>
+ 	<route action="stateMember" module="Members" urlPattern="/admin/members/([0-9]+)/(enable|disable)\.html" paramsNames="id,state"/>
+ 	<route action="upgradeMember" module="Members" urlPattern="/admin/members/([0-9]+)/(upgrade)\.html" paramsNames="id,option"/>
+ 	<route action="downlines" module="Members" urlPattern="/admin/members/([0-9]+)/(downlines)/" paramsNames="id,option"/>
+ 	<route action="downlines" module="Members" urlPattern="/admin/members/([0-9]+)/(downlines)/(left|middle|right|all)\.html" paramsNames="id,option,foot"/>
+ 	<route action="downlinesHierarchy" module="Members" urlPattern="/admin/members/([0-9]+)/(downlines-hierarchy)/" paramsNames="id,option"/>
+ 	<route action="downlinesHierarchy" module="Members" urlPattern="/admin/members/([0-9]+)/(downlines-hierarchy)/(left|middle|right|all)\.(json|xml|html)" paramsNames="id,option,foot,ext"/>
+ 	<route action="certifyMember" module="Members" urlPattern="/admin/members/([0-9]+)/(certify)-([0-9]+)\.html" paramsNames="id,option,idGradeMember"/>
+	<route action="tree" module="Members" urlPattern="/admin/members/([0-9]+)/(tree)/(left|middle|right|all)\.html" paramsNames="id,option,foot"/>
+	
+	<route action="withdrawalsMember" module="Members" urlPattern="/admin/members/([0-9]+)/(withdrawals)\.html" paramsNames="id,option"/>
+	<route action="withdrawalsMember" module="Members" urlPattern="/admin/members/([0-9]+)/(withdrawals)/([0-9]+)\.html" paramsNames="id,option,requestId"/>
+	
+	<!-- controle des offices -->
+	<route action="index" module="Offices" urlPattern="/admin/offices/"/>
+	<route action="index" module="Offices" urlPattern="/admin/offices/(table|grid)\.html" paramsNames="affichage"/>
+	<route action="addOffice" module="Offices" urlPattern="/admin/offices/(add)\.html" paramsNames="option"/>
+	<route action="updateOffice" module="Offices" urlPattern="/admin/offices/([0-9]+)/update\.html" paramsNames="id"/>
+	<route action="members" module="Offices" urlPattern="/admin/offices/([0-9]+)/members/(table|grid)/" paramsNames="id,affichage"/>
+	<route action="members" module="Offices" urlPattern="/admin/offices/([0-9]+)/members/(table|grid)/([0-9]+)-([0-9]+)\.html" paramsNames="id,affichage,limit,offset"/>
+	<route action="members" module="Offices" urlPattern="/admin/offices/([0-9]+)/members\.html" paramsNames="id"/>
+	<route action="upgrades" module="Offices" urlPattern="/admin/offices/([0-9]+)/upgrades\.html" paramsNames="id"/>
+	<route action="dashboard" module="Offices" urlPattern="/admin/offices/([0-9]+)/" paramsNames="id"/>
+	<route action="officeAdmin" module="Offices" urlPattern="/admin/offices/([0-9]+)/admin\.html" paramsNames="id"/>
+	<route action="officeAdmin" module="Offices" urlPattern="/admin/offices/([0-9]+)/(enable|disable)-([0-9]+)\.html" paramsNames="id,option,adminId"/>
+	<route action="resetPassword" module="Offices" urlPattern="/admin/offices/([0-9]+)/reset-([0-9]+)\.html" paramsNames="id,adminId"/>
+	<route action="redirectWithdrawal" module="Offices" urlPattern="/admin/offices/([0-9]+)/withdrawals/([0-9]+)/redirect\.html" paramsNames="id,withdrawalId"/>
+	
+	<route action="virtualmoney" module="Offices" urlPattern="/admin/offices/([0-9]+)/virtualmoney/" paramsNames="id"/>
+	<route action="sendVirtualmoney" module="Offices" urlPattern="/admin/offices/([0-9]+)/virtualmoney/send\.html" paramsNames="id"/>
+	<route action="sendVirtualmoney" module="Offices" urlPattern="/admin/offices/([0-9]+)/virtualmoney/([0-9]+)/send\.html" paramsNames="id,request"/>
+	
+	<route action="history" module="Offices" urlPattern="/admin/offices/([0-9]+)/history/" paramsNames="id"/>
+	<route action="history" module="Offices" urlPattern="/admin/offices/([0-9]+)/history/([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})\.html" paramsNames="id,date"/>
+	<route action="history" module="Offices" urlPattern="/admin/offices/([0-9]+)/history/([0-9]{1,2})-([0-9]{4})\.html" paramsNames="id,month,year"/>
+</app-routes>

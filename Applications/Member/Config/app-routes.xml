@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE app-routes SYSTEM "../../../Library/lib-dtd-conf.dtd" >
+<app-routes>
+ 	<route action="index" module="Account" urlPattern="/member/"/>
+ 	<route action="downlines" module="Account" urlPattern="/member/downlines/"/>
+ 	<route action="downlines" module="Account" urlPattern="/member/downlines/(left|right|middle|all)\.html" paramsNames="foot"/>
+ 	
+ 	<route action="tree" module="Account" urlPattern="/member/tree/"/>
+ 	<route action="tree" module="Account" urlPattern="/member/tree/(left|right|middle|all)\.html" paramsNames="foot"/>
+ 	<route action="tree" module="Account" urlPattern="/member/tree/(left|right|middle|all)-(stack|tree)\.html" paramsNames="foot,affichage"/>
+ 	
+ 	<route action="withdrawals" module="Account" urlPattern="/member/withdrawals/"/>
+ 	<route action="newWithdrawal" module="Account" urlPattern="/member/withdrawals/new\.html"/>
+ 	<route action="updateWithdrawal" module="Account" urlPattern="/member/withdrawals/([0-9]+)/update\.html" paramsNames="id"/>
+ 	<route action="history" module="Account" urlPattern="/member/history/"/>
+	<route action="history" module="Account" urlPattern="/member/history/([0-9]{1,2})-([0-9]{4})\.html" paramsNames="month,year"/>
+	<route action="history" module="Account" urlPattern="/member/history/([0-9]{1,2})-([0-9]{1,2})-([0-9]{4})\.html" paramsNames="day,month,year"/>
+ 	
+ 	<route action="index" module="Profil" urlPattern="/member/profil/"/>
+ 	<route action="update" module="Profil" urlPattern="/member/profil/"/>
+ 	
+ 	<route action="password" module="Profil" urlPattern="/member/profil/password\.html"/>
+ 	<route action="photo" module="Profil" urlPattern="/member/profil/photo\.html"/>
+ 	<route action="address" module="Profil" urlPattern="/member/profil/address\.html"/>
+ 	
+ 	<route action="index" module="MyOffice" urlPattern="/member/office/"/>
+ 	<route action="members" module="MyOffice" urlPattern="/member/office/members/"/>
+ 	<route action="upgrades" module="MyOffice" urlPattern="/member/office/upgrades\.html"/>
+ 	<route action="members" module="MyOffice" urlPattern="/member/office/members/(table|grid)/" paramsNames="affichage"/>
+ 	<route action="members" module="MyOffice" urlPattern="/member/office/members/(table|grid)/([0-9]+)-([0-9]+)\.html" paramsNames="affichage,limit,offiset"/>
+ 	<route action="virtualmoney" module="MyOffice" urlPattern="/member/office/virtualmoney/"/>
+ 	<route action="sendRaportWithdrawals" module="MyOffice" urlPattern="/member/office/send-matched-money.html"/>
+ 	<route action="requestVirtualmoney" module="MyOffice" urlPattern="/member/office/virtualmoney/request\.html"/>
+ 	<route action="history" module="MyOffice" urlPattern="/member/office/history/"/>
+	<route action="history" module="MyOffice" urlPattern="/member/office/history/([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})\.html" paramsNames="date"/>
+	<route action="history" module="MyOffice" urlPattern="/member/office/history/([0-9]{1,2})-([0-9]{4})\.html" paramsNames="month,year"/>
+ 	
+ 	<!-- monitoring de l'office -->
+ 	<route action="index" module="MyOffice" urlPattern="/member/office/"/>
+</app-routes>

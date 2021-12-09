@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "../Library/lib-dtd-conf.dtd" >
+<config webData="Web/data" webLogger="Web/logger">
+	
+	<applications foldName="Applications">
+		<application name="Public"/>
+		<application name="Member" subDomains="member"/>
+		<application name="Office" subDomains="office"/>
+		<application name="Admin" subDomains="admin"/>
+	</applications>
+	
+	<dbconnections>
+		<connection user="root" name="first" dsn="mysql:host=localhost;dbname=shivalik_db1"/>
+		<!-- 
+		<connection user="shivalik_db1" password="I45c9cKWv#" name="shivalik" dsn="mysql:host=localhost;dbname=shivalik_db1"/>
+		 -->
+	</dbconnections>
+	
+	<entities>
+		<entity name="\Entities\BonusGeneration" specification="\Managers\BonusGenerationDAOManager" implementation="\Managers\Implementation\BonusGenerationDAOManagerImplementation1"/>
+		<entity name="\Entities\Country" specification="\Managers\CountryDAOManager" implementation="\Managers\Implementation\CountryDAOManagerImplementation1"/>
+		<entity name="\Entities\Generation" specification="\Managers\GenerationDAOManager" implementation="\Managers\Implementation\GenerationDAOManagerImplementation1"/>
+		<entity name="\Entities\GradeMember" specification="\Managers\GradeMemberDAOManager" implementation="\Managers\Implementation\GradeMemberDAOManagerImplementation1"/>
+		<entity name="\Entities\Grade" specification="\Managers\GradeDAOManager" implementation="\Managers\Implementation\GradeDAOManagerImplementation1"/>
+		<entity name="\Entities\Localisation" specification="\Managers\LocalisationDAOManager" implementation="\Managers\Implementation\LocalisationDAOManagerImplementation1"/>
+		<entity name="\Entities\Member" specification="\Managers\MemberDAOManager" implementation="\Managers\Implementation\MemberDAOManagerImplementation1"/>
+		<entity name="\Entities\VirtualMoney" specification="\Managers\VirtualMoneyDAOManager" implementation="\Managers\Implementation\VirtualMoneyDAOManagerImplementation1"/>
+		<entity name="\Entities\RequestVirtualMoney" specification="\Managers\RequestVirtualMoneyDAOManager" implementation="\Managers\Implementation\RequestVirtualMoneyDAOManagerImplementation1"/>
+		<entity name="\Entities\Office" specification="\Managers\OfficeDAOManager" implementation="\Managers\Implementation\OfficeDAOManagerImplementation1"/>
+		<entity name="\Entities\OfficeBonus" specification="\Managers\OfficeBonusDAOManager" implementation="\Managers\Implementation\OfficeBonusDAOManagerImplementation1"/>
+		<entity name="\Entities\Size" specification="\Managers\SizeDAOManager" implementation="\Managers\Implementation\SizeDAOManagerImplementation1"/>
+		<entity name="\Entities\OfficeSize" specification="\Managers\OfficeSizeDAOManager" implementation="\Managers\Implementation\OfficeSizeDAOManagerImplementation1"/>
+		<entity name="\Entities\OfficeAdmin" specification="\Managers\OfficeAdminDAOManager" implementation="\Managers\Implementation\OfficeAdminDAOManagerImplementation1"/>
+		<entity name="\Entities\PointValue" specification="\Managers\PointValueDAOManager" implementation="\Managers\Implementation\PointValueDAOManagerImplementation1"/>
+		<entity name="\Entities\Withdrawal" specification="\Managers\WithdrawalDAOManager" implementation="\Managers\Implementation\WithdrawalDAOManagerImplementation1"/>
+		<entity name="\Entities\RaportWithdrawal" specification="\Managers\RaportWithdrawalDAOManager" implementation="\Managers\Implementation\RaportWithdrawalDAOManagerImplementation1"/>
+		<entity name="\Entities\Transfer" specification="\Managers\TransferDAOManager" implementation="\Managers\Implementation\TransferDAOManagerImplementation1"/>
+	</entities>
+	
+	<definitions>
+		<define name="webData" value="Web/data"/>
+		<define name="webLogger" value="Web/logger"/>
+		
+		<define name="logo" value="/logo.jpg"/>
+		<define name="icone_airtel" value="/img/airtel.jpg"/>
+		<define name="icone_vodacom" value="/img/vodacom.jpg"/>
+		<define name="icone_orange" value="/img/orage.jpg"/>
+		<define name="icone_visa" value="/img/visa.jpg"/>
+		<define name="icone_paypal" value="/img/paypal.jpg"/>
+		<define name="icone_crypto" value="/img/crypto.jpg"/>
+		
+		<define name="designerName" value="Ing. Jhon Brow"/>
+		<define name="designerEmail" value="webmaster@shivalikherbals.org"/>
+		<define name="devise" value="$"/>
+		<define name="minWithdrawal" value="10"/><!-- La plus petite valeur retirable en dolar -->
+		<define name="maxMembers" value="20"/>
+		
+		<list name="footsMember">
+			<item name="LEFT" value="1"/>
+			<item name="MIDDLE" value="2"/>
+			<item name="RIGHT" value="3"/>
+		</list>
+		
+		<list name="virtualMoney">
+			<item name="airtel" value="Airtel money"/>
+			<item name="vodacom" value="M-Pesa"/>
+			<item name="orange" value="Orage money"/>
+			<item name="paypal" value="PyPal"/>
+			<item name="visa" value="Master card"/>
+			<item name="crypto" value="Cryptocurrency"/>
+		</list>
+
+	</definitions>
+</config>

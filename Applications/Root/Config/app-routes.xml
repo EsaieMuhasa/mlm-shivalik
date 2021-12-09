@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE app-routes SYSTEM "../../../Library/lib-dtd-conf.dtd" >
+<app-routes>
+ 	<route action="index" module="Settings" urlPattern="/root/"/>
+ 	
+ 	<route action="admins" module="Settings" urlPattern="/root/admins/"/>
+ 	<route action="addAdmin" module="Settings" urlPattern="/root/admins/add\.html"/>
+ 	<route action="updateAdmin" module="Settings" urlPattern="/root/admins/([0-9]+)/update\.html" paramsNames="id"/>
+ 	
+ 	<route action="grades" module="Settings" urlPattern="/root/grades/"/>
+ 	<route action="addGrade" module="Settings" urlPattern="/root/grades/add\.html"/>
+ 	<route action="updateGrade" module="Settings" urlPattern="/root/grades/([0-9]+)/update\.html" paramsNames="id"/>
+ 	
+ 	<route action="countrys" module="Settings" urlPattern="/root/countrys/"/>
+ 	<route action="addCountry" module="Settings" urlPattern="/root/countrys/add\.html"/>
+ 	<route action="updateCountry" module="Settings" urlPattern="/root/countrys/([0-9]+)/update\.html" paramsNames="id"/>
+ 	
+ 	<route action="generations" module="Settings" urlPattern="/root/generations/"/>
+ 	<route action="addGeneration" module="Settings" urlPattern="/root/generations/add\.html"/>
+ 	<route action="updateGeneration" module="Settings" urlPattern="/root/generations/([0-9]+)/update\.html" paramsNames="id"/>
+ 	
+ 	<route action="offices" module="Settings" urlPattern="/root/offices/"/>
+ 	<route action="addOffice" module="Settings" urlPattern="/root/offices/add\.html"/>
+ 	<route action="updateOffice" module="Settings" urlPattern="/root/offices/([0-9]+)/update\.html"/>
+ 	
+ 	<route action="sizes" module="Settings" urlPattern="/root/sizes/"/>
+ 	<route action="addSize" module="Settings" urlPattern="/root/sizes/add\.html"/>
+ 	<route action="updateSize" module="Settings" urlPattern="/root/sizes/([0-9]{1,2})/update\.html" paramsNames="id"/>
+ 	
+ 	<route action="server" module="Settings" urlPattern="/root/server\.htm"/>
+</app-routes>
