@@ -84,7 +84,7 @@ class VirtualMoneyFormValidator extends AbstractFormValidator {
     			    $debts = $this->gradeMemberDAOManager->getOperations($money->getOffice()->getId(), null, false);
     			    
     			    foreach ($debts as $d) {//calcul de la dette
-    			        if ($money->getAmount() > $d->getMembership()) {
+    			        if ($money->getAmount() >= $d->getMembership()) {
     			            $money->addDebt($d);//on classe l'operation
     			            $money->setAmount($money->getAmount()-$d->getMembership());//on recalcule le montant
     			        }else{
