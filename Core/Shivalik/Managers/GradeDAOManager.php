@@ -57,7 +57,7 @@ abstract class GradeDAOManager extends DefaultDAOInterface
      * @param int $id
      * @return bool
      */
-    public function checkName (string $name, ?int $id = null) : bool {
+    public function checkByName (string $name, ?int $id = null) : bool {
         return $this->columnValueExist('name', $name, $id);
     }
     
@@ -66,7 +66,7 @@ abstract class GradeDAOManager extends DefaultDAOInterface
      * @param int $id
      * @return bool
      */
-    public function checkPercentage (float $percentage, ?int $id = null) : bool {
+    public function checkByPercentage (float $percentage, ?int $id = null) : bool {
         return $this->columnValueExist('percentage', $percentage, $id);
     }
     
@@ -96,14 +96,14 @@ abstract class GradeDAOManager extends DefaultDAOInterface
      * @return \Core\Shivalik\Entities\Grade[]
      */
     public function findUpTo (int $id) : array {        
-        $current = $this->getForId($id);
+        $current = $this->findById($id);
         
-        if (!$this->upExist($id)) {
+        if (!$this->checkUpTo($id)) {
             throw new DAOException("no packet greater than '{$current->getName()}' paket");
         }
         
         $up = array();
-        $all = $this->getAll();
+        $all = $this->findAll();
         
         foreach ($all as $grade) {
             if ($current->getAmount() < $grade->getAmount()) {

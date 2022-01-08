@@ -2,20 +2,21 @@
 
 namespace Core\Shivalik\Validators;
 
-use Library\AbstractFormValidator;
-use Library\IllegalFormValueException;
-use Library\DAOException;
-use Core\Shivalik\Managers\SizeDAOManager;
-use Core\Shivalik\Managers\OfficeSizeDAOManager;
-use Core\Shivalik\Managers\OfficeDAOManager;
 use Core\Shivalik\Entities\OfficeSize;
+use Core\Shivalik\Managers\OfficeDAOManager;
+use Core\Shivalik\Managers\OfficeSizeDAOManager;
+use Core\Shivalik\Managers\SizeDAOManager;
+use PHPBackend\DAOException;
+use PHPBackend\Request;
+use PHPBackend\Validator\DefaultFormValidator;
+use PHPBackend\Validator\IllegalFormValueException;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-class OfficeSizeFormValidator extends AbstractFormValidator {
+class OfficeSizeFormValidator extends DefaultFormValidator {
 	
 	const FIELD_OFFICE = 'office';
 	const FIELD_SIZE = 'size';
@@ -46,7 +47,7 @@ class OfficeSizeFormValidator extends AbstractFormValidator {
 		}
 		
 		try {
-			if (!$this->sizeDAOManager->idExist($size)) {
+			if (!$this->sizeDAOManager->checkById($size)) {
 				throw new IllegalFormValueException("unknown reference in the system");
 			}
 		} catch (DAOException $e) {
@@ -69,9 +70,9 @@ class OfficeSizeFormValidator extends AbstractFormValidator {
 	
 	/**
 	 * {@inheritDoc}
-	 * @see \Library\AbstractFormValidator::createAfterValidation()
+	 * @see \PHPBackend\Validator\FormValidator::createAfterValidation()
 	 */
-	public function createAfterValidation(\Library\HTTPRequest $request) {
+	public function createAfterValidation(Request $request) {
 		$os = new OfficeSize();
 		
 		$size = $request->getDataPOST(self::FIELD_SIZE);
@@ -102,43 +103,15 @@ class OfficeSizeFormValidator extends AbstractFormValidator {
 		
 		return $os;
 	}
-
-	/**
-	 * {@inheritDoc}
-	 * @see \Library\AbstractFormValidator::updateAfterValidation()
-	 */
-	public function updateAfterValidation(\Library\HTTPRequest $request) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	/**
-	 * {@inheritDoc}
-	 * @see \Library\AbstractFormValidator::deleteAfterValidation()
-	 */
-	public function deleteAfterValidation(\Library\HTTPRequest $request) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @see \Library\AbstractFormValidator::recycleAfterValidation()
-	 */
-	public function recycleAfterValidation(\Library\HTTPRequest $request) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @see \Library\AbstractFormValidator::removeAfterValidation()
-	 */
-	public function removeAfterValidation(\Library\HTTPRequest $request) {
-		// TODO Auto-generated method stub
-		
-	}
+	
+    /**
+     * {@inheritDoc}
+     * @see \PHPBackend\Validator\FormValidator::updateAfterValidation()
+     */
+    public function updateAfterValidation(\PHPBackend\Request $request)
+    {
+        
+    }
 
 
 }

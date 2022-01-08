@@ -18,7 +18,7 @@ abstract class GenerationDAOManager extends DefaultDAOInterface
      * @param int $id
      * @return bool
      */
-    public function nameExist (string $name, int $id =-1) : bool {
+    public function checkByName (string $name, ?int $id = null) : bool {
         return $this->columnValueExist('name', $name, $id);
     }
     
@@ -28,7 +28,7 @@ abstract class GenerationDAOManager extends DefaultDAOInterface
      * @param int $id
      * @return bool
      */
-    public function abreviationExist (string $abbreviation, int $id =-1) : bool {
+    public function checkByAbreviation(string $abbreviation, ?int $id = null) : bool {
         return $this->columnValueExist('abbreviation', $abbreviation, $id);
     }
     
@@ -38,7 +38,7 @@ abstract class GenerationDAOManager extends DefaultDAOInterface
      * @param int $id
      * @return bool
      */
-    public function numberExist (int $number, int $id =-1) : bool {
+    public function checkByNumber (int $number, ?int $id = null) : bool {
         return $this->columnValueExist('number', $number, $id);
     }
     

@@ -1,14 +1,15 @@
 <?php
 namespace Core\Shivalik\Validators;
 
-use Library\IllegalFormValueException;
 use Applications\Member\Modules\Account\AccountController;
-use Library\DAOException;
-use Core\Shivalik\Managers\OfficeDAOManager;
-use Core\Shivalik\Managers\WithdrawalDAOManager;
+use Core\Shivalik\Entities\Account;
 use Core\Shivalik\Entities\Member;
 use Core\Shivalik\Entities\Withdrawal;
-use Core\Shivalik\Entities\Account;
+use Core\Shivalik\Managers\OfficeDAOManager;
+use Core\Shivalik\Managers\WithdrawalDAOManager;
+use PHPBackend\DAOException;
+use PHPBackend\Request;
+use PHPBackend\Validator\IllegalFormValueException;
 
 /**
  *
@@ -45,7 +46,7 @@ class WithdrawalFormValidator extends AbstractOperationFormValidator
 //         }
         
         try {
-            if (!$this->officeDAOManager->idExist(intval($office))) {
+            if (!$this->officeDAOManager->checkById(intval($office, 10))) {
                 throw new IllegalFormValueException("office unknown in the system");
             }
         } catch (DAOException $e) {
@@ -132,10 +133,10 @@ class WithdrawalFormValidator extends AbstractOperationFormValidator
     
     /**
      * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::createAfterValidation()
+     * @see \PHPBackend\Validator\FormValidator::createAfterValidation()
      * @return Withdrawal
      */
-    public function createAfterValidation(\Library\HTTPRequest $request)
+    public function createAfterValidation(Request $request)
     {
         $withdrawal = new Withdrawal();
         $amount = $request->getDataPOST(self::FIELD_AMOUNT);
@@ -173,39 +174,9 @@ class WithdrawalFormValidator extends AbstractOperationFormValidator
 
     /**
      * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::deleteAfterValidation()
+     * @see \PHPBackend\Validator\FormValidator::updateAfterValidation()
      */
-    public function deleteAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::recycleAfterValidation()
-     */
-    public function recycleAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::removeAfterValidation()
-     */
-    public function removeAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::updateAfterValidation()
-     */
-    public function updateAfterValidation(\Library\HTTPRequest $request)
+    public function updateAfterValidation(Request $request)
     {
         $withdrawal = new Withdrawal();
         $office = $request->getDataPOST(self::FIELD_OFFICE);
@@ -228,10 +199,10 @@ class WithdrawalFormValidator extends AbstractOperationFormValidator
     }
     
     /**
-     * @param \Library\HTTPRequest $request
+     * @param Request $request
      * @return Withdrawal
      */
-    public function redirectAfterValidation(\Library\HTTPRequest $request)
+    public function redirectAfterValidation(Request $request)
     {
         $withdrawal = new Withdrawal();
         $office = $request->getDataPOST(self::FIELD_OFFICE);

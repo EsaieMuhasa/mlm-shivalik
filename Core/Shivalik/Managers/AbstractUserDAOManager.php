@@ -67,7 +67,7 @@ abstract class AbstractUserDAOManager extends DefaultDAOInterface
      * @param int $id
      * @return bool
      */
-    public function checkByMail (string $email, ?int $id = null) : bool {
+    public function checkByEmail (string $email, ?int $id = null) : bool {
         return $this->columnValueExist('email', $email, $id);
     }
     

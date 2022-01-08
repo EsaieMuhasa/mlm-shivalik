@@ -1,20 +1,21 @@
 <?php
 namespace Core\Shivalik\Validators;
 
-use Library\AbstractFormValidator;
-use Library\IllegalFormValueException;
-use Library\DAOException;
-use Library\HTTPRequest;
-use Core\Shivalik\Managers\LocalisationDAOManager;
-use Core\Shivalik\Managers\CountryDAOManager;
 use Core\Shivalik\Entities\Localisation;
+use Core\Shivalik\Managers\CountryDAOManager;
+use Core\Shivalik\Managers\LocalisationDAOManager;
+use PHPBackend\DAOException;
+use PHPBackend\Request;
+use PHPBackend\Http\HTTPRequest;
+use PHPBackend\Validator\DefaultFormValidator;
+use PHPBackend\Validator\IllegalFormValueException;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-class LocalisationFormValidator extends AbstractFormValidator
+class LocalisationFormValidator extends DefaultFormValidator
 {
     
     const FIELD_COUNTRY = 'country';
@@ -39,7 +40,7 @@ class LocalisationFormValidator extends AbstractFormValidator
         }
         
         try {
-            if (!$this->countryDAOManager->idExist(intval($country, 10))) {
+            if (!$this->countryDAOManager->checkById(intval($country, 10))) {
                 throw new IllegalFormValueException("the country you have selected is unknown in the system");
             }
         } catch (DAOException $e) {
@@ -90,9 +91,9 @@ class LocalisationFormValidator extends AbstractFormValidator
     
     /**
      * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::createAfterValidation()
+     * @see \PHPBackend\Validator\FormValidator::createAfterValidation()
      */
-    public function createAfterValidation(\Library\HTTPRequest $request)
+    public function createAfterValidation(Request $request)
     {
         $localisation = $this->processingLocalisation($request);
         
@@ -112,39 +113,9 @@ class LocalisationFormValidator extends AbstractFormValidator
 
     /**
      * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::deleteAfterValidation()
+     * @see \PHPBackend\Validator\FormValidator::updateAfterValidation()
      */
-    public function deleteAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::recycleAfterValidation()
-     */
-    public function recycleAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::removeAfterValidation()
-     */
-    public function removeAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::updateAfterValidation()
-     */
-    public function updateAfterValidation(\Library\HTTPRequest $request)
+    public function updateAfterValidation(Request $request)
     {
         $localisation = $this->processingLocalisation($request);
         

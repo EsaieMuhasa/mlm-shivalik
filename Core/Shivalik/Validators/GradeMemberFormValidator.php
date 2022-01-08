@@ -1,22 +1,23 @@
 <?php
 namespace Core\Shivalik\Validators;
 
-use Library\AbstractFormValidator;
-use Library\IllegalFormValueException;
-use Library\DAOException;
-use Library\HTTPRequest;
-use Core\Shivalik\Managers\GradeMemberDAOManager;
-use Core\Shivalik\Managers\MemberDAOManager;
-use Core\Shivalik\Managers\GradeDAOManager;
 use Core\Shivalik\Entities\GradeMember;
 use Core\Shivalik\Entities\Member;
+use Core\Shivalik\Managers\GradeDAOManager;
+use Core\Shivalik\Managers\GradeMemberDAOManager;
+use Core\Shivalik\Managers\MemberDAOManager;
+use PHPBackend\DAOException;
+use PHPBackend\Request;
+use PHPBackend\Http\HTTPRequest;
+use PHPBackend\Validator\DefaultFormValidator;
+use PHPBackend\Validator\IllegalFormValueException;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-class GradeMemberFormValidator extends AbstractFormValidator
+class GradeMemberFormValidator extends DefaultFormValidator
 {
     const FIELD_GRADE = 'grade';
     const FIELD_MEMBER = 'member';
@@ -53,14 +54,14 @@ class GradeMemberFormValidator extends AbstractFormValidator
     
     /**
      * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::validationId()
+     * @see \PHPBackend\Validator\DefaultFormValidator::validationId()
      */
     protected function validationId($id): void
     {
         parent::validationId($id);
         
         try {
-            if (!$this->gradeMemberDAOManager->idExist(intval($id))) {
+            if (!$this->gradeMemberDAOManager->checkById(intval($id, 10))) {
                 throw new DAOException("unknown user rank in the system");
             }
         } catch (DAOException $e) {
@@ -73,6 +74,14 @@ class GradeMemberFormValidator extends AbstractFormValidator
             throw new IllegalFormValueException("the reference of the member concerned is mandatory");
         }elseif (!preg_match(self::RGX_INT_POSITIF, $member)) {
             throw new IllegalFormValueException("member reference must be a positive numeric value");
+        }
+        
+        try {
+            if (!$this->memberDAOManager->checkById(intval($member, 10))) {
+                throw new IllegalFormValueException("the referemce of member is invalid");
+            }
+        } catch (DAOException $e) {
+            throw new IllegalFormValueException($e->getMessage(), $e->getCode(), $e);
         }
     }
     
@@ -152,10 +161,10 @@ class GradeMemberFormValidator extends AbstractFormValidator
      * -la validation temporel de la localisation du membre
      * -et en fin le grade meme soliciter par le membre
      * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::createAfterValidation()
+     * @see \PHPBackend\Validator\FormValidator::createAfterValidation()
      * @return GradeMember
      */
-    public function createAfterValidation(\Library\HTTPRequest $request)
+    public function createAfterValidation(Request $request)
     {
         $gm = new GradeMember();
         $grade = $request->getDataPOST(self::FIELD_GRADE);
@@ -181,7 +190,7 @@ class GradeMemberFormValidator extends AbstractFormValidator
             $gm->getMember()->setAdmin($request->getAttribute(self::FIELD_OFFICE_ADMIN));
             $gm->getMember()->setOffice($gm->getMember()->getAdmin()->getOffice());
             $gm->setOffice($gm->getMember()->getAdmin()->getOffice());
-            $gm->setGrade($this->gradeDAOManager->getForId($gm->getGrade()->getId()));
+            $gm->setGrade($this->gradeDAOManager->findById($gm->getGrade()->getId()));
             $this->processingProduct($gm, $gm->getGrade()->getAmount()-30);
             $this->processingMembership($gm, 20, 10);
             
@@ -215,10 +224,10 @@ class GradeMemberFormValidator extends AbstractFormValidator
     
     /**
      * to upgrage the status of member
-     * @param \Library\HTTPRequest $request
+     * @param Request $request
      * @return GradeMember
      */
-    public function upgradeAfterValidation (\Library\HTTPRequest $request) : GradeMember{
+    public function upgradeAfterValidation (Request $request) : GradeMember{
         $gm = new GradeMember();
         $gradeId = $request->getDataPOST(self::FIELD_GRADE);
         $memberId = $request->getAttribute(self::FIELD_MEMBER);
@@ -231,10 +240,10 @@ class GradeMemberFormValidator extends AbstractFormValidator
             $gm->getMember()->setOffice($gm->getMember()->getAdmin()->getOffice());
             try {
                 
-                $member = $this->memberDAOManager->getForId(intval($memberId, 10));
+                $member = $this->memberDAOManager->findById(intval($memberId, 10));
                 $old = $this->gradeMemberDAOManager->getCurrent($member->getId());
                 
-                $require = $this->gradeDAOManager->getForId($gradeId);
+                $require = $this->gradeDAOManager->findById($gradeId);
                 
                 $product = $require->getAmount() - $old->getGrade()->getAmount();
                 
@@ -271,42 +280,12 @@ class GradeMemberFormValidator extends AbstractFormValidator
         $this->result = $this->hasError()? "failed to upgrade account packages" :"account package upgrade success";
         return $gm;
     }
-
     /**
      * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::deleteAfterValidation()
+     * @see \PHPBackend\Validator\FormValidator::updateAfterValidation()
+     * @return GradeMember
      */
-    public function deleteAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::recycleAfterValidation()
-     */
-    public function recycleAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::removeAfterValidation()
-     */
-    public function removeAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::updateAfterValidation()
-     */
-    public function updateAfterValidation(\Library\HTTPRequest $request)
+    public function updateAfterValidation(Request $request)
     {
         $gm = new GradeMember();
         $id = $request->getDataGET(self::CHAMP_ID);
@@ -346,7 +325,7 @@ class GradeMemberFormValidator extends AbstractFormValidator
         
         if (!$this->hasError()) {
             try {
-                $inDatabase = $this->gradeMemberDAOManager->getForId(intval($id), 10);
+                $inDatabase = $this->gradeMemberDAOManager->findById(intval($id), 10);
                 $inDatabase->setInitDate(new \DateTime());
                 $this->gradeMemberDAOManager->enable($inDatabase);
                 $gm = $inDatabase;

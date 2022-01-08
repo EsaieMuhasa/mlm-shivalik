@@ -265,7 +265,7 @@ class Member extends User implements TernaryNode
      * {@inheritDoc}
      * @see \PHPBackend\Image2D\Mlm\Ternary\TernaryNode::getLeftChild()
      */
-    public function getLeftChild()
+    public function getLeftChild() : ?TernaryNode
     {
         return $this->getChild(self::LEFT_FOOT);
     }
@@ -274,7 +274,7 @@ class Member extends User implements TernaryNode
      * {@inheritDoc}
      * @see \PHPBackend\Image2D\Mlm\Ternary\TernaryNode::getMiddleChild()
      */
-    public function getMiddleChild()
+    public function getMiddleChild() : ?TernaryNode
     {
         return $this->getChild(self::MIDDEL_FOOT);
     }
@@ -283,7 +283,7 @@ class Member extends User implements TernaryNode
      * {@inheritDoc}
      * @see \PHPBackend\Image2D\Mlm\Ternary\TernaryNode::getRightChild()
      */
-    public function getRightChild()
+    public function getRightChild() : ?TernaryNode
     {
         return $this->getChild(self::RIGHT_FOOT);
     }
@@ -328,7 +328,7 @@ class Member extends User implements TernaryNode
      * {@inheritDoc}
      * @see \PHPBackend\Image2D\Mlm\Node::getChild()
      */
-    public function getChild(int $foot)
+    public function getChild(int $foot) : ?Node
     {
         foreach ($this->getChilds() as $child) {
             if ($child->getFoot() == $foot) {

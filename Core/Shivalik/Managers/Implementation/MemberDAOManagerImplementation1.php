@@ -1,5 +1,5 @@
 <?php
-namespace Core\ShivalikImplementation;
+namespace Core\Shivalik\Managers\Implementation;
 
 
 use Core\Shivalik\Entities\Localisation;
@@ -162,7 +162,7 @@ class MemberDAOManagerImplementation1 extends MemberDAOManager
      * @see \PHPBackend\Dao\DAOInterface::update()
      * @param Member $entity
      */
-    public function update($entity, $id)
+    public function update($entity, $id) : void
     {
         UtilitaireSQL::update($this->getConnection(), $this->getTableName(), [
             'name' => $entity->getName(),

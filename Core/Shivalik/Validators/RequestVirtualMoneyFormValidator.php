@@ -2,21 +2,21 @@
 
 namespace Core\Shivalik\Validators;
 
-use Library\AbstractFormValidator;
-use Library\IllegalFormValueException;
-use Library\DAOException;
 use Applications\Member\MemberApplication;
+use Core\Shivalik\Entities\RequestVirtualMoney;
 use Core\Shivalik\Managers\RequestVirtualMoneyDAOManager;
 use Core\Shivalik\Managers\VirtualMoneyDAOManager;
-use Core\Shivalik\Entities\RequestVirtualMoney;
-use Core\Shivalik\Entities\Office;
+use PHPBackend\DAOException;
+use PHPBackend\Request;
+use PHPBackend\Validator\DefaultFormValidator;
+use PHPBackend\Validator\IllegalFormValueException;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-class RequestVirtualMoneyFormValidator extends AbstractFormValidator {
+class RequestVirtualMoneyFormValidator extends DefaultFormValidator {
 	const FIELD_AMOUNT = 'amount';
 	const FIELD_OFFICE = 'office';
 	
@@ -55,9 +55,9 @@ class RequestVirtualMoneyFormValidator extends AbstractFormValidator {
 	
 	/**
 	 * {@inheritDoc}
-	 * @see \Library\AbstractFormValidator::createAfterValidation()
+	 * @see \PHPBackend\Validator\FormValidator::createAfterValidation()
 	 */
-	public function createAfterValidation(\Library\HTTPRequest $request) {
+	public function createAfterValidation(Request $request) {
 		$rv = new RequestVirtualMoney();
 		$amount = $request->getDataPOST(self::FIELD_AMOUNT);
 		$password = $request->getDataPOST('password');
@@ -82,60 +82,9 @@ class RequestVirtualMoneyFormValidator extends AbstractFormValidator {
 
 	/**
 	 * {@inheritDoc}
-	 * @see \Library\AbstractFormValidator::removeAfterValidation()
+	 * @see \PHPBackend\Validator\FormValidator::updateAfterValidation()
 	 */
-	public function removeAfterValidation(\Library\HTTPRequest $request) {
-		$rv = new RequestVirtualMoney();
-		
-		$id = $request->getAttribute(self::CHAMP_ID);
-		/**
-		 * @var Office $office
-		 */
-		$office = $request->getAttribute(self::FIELD_OFFICE);
-		
-		$this->traitementId($rv, $id);
-		
-		if(!$this->hasError()) {
-			try {
-				$in = $this->requestVirtualMoneyDAOManager->getForId($id);
-				if ($this->virtualMoneyDAOManger->hasResponse($id) || $in->getOffice()->getId() != $office->getId()) {
-					$this->setMessage("Cannot perform this operation, because you no longer have the permission to do so");
-				}else {					
-					$this->requestVirtualMoneyDAOManager->remove($id);
-				}
-			} catch (DAOException $e) {
-				$this->setMessage($e->getMessage());
-			}
-		}
-		
-		$this->result =  $this->hasError()? "failed to delete query"  :  "successful deletion of the request";
-		
-		return $rv;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @see \Library\AbstractFormValidator::deleteAfterValidation()
-	 */
-	public function deleteAfterValidation(\Library\HTTPRequest $request) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @see \Library\AbstractFormValidator::recycleAfterValidation()
-	 */
-	public function recycleAfterValidation(\Library\HTTPRequest $request) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @see \Library\AbstractFormValidator::updateAfterValidation()
-	 */
-	public function updateAfterValidation(\Library\HTTPRequest $request) {
+	public function updateAfterValidation(Request $request) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -1,10 +1,11 @@
 <?php
 namespace Core\Shivalik\Validators;
 
-use Library\IllegalFormValueException;
-use Library\DAOException;
 use Core\Shivalik\Entities\OfficeAdmin;
 use Core\Shivalik\Entities\User;
+use PHPBackend\DAOException;
+use PHPBackend\Request;
+use PHPBackend\Validator\IllegalFormValueException;
 
 /**
  *
@@ -35,7 +36,7 @@ class OfficeAdminFormValidator extends UserFormValidator
      * {@inheritDoc}
      * @see \Core\Shivalik\Validators\UserFormValidator::validationEmail()
      */
-    protected function validationEmail($email, $id = -1): void
+    protected function validationEmail($email, $id = null): void
     {
         if ($email == null) {
             throw new IllegalFormValueException('user email is required');
@@ -62,10 +63,10 @@ class OfficeAdminFormValidator extends UserFormValidator
     
     /**
      * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::createAfterValidation()
+     * @see \PHPBackend\Validator\FormValidator::createAfterValidation()
      * @return OfficeAdmin
      */
-    public function createAfterValidation(\Library\HTTPRequest $request)
+    public function createAfterValidation(Request $request)
     {
         $user = new OfficeAdmin();
         $name = $request->getDataPOST(self::FIELD_NAME);
@@ -113,39 +114,9 @@ class OfficeAdminFormValidator extends UserFormValidator
 
     /**
      * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::deleteAfterValidation()
+     * @see \PHPBackend\Validator\FormValidator::updateAfterValidation()
      */
-    public function deleteAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::recycleAfterValidation()
-     */
-    public function recycleAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::removeAfterValidation()
-     */
-    public function removeAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::updateAfterValidation()
-     */
-    public function updateAfterValidation(\Library\HTTPRequest $request)
+    public function updateAfterValidation(Request $request)
     {
         // TODO Auto-generated method stub
         
@@ -155,7 +126,7 @@ class OfficeAdminFormValidator extends UserFormValidator
      * {@inheritDoc}
      * @see \Core\Shivalik\Validators\UserFormValidator::updatePasswordAfterValidation()
      */
-    public function updatePasswordAfterValidation(\Library\HTTPRequest $request): User {
+    public function updatePasswordAfterValidation(Request $request): User {
     	$user = new OfficeAdmin();
     	$id = intval($request->getAttribute(self::CHAMP_ID), 10);
     	$password = $request->getDataPOST(self::FIELD_PASSWORD);
@@ -181,7 +152,7 @@ class OfficeAdminFormValidator extends UserFormValidator
      * {@inheritDoc}
      * @see \Core\Shivalik\Validators\UserFormValidator::updatePhotoAfterValidation()
      */
-    public function updatePhotoAfterValidation(\Library\HTTPRequest $request): User {
+    public function updatePhotoAfterValidation(Request $request): User {
     	$member = new OfficeAdmin();
     	$photo = $request->getFile(self::FIELD_PHOTO);
     	

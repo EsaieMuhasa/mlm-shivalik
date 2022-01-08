@@ -2,7 +2,9 @@
 <!DOCTYPE app-routes SYSTEM "../../../Library/lib-dtd-conf.dtd" >
 <app-routes>
  	<route action="index" module="Dashboard" urlPattern="/admin/"/>
- 	
+ 	<route action="statistics" module="Dashboard" urlPattern="/admin/dashboard/statistics/"/>
+	<route action="chartPackets" module="Dashboard" urlPattern="/admin/dashboard/statistics/config-chart-packets\.json"/>
+	 	
  	<route action="index" module="Profil" urlPattern="/admin/profil/"/>
  	<route action="photo" module="Profil" urlPattern="/admin/profil/photo\.html"/>
  	<route action="password" module="Profil" urlPattern="/admin/profil/password\.html"/>

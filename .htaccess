@@ -11,8 +11,8 @@ RewriteRule ^favicon.icon$ logo.png [L]
 RewriteRule ^(member|office|root|admin)/(.*)$ Web/applications.php?subdomain=$1 [QSA,L]
 
 #protection des fichiers sources sensible
-RewriteCond %{REQUEST_URI} ^/(Applications|Library|dompdf|Entities|Errors|includes|Managers|Utilitaires|Validators)/.*
-RewriteRule ^(Applications|Library|dompdf|Entities|Errors|includes|Managers|Utilitaires|Validators)(.*)$ Web/applications.php [L]
+RewriteCond %{REQUEST_URI} ^/(Applications|PHPBackend|Core)/.*
+RewriteRule ^(Applications|PHPBackend|Core)(.*)$ Web/index.php [L]
 
 #pour tout ce qui n'est pas fichiers publique
 RewriteCond %{REQUEST_FILENAME} !-f

@@ -1,23 +1,24 @@
 <?php
 namespace Core\Shivalik\Validators;
 
-use Library\AbstractFormValidator;
-use Library\Config;
-use Library\File;
-use Library\IllegalFormValueException;
-use Library\Image2D\ImageResizing;
-use Library\Image2D\Image;
-use Library\DAOException;
+use Core\Shivalik\Entities\Grade;
 use Core\Shivalik\Managers\GenerationDAOManager;
 use Core\Shivalik\Managers\GradeDAOManager;
-use Core\Shivalik\Entities\Grade;
+use PHPBackend\DAOException;
+use PHPBackend\Request;
+use PHPBackend\File\UploadedFile;
+use PHPBackend\Image2D\Image;
+use PHPBackend\Image2D\ImageResizing;
+use PHPBackend\Validator\DefaultFormValidator;
+use PHPBackend\Validator\IllegalFormValueException;
+use React\Dns\Config\Config;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-class GradeFormValidator extends AbstractFormValidator
+class GradeFormValidator extends DefaultFormValidator
 {
     const FIELD_NAME = 'name';
     const FIELD_ICON = 'icon';
@@ -35,13 +36,13 @@ class GradeFormValidator extends AbstractFormValidator
      */
     private $gradeDAOManager;
     
-    private function validationName ($name, $id = -1) : void {
+    private function validationName ($name, $id = null) : void {
         if ($name == null) {
             throw new IllegalFormValueException("the name is required");
         }
         
         try {
-            if ($this->gradeDAOManager->nameExist($name, $id)) {
+            if ($this->gradeDAOManager->checkByName($name, $id)) {
                 throw new IllegalFormValueException("This name are used by oder grade");
             }
         } catch (DAOException $e) {
@@ -57,7 +58,7 @@ class GradeFormValidator extends AbstractFormValidator
         }
     }
     
-    private function validationIcon (File $icon) : void {
+    private function validationIcon (UploadedFile $icon) : void {
         if (!$icon->isFile()) {
             throw new IllegalFormValueException("the grade icon is mandatory");
         }
@@ -65,7 +66,7 @@ class GradeFormValidator extends AbstractFormValidator
         $this->validationImage($icon);
     }
     
-    private function validationPercentage ($percentage, $id = -1) : void {
+    private function validationPercentage ($percentage, $id = null) : void {
         if ($percentage == null) {
             throw new IllegalFormValueException("the profit percentage is obligatory");
         }elseif (!preg_match(self::RGX_NUMERIC_POSITIF, $percentage)) {
@@ -73,7 +74,7 @@ class GradeFormValidator extends AbstractFormValidator
         }
         
         try {
-            if ($this->gradeDAOManager->percentageExist($percentage, $id)) {
+            if ($this->gradeDAOManager->checkByPercentage($percentage, $id)) {
                 throw new IllegalFormValueException("This percentage are used by oder grade {$id}");
             }
         } catch (DAOException $e) {
@@ -83,7 +84,7 @@ class GradeFormValidator extends AbstractFormValidator
     
     private function validationMaxGeneration ($maxGeneration) : void {
         try {
-            if (!$this->generationDAOManager->idExist(intval($maxGeneration))) {
+            if (!$this->generationDAOManager->checkById(intval($maxGeneration, 10))) {
                 throw new IllegalFormValueException("generation unknown in the system");
             }
         } catch (DAOException $e) {
@@ -119,7 +120,7 @@ class GradeFormValidator extends AbstractFormValidator
         }
     }
     
-    private function processingIcon (Grade $grade, File $icon, bool $write = false) : void {
+    private function processingIcon (Grade $grade, UploadedFile $icon, bool $write = false) : void {
         try {
             $this->validationIcon($icon);
         } catch (IllegalFormValueException $e) {
@@ -131,7 +132,7 @@ class GradeFormValidator extends AbstractFormValidator
             $reelName = self::getAbsolutDataDirName($icon->getApplication()->getConfig(), $grade->getId()).DIRECTORY_SEPARATOR.$grade->getId().'-'.$time.'-reel.'.$icon->getExtension();
             $reelFullName = self::getDataDirName($icon->getApplication()->getConfig(), $grade->getId()).DIRECTORY_SEPARATOR.$grade->getId().'-'.$time.'-reel.'.$icon->getExtension();
             $iconName = self::getDataDirName($icon->getApplication()->getConfig(), $grade->getId()).DIRECTORY_SEPARATOR.$grade->getId().'-'.$time.'.'.$icon->getExtension();
-            $icon->getApplication()->writeFile($icon, $reelFullName);
+            $icon->getApplication()->writeUploadedFile($icon, $reelFullName);
             ImageResizing::profiling(new Image($reelName));
             $grade->setIcon($iconName);
         }
@@ -148,13 +149,14 @@ class GradeFormValidator extends AbstractFormValidator
 
     /**
      * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::createAfterValidation()
+     * @see \PHPBackend\Validator\FormValidator::createAfterValidation()
+     * @return Grade
      */
-    public function createAfterValidation(\Library\HTTPRequest $request)
+    public function createAfterValidation(Request $request)
     {
          $grade = new Grade();
          $name = $request->getDataPOST(self::FIELD_NAME);
-         $icon = $request->getFile(self::FIELD_ICON);
+         $icon = $request->getUploadedFile(self::FIELD_ICON);
          $percentage = $request->getDataPOST(self::FIELD_PERCENTAGE);
          $amount = $request->getDataPOST(self::FIELD_AMOUNT);
          $maxGeneration = $request->getDataPOST(self::FIELD_MAX_GENERATION);
@@ -182,44 +184,14 @@ class GradeFormValidator extends AbstractFormValidator
 
     /**
      * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::deleteAfterValidation()
+     * @see \PHPBackend\Validator\FormValidator::updateAfterValidation()
      */
-    public function deleteAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::recycleAfterValidation()
-     */
-    public function recycleAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::removeAfterValidation()
-     */
-    public function removeAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::updateAfterValidation()
-     */
-    public function updateAfterValidation(\Library\HTTPRequest $request)
+    public function updateAfterValidation(Request $request)
     {
         $grade = new Grade();
         $id = $request->getDataGET(self::CHAMP_ID);
         $name = $request->getDataPOST(self::FIELD_NAME);
-        $icon = $request->getFile(self::FIELD_ICON);
+        $icon = $request->getUploadedFile(self::FIELD_ICON);
         $percentage = $request->getDataPOST(self::FIELD_PERCENTAGE);
         $amount = $request->getDataPOST(self::FIELD_AMOUNT);
         $maxGeneration = $request->getDataPOST(self::FIELD_MAX_GENERATION);
@@ -227,7 +199,7 @@ class GradeFormValidator extends AbstractFormValidator
         
         $this->traitementId($grade, $id);
         $this->processingName($grade, $name, $id);
-        if ($icon->isFile()) {
+        if ($icon->isUploadedFile()) {
             $this->processingIcon($grade, $icon);
         }
         $this->processingAmount($grade, $amount, $id);
@@ -237,7 +209,7 @@ class GradeFormValidator extends AbstractFormValidator
         if (!$this->hasError()) {
             try {
                 $this->gradeDAOManager->update($grade, $grade->getId());
-                if ($icon->isFile()){
+                if ($icon->isUploadedFile()){
                     $this->processingIcon($grade, $icon, true);
                     $this->gradeDAOManager->updateIcon($grade->getId(), $grade->getIcon());
                 }

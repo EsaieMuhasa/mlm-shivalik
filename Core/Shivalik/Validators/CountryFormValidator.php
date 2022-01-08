@@ -1,18 +1,19 @@
 <?php
 namespace Core\Shivalik\Validators;
 
-use Library\AbstractFormValidator;
-use Library\IllegalFormValueException;
-use Library\DAOException;
-use Core\Shivalik\Managers\CountryDAOManager;
 use Core\Shivalik\Entities\Country;
+use Core\Shivalik\Managers\CountryDAOManager;
+use PHPBackend\DAOException;
+use PHPBackend\Request;
+use PHPBackend\Validator\DefaultFormValidator;
+use PHPBackend\Validator\IllegalFormValueException;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-class CountryFormValidator extends AbstractFormValidator
+class CountryFormValidator extends DefaultFormValidator
 {
     const FIELD_NAME = 'name';
     const FIELD_ABBREVIATION = 'abbreviation';
@@ -22,13 +23,13 @@ class CountryFormValidator extends AbstractFormValidator
      */
     private $countryDAOManager;
     
-    private function validationName ($name, $id = -1) : void {
+    private function validationName ($name, $id = null) : void {
         if ($name == null) {
             throw new IllegalFormValueException("country name is required");
         }
         
         try {
-            if ($this->countryDAOManager->nameExist($name, $id)) {
+            if ($this->countryDAOManager->checkByName($name, $id)) {
                 throw new IllegalFormValueException("This name is used by oder country");
             }
         } catch (DAOException $e) {
@@ -36,13 +37,13 @@ class CountryFormValidator extends AbstractFormValidator
         }
     }
     
-    private function validationAbbreviation ($abbreviation, $id = -1) : void {
+    private function validationAbbreviation ($abbreviation, $id = null) : void {
         if ($abbreviation == null) {
             throw new IllegalFormValueException("country abbreviation is required");
         }
         
         try {
-            if ($this->countryDAOManager->abreviationExist($abbreviation, $id)) {
+            if ($this->countryDAOManager->checkByAbreviation($abbreviation, $id)) {
                 throw new IllegalFormValueException("This abbreviation are used by oder country");
             }
         } catch (DAOException $e) {
@@ -70,9 +71,9 @@ class CountryFormValidator extends AbstractFormValidator
     
     /**
      * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::createAfterValidation()
+     * @see \PHPBackend\Validator\FormValidator::createAfterValidation()
      */
-    public function createAfterValidation(\Library\HTTPRequest $request)
+    public function createAfterValidation(Request $request)
     {
         $country = new Country();
         $name = $request->getDataPOST(self::FIELD_NAME);
@@ -97,39 +98,9 @@ class CountryFormValidator extends AbstractFormValidator
 
     /**
      * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::deleteAfterValidation()
+     * @see \PHPBackend\Validator\FormValidator::updateAfterValidation()
      */
-    public function deleteAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::recycleAfterValidation()
-     */
-    public function recycleAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::removeAfterValidation()
-     */
-    public function removeAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::updateAfterValidation()
-     */
-    public function updateAfterValidation(\Library\HTTPRequest $request)
+    public function updateAfterValidation(Request $request)
     {
         $country = new Country();
         $id = intval($request->getDataGET('id'), 10);

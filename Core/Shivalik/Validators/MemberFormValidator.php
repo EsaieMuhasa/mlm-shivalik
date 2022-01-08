@@ -1,14 +1,15 @@
 <?php
 namespace Core\Shivalik\Validators;
 
-use Library\Config\VarList;
-use Library\IllegalFormValueException;
-use Library\DAOException;
-use Library\HTTPRequest;
-use Library\File;
 use Applications\Member\MemberApplication;
 use Core\Shivalik\Entities\Member;
 use Core\Shivalik\Entities\User;
+use PHPBackend\DAOException;
+use PHPBackend\Request;
+use PHPBackend\Config\VarList;
+use PHPBackend\File\UploadedFile;
+use PHPBackend\Http\HTTPRequest;
+use PHPBackend\Validator\IllegalFormValueException;
 
 /**
  *
@@ -25,14 +26,14 @@ class MemberFormValidator extends UserFormValidator
     
     /**
      * la photo encours de traitement
-     * @var File
+     * @var UploadedFile
      */
     private $processPhoto;
     
     
     private function validationParent ($parent) : void {
         try {
-            if ($parent!=null && !$this->memberDAOManager->matriculeExist($parent)) {
+            if ($parent!=null && !$this->memberDAOManager->checkByMatricule($parent)) {
                 throw new IllegalFormValueException("unknown ID in system");
             }
         } catch (DAOException $e) {
@@ -42,7 +43,7 @@ class MemberFormValidator extends UserFormValidator
     
     private function validationSponsor ($sponsor) : void {
         try {
-            if ($sponsor!=null && !$this->memberDAOManager->matriculeExist($sponsor)) {
+            if ($sponsor!=null && !$this->memberDAOManager->checkByMatricule($sponsor)) {
                 throw new IllegalFormValueException("unknown ID in system");
             }
         } catch (DAOException $e) {
@@ -59,11 +60,11 @@ class MemberFormValidator extends UserFormValidator
         parent::validationPseudo($pseudo, $onConnection, $id);
         try {    
             if ($onConnection) {
-                if (!$this->memberDAOManager->pseudoExist($pseudo)) {
+                if (!$this->memberDAOManager->checkByPseudo($pseudo)) {
                     throw new IllegalFormValueException("unknown user");
                 }
             } else {                
-                if ($this->memberDAOManager->pseudoExist($pseudo, $id)) {
+                if ($this->memberDAOManager->checkByPseudo($pseudo, $id)) {
                     throw new IllegalFormValueException("username are used");
                 }
             }
@@ -92,7 +93,7 @@ class MemberFormValidator extends UserFormValidator
         try {
             $this->validationParent($parent);
             if ($parent != null) {
-                $member->setParent($this->memberDAOManager->getForMatricule($parent));
+                $member->setParent($this->memberDAOManager->findByMatricule($parent));
             }
         } catch (IllegalFormValueException $e) {
             $this->addError(self::FIELD_PARENT, $e->getMessage());
@@ -104,7 +105,7 @@ class MemberFormValidator extends UserFormValidator
         try {
             $this->validationSponsor($sponsor);
             if ($sponsor!=null) {
-                $member->setSponsor($this->memberDAOManager->getForMatricule($sponsor));
+                $member->setSponsor($this->memberDAOManager->findByMatricule($sponsor));
             }
         } catch (IllegalFormValueException $e) {
             $this->addError(self::FIELD_SPONSOR, $e->getMessage());
@@ -119,8 +120,8 @@ class MemberFormValidator extends UserFormValidator
                 $parent = $member->getParent();
                 
                 foreach ($foots->getItems() as $item) {
-                    if (!$this->memberDAOManager->hasChild($parent->getId(), intval($item->getValue()))) {
-                        $foot = intval($item->getValue());
+                    if (!$this->memberDAOManager->checkChild($parent->getId(), intval($item->getValue()))) {
+                        $foot = intval($item->getValue(), 10);
                     }
                 }
                 
@@ -140,9 +141,9 @@ class MemberFormValidator extends UserFormValidator
     }
     
     /**
-     * @return \Library\File
+     * @return UploadedFile|NULL
      */
-    public function getProcessPhoto() :?File
+    public function getProcessPhoto() :?UploadedFile
     {
         return $this->processPhoto;
     }
@@ -165,7 +166,7 @@ class MemberFormValidator extends UserFormValidator
         $parent = $request->getDataPOST(self::FIELD_PARENT);
         $sponsor = $request->getDataPOST(self::FIELD_SPONSOR);
         
-        $photo = $request->getFile(self::FIELD_PHOTO);
+        $photo = $request->getUploadedFile(self::FIELD_PHOTO);
         $user->setKind($request->getDataPOST(self::FIELD_KIND));
         
         $this->processingName($user, $name);
@@ -175,7 +176,7 @@ class MemberFormValidator extends UserFormValidator
         $this->processingTelephone($user, $telephone);
         $this->processingPassword($user, $password, $confirmation, false);
         $this->processingPseudo($user, $pseudo);
-        if ($photo->isFile()) {
+        if ($photo->isUploadedFile()) {
 	        $this->processingPhoto($user, $photo);
         }
         $this->processingParent($user, $parent);
@@ -214,7 +215,7 @@ class MemberFormValidator extends UserFormValidator
      * {@inheritDoc}
      * @see \Core\Shivalik\Validators\UserFormValidator::updatePasswordAfterValidation()
      */
-    public function updatePasswordAfterValidation(\Library\HTTPRequest $request): User
+    public function updatePasswordAfterValidation(Request $request): User
     {
         $member = new Member();
         $old = $request->getDataPOST('old');
@@ -249,12 +250,12 @@ class MemberFormValidator extends UserFormValidator
      * {@inheritDoc}
      * @see \Core\Shivalik\Validators\UserFormValidator::updatePhotoAfterValidation()
      */
-    public function updatePhotoAfterValidation(\Library\HTTPRequest $request): User
+    public function updatePhotoAfterValidation(Request $request): User
     {
         $member = new Member();
-        $photo = $request->getFile(self::FIELD_PHOTO);
+        $photo = $request->getUploadedFile(self::FIELD_PHOTO);
         
-        if (!$photo->isFile()) {
+        if (!$photo->isUploadedFile()) {
             $this->addError(self::FIELD_PHOTO, "make sure you have selected a photo on your terminal");
         }
         
@@ -278,12 +279,12 @@ class MemberFormValidator extends UserFormValidator
 
     /**
      * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::createAfterValidation()
+     * @see \PHPBackend\Validator\FormValidator::createAfterValidation()
      */
-    public function createAfterValidation(\Library\HTTPRequest $request)
+    public function createAfterValidation(Request $request)
     {
         $user = $this->processingMember($request);
-        $photo = $request->getFile(self::FIELD_PHOTO);
+        $photo = $request->getUploadedFile(self::FIELD_PHOTO);
         $this->processingPhoto($user, $photo);
        
         if (!$this->hasError()) {
@@ -299,41 +300,12 @@ class MemberFormValidator extends UserFormValidator
     }
 
     /**
+     * 
      * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::deleteAfterValidation()
-     */
-    public function deleteAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::recycleAfterValidation()
-     */
-    public function recycleAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::removeAfterValidation()
-     */
-    public function removeAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::updateAfterValidation()
+     * @see \PHPBackend\Validator\FormValidator::updateAfterValidation()
      * @return Member
      */
-    public function updateAfterValidation(\Library\HTTPRequest $request)
+    public function updateAfterValidation(Request $request)
     {
     	$user = new Member();
     	$id = $request->getAttribute(self::CHAMP_ID);

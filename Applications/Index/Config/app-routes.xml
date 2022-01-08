@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE app-routes SYSTEM "../../../Library/lib-dtd-conf.dtd" >
+<!DOCTYPE app-routes SYSTEM "../../../PHPBackend/config.dtd" >
 <app-routes>
- 	<route action="index" module="News" urlPattern="/"/>
- 	<route action="login" module="Authentification" urlPattern="/login\.html"/>
- 	<route action="logout" module="Authentification" urlPattern="/logout\.html"/>
+	
+	<module name="News">
+	 	<route action="index" urlPattern="/"/>
+	</module>
+	
+	<module name="Authentification">
+	 	<route action="login" urlPattern="/login\.html"/>
+	 	<route action="logout" urlPattern="/logout\.html"/>
+	</module>
+	
 </app-routes>

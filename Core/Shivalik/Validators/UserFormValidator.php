@@ -1,25 +1,25 @@
 <?php
 namespace Core\Shivalik\Validators;
 
-use Library\AbstractFormValidator;
-use Library\IllegalFormValueException;
-use Library\File;
-use Library\Config;
-use Library\Image2D\ImageResizing;
-use Library\Image2D\Image;
-use Library\HTTPRequest;
-use Library\DAOException;
+use Core\Shivalik\Entities\Member;
+use Core\Shivalik\Entities\User;
 use Core\Shivalik\Managers\MemberDAOManager;
 use Core\Shivalik\Managers\OfficeAdminDAOManager;
-use Library\User;
-use Core\Shivalik\Entities\Member;
+use PHPBackend\DAOException;
+use PHPBackend\File\UploadedFile;
+use PHPBackend\Http\HTTPRequest;
+use PHPBackend\Image2D\Image;
+use PHPBackend\Image2D\ImageResizing;
+use PHPBackend\Validator\DefaultFormValidator;
+use PHPBackend\Validator\IllegalFormValueException;
+use React\Dns\Config\Config;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-abstract class UserFormValidator extends AbstractFormValidator
+abstract class UserFormValidator extends DefaultFormValidator
 {
     const FIELD_NAME = 'name';
     const FIELD_POST_NAME = 'postName';
@@ -96,7 +96,7 @@ abstract class UserFormValidator extends AbstractFormValidator
         }
     }
     
-    protected function validationPhoto (File $photo) : void {
+    protected function validationPhoto (UploadedFile $photo) : void {
         if (!$photo->isFile()) {
             throw new IllegalFormValueException("select profile photo");
         }
@@ -173,7 +173,7 @@ abstract class UserFormValidator extends AbstractFormValidator
         $user->setPassword(sha1($password));
     }
     
-    public function processingPhoto (User $user, File $photo, bool $write=false) : void {
+    public function processingPhoto (User $user, UploadedFile $photo, bool $write=false) : void {
         try {
             $this->validationPhoto($photo);
         } catch (IllegalFormValueException $e) {
@@ -185,7 +185,7 @@ abstract class UserFormValidator extends AbstractFormValidator
             $reelName = self::getAbsolutDataDirName($photo->getApplication()->getConfig(), $user->getId()).DIRECTORY_SEPARATOR.$user->getId().'-'.$time.'-reel.'.$photo->getExtension();
             $reelFullName = self::getDataDirName($photo->getApplication()->getConfig(), $user->getId()).DIRECTORY_SEPARATOR.$user->getId().'-'.$time.'-reel.'.$photo->getExtension();
             $photoName = self::getDataDirName($photo->getApplication()->getConfig(), $user->getId()).DIRECTORY_SEPARATOR.$user->getId().'-'.$time.'.'.$photo->getExtension();
-            $photo->getApplication()->writeFile($photo, $reelFullName);
+            $photo->getApplication()->writeUploadedFile($photo, $reelFullName);
             ImageResizing::profiling(new Image($reelName));
             $user->setPhoto($photoName);
         }
@@ -223,10 +223,10 @@ abstract class UserFormValidator extends AbstractFormValidator
                  * @var User $u
                  */
                 $u = null;
-                if ($this->memberDAOManager->pseudoExist($pseudo)) {//est-ce un membre
-                    $u = $this->memberDAOManager->getForPseudo($pseudo, true);
-                }elseif ($this->officeAdminDAOManager->emailExist($pseudo)){//est-ce un administrateur d'un bureau
-                    $u = $this->officeAdminDAOManager->getForEmail($pseudo, true);
+                if ($this->memberDAOManager->checkByPseudo($pseudo)) {//est-ce un membre
+                    $u = $this->memberDAOManager->findByPseudo($pseudo, true);
+                }elseif ($this->officeAdminDAOManager->checkByEmail($pseudo)){//est-ce un administrateur d'un bureau
+                    $u = $this->officeAdminDAOManager->findByEmail($pseudo, true);
                 }else {
                     $this->addError(self::FIELD_PSEUDO, "unknown user in the system");
                 }

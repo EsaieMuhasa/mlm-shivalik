@@ -1,8 +1,2 @@
 <?php 
-
-use Applications\Index\IndexApplication;
-
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'Library'.DIRECTORY_SEPARATOR.'autoload.php';
-
-$app = new IndexApplication();
-$app->run();
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'PHPBackend'.DIRECTORY_SEPARATOR.'index.php';

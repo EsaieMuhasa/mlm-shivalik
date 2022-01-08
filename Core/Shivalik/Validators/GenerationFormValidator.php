@@ -1,18 +1,19 @@
 <?php
 namespace Core\Shivalik\Validators;
 
-use Library\AbstractFormValidator;
-use Library\IllegalFormValueException;
-use Library\DAOException;
-use Core\Shivalik\Managers\GenerationDAOManager;
 use Core\Shivalik\Entities\Generation;
+use Core\Shivalik\Managers\GenerationDAOManager;
+use PHPBackend\DAOException;
+use PHPBackend\Request;
+use PHPBackend\Validator\DefaultFormValidator;
+use PHPBackend\Validator\IllegalFormValueException;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-class GenerationFormValidator extends AbstractFormValidator
+class GenerationFormValidator extends DefaultFormValidator
 {
     const FIELD_NAME = 'name';
     const FIELD_ABBREVIATION = 'abbreviation';
@@ -24,13 +25,13 @@ class GenerationFormValidator extends AbstractFormValidator
      */
     private $generationDAOManager;
     
-    private function validationName ($name, $id = -1) : void {
+    private function validationName ($name, $id = null) : void {
         if ($name == null) {
             throw new IllegalFormValueException("generation name is required");
         }
         
         try {
-            if ($this->generationDAOManager->nameExist($name, $id)) {
+            if ($this->generationDAOManager->checkByName($name, $id)) {
                 throw new IllegalFormValueException("This name is used by oder generation");
             }
         } catch (DAOException $e) {
@@ -38,13 +39,13 @@ class GenerationFormValidator extends AbstractFormValidator
         }
     }
     
-    private function validationAbbreviation ($abbreviation, $id = -1) : void {
+    private function validationAbbreviation ($abbreviation, $id = null) : void {
         if ($abbreviation == null) {
             throw new IllegalFormValueException("generation abbreviation is required");
         }
         
         try {
-            if ($this->generationDAOManager->abreviationExist($abbreviation, $id)) {
+            if ($this->generationDAOManager->checkByAbreviation($abbreviation, $id)) {
                 throw new IllegalFormValueException("This abbreviation are used by oder generation");
             }
         } catch (DAOException $e) {
@@ -60,7 +61,7 @@ class GenerationFormValidator extends AbstractFormValidator
         }
         
         try {
-            if ($this->generationDAOManager->numberExist($number, $id)) {
+            if ($this->generationDAOManager->checkByNumber($number, $id)) {
                 throw new IllegalFormValueException("This number are used by oder generation");
             }
         } catch (DAOException $e) {
@@ -115,9 +116,10 @@ class GenerationFormValidator extends AbstractFormValidator
     
     /**
      * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::createAfterValidation()
+     * @see \PHPBackend\Validator\FormValidator::createAfterValidation()
+     * @return Generation
      */
-    public function createAfterValidation(\Library\HTTPRequest $request)
+    public function createAfterValidation(Request $request)
     {
         $generation =  new Generation();
         $name = $request->getDataPOST(self::FIELD_NAME);
@@ -146,39 +148,10 @@ class GenerationFormValidator extends AbstractFormValidator
 
     /**
      * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::deleteAfterValidation()
+     * @see \PHPBackend\Validator\FormValidator::updateAfterValidation()
+     * @return Generation
      */
-    public function deleteAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::recycleAfterValidation()
-     */
-    public function recycleAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::removeAfterValidation()
-     */
-    public function removeAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::updateAfterValidation()
-     */
-    public function updateAfterValidation(\Library\HTTPRequest $request)
+    public function updateAfterValidation(Request $request)
     {
         $generation =  new Generation();
         $id = $request->getDataGET(self::CHAMP_ID);

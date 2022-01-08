@@ -56,7 +56,7 @@ abstract class OfficeAdminDAOManager extends AbstractUserDAOManager
      * {@inheritDoc}
      * @see \PHPBackend\Dao\DefaultDAOInterface::findAll()
      */
-    public function findAll(?int $limit = null, int $offset = 0)
+    public function findAll(?int $limit = null, int $offset = 0) : array
     {
         $users = parent::findAll($limit, $offset);
         foreach ($users as $user){

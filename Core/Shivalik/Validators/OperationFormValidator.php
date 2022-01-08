@@ -1,16 +1,16 @@
 <?php
 namespace Core\Shivalik\Validators;
 
-use Library\AbstractFormValidator;
-use Library\IllegalFormValueException;
 use Core\Shivalik\Entities\Operation;
+use PHPBackend\Validator\DefaultFormValidator;
+use PHPBackend\Validator\IllegalFormValueException;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-abstract class OperationFormValidator extends AbstractFormValidator
+abstract class OperationFormValidator extends DefaultFormValidator
 {
     
     const FIELD_AMOUNT = 'amount';

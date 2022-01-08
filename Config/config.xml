@@ -1,41 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE config SYSTEM "../Library/lib-dtd-conf.dtd" >
+<!DOCTYPE config SYSTEM "../PHPbackend/config.dtd" >
 <config webData="Web/data" webLogger="Web/logger">
 	
 	<applications foldName="Applications">
-		<application name="Public"/>
-		<application name="Member" subDomains="member"/>
-		<application name="Office" subDomains="office"/>
-		<application name="Admin" subDomains="admin"/>
+		<application name="Index"/>
+		<application name="Member" urlPattern="/member/(.*)"/>
+		<application name="Office" urlPattern="/office/(.*)"/>
+		<application name="Admin" urlPattern="/admin/(.*)"/>
 	</applications>
-	
-	<dbconnections>
-		<connection user="root" name="first" dsn="mysql:host=localhost;dbname=shivalik_db1"/>
-		<!-- 
-		<connection user="shivalik_db1" password="I45c9cKWv#" name="shivalik" dsn="mysql:host=localhost;dbname=shivalik_db1"/>
-		 -->
-	</dbconnections>
-	
-	<entities>
-		<entity name="\Entities\BonusGeneration" specification="\Managers\BonusGenerationDAOManager" implementation="\Managers\Implementation\BonusGenerationDAOManagerImplementation1"/>
-		<entity name="\Entities\Country" specification="\Managers\CountryDAOManager" implementation="\Managers\Implementation\CountryDAOManagerImplementation1"/>
-		<entity name="\Entities\Generation" specification="\Managers\GenerationDAOManager" implementation="\Managers\Implementation\GenerationDAOManagerImplementation1"/>
-		<entity name="\Entities\GradeMember" specification="\Managers\GradeMemberDAOManager" implementation="\Managers\Implementation\GradeMemberDAOManagerImplementation1"/>
-		<entity name="\Entities\Grade" specification="\Managers\GradeDAOManager" implementation="\Managers\Implementation\GradeDAOManagerImplementation1"/>
-		<entity name="\Entities\Localisation" specification="\Managers\LocalisationDAOManager" implementation="\Managers\Implementation\LocalisationDAOManagerImplementation1"/>
-		<entity name="\Entities\Member" specification="\Managers\MemberDAOManager" implementation="\Managers\Implementation\MemberDAOManagerImplementation1"/>
-		<entity name="\Entities\VirtualMoney" specification="\Managers\VirtualMoneyDAOManager" implementation="\Managers\Implementation\VirtualMoneyDAOManagerImplementation1"/>
-		<entity name="\Entities\RequestVirtualMoney" specification="\Managers\RequestVirtualMoneyDAOManager" implementation="\Managers\Implementation\RequestVirtualMoneyDAOManagerImplementation1"/>
-		<entity name="\Entities\Office" specification="\Managers\OfficeDAOManager" implementation="\Managers\Implementation\OfficeDAOManagerImplementation1"/>
-		<entity name="\Entities\OfficeBonus" specification="\Managers\OfficeBonusDAOManager" implementation="\Managers\Implementation\OfficeBonusDAOManagerImplementation1"/>
-		<entity name="\Entities\Size" specification="\Managers\SizeDAOManager" implementation="\Managers\Implementation\SizeDAOManagerImplementation1"/>
-		<entity name="\Entities\OfficeSize" specification="\Managers\OfficeSizeDAOManager" implementation="\Managers\Implementation\OfficeSizeDAOManagerImplementation1"/>
-		<entity name="\Entities\OfficeAdmin" specification="\Managers\OfficeAdminDAOManager" implementation="\Managers\Implementation\OfficeAdminDAOManagerImplementation1"/>
-		<entity name="\Entities\PointValue" specification="\Managers\PointValueDAOManager" implementation="\Managers\Implementation\PointValueDAOManagerImplementation1"/>
-		<entity name="\Entities\Withdrawal" specification="\Managers\WithdrawalDAOManager" implementation="\Managers\Implementation\WithdrawalDAOManagerImplementation1"/>
-		<entity name="\Entities\RaportWithdrawal" specification="\Managers\RaportWithdrawalDAOManager" implementation="\Managers\Implementation\RaportWithdrawalDAOManagerImplementation1"/>
-		<entity name="\Entities\Transfer" specification="\Managers\TransferDAOManager" implementation="\Managers\Implementation\TransferDAOManagerImplementation1"/>
-	</entities>
 	
 	<definitions>
 		<define name="webData" value="Web/data"/>

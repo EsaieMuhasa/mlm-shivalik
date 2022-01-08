@@ -1,24 +1,25 @@
 <?php
 namespace Core\Shivalik\Validators;
 
-use Library\AbstractFormValidator;
-use Library\IllegalFormValueException;
-use Library\File;
-use Library\Image2D\ImageResizing;
-use Library\Image2D\Image;
-use Library\Config;
-use Library\DAOException;
-use Library\HTTPRequest;
-use Core\Shivalik\Managers\OfficeDAOManager;
-use Core\Shivalik\Managers\MemberDAOManager;
 use Core\Shivalik\Entities\Office;
+use Core\Shivalik\Managers\MemberDAOManager;
+use Core\Shivalik\Managers\OfficeDAOManager;
+use PHPBackend\DAOException;
+use PHPBackend\Request;
+use PHPBackend\File\UploadedFile;
+use PHPBackend\Http\HTTPRequest;
+use PHPBackend\Image2D\Image;
+use PHPBackend\Image2D\ImageResizing;
+use PHPBackend\Validator\DefaultFormValidator;
+use PHPBackend\Validator\IllegalFormValueException;
+use React\Dns\Config\Config;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-class OfficeFormValidator extends AbstractFormValidator
+class OfficeFormValidator extends DefaultFormValidator
 {
     const FIELD_NAME = 'name';
     const FIELD_PHOTO = 'photo';
@@ -36,7 +37,7 @@ class OfficeFormValidator extends AbstractFormValidator
     private $memberDAOManager;
     
     /**
-     * @var File
+     * @var UploadedFile
      */
     private $photo;
     
@@ -50,7 +51,7 @@ class OfficeFormValidator extends AbstractFormValidator
         }
     }
     
-    private function validationPhoto (File $photo, bool $onCreate=true) : void {
+    private function validationPhoto (UploadedFile $photo, bool $onCreate=true) : void {
         if (!$photo->isFile() && $onCreate) {
             throw new IllegalFormValueException("select the desktop photo");
         }
@@ -69,7 +70,7 @@ class OfficeFormValidator extends AbstractFormValidator
     	}else {
     	    try {
     	        // le membre doit exister
-        		if (!$this->memberDAOManager->matriculeExist($matricule)) {
+        		if (!$this->memberDAOManager->checkByMatricule($matricule)) {
         			throw new IllegalFormValueException("unknown member ID in the system");
         		}
     	    } catch (DAOException $e) {
@@ -98,17 +99,17 @@ class OfficeFormValidator extends AbstractFormValidator
     	try {
     		
     		$this->validationMember($matricule);
-    		$member = $this->memberDAOManager->getForMatricule($matricule);
+    		$member = $this->memberDAOManager->findByMatricule($matricule);
     		
     		$office->setMember($member);
     		
     		if ($onCreate) {//pour la creation on verifien uniquement si le membre a deja un compte
-    			if ($this->officeDAOManager->hasOffice($member->getId())) {
+    			if ($this->officeDAOManager->checkByMember($member->getId())) {
     				throw new IllegalFormValueException("the owner of this account already has");
     			}
     		}else {
-    			$in = $this->officeDAOManager->forMember($member->getId());
-    			if ($in->getId()!= $id) {
+    			$in = $this->officeDAOManager->checkByMember($member->getId());
+    			if ($in->getId() != $id) {
     				//Identifiant different de l'id de l'office encours de modification???
     				//fermeture  de la faille de securite
     				throw new IllegalFormValueException ("the owner of this account already has");
@@ -122,11 +123,11 @@ class OfficeFormValidator extends AbstractFormValidator
     /**
      * 
      * @param Office $office
-     * @param File $photo
+     * @param UploadedFile $photo
      * @param bool $write
      * @param bool $onCreate
      */
-    public function processingPhoto (Office $office, File $photo, bool $write = false, bool $onCreate = true) : void {
+    public function processingPhoto (Office $office, UploadedFile $photo, bool $write = false, bool $onCreate = true) : void {
         
     	try {
             $this->validationPhoto($photo, $onCreate);
@@ -139,16 +140,16 @@ class OfficeFormValidator extends AbstractFormValidator
             $reelName = self::getAbsolutDataDirName($photo->getApplication()->getConfig(), $office->getId()).DIRECTORY_SEPARATOR.$office->getId().'-'.$time.'-reel.'.$photo->getExtension();
             $reelFullName = self::getDataDirName($photo->getApplication()->getConfig(), $office->getId()).DIRECTORY_SEPARATOR.$office->getId().'-'.$time.'-reel.'.$photo->getExtension();
             $photoName = self::getDataDirName($photo->getApplication()->getConfig(), $office->getId()).DIRECTORY_SEPARATOR.$office->getId().'-'.$time.'.'.$photo->getExtension();
-            $photo->getApplication()->writeFile($photo, $reelFullName);
+            $photo->getApplication()->writeUploadedFile($photo, $reelFullName);
             ImageResizing::profiling(new Image($reelName));
             $office->setPhoto($photoName);
         }
     }
     
     /**
-	 * @return \Library\File
+	 * @return UploadedFile
 	 */
-	public function getPhoto() : ?File {
+	public function getPhoto() : ?UploadedFile {
 		return $this->photo;
 	}
 
@@ -159,7 +160,7 @@ class OfficeFormValidator extends AbstractFormValidator
     public function processingOffice (HTTPRequest $request) : Office {
     	$office = new Office();
     	$name = $request->getDataPOST(self::FIELD_NAME);
-    	$photo = $request->getFile(self::FIELD_PHOTO);
+    	$photo = $request->getUploadedFile(self::FIELD_PHOTO);
     	$matricule = $request->getDataPOST(self::FIELD_MEMBER);
     	
     	$this->processingName($office, $name);
@@ -185,10 +186,10 @@ class OfficeFormValidator extends AbstractFormValidator
     
     /**
      * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::createAfterValidation()
+     * @see \PHPBackend\Validator\FormValidator::createAfterValidation()
      * @return Office
      */
-    public function createAfterValidation(\Library\HTTPRequest $request)
+    public function createAfterValidation(Request $request)
     {
         $office = $this->processingOffice($request);
         
@@ -207,46 +208,17 @@ class OfficeFormValidator extends AbstractFormValidator
         return $office;
     }
 
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::deleteAfterValidation()
-     */
-    public function deleteAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
 
     /**
      * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::recycleAfterValidation()
+     * @see \PHPBackend\Validator\FormValidator::updateAfterValidation()
      */
-    public function recycleAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::removeAfterValidation()
-     */
-    public function removeAfterValidation(\Library\HTTPRequest $request)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Library\AbstractFormValidator::updateAfterValidation()
-     */
-    public function updateAfterValidation(\Library\HTTPRequest $request)
+    public function updateAfterValidation(Request $request)
     {
         $office = new Office();
         $id = $request->getAttribute(self::CHAMP_ID);
         $name = $request->getDataPOST(self::FIELD_NAME);
-        $photo = $request->getFile(self::FIELD_PHOTO);
+        $photo = $request->getUploadedFile(self::FIELD_PHOTO);
         
         $this->traitementId($office, $id);
         $this->processingName($office, $name);

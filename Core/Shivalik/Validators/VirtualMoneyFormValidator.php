@@ -2,21 +2,22 @@
 
 namespace Core\Shivalik\Validators;
 
-use Library\AbstractFormValidator;
-use Library\IllegalFormValueException;
-use Library\DAOException;
-use Core\Shivalik\Managers\VirtualMoneyDAOManager;
+use Core\Shivalik\Entities\OfficeBonus;
+use Core\Shivalik\Entities\VirtualMoney;
 use Core\Shivalik\Managers\GradeMemberDAOManager;
 use Core\Shivalik\Managers\OfficeSizeDAOManager;
-use Core\Shivalik\Entities\VirtualMoney;
-use Core\Shivalik\Entities\OfficeBonus;
+use Core\Shivalik\Managers\VirtualMoneyDAOManager;
+use PHPBackend\DAOException;
+use PHPBackend\Request;
+use PHPBackend\Validator\DefaultFormValidator;
+use PHPBackend\Validator\IllegalFormValueException;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-class VirtualMoneyFormValidator extends AbstractFormValidator {
+class VirtualMoneyFormValidator extends DefaultFormValidator {
 	
 	const FIELD_AMOUNT = 'amount';
 	const FIELD_OFFICE = 'office';
@@ -62,14 +63,12 @@ class VirtualMoneyFormValidator extends AbstractFormValidator {
 	}
 	
 	/**
-	 * lors de l'envoie d'un nouveau forfait,
-	 * -verification dette
-	 * -
+	 * lors de l'envoie d'un nouveau forfait, verification dette
 	 * {@inheritDoc}
-	 * @see \Library\AbstractFormValidator::createAfterValidation()
+	 * @see \PHPBackend\Validator\FormValidator::createAfterValidation()
 	 * @return VirtualMoney
 	 */
-	public function createAfterValidation(\Library\HTTPRequest $request) {
+	public function createAfterValidation(Request $request) {
 		$money = new VirtualMoney();
 		$amount = $request->getDataPOST(self::FIELD_AMOUNT);
 		
@@ -120,36 +119,9 @@ class VirtualMoneyFormValidator extends AbstractFormValidator {
 
 	/**
 	 * {@inheritDoc}
-	 * @see \Library\AbstractFormValidator::deleteAfterValidation()
+	 * @see \PHPBackend\Validator\FormValidator::updateAfterValidation()
 	 */
-	public function deleteAfterValidation(\Library\HTTPRequest $request) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @see \Library\AbstractFormValidator::recycleAfterValidation()
-	 */
-	public function recycleAfterValidation(\Library\HTTPRequest $request) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @see \Library\AbstractFormValidator::removeAfterValidation()
-	 */
-	public function removeAfterValidation(\Library\HTTPRequest $request) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @see \Library\AbstractFormValidator::updateAfterValidation()
-	 */
-	public function updateAfterValidation(\Library\HTTPRequest $request) {
+	public function updateAfterValidation(Request $request) {
 		// TODO Auto-generated method stub
 		
 	}

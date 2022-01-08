@@ -1,3 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE app-config SYSTEM "../../../Library/lib-dtd-conf.dtd" >
-<app-config></app-config>
+<!DOCTYPE app-config SYSTEM "../../../PHPBackend/config.dtd" >
+<app-config>
+</app-config>

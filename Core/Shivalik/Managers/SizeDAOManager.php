@@ -16,7 +16,7 @@ abstract class SizeDAOManager extends DefaultDAOInterface
      * @param int $id
      * @return bool
      */
-    public function checkAbbreviation (string $abbreviation, ?int $id = null) : bool{
+    public function checkByAbbreviation (string $abbreviation, ?int $id = null) : bool{
         return $this->columnValueExist('abbreviation', $abbreviation, $id);
     }
     
@@ -25,7 +25,7 @@ abstract class SizeDAOManager extends DefaultDAOInterface
      * @param int $id
      * @return bool
      */
-    public function checkName (string $name, ?int $id = null) : bool {
+    public function checkByName (string $name, ?int $id = null) : bool {
         return $this->columnValueExist('name', $name, $id);
     }
 }

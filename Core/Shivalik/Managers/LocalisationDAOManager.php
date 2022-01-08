@@ -17,7 +17,7 @@ abstract class LocalisationDAOManager extends DefaultDAOInterface
      * @see \PHPBackend\Dao\DefaultDAOInterface::findById()
      * @return Localisation
      */
-    public function findById(int $id, bool $forward = true)
+    public function findById($id, bool $forward = true)
     {
         /**
          * @var Localisation $localisation

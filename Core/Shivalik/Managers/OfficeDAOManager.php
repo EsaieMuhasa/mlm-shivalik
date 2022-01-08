@@ -32,7 +32,7 @@ abstract class OfficeDAOManager extends DefaultDAOInterface
      * @param int $id
      * @return bool
      */
-    public function nameExist (string $name, int $id =-1) : bool {
+    public function checkByName (string $name, ?int $id = null) : bool {
         return $this->columnValueExist('name', $name, $id);
     }
     
@@ -96,7 +96,7 @@ abstract class OfficeDAOManager extends DefaultDAOInterface
      * @param int $memberId
      * @return bool
      */
-    public function hasOffice (int $memberId) : bool {
+    public function checkByMember (int $memberId) : bool {
     	return $this->columnValueExist('member', $memberId);
     }
     
@@ -116,7 +116,7 @@ abstract class OfficeDAOManager extends DefaultDAOInterface
 	 * {@inheritDoc}
 	 * @see \PHPBackend\Dao\DefaultDAOInterface::findAll()
 	 */
-	public function findAll(?int $limit = null, int $offset = 0) {
+	public function findAll(?int $limit = null, int $offset = 0) : array {
 		$all = parent::findAll($limit, $offset);
 		foreach ($all as $o) {
 			if ($o->member != null) {

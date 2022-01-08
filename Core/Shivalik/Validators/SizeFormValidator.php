@@ -2,18 +2,19 @@
 
 namespace Core\Shivalik\Validators;
 
-use Library\AbstractFormValidator;
-use Library\IllegalFormValueException;
-use Library\DAOException;
-use Core\Shivalik\Managers\SizeDAOManager;
 use Core\Shivalik\Entities\Size;
+use Core\Shivalik\Managers\SizeDAOManager;
+use PHPBackend\DAOException;
+use PHPBackend\Request;
+use PHPBackend\Validator\DefaultFormValidator;
+use PHPBackend\Validator\IllegalFormValueException;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-class SizeFormValidator extends AbstractFormValidator {
+class SizeFormValidator extends DefaultFormValidator {
 	
 	const FIELD_ABBREVIATION = 'abbreviation';
 	const FIELD_NAME = 'name';
@@ -29,7 +30,7 @@ class SizeFormValidator extends AbstractFormValidator {
 	 * @param int $id
 	 * @throws IllegalFormValueException
 	 */
-	private function validationAbbreviation ($abbreviation, $id=-1) : void {
+	private function validationAbbreviation ($abbreviation, $id=null) : void {
 		if ($abbreviation == null) {
 			throw new IllegalFormValueException("abbreviation is required");
 		}
@@ -39,7 +40,7 @@ class SizeFormValidator extends AbstractFormValidator {
 		}
 		
 		try {
-			if ($this->sizeDAOManager->abbreviationExist($abbreviation, $id)) {
+			if ($this->sizeDAOManager->checkByAbbreviation($abbreviation, $id)) {
 				throw new IllegalFormValueException("abbreviation already used");
 			}
 		} catch (DAOException $e) {
@@ -62,7 +63,7 @@ class SizeFormValidator extends AbstractFormValidator {
 		}
 		
 		try {
-			if ($this->sizeDAOManager->nameExist($name, $id)) {
+			if ($this->sizeDAOManager->checkByName($name, $id)) {
 				throw new IllegalFormValueException("full name already used");
 			}
 		} catch (DAOException $e) {
@@ -128,10 +129,10 @@ class SizeFormValidator extends AbstractFormValidator {
 	
 	/**
 	 * {@inheritDoc}
-	 * @see \Library\AbstractFormValidator::createAfterValidation()
+	 * @see \PHPBackend\Validator\FormValidator::createAfterValidation()
 	 * @return Size
 	 */
-	public function createAfterValidation(\Library\HTTPRequest $request) {
+	public function createAfterValidation(Request $request) {
 		$size = new Size();
 		$abbreviation = $request->getDataPOST(self::FIELD_ABBREVIATION);
 		$name = $request->getDataPOST(self::FIELD_NAME);
@@ -157,10 +158,10 @@ class SizeFormValidator extends AbstractFormValidator {
 	
 	/**
 	 * {@inheritDoc}
-	 * @see \Library\AbstractFormValidator::updateAfterValidation()
+	 * @see \PHPBackend\Validator\FormValidator::updateAfterValidation()
 	 * @return Size
 	 */
-	public function updateAfterValidation(\Library\HTTPRequest $request) {
+	public function updateAfterValidation(Request $request) {
 		$size = new Size();
 		$id = $request->getAttribute(self::CHAMP_ID);
 		$abbreviation = $request->getDataPOST(self::FIELD_ABBREVIATION);
@@ -182,33 +183,6 @@ class SizeFormValidator extends AbstractFormValidator {
 		$this->result = $this->hasError()? "registration failure" : "Saving changes successfully";
 		
 		return $size;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @see \Library\AbstractFormValidator::deleteAfterValidation()
-	 */
-	public function deleteAfterValidation(\Library\HTTPRequest $request) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @see \Library\AbstractFormValidator::recycleAfterValidation()
-	 */
-	public function recycleAfterValidation(\Library\HTTPRequest $request) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @see \Library\AbstractFormValidator::removeAfterValidation()
-	 */
-	public function removeAfterValidation(\Library\HTTPRequest $request) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }
