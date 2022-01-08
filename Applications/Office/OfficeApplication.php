@@ -2,34 +2,27 @@
 
 namespace Applications\Office;
 
-use Library\Application;
-use Entities\OfficeAdmin;
+
+use PHPBackend\Http\HTTPApplication;
+use Core\Shivalik\Entities\OfficeAdmin;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-class OfficeApplication extends Application {
+class OfficeApplication extends HTTPApplication {
 
 	const ATT_CONNETED_OFFICE_ADMIN = "CONNECTED_OFFICE_ADMIN_";
-	
-	/**
-	 * {@inheritDoc}
-	 * @see \Library\Application::__construct()
-	 */
-	public function __construct() {
-		parent::__construct();
-		$this->name = 'Office';
-	}
+
 
 	/**
 	 * {@inheritDoc}
-	 * @see \Library\Application::run()
+	 * @see HTTPApplication::run()
 	 */
-	public function run() {
+	public function run() : void {
 		if (self::getConnectedUser() != null) {
-			return parent::run();
+			parent::run();
 		}else {
 			$this->getHttpRequest()->forward('login', 'Authentification', 'Index');
 		}

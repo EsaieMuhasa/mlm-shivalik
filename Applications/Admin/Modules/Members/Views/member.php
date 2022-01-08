@@ -115,3 +115,19 @@ $config = Config::getInstance();
         <!--/.info-box-->
     </div>
 </div>
+
+<div class="row">
+	<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<?php echo htmlspecialchars($compte->getMember()->getPacket()->getGrade()->getName()); ?>
+			</div>
+			<div class="panel-body">
+				<img alt="" class="thumbnail" src="/<?php echo ($compte->getMember()->getPacket()->getGrade()->getIcon()); ?>">
+			</div>
+			<div class="panel-footer">
+				up to <span class="badge"><?php echo htmlspecialchars($compte->getMember()->getPacket()->getGrade()->getMaxGeneration()->getNumber()); ?> th</span> generation
+			</div>
+		</div>
+	</div>
+</div>

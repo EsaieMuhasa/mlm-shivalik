@@ -2,22 +2,23 @@
 
 namespace Applications\Office\Modules\Dashboard;
 
-use Library\HTTPRequest;
-use Library\HTTPResponse;
-use Library\Controller;
 use Applications\Office\OfficeApplication;
-use Managers\WithdrawalDAOManager;
-use Managers\GradeMemberDAOManager;
-use Managers\MemberDAOManager;
-use Managers\VirtualMoneyDAOManager;
-use Managers\RequestVirtualMoneyDAOManager;
+use Core\Shivalik\Managers\WithdrawalDAOManager;
+use Core\Shivalik\Managers\RequestVirtualMoneyDAOManager;
+use Core\Shivalik\Managers\MemberDAOManager;
+use Core\Shivalik\Managers\GradeMemberDAOManager;
+use Core\Shivalik\Managers\VirtualMoneyDAOManager;
+use PHPBackend\Http\HTTPController;
+use PHPBackend\Application;
+use PHPBackend\Request;
+
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-class DashboardController extends Controller {
+class DashboardController extends HTTPController {
 	
 	const ATT_SOLDE = 'solde';
 	const ATT_SOLDE_WITHDRAWALS = 'soldeWithdrawals';
@@ -51,19 +52,19 @@ class DashboardController extends Controller {
 	
 	/**
 	 * {@inheritDoc}
-	 * @see \Library\Controller::__construct()
+	 * @see HTTPController::__construct()
 	 */
-	public function __construct(\Library\Application $application, $action, $module) {
+	public function __construct(Application $application, $action, $module) {
 		parent::__construct ( $application, $action, $module );
 		$application->getHttpRequest()->addAttribute(self::ATT_VIEW_TITLE, "Dashboard");
 	}
 
 	
 	 /**
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Request $response
      */
-    public function executeIndex (HTTPRequest $request, HTTPResponse $response) : void{
+    public function executeIndex (Request $request, Request $response) : void{
         //$response->sendRedirect("/admin/members/");
         $office = OfficeApplication::getConnectedUser()->getOffice();
         
@@ -99,10 +100,10 @@ class DashboardController extends Controller {
      * -affiches les matching deja faits
      * -les demandes de matching
      * -la liste de membres qui ont faitles demandes leurs matiching
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Request $response
      */
-    public function executeVirtualMoney (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeVirtualMoney (Request $request, Request $response) : void {
     	$request->addAttribute(self::ATT_VIEW_TITLE, "Dashboard virtual money");
     	
     	$office = OfficeApplication::getConnectedUser()->getOffice();
@@ -141,10 +142,10 @@ class DashboardController extends Controller {
     
     /***
      * Evoie d'une requette de demande de matching
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Request $response
      */
-    public function executeRequestVirtualMoney (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeRequestVirtualMoney (Request $request, Request $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Send request of virtual money");
     }
 

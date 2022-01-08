@@ -1,6 +1,6 @@
 <?php
 use Applications\Root\Modules\Settings\SettingsController;
-use Validators\LocalisationFormValidator;
+use Core\Shivalik\Validators\LocalisationFormValidator;
 ?>
 <fieldset>
 	<legend>Membrer's address</legend>

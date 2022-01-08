@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT app-routes (module+)>
+<!ELEMENT app-config (definitions?, users?)>
+<!ELEMENT config (applications?, filters?, definitions?)>
+<!ATTLIST config webData CDATA #REQUIRED> <!--Chemian vers le dossier pour stoker les donnee bruts-->
+<!ATTLIST config webLogger CDATA #REQUIRED> <!-- Chemin vers le dossier log des erreurs -->
+
+
+<!ELEMENT users (user+)>
+<!ELEMENT definitions (define*, list*)>
+
+<!--Pour les routes de l'application-->
+<!--================================= -->
+<!ELEMENT module (route+)>
+<!ATTLIST module name ID #REQUIRED>
+
+<!ELEMENT route EMPTY>
+<!ATTLIST route urlPattern CDATA #REQUIRED>
+<!ATTLIST route action CDATA #REQUIRED>
+<!ATTLIST route paramsNames CDATA #IMPLIED>
+
+<!-- histoire des filtres -->
+<!-- ==================== -->
+<!ELEMENT filters (filter+)>
+<!ELEMENT filter (filter-route+)>
+<!ATTLIST filter name CDATA #REQUIRED>
+
+<!ELEMENT filter-route EMPTY>
+<!ATTLIST filter-route urlPattern CDATA #REQUIRED>
+<!ATTLIST filter-route prioriry CDATA #IMPLIED>
+<!ATTLIST filter-route paramsNames CDATA #IMPLIED>
+
+
+<!-- pour la balise manager -->
+<!-- ====================== -->
+<!ELEMENT dao (dbconnections+, entities?)>
+<!ELEMENT dbconnections (connection+)>
+<!ELEMENT connection EMPTY>
+<!ATTLIST connection name ID #REQUIRED>
+<!ATTLIST connection dsn CDATA #REQUIRED>
+<!ATTLIST connection user CDATA #REQUIRED>
+<!ATTLIST connection password CDATA #IMPLIED>
+<!ATTLIST connection max CDATA #IMPLIED>
+
+<!-- pour le entites -->
+<!-- ====================== -->
+<!ELEMENT entities (entity+)>
+<!ELEMENT entity EMPTY>
+<!ATTLIST entity name CDATA #REQUIRED><!-- Le nom simple de la classe qui incapsule l'entite -->
+<!ATTLIST entity specification CDATA #REQUIRED>
+<!ATTLIST entity implementation CDATA #REQUIRED>
+<!ATTLIST entity alias CDATA #IMPLIED>
+
+<!--pour une application -->
+<!--==================== -->
+<!ELEMENT applications (application+)>
+<!ATTLIST applications foldName CDATA #REQUIRED>
+<!ELEMENT application EMPTY>
+<!ATTLIST application name ID #REQUIRED>
+<!ATTLIST application urlPattern CDATA #IMPLIED><!-- pour l'application par defaut, le nom du sous domaine n'est pas obligatoire -->
+<!ATTLIST application wsPort CDATA #IMPLIED><!-- le port ecouter par le WS -->
+<!ATTLIST application wsListener CDATA #IMPLIED><!-- l'ecouteur du WS -->
+
+<!-- -->
+<!-- -->
+
+<!--Les parametres de configuraion de l'application-->
+<!ELEMENT define EMPTY>
+<!ATTLIST define name ID #REQUIRED>
+<!ATTLIST define value CDATA #REQUIRED>
+<!ATTLIST define label CDATA #IMPLIED>
+
+
+<!-- les attribut d'un utilisateur -->
+<!ELEMENT user EMPTY>
+<!ATTLIST user pseudo CDATA #REQUIRED>
+<!ATTLIST user password CDATA #REQUIRED>
+
+<!ELEMENT list (item+)>
+<!ATTLIST list name ID #REQUIRED>
+<!ATTLIST list label CDATA #IMPLIED><!-- utile lorsque l'item contien une liste -->
+<!ELEMENT item (list?)><!-- pour une liste dans un element d'une liste -->
+<!ATTLIST item name CDATA #REQUIRED>
+<!ATTLIST item value CDATA #IMPLIED>
+<!ATTLIST item label CDATA #IMPLIED>

@@ -1,20 +1,26 @@
 <?php
-use Library\Config;
-use Applications\Office\Modules\Members\MembersController;
 use Applications\Office\OfficeApplication;
+use Applications\Office\Modules\Members\MembersController;
+use Core\Shivalik\Entities\Account;
+use Core\Shivalik\Entities\Member;
+use PHPBackend\AppConfig;
+use PHPBackend\Request;
 
 /**
- * @var \Entities\Member $member
+ * @var Member $member
  */
 $member = $_REQUEST[MembersController::ATT_MEMBER];
 
 /**
- * @var \Entities\Account $compte
+ * @var Account $compte
  */
 $compte = $_REQUEST[MembersController::ATT_COMPTE];
 
 
-$config = Config::getInstance();
+/**
+ * @var AppConfig $config
+ */
+$config = $_REQUEST[Request::ATT_APP_CONFIG];
 ?>
 
 <?php require_once '_nav-member.php';?>

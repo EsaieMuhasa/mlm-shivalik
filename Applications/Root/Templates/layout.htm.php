@@ -1,2 +1,2 @@
 
-<?php echo $_REQUEST[Library\Page::ATT_VIEW];?>
+<?php echo $_REQUEST[PHPBackend\Page::ATT_VIEW];?>

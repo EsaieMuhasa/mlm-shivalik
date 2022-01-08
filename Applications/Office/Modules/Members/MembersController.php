@@ -2,31 +2,31 @@
 
 namespace Applications\Office\Modules\Members;
 
-use Library\Controller;
-use Library\HTTPResponse;
-use Library\HTTPRequest;
-use Managers\CountryDAOManager;
-use Managers\PointValueDAOManager;
-use Managers\GradeMemberDAOManager;
-use Managers\BonusGenerationDAOManager;
-use Managers\WithdrawalDAOManager;
-use Managers\MemberDAOManager;
-use Managers\GradeDAOManager;
-use Entities\Member;
-use Entities\Account;
 use Applications\Office\OfficeApplication;
-use Library\AppMessage;
-use Validators\GradeMemberFormValidator;
-use Validators\LocalisationFormValidator;
-use Validators\MemberFormValidator;
-use Managers\VirtualMoneyDAOManager;
+use PHPBackend\Http\HTTPController;
+use Core\Shivalik\Managers\MemberDAOManager;
+use Core\Shivalik\Managers\GradeDAOManager;
+use Core\Shivalik\Managers\CountryDAOManager;
+use Core\Shivalik\Managers\PointValueDAOManager;
+use Core\Shivalik\Managers\GradeMemberDAOManager;
+use Core\Shivalik\Managers\BonusGenerationDAOManager;
+use Core\Shivalik\Managers\WithdrawalDAOManager;
+use Core\Shivalik\Managers\VirtualMoneyDAOManager;
+use PHPBackend\Application;
+use Core\Shivalik\Entities\Member;
+use Core\Shivalik\Entities\Account;
+use Core\Shivalik\Validators\GradeMemberFormValidator;
+use PHPBackend\Request;
+use Core\Shivalik\Validators\MemberFormValidator;
+use Core\Shivalik\Validators\LocalisationFormValidator;
+use PHPBackend\ToastMessage;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-class MembersController extends Controller {
+class MembersController extends HTTPController {
 	const CONFIG_MAX_MEMBER_VIEW_STEP = 'maxMembers';
 	const PARAM_MEMBER_COUNT = 'countMembers';
 	
@@ -88,22 +88,22 @@ class MembersController extends Controller {
 	
 	/**
 	 * {@inheritDoc}
-	 * @see \Library\Controller::__construct()
+	 * @see HTTPController::__construct()
 	 */
-	public function __construct(\Library\Application $application, $action, $module)
+	public function __construct(Application $application, string $action, string $module)
 	{
 		parent::__construct($application, $action, $module);
 		$nombre = $this->memberDAOManager->countAll();
-		$application->getHttpRequest()->addAttribute(self::PARAM_MEMBER_COUNT, $nombre);
-		$application->getHttpRequest()->addAttribute(self::ATT_VIEW_TITLE, "Union members");
+		$application->getRequest()->addAttribute(self::PARAM_MEMBER_COUNT, $nombre);
+		$application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, "Union members");
 		
 		if ($application->getHttpRequest()->existGET('id')) {//
-			$id = intval($application->getHttpRequest()->getDataGET('id'), 10);
+			$id = intval($application->getRequest()->getDataGET('id'), 10);
 			$member = $this->memberDAOManager->getForId($id);
 			$account = $this->getAccount($member);
 			
-			$application->getHttpRequest()->addAttribute(self::ATT_COMPTE, $account);
-			$application->getHttpRequest()->addAttribute(self::ATT_MEMBER, $member);
+			$application->getRequest()->addAttribute(self::ATT_COMPTE, $account);
+			$application->getRequest()->addAttribute(self::ATT_MEMBER, $member);
 		}
 	}
 	
@@ -116,10 +116,10 @@ class MembersController extends Controller {
 	}
 	
 	/**
-	 * @param HTTPRequest $request
-	 * @param HTTPResponse $response
+	 * @param Request $request
+	 * @param Request $response
 	 */
-	public function executeIndex (HTTPRequest $request, HTTPResponse $response) : void{
+	public function executeIndex (Request $request, Request $response) : void{
 		$withdrawal = 0;
 
 		if ($this->withdrawalDAOManager->hasRequest(OfficeApplication::getConnectedUser()->getOffice()->getId())) {
@@ -136,23 +136,23 @@ class MembersController extends Controller {
 	}
 	
 	/**
-	 * @param HTTPRequest $request
-	 * @param HTTPResponse $response
+	 * @param Request $request
+	 * @param Request $response
 	 */
-	public function executeMembers (HTTPRequest $request, HTTPResponse $response) : void {
+	public function executeMembers (Request $request, Request $response) : void {
 		
 		$office = OfficeApplication::getConnectedUser()->getOffice();
 		
-		if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+		if ($request->getMethod() == Request::HTTP_POST) {
 		    
 		    $matricule = $request->getDataPOST('id');
 		    if ($matricule == null ) {
-		        $message = new AppMessage('Error', "Enter user ID to perform shearch operation...", AppMessage::MESSAGE_ERROR);
+		        $message = new ToastMessage('Error', "Enter user ID to perform shearch operation...", ToastMessage::MESSAGE_ERROR);
 		    } else if ($this->memberDAOManager->matriculeExist($matricule)) {
 				$member = $this->memberDAOManager->getForMatricule($request->getDataPOST('id'));
 				$response->sendRedirect("/office/members/{$member->getId()}/");
 			}else {
-    			$message = new AppMessage('Error', "Know user ID in system. ID: {$request->getDataPOST('id')}", AppMessage::MESSAGE_ERROR);
+    			$message = new ToastMessage('Error', "Know user ID in system. ID: {$request->getDataPOST('id')}", ToastMessage::MESSAGE_ERROR);
 			}
 			
 			$request->addAppMessage($message);
@@ -187,10 +187,10 @@ class MembersController extends Controller {
 	
 	
 	/**
-	 * @param HTTPRequest $request
-	 * @param HTTPResponse $response
+	 * @param Request $request
+	 * @param Request $response
 	 */
-	public function executeAddMember (HTTPRequest $request, HTTPResponse $response) : void {
+	public function executeAddMember (Request $request, Request $response) : void {
 		
 		$office = OfficeApplication::getConnectedUser()->getOffice();
 		
@@ -202,7 +202,7 @@ class MembersController extends Controller {
 			$office->setVirtualMoneys($this->virtualMoneyDAOManager->forOffice($office->getId()));
 		}
 		
-		if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+		if ($request->getMethod() == Request::HTTP_POST) {
 			$form = new GradeMemberFormValidator($this->getDaoManager());
 			$request->addAttribute(GradeMemberFormValidator::FIELD_OFFICE_ADMIN, OfficeApplication::getConnectedUser());
 			$gm = $form->createAfterValidation($request);
@@ -228,17 +228,17 @@ class MembersController extends Controller {
 	
 	
 	/**
-	 * @param HTTPRequest $request
-	 * @param HTTPResponse $response
+	 * @param Request $request
+	 * @param Request $response
 	 */
-	public function executeMember (HTTPRequest $request, HTTPResponse $response) : void {
+	public function executeMember (Request $request, Request $response) : void {
 		$id = intval($request->getDataGET('id'), 10);
 		if (!$this->memberDAOManager->idExist($id)) {
 			$response->sendError();
 		}
 		
 		/**
-		 * @var \Entities\Member $member
+		 * @var Member $member
 		 */
 		$member = $this->memberDAOManager->getForId($id);
 		
@@ -262,10 +262,10 @@ class MembersController extends Controller {
 	}
 	
 	/**
-	 * @param HTTPRequest $request
-	 * @param HTTPResponse $response
+	 * @param Request $request
+	 * @param Request $response
 	 */
-	public function executeDownlines (HTTPRequest $request, HTTPResponse $response) : void {
+	public function executeDownlines (Request $request, Request $response) : void {
 		
 		$id = intval($request->getDataGET('id'), 10);
 		if (!$this->memberDAOManager->idExist($id)) {
@@ -273,7 +273,7 @@ class MembersController extends Controller {
 		}
 		
 		/**
-		 * @var \Entities\Member $member
+		 * @var Member $member
 		 */
 		$member = $this->memberDAOManager->getForId($id);
 		
@@ -320,17 +320,17 @@ class MembersController extends Controller {
 	}
 	
 	/**
-	 * @param HTTPRequest $request
-	 * @param HTTPResponse $response
+	 * @param Request $request
+	 * @param Request $response
 	 */
-	public function executeWithdrawalsMember (HTTPRequest $request, HTTPResponse $response) : void {
+	public function executeWithdrawalsMember (Request $request, Request $response) : void {
 		$id = intval($request->getDataGET('id'), 10);
 		if (!$this->memberDAOManager->idExist($id)) {
 			$response->sendError();
 		}
 		
 		/**
-		 * @var \Entities\Member $member
+		 * @var Member $member
 		 */
 		$member = $this->memberDAOManager->getForId($id);
 		
@@ -369,10 +369,10 @@ class MembersController extends Controller {
 	
 	/**
 	 *
-	 * @param HTTPRequest $request
-	 * @param HTTPResponse $response
+	 * @param Request $request
+	 * @param Request $response
 	 */
-	public function executeStateMember (HTTPRequest $request, HTTPResponse $response) : void {
+	public function executeStateMember (Request $request, Request $response) : void {
 		$request->addAttribute(self::ATT_VIEW_TITLE, "Union members");
 		$id = intval($request->getDataGET('id'), 10);
 		if (!$this->memberDAOManager->idExist($id)) {
@@ -382,7 +382,7 @@ class MembersController extends Controller {
 		$state = ($request->getDataGET('state') == 'enable');
 		
 		/**
-		 * @var \Entities\Member $member
+		 * @var Member $member
 		 */
 		$member = $this->memberDAOManager->getForId($id);
 		
@@ -396,10 +396,10 @@ class MembersController extends Controller {
 	
 	/**
 	 *
-	 * @param HTTPRequest $request
-	 * @param HTTPResponse $response
+	 * @param Request $request
+	 * @param Request $response
 	 */
-	public function executeUpgradeMember (HTTPRequest $request, HTTPResponse $response) : void {
+	public function executeUpgradeMember (Request $request, Request $response) : void {
 		$id = intval($request->getDataGET('id'), 10);
 		if (!$this->memberDAOManager->idExist($id)) {
 			$response->sendError();
@@ -420,13 +420,13 @@ class MembersController extends Controller {
 		}
 		
 		/**
-		 * @var \Entities\Member $member
+		 * @var Member $member
 		 */
 		$member = $this->memberDAOManager->getForId($id);
 		$gradeMember = $this->gradeMemberDAOManager->getCurrent($id);
 		$gradeMember->setMember($member);
 		
-		if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+		if ($request->getMethod() == Request::HTTP_POST) {
 			$form = new GradeMemberFormValidator($this->getDaoManager());
 			$request->addAttribute(GradeMemberFormValidator::FIELD_OFFICE_ADMIN, OfficeApplication::getConnectedUser());
 			$request->addAttribute($form::FIELD_MEMBER, $member->getId());

@@ -1,9 +1,13 @@
 <?php
-use Library\Config;
 use Applications\Office\OfficeApplication;
 use Applications\Office\Modules\Dashboard\DashboardController;
+use PHPBackend\AppConfig;
+use PHPBackend\Request;
 
-$config = Config::getInstance();
+/**
+ * @var AppConfig $config
+ */
+$config = $_REQUEST[Request::ATT_APP_CONFIG];
 
 $office = OfficeApplication::getConnectedUser()->getOffice();
 ?>

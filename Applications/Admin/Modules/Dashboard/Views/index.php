@@ -13,52 +13,66 @@ $config = Config::getInstance();
     </div>
 </div>
 <hr/>
-
 <div class="row">
+	<div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
+        <div class="row">
+        	<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                <div class="info-box green-bg">
+                    <i class="fa fa-users"></i>
+                    <div class="count"><?php echo ($_REQUEST[DashboardController::PARAM_MEMBER_COUNT]); ?></div>
+                    <div class="title">Members</div>
+                </div>
+                <!--/.info-box-->
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                <div class="info-box green-bg">
+                    <i class="fa fa-users"></i>
+                    <div class="count"><?php echo ($_REQUEST[DashboardController::PARAM_UPGRADES_COUNT]); ?></div>
+                    <div class="title">Upgrades</div>
+                </div>
+                <!--/.info-box-->
+            </div>
+        </div>
+        
+        <div class="row">
+        	 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="info-box blue-bg">
+                    <i class="fa fa-inbox"></i>
+                    <div class="count"><?php echo "{$_REQUEST[DashboardController::ATT_SOLDE]} {$config->get('devise')}"; ?></div>
+                    <div class="title">Sold</div>
+                </div>
+                <!--/.info-box-->
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                <div class="info-box blue-bg">
+                    <i class="fa fa-money"></i>
+                    <div class="count"><?php echo "{$_REQUEST[DashboardController::ATT_SOLDE_WITHDRAWALS]} {$config->get('devise')}"; ?></div>
+                    <div class="title">Requested</div>
+                </div>
+                <!--/.info-box-->
+            </div>
+            
+            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                <div class="info-box blue-bg">
+                    <i class="glyphicon glyphicon-ok-circle"></i>
+                    <div class="count"><?php echo "{$_REQUEST[DashboardController::ATT_SOLDE_WITHDRAWALS_SERVED]} {$config->get('devise')}"; ?></div>
+                    <div class="title">Served</div>
+                </div>
+                <!--/.info-box-->
+            </div>
+        </div>
+	</div>
 	<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-        <div class="info-box green-bg">
-            <i class="fa fa-users"></i>
-            <div class="count"><?php echo ($_REQUEST[DashboardController::PARAM_MEMBER_COUNT]); ?></div>
-            <div class="title">Members</div>
-        </div>
-        <!--/.info-box-->
-    </div>
-    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-        <div class="info-box green-bg">
-            <i class="fa fa-users"></i>
-            <div class="count"><?php echo ($_REQUEST[DashboardController::PARAM_UPGRADES_COUNT]); ?></div>
-            <div class="title">Upgrades</div>
-        </div>
-        <!--/.info-box-->
-    </div>
-</div>
-
-<div class="row">
-	 <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-        <div class="info-box blue-bg">
-            <i class="fa fa-inbox"></i>
-            <div class="count"><?php echo "{$_REQUEST[DashboardController::ATT_SOLDE]} {$config->get('devise')}"; ?></div>
-            <div class="title">Sold</div>
-        </div>
-        <!--/.info-box-->
-    </div>
-    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-        <div class="info-box blue-bg">
-            <i class="fa fa-money"></i>
-            <div class="count"><?php echo "{$_REQUEST[DashboardController::ATT_SOLDE_WITHDRAWALS]} {$config->get('devise')}"; ?></div>
-            <div class="title">Requested</div>
-        </div>
-        <!--/.info-box-->
-    </div>
-    
-    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-        <div class="info-box blue-bg">
-            <i class="glyphicon glyphicon-ok-circle"></i>
-            <div class="count"><?php echo "{$_REQUEST[DashboardController::ATT_SOLDE_WITHDRAWALS_SERVED]} {$config->get('devise')}"; ?></div>
-            <div class="title">Served</div>
-        </div>
-        <!--/.info-box-->
-    </div>
+		<div class="panel palel-default">
+			<div class="panel-heading">
+				<strong class="panel-title">Membership by packet</strong>
+			</div>
+			<div class="panel-body graphic" data-config="/admin/dashboard/statistics/config-chart-packets.json">
+				<canvas></canvas>
+			</div>
+			<div class="panel-footer">above the distribution of members for each pack</div>
+		</div>
+	</div>
 </div>
 
 <?php if (!empty($_REQUEST[DashboardController::ATT_WITHDRAWALS])): ?>
@@ -103,3 +117,35 @@ $config = Config::getInstance();
     </div>
 </div>
 <?php endif;?>
+
+<hr/>
+
+<?php if (!empty($_REQUEST[DashboardController::ATT_RAPORT_WITHDRAWALS])) : ?>
+<div class="row">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="table-responsive">
+			<table class="table table-bordered table-condenced panel panel-info">
+    			<caption class="panel-title">Offices rapports</caption>
+				<thead class="panel-heading">
+					<tr>
+						<th>Date</th>
+						<th>Office</th>
+						<th>Amount</th>
+						<th>Options</th>
+					</tr>
+				</thead>
+				<tbody class="panel-body">
+					<?php foreach ($_REQUEST[DashboardController::ATT_RAPORT_WITHDRAWALS] as $raport) : ?>
+					<tr>
+						<td><?php echo $raport->dateAjout->format('D, d M Y \a\t H:i'); ?></td>
+						<td></td>
+						<td><?php //echo $raport->dateAjout->format('D, d M Y \a\t H:i'); ?></td>
+						<td></td>
+					</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<?php endif; ?>

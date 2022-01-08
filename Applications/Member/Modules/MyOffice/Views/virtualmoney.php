@@ -1,15 +1,18 @@
 <?php 
-use Entities\Office;
-use Library\Config;
 use Applications\Member\MemberApplication;
 use Applications\Member\Modules\MyOffice\MyOfficeController;
+use PHPBackend\AppConfig;
+use PHPBackend\Request;
 
 /**
- * @var Office $office
+ * @var \Core\Shivalik\Entities\Office $office
  */
 $office = MemberApplication::getConnectedMember()->getOfficeAccount();
 
-$config = Config::getInstance();
+/**
+ * @var AppConfig $config
+ */
+$config = $_REQUEST[Request::ATT_APP_CONFIG];
 
 $requests = $_REQUEST[MyOfficeController::ATT_VIRTUAL_MONEYS];
 ?>

@@ -1,23 +1,24 @@
 <?php
 namespace Applications\Member\Modules\MyOffice;
 
-use Library\Controller;
-use Entities\Office;
 use Applications\Member\MemberApplication;
-use Library\HTTPRequest;
-use Library\HTTPResponse;
-use Managers\GradeMemberDAOManager;
-use Managers\VirtualMoneyDAOManager;
-use Managers\MemberDAOManager;
-use Managers\WithdrawalDAOManager;
-use Library\Calendar\Month;
-use Managers\RequestVirtualMoneyDAOManager;
-use Validators\RequestVirtualMoneyFormValidator;
-use Managers\RaportWithdrawalDAOManager;
-use Entities\RaportWithdrawal;
-use Entities\Member;
+use PHPBackend\Http\HTTPController;
+use Core\Shivalik\Managers\GradeMemberDAOManager;
+use Core\Shivalik\Managers\VirtualMoneyDAOManager;
+use Core\Shivalik\Managers\MemberDAOManager;
+use Core\Shivalik\Managers\WithdrawalDAOManager;
+use Core\Shivalik\Managers\RequestVirtualMoneyDAOManager;
+use Core\Shivalik\Entities\Office;
+use Core\Shivalik\Managers\RaportWithdrawalDAOManager;
+use PHPBackend\Application;
+use PHPBackend\Response;
+use PHPBackend\Request;
+use PHPBackend\Calendar\Month;
+use Core\Shivalik\Validators\RequestVirtualMoneyFormValidator;
+use Core\Shivalik\Entities\RaportWithdrawal;
+use Core\Shivalik\Entities\Member;
 
-class MyOfficeController extends Controller
+class MyOfficeController extends HTTPController
 {
     const ATT_ACTIVE_ITEM_MENU = 'OFFICE_ACTIVE_ITEM_MENU';
     const ATT_ITEM_MENU_DASHBOARD = 'OFFICE_ACTIVE_ITEM_MENU_DASHBOARD';
@@ -84,9 +85,9 @@ class MyOfficeController extends Controller
     
     /**
      * {@inheritDoc}
-     * @see \Library\Controller::__construct()
+     * @see HTTPController::__construct()
      */
-    public function __construct(\Library\Application $application, $action, $module)
+    public function __construct(Application $application, string $action, $module)
     {
         parent::__construct($application, $action, $module);
         if (MemberApplication::getConnectedMember()->getOfficeAccount() == null) {
@@ -97,10 +98,10 @@ class MyOfficeController extends Controller
     
     /**
      * 
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeIndex (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeIndex (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_DASHBOARD);
         
         $nombreMembre = $this->memberDAOManager->countCreatedBy($this->office->getId());
@@ -132,10 +133,10 @@ class MyOfficeController extends Controller
     
     /**
      *
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeVirtualmoney(HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeVirtualmoney(Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_VIRTUAL_MONEY);
         
         if ($this->gradeMemberDAOManager->hasOperation($this->office->getId())) {
@@ -157,11 +158,11 @@ class MyOfficeController extends Controller
     
     /**
      * Envoie requette demande monais virtuel
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeRequestVirtualmoney(HTTPRequest $request, HTTPResponse $response) : void {
-        if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+    public function executeRequestVirtualmoney(Request $request, Response $response) : void {
+        if ($request->getMethod() == Request::HTTP_POST) {
             $form = new RequestVirtualMoneyFormValidator($this->getDaoManager());
             $request->addAttribute($form::FIELD_OFFICE, $this->office);
             $virtual = $form->createAfterValidation($request);
@@ -178,10 +179,10 @@ class MyOfficeController extends Controller
     /**
      * Envoie du rapport mensuel du matching
      * cette action n'a pas de vue
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeSendRaportWithdrawals(HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeSendRaportWithdrawals(Request $request, Response $response) : void {
         if (!$this->raportWithdrawalDAOManager->canSendRaport($this->office->getId()) || !$this->withdrawalDAOManager->hasRequest($this->office->getId(), true)) {
             $response->sendError("impossible to perform this operation because it is active for a precise time limit.");
         }
@@ -197,10 +198,10 @@ class MyOfficeController extends Controller
     
     /**
      * affichage de membres qui se sont adherer, en passant par le bureau
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeMembers (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeMembers (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_MEMBERS);
         
         $nombre = $this->memberDAOManager->countCreatedBy($this->office->getId());
@@ -232,10 +233,10 @@ class MyOfficeController extends Controller
     }
     
     /**
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeUpgrades (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeUpgrades (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_MEMBERS);
         //upgrades
         if ($this->gradeMemberDAOManager->hasOperation($this->office->getId(), true)) {
@@ -249,10 +250,10 @@ class MyOfficeController extends Controller
     
     /**
      * consultation de l'istorique des activites d'un office
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeHistory (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeHistory (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_HISTORY);
         
         $date = null;

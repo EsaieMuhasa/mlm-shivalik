@@ -1,5 +1,12 @@
 <?php
-use Library\Config;
+
+/**
+ * @var AppConfig $config
+ */
+use PHPBackend\AppConfig;
+use PHPBackend\Request;
+
+$config = $_REQUEST[Request::ATT_APP_CONFIG];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -72,7 +79,7 @@ use Library\Config;
             
             <div class="text-right">
         		<div class="credits">
-                 	Designed by <a href="mailto:<?php echo Config::getInstance()->get('designerEmail'); ?>"><?php echo Config::getInstance()->get('designerName'); ?></a>
+                 	Designed by <a href="mailto:<?php echo $config->get('designerEmail'); ?>"><?php echo $config->get('designerName'); ?></a>
         		</div>
             </div>
         </div>

@@ -1,9 +1,13 @@
 <?php
-use Library\Config;
 use Applications\Member\Modules\MyOffice\MyOfficeController;
+use PHPBackend\AppConfig;
+use PHPBackend\Request;
 
 
-$config = Config::getInstance();
+/**
+ * @var AppConfig $config
+ */
+$config = $_REQUEST[Request::ATT_APP_CONFIG];
 $maxMembers = intval($config->get('maxMembers')->getValue(), 10);
 $max = intval($_REQUEST[MyOfficeController::PARAM_MEMBER_COUNT], 10);
 

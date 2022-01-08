@@ -1,20 +1,20 @@
 <?php
 namespace Applications\Member\Modules\Profil;
 
-use Library\Controller;
-use Library\HTTPRequest;
-use Library\HTTPResponse;
-use Validators\MemberFormValidator;
-use Validators\LocalisationFormValidator;
 use Applications\Member\MemberApplication;
-use Managers\CountryDAOManager;
+use PHPBackend\Http\HTTPController;
+use Core\Shivalik\Managers\CountryDAOManager;
+use PHPBackend\Request;
+use PHPBackend\Response;
+use Core\Shivalik\Validators\LocalisationFormValidator;
+use Core\Shivalik\Validators\MemberFormValidator;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-class ProfilController extends Controller
+class ProfilController extends HTTPController
 {
     
     const ATT_LOCALISATION = 'localisation';
@@ -26,32 +26,22 @@ class ProfilController extends Controller
     private $countryDAOManager;
     
     /**
-     * {@inheritDoc}
-     * @see \Library\Controller::__construct()
+     * @param Request $request
+     * @param Response $response
      */
-    public function __construct(\Library\Application $application, $action, $module)
-    {
-        parent::__construct($application, $action, $module);
-    }
-    
-    /**
-     * 
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
-     */
-    public function executeIndex (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeIndex (Request $request, Response $response) : void {
         
     }
     
     
     /**
      * update password of member
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executePassword (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executePassword (Request $request, Response $response) : void {
         
-        if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+        if ($request->getMethod() == Request::HTTP_POST) {
             $form = new MemberFormValidator($this->getDaoManager());
             $form->updatePasswordAfterValidation($request);
             
@@ -64,11 +54,11 @@ class ProfilController extends Controller
     }
     
     /**
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executePhoto (HTTPRequest $request, HTTPResponse $response) : void{
-        if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+    public function executePhoto (Request $request, Response $response) : void{
+        if ($request->getMethod() == Request::HTTP_POST) {
             $form = new MemberFormValidator($this->getDaoManager());
             $form->updatePhotoAfterValidation($request);
             
@@ -82,13 +72,12 @@ class ProfilController extends Controller
     
     
     /**
-     * 
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeAddress (HTTPRequest $request, HTTPResponse $response) : void{
+    public function executeAddress (Request $request, Response $response) : void{
         
-        if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+        if ($request->getMethod() == Request::HTTP_POST) {
             $form = new LocalisationFormValidator($this->getDaoManager());
             $request->addAttribute($form::CHAMP_ID, MemberApplication::getConnectedMember()->getLocalisation()->getId());
             $localisation = $form->updateAfterValidation($request);
@@ -106,7 +95,6 @@ class ProfilController extends Controller
         $request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->getAll());
         $request->addAttribute(self::ATT_LOCALISATION, $localisation);
     }
-
 
 }
 

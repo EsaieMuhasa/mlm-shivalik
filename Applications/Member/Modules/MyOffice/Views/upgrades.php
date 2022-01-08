@@ -1,10 +1,9 @@
 <?php 
 
-use Entities\GradeMember;
 use Applications\Member\Modules\MyOffice\MyOfficeController;
 
 /**
- * @var GradeMember[] $packets
+ * @var \Core\Shivalik\Entities\GradeMember[] $packets
  */
 $packets = $_REQUEST[MyOfficeController::ATT_GRADES_MEMBERS];
 ?>

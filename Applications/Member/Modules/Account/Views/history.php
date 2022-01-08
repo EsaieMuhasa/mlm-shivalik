@@ -1,11 +1,12 @@
 <?php
 use Applications\Member\Modules\Account\AccountController;
-use Library\Calendar\Month;
-use Library\Calendar\Year;
-use Entities\Withdrawal;
-use Library\Config;
-use Entities\PointValue;
-use Entities\BonusGeneration;
+use PHPBackend\Calendar\Month;
+use PHPBackend\Calendar\Year;
+use PHPBackend\AppConfig;
+use PHPBackend\Request;
+use Core\Shivalik\Entities\Withdrawal;
+use Core\Shivalik\Entities\PointValue;
+use Core\Shivalik\Entities\BonusGeneration;
 
 /**
  * @var Month $month
@@ -16,7 +17,10 @@ $next = $month->nextMonth();
 
 $year = new Year($month->getYear());
 
-$config = Config::getInstance();
+/**
+ * @var AppConfig $config
+ */
+$config = $_REQUEST[Request::ATT_APP_CONFIG];
 
 /**
  * @var Withdrawal[] $withdrawals
@@ -39,6 +43,7 @@ if ($month->hasSelectedDate()) {
     $date = null;
 }
 ?>
+
 <div class="row">
     <div class="col-lg-12">
     	<h1 class="page-header"><i class="fa fa-calendar"></i> <?php echo ($_REQUEST[AccountController::ATT_VIEW_TITLE]); ?></h1><hr/>

@@ -1,42 +1,32 @@
 <?php
 namespace Applications\Member;
 
-use Library\Application;
-use Entities\Member;
+use PHPBackend\Http\HTTPApplication;
+use Core\Shivalik\Entities\Member;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-class MemberApplication extends Application
+class MemberApplication extends HTTPApplication
 {
     const ATT_CONNECTED_MEMBER = 'SESSION_MEMBER_CONNECTED_USER';
-    
-    /**
-     * {@inheritDoc}
-     * @see \Library\Application::__construct()
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->name = 'Member';
-    }
 
     /**
      * {@inheritDoc}
-     * @see \Library\Application::run()
+     * @see HTTPApplication::run()
      */
-    public function run()
+    public function run() : void
     {
         if (self::getConnectedMember() != null) {
             if (self::getConnectedMember()->isEnable()) {
-                return parent::run();
+                parent::run();
             }else {
-                $this->getHttpRequest()->forward('disabled', 'Account');
+                $this->getRequest()->forward('disabled', 'Account');
             }
         }else {
-            $this->getHttpRequest()->forward('login', 'Authentification', 'Index');
+            $this->getRequest()->forward('login', 'Authentification', 'Index');
         }
     }
     

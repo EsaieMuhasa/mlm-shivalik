@@ -1,16 +1,22 @@
 <?php
 use Applications\Member\Modules\Account\AccountController;
-use Library\Config;
-
-$config = Config::getInstance();
+use Core\Shivalik\Entities\Account;
+use PHPBackend\Config\VarList;
+use PHPBackend\Request;
+use PHPBackend\AppConfig;
 
 /**
- * @var \Library\Config\VarList $money
+ * @var AppConfig $config
+ */
+$config = $_REQUEST[Request::ATT_APP_CONFIG];
+
+/**
+ * @var VarList $money
  */
 $money = $config->get('virtualMoney');
 
 /**
- * @var \Entities\Account $account
+ * @var Account $account
  */
 $account = $_REQUEST[AccountController::ATT_ACCOUNT];
 ?>

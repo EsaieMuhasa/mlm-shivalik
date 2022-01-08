@@ -1,6 +1,6 @@
 <?php
-use Entities\User;
 use Applications\Root\Modules\Settings\SettingsController;
+use Core\Shivalik\Entities\User;
 ?>
 <section class="panel">
     <header class="panel-heading">

@@ -1,12 +1,17 @@
 <?php
 use Applications\Root\Modules\Settings\SettingsController;
-use Library\Config;
 use Applications\Member\Modules\Account\AccountController;
-
-$config = Config::getInstance();
+use PHPBackend\AppConfig;
+use Core\Shivalik\Entities\Account;
+use PHPBackend\Request;
 
 /**
- * @var Entities\Account $account
+ * @var AppConfig $config
+ */
+$config = $_REQUEST[Request::ATT_APP_CONFIG];
+
+/**
+ * @var Account $account
  */
 $account = $_REQUEST[AccountController::ATT_ACCOUNT];
 ?>

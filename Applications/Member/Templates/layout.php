@@ -1,1 +1,1 @@
-<?php require_once dirname(dirname(dirname(__DIR__))).'/includes/apps-layout.php'; ?>
+<?php require_once dirname(dirname(dirname(__DIR__))).'/Core/Shivalik/inc/apps-layout.php'; ?>

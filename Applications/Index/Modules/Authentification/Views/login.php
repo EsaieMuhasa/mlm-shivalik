@@ -1,8 +1,8 @@
 <?php 
 
-use Library\Config;
+use PHPBackend\Request;
 
-$config = Config::getInstance();
+$config = $_REQUEST[Request::ATT_APP_CONFIG];
 ?>
 
 <!DOCTYPE html>

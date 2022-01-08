@@ -1,10 +1,14 @@
 <?php
-use Entities\User;
-use Validators\MemberFormValidator;
-use Library\Config;
 use Applications\Office\Modules\Members\MembersController;
+use Core\Shivalik\Entities\User;
+use Core\Shivalik\Validators\MemberFormValidator;
+use PHPBackend\AppConfig;
+use PHPBackend\Request;
 
-$config = Config::getInstance();
+/**
+ * @var AppConfig $config
+ */
+$config = $_REQUEST[Request::ATT_APP_CONFIG];
 ?>
 <section class="panel">
     <header class="panel-heading">

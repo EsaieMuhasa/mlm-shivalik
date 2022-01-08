@@ -1,3 +1,3 @@
 
 <?php 
-echo '<onlinediab>'.$_REQUEST[Library\Page::ATT_VIEW].'</onlinediab>';?>
+echo '<onlinediab>'.$_REQUEST[PHPBackend\Page::ATT_VIEW].'</onlinediab>';?>

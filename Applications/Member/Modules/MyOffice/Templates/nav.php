@@ -1,10 +1,9 @@
 <?php
 use Applications\Admin\Modules\Offices\OfficesController;
-use Entities\Office;
 use Applications\Member\MemberApplication;
 
 /**
- * @var Office $dashboard
+ * @var \Core\Shivalik\Entities\Office $dashboard
  */
 $office = MemberApplication::getConnectedMember()->getOfficeAccount();
 

@@ -1,39 +1,27 @@
 <?php
 namespace Applications\Root;
-
-use Library\Application;
-use Library\User;
+use PHPBackend\Http\HTTPApplication;
+use PHPBackend\User;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-class RootApplication extends Application
+class RootApplication extends HTTPApplication
 {
     const ATT_CONNECTED_ROOT = 'CONNETED_USER_ROOT';
     
     /**
      * {@inheritDoc}
-     * @see \Library\Application::__construct()
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->name = 'Root';
-        
-    }
-    
-    /**
-     * {@inheritDoc}
-     * @see \Library\Application::run()
+     * @see HTTPApplication::run()
      */
     public function run()
     {
         if (isset($_SESSION[self::ATT_CONNECTED_ROOT])  && $_SESSION[self::ATT_CONNECTED_ROOT] instanceof User) {            
             parent::run();
         }else {
-            $this->getHttpRequest()->forward('login', 'Settings');
+            $this->getRequest()->forward('login', 'Settings');
         }
     }
 

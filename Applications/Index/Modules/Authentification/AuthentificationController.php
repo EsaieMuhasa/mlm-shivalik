@@ -1,23 +1,23 @@
 <?php
 namespace Applications\Index\Modules\Authentification;
 
-use Library\Controller;
-use Library\HTTPRequest;
-use Library\HTTPResponse;
-use Validators\MemberFormValidator;
-use Entities\OfficeAdmin;
-use Entities\Member;
 use Applications\Admin\AdminApplication;
 use Applications\Member\MemberApplication;
 use Applications\Office\OfficeApplication;
-use Managers\OfficeDAOManager;
+use PHPBackend\Http\HTTPController;
+use Core\Shivalik\Managers\OfficeDAOManager;
+use PHPBackend\Request;
+use PHPBackend\Response;
+use Core\Shivalik\Validators\MemberFormValidator;
+use Core\Shivalik\Entities\OfficeAdmin;
+use Core\Shivalik\Entities\Member;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-class AuthentificationController extends Controller
+class AuthentificationController extends HTTPController
 {
     const ATT_USER = 'user';
     
@@ -29,10 +29,10 @@ class AuthentificationController extends Controller
     /***
      * Connection process
      * if user is connected, connction form has ben inaccessible
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeLogin (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeLogin (Request $request, Response $response) : void {
         
         if (AdminApplication::getConnectedUser()!=null) {
             $response->sendRedirect("/admin/");
@@ -47,7 +47,7 @@ class AuthentificationController extends Controller
         }
         
         
-        if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+        if ($request->getMethod() == Request::HTTP_POST) {
             $form = new MemberFormValidator($this->getDaoManager());
             $user = $form->connectionProcess($request);
             
@@ -80,10 +80,10 @@ class AuthentificationController extends Controller
     
     /**
      * 
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeLogout (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeLogout (Request $request, Response $response) : void {
         session_destroy();
         $response->sendRedirect("/");
     }

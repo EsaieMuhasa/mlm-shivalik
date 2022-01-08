@@ -1,33 +1,33 @@
 <?php
 namespace Applications\Member\Modules\Account;
 
-use Managers\PointValueDAOManager;
-use Managers\BonusGenerationDAOManager;
-use Managers\MemberDAOManager;
-use Entities\Account;
 use Applications\Member\MemberApplication;
-use Library\HTTPRequest;
-use Library\HTTPResponse;
-use Library\Controller;
-use Managers\GradeMemberDAOManager;
-use Managers\WithdrawalDAOManager;
-use Managers\OfficeDAOManager;
-use Validators\WithdrawalFormValidator;
-use Library\Calendar\Month;
-use Library\Image2D\Mlm\Ternary\TernaryTreeBuilder;
-use Library\Image2D\Mlm\Ternary\TernaryTreeRender;
-use Library\Image2D\Mlm\TreeFormatter;
-use Managers\OfficeBonusDAOManager;
+use PHPBackend\Http\HTTPController;
+use Core\Shivalik\Managers\MemberDAOManager;
+use Core\Shivalik\Managers\GradeMemberDAOManager;
+use Core\Shivalik\Managers\BonusGenerationDAOManager;
+use Core\Shivalik\Managers\OfficeBonusDAOManager;
+use Core\Shivalik\Managers\PointValueDAOManager;
+use Core\Shivalik\Managers\WithdrawalDAOManager;
+use Core\Shivalik\Managers\OfficeDAOManager;
+use PHPBackend\Application;
+use Core\Shivalik\Entities\Account;
+use PHPBackend\Request;
+use PHPBackend\Response;
+use PHPBackend\Calendar\Month;
+use Core\Shivalik\Entities\Member;
+use Core\Shivalik\Validators\WithdrawalFormValidator;
+use PHPBackend\Image2D\Mlm\TreeFormatter;
+use PHPBackend\Image2D\Mlm\Ternary\TernaryTreeBuilder;
+use PHPBackend\Image2D\Mlm\Ternary\TernaryTreeRender;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-class AccountController extends Controller
+class AccountController extends HTTPController
 {
-    
-    const ATT_VIEW_TITLE = 'view_title';
     const ATT_MEMBERS = 'members';
     const ATT_MEMBER = 'member';
     const ATT_GRADE_MEMBER = 'gradeMember';
@@ -86,9 +86,9 @@ class AccountController extends Controller
     
     /**
      * {@inheritDoc}
-     * @see \Library\Controller::__construct()
+     * @see HTTPController::__construct()
      */
-    public function __construct(\Library\Application $application, $action, $module)
+    public function __construct(Application $application, string $action, string $module)
     {
         parent::__construct($application, $action, $module);
         $application->getHttpRequest()->addAttribute(self::ATT_VIEW_TITLE, "Account");
@@ -104,14 +104,14 @@ class AccountController extends Controller
 
     /**
      * index du compte d'un membre 
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeIndex (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeIndex (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Dashboard");
         
         /**
-         * @var \Entities\Member $member
+         * @var Member $member
          */
         $member = MemberApplication::getConnectedMember();
         $gradeMember = $this->gradeMemberDAOManager->getCurrent($member->getId());
@@ -129,10 +129,10 @@ class AccountController extends Controller
     
     /**
      * 
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeDownlines (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeDownlines (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Downlines");
         $member = MemberApplication::getConnectedMember();
         
@@ -177,10 +177,10 @@ class AccountController extends Controller
     
     /**
      * panel des historique des retraits
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeWithdrawals (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeWithdrawals (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Withdrawal Money");
         $member = MemberApplication::getConnectedMember();
         
@@ -205,15 +205,15 @@ class AccountController extends Controller
     
     /**
      *  Nouveau Retrait
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeNewWithdrawal (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeNewWithdrawal (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Withdrawal Money");
         $account = $this->getAccount();
         $request->addAttribute(self::ATT_ACCOUNT, $account);
         
-        if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+        if ($request->getMethod() == Request::HTTP_POST) {
             $form = new WithdrawalFormValidator($this->getDaoManager());
             
             $withdrawel = $form->createAfterValidation($request);
@@ -231,10 +231,10 @@ class AccountController extends Controller
     }
     
     /**
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeUpdateWithdrawal (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeUpdateWithdrawal (Request $request, Response $response) : void {
         $id = intval($request->getDataGET('id'), 10);
         $member = MemberApplication::getConnectedMember();
         
@@ -252,7 +252,7 @@ class AccountController extends Controller
         $account = $this->getAccount();
         $request->addAttribute(self::ATT_ACCOUNT, $account);
         
-        if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+        if ($request->getMethod() == Request::HTTP_POST) {
             $form = new WithdrawalFormValidator($this->getDaoManager());
             $request->addAttribute($form::CHAMP_ID, $id);
             $updatedWithdrawal = $form->updateAfterValidation($request);
@@ -272,18 +272,18 @@ class AccountController extends Controller
     }
     
     /**
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeTransfer (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeTransfer (Request $request, Response $response) : void {
         
     }
     
     /**
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeTree (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeTree (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Tree");
         $member = MemberApplication::getConnectedMember();
         
@@ -343,7 +343,7 @@ class AccountController extends Controller
         }
     }
     
-    public function executeHistory (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeHistory (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Account history");
         
         if ($request->existGET('day')) {

@@ -1,9 +1,13 @@
 <?php
 use Applications\Member\Modules\Account\AccountController;
-use Library\Config;
-use Library\Image2D\Mlm\TreeFormatter;
+use PHPBackend\AppConfig;
+use PHPBackend\Request;
+use PHPBackend\Image2D\Mlm\TreeFormatter;
 
-$config = Config::getInstance();
+/**
+ * @var AppConfig $config
+ */
+$config = $_REQUEST[Request::ATT_APP_CONFIG];
 
 $foots = $config->get("footsMember");
 ?>

@@ -1,12 +1,15 @@
 <?php
-use Library\Config;
-use Entities\Office;
 use Applications\Member\Modules\MyOffice\MyOfficeController;
 use Applications\Member\MemberApplication;
-use Entities\Withdrawal;
+use PHPBackend\AppConfig;
+use PHPBackend\Request;
+use Core\Shivalik\Entities\Office;
+use Core\Shivalik\Entities\Withdrawal;
 
-$config = Config::getInstance();
-
+/**
+ * @var AppConfig $config
+ */
+$config = $_REQUEST[Request::ATT_APP_CONFIG];
 /**
  * @var Office $office
  */

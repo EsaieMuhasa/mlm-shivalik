@@ -1,11 +1,16 @@
 <?php 
-use Library\Config;
 use Applications\Office\Modules\Members\MembersController;
-use Entities\GradeMember;
-use Entities\Grade;
+use Core\Shivalik\Entities\Grade;
+use Core\Shivalik\Entities\GradeMember;
+use PHPBackend\AppConfig;
+use PHPBackend\Request;
 
 require_once '_nav-member.php';
-$config = Config::getInstance();
+
+/**
+ * @var AppConfig $config
+ */
+$config = $_REQUEST[Request::ATT_APP_CONFIG];
 
 /**
  * @var GradeMember $gradeMember

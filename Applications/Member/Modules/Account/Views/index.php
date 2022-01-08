@@ -112,12 +112,18 @@ $config = Config::getInstance();
 </div>
 
 <div class="row">
-	<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
-		<div class="thumbnail">
-			<h2><?php echo htmlspecialchars($_REQUEST[AccountController::ATT_GRADE_MEMBER]->grade->name); ?></h2>
-			<img alt="" src="/<?php echo ($_REQUEST[AccountController::ATT_GRADE_MEMBER]->grade->icon); ?>">
-			<h3 class="text-info">sponsoring: <?php echo ($_REQUEST[AccountController::ATT_GRADE_MEMBER]->grade->percentage); ?>%</h3>
-			<h4 class="text-danger">up to <?php echo ($_REQUEST[AccountController::ATT_GRADE_MEMBER]->grade->maxGeneration->name); ?></h4>
+	<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+    			<h2 class="panel-title"><?php echo htmlspecialchars($_REQUEST[AccountController::ATT_GRADE_MEMBER]->grade->name); ?></h2>
+			</div>
+    		<div class="panel-body">
+    			<img class="thumbnail" alt="" src="/<?php echo ($_REQUEST[AccountController::ATT_GRADE_MEMBER]->grade->icon); ?>">
+    		</div>
+    		<div class="panel-footer">
+    			<h3 class="text-info">sponsoring: <?php echo ($_REQUEST[AccountController::ATT_GRADE_MEMBER]->grade->percentage); ?>%</h3>
+    			<h4 class="text-danger">up to <?php echo ($_REQUEST[AccountController::ATT_GRADE_MEMBER]->grade->maxGeneration->name); ?></h4>
+    		</div>
 		</div>
 	</div>
 </div>

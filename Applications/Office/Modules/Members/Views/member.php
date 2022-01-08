@@ -1,13 +1,15 @@
 <?php
 use Applications\Admin\Modules\Members\MembersController;
+use Core\Shivalik\Entities\Account;
+use Core\Shivalik\Entities\Member;
 
 /**
- * @var \Entities\Member $member
+ * @var Member $member
  */
 $member = $_REQUEST[MembersController::ATT_MEMBER];
 
 /**
- * @var \Entities\Account $compte
+ * @var Account $compte
  */
 $compte = $_REQUEST[MembersController::ATT_COMPTE];
 

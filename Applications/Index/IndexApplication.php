@@ -1,24 +1,15 @@
 <?php
 namespace Applications\Index;
 
-use Library\Application;
+
+use PHPBackend\Http\HTTPApplication;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-class IndexApplication extends Application
+class IndexApplication extends HTTPApplication
 {
-    /**
-     * {@inheritDoc}
-     * @see \Library\Application::__construct()
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->name = 'Index';
-    }
-
 }
 

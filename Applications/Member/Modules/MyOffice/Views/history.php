@@ -1,20 +1,23 @@
 <?php
-use Library\Calendar\Month;
-use Entities\Office;
-use Library\Calendar\Year;
-use Entities\Member;
-use Entities\GradeMember;
-use Entities\Withdrawal;
-use Library\Config;
-use Entities\VirtualMoney;
 use Applications\Member\Modules\MyOffice\MyOfficeController;
 use Applications\Member\MemberApplication;
+use PHPBackend\AppConfig;
+use PHPBackend\Request;
+use PHPBackend\Calendar\Year;
+use Core\Shivalik\Entities\Office;
+use Core\Shivalik\Entities\Member;
+use Core\Shivalik\Entities\GradeMember;
+use Core\Shivalik\Entities\Withdrawal;
+use Core\Shivalik\Entities\VirtualMoney;
  
 
-$config = Config::getInstance();
+/**
+ * @var AppConfig $config
+ */
+$config = $_REQUEST[Request::ATT_APP_CONFIG];
 
 /**
- * @var Month $month
+ * @var \PHPBackend\Calendar\Month $month
  */
 $month = $_REQUEST[MyOfficeController::ATT_MONTH];
 $next = $month->nextMonth();

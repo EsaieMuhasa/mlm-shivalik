@@ -2,28 +2,29 @@
 
 namespace Applications\Admin\Modules\Offices;
 
-use Library\HTTPRequest;
-use Library\HTTPResponse;
-use Managers\CountryDAOManager;
-use Managers\SizeDAOManager;
-use Managers\OfficeDAOManager;
-use Validators\OfficeSizeFormValidator;
-use Entities\Office;
-use Managers\OfficeAdminDAOManager;
-use Validators\OfficeAdminFormValidator;
 use Applications\Admin\AdminController;
-use Managers\GradeMemberDAOManager;
-use Managers\VirtualMoneyDAOManager;
-use Validators\VirtualMoneyFormValidator;
-use Validators\OfficeFormValidator;
-use Library\Calendar\Month;
-use Managers\RequestVirtualMoneyDAOManager;
-use Entities\RequestVirtualMoney;
-use Entities\VirtualMoney;
-use Validators\WithdrawalFormValidator;
-use Managers\RaportWithdrawalDAOManager;
-use Entities\OfficeSize;
-use Managers\OfficeSizeDAOManager;
+use Core\Shivalik\Managers\CountryDAOManager;
+use Core\Shivalik\Managers\SizeDAOManager;
+use Core\Shivalik\Managers\OfficeDAOManager;
+use Core\Shivalik\Managers\OfficeSizeDAOManager;
+use Core\Shivalik\Managers\OfficeAdminDAOManager;
+use Core\Shivalik\Managers\GradeMemberDAOManager;
+use Core\Shivalik\Managers\VirtualMoneyDAOManager;
+use Core\Shivalik\Managers\RequestVirtualMoneyDAOManager;
+use Core\Shivalik\Managers\RaportWithdrawalDAOManager;
+use Core\Shivalik\Entities\Office;
+use PHPBackend\Application;
+use PHPBackend\Request;
+use PHPBackend\Response;
+use PHPBackend\Calendar\Month;
+use Core\Shivalik\Entities\OfficeSize;
+use Core\Shivalik\Validators\OfficeSizeFormValidator;
+use Core\Shivalik\Validators\OfficeFormValidator;
+use Core\Shivalik\Validators\OfficeAdminFormValidator;
+use Core\Shivalik\Validators\WithdrawalFormValidator;
+use Core\Shivalik\Entities\RequestVirtualMoney;
+use Core\Shivalik\Entities\VirtualMoney;
+use Core\Shivalik\Validators\VirtualMoneyFormValidator;
 
 /**
  *
@@ -117,9 +118,9 @@ class OfficesController extends AdminController {
 	
 	/**
 	 * {@inheritDoc}
-	 * @see \Library\Controller::__construct()
+	 * @see \Applications\Admin\AdminController::__construct()
 	 */
-	public function __construct(\Library\Application $application, $action, $module) {
+	public function __construct(Application $application, string $action, string $module) {
 		parent::__construct($application, $action, $module);
 		$application->getHttpRequest()->addAttribute(self::ATT_VIEW_TITLE, "Offices");
 		$this->init($application->getHttpRequest(), $application->getHttpResponse());
@@ -128,10 +129,10 @@ class OfficesController extends AdminController {
 	/**
 	 * chargement des donnes obligatorie
 	 * lors d ela consultation d'un office, on chage les donnees qui le concerne 
-	 * @param HTTPRequest $request
-	 * @param HTTPResponse $response
+	 * @param Request $request
+	 * @param Response $response
 	 */
-	private function init (HTTPRequest $request, HTTPResponse $response) : void {
+	private function init (Request $request, Response $response) : void {
 		if ($request->existGET('id')) {
 			$id = intval($request->getDataGET('id'), 10);
 			
@@ -154,10 +155,10 @@ class OfficesController extends AdminController {
 	
 	/**
 	 * visualisation des la liste des bureau qui existe dans le systeme
-	 * @param HTTPRequest $request
-	 * @param HTTPResponse $response
+	 * @param Request $request
+	 * @param Response $response
 	 */
-	public function executeIndex (HTTPRequest $request, HTTPResponse $response) : void {
+	public function executeIndex (Request $request, Response $response) : void {
 		if ($this->officeDAOManager->countAll()>0) {
 			$offices = $this->officeDAOManager->getAll();
 		}else {
@@ -178,11 +179,11 @@ class OfficesController extends AdminController {
 	
 	/**
 	 * creation d'un nouveau bureau secodaire dans le systeme
-	 * @param HTTPRequest $request
-	 * @param HTTPResponse $response
+	 * @param Request $request
+	 * @param Response $response
 	 */
-	public function executeAddOffice (HTTPRequest $request, HTTPResponse $response) : void {
-		if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+	public function executeAddOffice (Request $request, Response $response) : void {
+		if ($request->getMethod() == Request::HTTP_POST) {
 			$form = new OfficeSizeFormValidator($this->getDaoManager());
 			
 			$os = $form->createAfterValidation($request);
@@ -202,15 +203,15 @@ class OfficesController extends AdminController {
 	
 	/**
 	 * modification des information d'un office
-	 * @param HTTPRequest $request
-	 * @param HTTPResponse $response
+	 * @param Request $request
+	 * @param Response $response
 	 */
-	public function executeUpdateOffice (HTTPRequest $request, HTTPResponse $response) : void {
+	public function executeUpdateOffice (Request $request, Response $response) : void {
 		
 		$request->addAttribute('localisation', $this->office->getLocalisation());
 		$id = $this->office->getId();
 		
-		if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+		if ($request->getMethod() == Request::HTTP_POST) {
 			$form = new OfficeFormValidator($this->getDaoManager());
 			$request->addAttribute($form::CHAMP_ID, $id);
 			$office = $form->updateAfterValidation($request);
@@ -227,10 +228,10 @@ class OfficesController extends AdminController {
 	}
 	
 	/**
-	 * @param HTTPRequest $request
-	 * @param HTTPResponse $response
+	 * @param Request $request
+	 * @param Response $response
 	 */
-	public function executeOfficeAdmin (HTTPRequest $request, HTTPResponse $response) : void {
+	public function executeOfficeAdmin (Request $request, Response $response) : void {
 		$request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_OFFICE_ADMIN);
 		if ($request->existGET('adminId')) {
 			$id = $request->getDataGET('adminId');
@@ -249,7 +250,7 @@ class OfficesController extends AdminController {
 			$response->sendRedirect("/admin/offices/{$this->office->getId()}/");
 		}
 		
-		if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+		if ($request->getMethod() == Request::HTTP_POST) {
 			$form = new OfficeAdminFormValidator($this->getDaoManager());
 			$request->addAttribute($form::FIELD_OFFICE, $this->office);
 			$admin = $form->createAfterValidation($request);
@@ -267,12 +268,12 @@ class OfficesController extends AdminController {
 	
 	/**
 	 * 
-	 * @param HTTPRequest $request
-	 * @param HTTPResponse $response
+	 * @param Request $request
+	 * @param Response $response
 	 */
-	public function executeResetPassword (HTTPRequest $request, HTTPResponse $response) : void {
+	public function executeResetPassword (Request $request, Response $response) : void {
 		$request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_OFFICE_ADMIN);
-		if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+		if ($request->getMethod() == Request::HTTP_POST) {
 			$id = intval($request->getDataGET('adminId'), 10);
 			
 			$form = new OfficeAdminFormValidator($this->getDaoManager());
@@ -289,28 +290,14 @@ class OfficesController extends AdminController {
 	
 	/**
 	 * le tableau de bord dans un bureau
-	 * @param HTTPRequest $request
-	 * @param HTTPResponse $response
+	 * @param Request $request
+	 * @param Response $response
 	 */
-	public function executeDashboard (HTTPRequest $request, HTTPResponse $response) : void{
+	public function executeDashboard (Request $request, Response $response) : void{
 		$request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_DASHBOARD);
 		$nombreMembre = $this->memberDAOManager->countCreatedBy($this->office->getId());
 		
-		if ($this->withdrawalDAOManager->hasRequest($this->office->getId(), null)) {
-			$withdrawals = $this->withdrawalDAOManager->getOfficeRequests($this->office->getId(), null);
-		}else {
-			$withdrawals = array();
-		}
-		
-		if ($this->gradeMemberDAOManager->hasOperation($this->office->getId())) {
-			$this->office->setOperations($this->gradeMemberDAOManager->getOperations($this->office->getId()));
-		}
-		
-		if ($this->virtualMoneyDAOManager->hasVirtualMoney($this->office->getId())) {
-			$this->office->setVirtualMoneys($this->virtualMoneyDAOManager->forOffice($this->office->getId()));
-		}
-		
-		$this->office->setWithdrawals($withdrawals);
+		$this->office = $this->officeDAOManager->load($this->office);
 		
 		if ($this->requestVirtualMoneyDAOManager->hasWaiting($this->office->getId())) {
 		    $requests = $this->requestVirtualMoneyDAOManager->getWaiting($this->office->getId());
@@ -334,12 +321,12 @@ class OfficesController extends AdminController {
 	}
 	
 	/**
-	 * @param HTTPRequest $request
-	 * @param HTTPResponse $response
+	 * @param Request $request
+	 * @param Response $response
 	 */
-	public function executeRedirectWithdrawal (HTTPRequest $request, HTTPResponse $response) : void {
+	public function executeRedirectWithdrawal (Request $request, Response $response) : void {
 	    
-	    if ($request->getMethod() != HTTPRequest::HTTP_POST) {
+	    if ($request->getMethod() != Request::HTTP_POST) {
 	        $response->sendRedirect("/admin/offices/");
 	    }
 	    
@@ -367,10 +354,10 @@ class OfficesController extends AdminController {
 	
 	/**
 	 * tableau de board des monais virtuels
-	 * @param HTTPRequest $request
-	 * @param HTTPResponse $response
+	 * @param Request $request
+	 * @param Response $response
 	 */
-	public function executeVirtualmoney(HTTPRequest $request, HTTPResponse $response) : void {
+	public function executeVirtualmoney(Request $request, Response $response) : void {
 		$request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_VIRTUAL_MONEY);
 		
 		if ($this->gradeMemberDAOManager->hasOperation($this->office->getId())) {
@@ -392,10 +379,10 @@ class OfficesController extends AdminController {
 	
 	/**
 	 * envoie d'un nouveau forfait
-	 * @param HTTPRequest $request
-	 * @param HTTPResponse $response
+	 * @param Request $request
+	 * @param Response $response
 	 */
-	public function executeSendVirtualMoney (HTTPRequest $request, HTTPResponse $response) : void {
+	public function executeSendVirtualMoney (Request $request, Response $response) : void {
 		$request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_VIRTUAL_MONEY);
 		
 	    $money = new RequestVirtualMoney();
@@ -416,7 +403,7 @@ class OfficesController extends AdminController {
 		    $request->addAttribute(VirtualMoneyFormValidator::FIELD_REQUEST_MONEY, $requestMoney);
 		}
 		
-		if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+		if ($request->getMethod() == Request::HTTP_POST) {
 			$form = new VirtualMoneyFormValidator($this->getDaoManager());
 			$request->addAttribute($form::FIELD_OFFICE, $this->office);
 			$virtual = $form->createAfterValidation($request);
@@ -437,10 +424,10 @@ class OfficesController extends AdminController {
 	
 	/**
 	 * affichage de membres qui se sont adherer, en passant par le bureau
-	 * @param HTTPRequest $request
-	 * @param HTTPResponse $response
+	 * @param Request $request
+	 * @param Response $response
 	 */
-	public function executeMembers (HTTPRequest $request, HTTPResponse $response) : void {
+	public function executeMembers (Request $request, Response $response) : void {
 	    $request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_MEMBERS);
 	    
 	    $nombre = $this->memberDAOManager->countCreatedBy($this->office->getId());
@@ -463,10 +450,10 @@ class OfficesController extends AdminController {
 	}
 	
 	/**
-	 * @param HTTPRequest $request
-	 * @param HTTPResponse $response
+	 * @param Request $request
+	 * @param Response $response
 	 */
-	public function executeUpgrades (HTTPRequest $request, HTTPResponse $response) : void {
+	public function executeUpgrades (Request $request, Response $response) : void {
 	    $request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_MEMBERS);
 	    //upgrades
 	    if ($this->gradeMemberDAOManager->hasOperation($this->office->getId(), true)) {
@@ -480,10 +467,10 @@ class OfficesController extends AdminController {
 	
 	/**
 	 * consultation de l'istorique des activites d'un office
-	 * @param HTTPRequest $request
-	 * @param HTTPResponse $response
+	 * @param Request $request
+	 * @param Response $response
 	 */
-	public function executeHistory (HTTPRequest $request, HTTPResponse $response) : void {
+	public function executeHistory (Request $request, Response $response) : void {
 	    $request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_HISTORY);
 	    
 	    $date = null;

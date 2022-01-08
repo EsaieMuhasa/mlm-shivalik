@@ -1,6 +1,5 @@
-<?php use Library\Page;
-
+<?php 
 require_once 'nav.php'; ?>
 <hr/>
 
-<?php echo $_REQUEST[Page::ATT_VIEW]; ?>
+<?php echo $_REQUEST[\PHPBackend\Page::ATT_VIEW]; ?>

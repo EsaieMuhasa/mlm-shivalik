@@ -1,19 +1,19 @@
 <?php
 namespace Applications\Index\Modules\News;
 
-use Library\Controller;
-use Library\HTTPRequest;
-use Library\HTTPResponse;
+use PHPBackend\Http\HTTPController;
+use PHPBackend\Request;
+use PHPBackend\Response;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-class NewsController extends Controller
+class NewsController extends HTTPController
 {
 
-    public function executeIndex (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeIndex (Request $request, Response $response) : void {
         
     }
 }

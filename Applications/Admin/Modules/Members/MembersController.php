@@ -1,21 +1,23 @@
 <?php
 namespace Applications\Admin\Modules\Members;
 
-use Library\HTTPRequest;
-use Library\HTTPResponse;
-use Managers\GradeDAOManager;
-use Validators\GradeMemberFormValidator;
-use Validators\LocalisationFormValidator;
-use Validators\MemberFormValidator;
-use Managers\CountryDAOManager;
-use Applications\Admin\AdminApplication;
-use Managers\GradeMemberDAOManager;
-use Library\AppMessage;
 use Applications\Admin\AdminController;
-use Entities\Member;
-use Library\Image2D\Mlm\TreeFormatter;
-use Library\Image2D\Mlm\Ternary\TernaryTreeBuilder;
-use Library\Image2D\Mlm\Ternary\TernaryTreeRender;
+use Core\Shivalik\Managers\GradeDAOManager;
+use Core\Shivalik\Managers\CountryDAOManager;
+use Core\Shivalik\Managers\GradeMemberDAOManager;
+use PHPBackend\Application;
+use PHPBackend\Request;
+use PHPBackend\Response;
+use Core\Shivalik\Entities\GradeMember;
+use Core\Shivalik\Validators\GradeMemberFormValidator;
+use Core\Shivalik\Entities\Member;
+use Applications\Admin\AdminApplication;
+use PHPBackend\Image2D\Mlm\Ternary\TernaryTreeBuilder;
+use PHPBackend\Image2D\Mlm\Ternary\TernaryTreeRender;
+use PHPBackend\Image2D\Mlm\TreeFormatter;
+use Core\Shivalik\Validators\MemberFormValidator;
+use Core\Shivalik\Validators\LocalisationFormValidator;
+use PHPBackend\ToastMessage;
 
 /**
  *
@@ -71,9 +73,9 @@ class MembersController extends AdminController
     
     /**
      * {@inheritDoc}
-     * @see \Library\Controller::__construct()
+     * @see \Applications\Admin\AdminController::__construct()
      */
-    public function __construct(\Library\Application $application, $action, $module)
+    public function __construct(Application $application, string $action, string $module)
     {
         parent::__construct($application, $action, $module);
         $nombre = $this->memberDAOManager->countAll();
@@ -82,18 +84,18 @@ class MembersController extends AdminController
     }
 
     /**
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeMembers (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeMembers (Request $request, Response $response) : void {
         
-        if ($request->getMethod() == HTTPRequest::HTTP_POST) {//RECHERCHE D'UN MEMBRE EN FONCTION DES SON ID
+        if ($request->getMethod() == Request::HTTP_POST) {//RECHERCHE D'UN MEMBRE EN FONCTION DES SON ID
             if ($this->memberDAOManager->matriculeExist($request->getDataPOST('id'))) {
                 $member = $this->memberDAOManager->getForMatricule($request->getDataPOST('id'));
                 $response->sendRedirect("/admin/members/{$member->getId()}/");
             }
             
-            $message = new AppMessage('Error', "Know user ID in system => {$request->getDataPOST('id')}", AppMessage::MESSAGE_ERROR);
+            $message = new ToastMessage('Error', "Know user ID in system => {$request->getDataPOST('id')}", ToastMessage::MESSAGE_ERROR);
             $request->addAppMessage($message);
             $response->sendRedirect('/admin/');
         }
@@ -132,12 +134,12 @@ class MembersController extends AdminController
     
     
     /**
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeAddMember (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeAddMember (Request $request, Response $response) : void {
         
-        if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+        if ($request->getMethod() == Request::HTTP_POST) {
             $form = new GradeMemberFormValidator($this->getDaoManager());
             $request->addAttribute(GradeMemberFormValidator::FIELD_OFFICE_ADMIN, AdminApplication::getConnectedUser());
             $gm = $form->createAfterValidation($request);
@@ -164,10 +166,10 @@ class MembersController extends AdminController
     
     /**
      * Dashoard du compte d'un membre
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeMember (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeMember (Request $request, Response $response) : void {
         $id = intval($request->getDataGET('id'), 10);
         if (!$this->memberDAOManager->idExist($id)) {
             $response->sendError();
@@ -176,9 +178,10 @@ class MembersController extends AdminController
         $request->addAttribute(self::ATT_SELECTED_ITEM_MENU, self::ATT_ITEM_MENU_DASHBORAD);
         
         /**
-         * @var \Entities\Member $member
+         * @var Member $member
          */
         $member = $this->memberDAOManager->getForId($id);
+        $member->setPacket($this->gradeMemberDAOManager->getCurrent($member->getId()));
         
         if ($this->gradeMemberDAOManager->hasCurrent($member->getId())) {
             $gradeMember = $this->gradeMemberDAOManager->getCurrent($id);
@@ -203,21 +206,21 @@ class MembersController extends AdminController
     
     /**
      * 
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeUpdateMember (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeUpdateMember (Request $request, Response $response) : void {
         $id = intval($request->getDataGET('id'), 10);
         if (!$this->memberDAOManager->idExist($id)) {
             $response->sendError();
         }
         
         /**
-         * @var \Entities\Member $member
+         * @var Member $member
          */
         $member = $this->memberDAOManager->getForId($id);
         
-        if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+        if ($request->getMethod() == Request::HTTP_POST) {
         	$form = new MemberFormValidator($this->getDaoManager());
         	$request->addAttribute($form::CHAMP_ID, $id);
         	$member = $form->updateAfterValidation($request);
@@ -235,21 +238,21 @@ class MembersController extends AdminController
     }
     
     /**
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeResetPassword (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeResetPassword (Request $request, Response $response) : void {
     	$id = intval($request->getDataGET('id'), 10);
     	if (!$this->memberDAOManager->idExist($id)) {
     		$response->sendError();
     	}
     	
     	/**
-    	 * @var \Entities\Member $member
+    	 * @var Member $member
     	 */
     	$member = $this->memberDAOManager->getForId($id);
     	
-    	if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+    	if ($request->getMethod() == Request::HTTP_POST) {
     		$id = intval($request->getDataGET('id'), 10);
     		
     		$form = new MemberFormValidator($this->getDaoManager());
@@ -272,10 +275,10 @@ class MembersController extends AdminController
     }
     
     /**
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeDownlines (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeDownlines (Request $request, Response $response) : void {
         
         $id = intval($request->getDataGET('id'), 10);
         if (!$this->memberDAOManager->idExist($id)) {
@@ -285,7 +288,7 @@ class MembersController extends AdminController
         $request->addAttribute(self::ATT_SELECTED_ITEM_MENU, self::ATT_ITEM_MENU_DOWNLINES);
         
         /**
-         * @var \Entities\Member $member
+         * @var Member $member
          */
         $member = $this->memberDAOManager->getForId($id);
         
@@ -332,10 +335,10 @@ class MembersController extends AdminController
     }
     
     /**
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeDownlinesHierarchy (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeDownlinesHierarchy (Request $request, Response $response) : void {
         
         $id = intval($request->getDataGET('id'), 10);
         if (!$this->memberDAOManager->idExist($id)) {
@@ -345,7 +348,7 @@ class MembersController extends AdminController
         $request->addAttribute(self::ATT_SELECTED_ITEM_MENU, self::ATT_ITEM_MENU_DOWNLINES);
         
         /**
-         * @var \Entities\Member $member
+         * @var Member $member
          */
         $member = $this->memberDAOManager->getForId($id);
         
@@ -388,10 +391,10 @@ class MembersController extends AdminController
     
     /**
      * generation de l'arbre genealogique d'un membre
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeTree (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeTree (Request $request, Response $response) : void {
         
         $id = intval($request->getDataGET('id'), 10);
         if (!$this->memberDAOManager->idExist($id)) {
@@ -403,7 +406,7 @@ class MembersController extends AdminController
         $request->addAttribute(self::ATT_SELECTED_ITEM_MENU, self::ATT_ITEM_MENU_DOWNLINES);
         
         /**
-         * @var \Entities\Member $member
+         * @var Member $member
          */
         $member = $this->memberDAOManager->getForId($id);
         
@@ -448,10 +451,10 @@ class MembersController extends AdminController
     
     
     /**
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeWithdrawalsMember (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeWithdrawalsMember (Request $request, Response $response) : void {
         $id = intval($request->getDataGET('id'), 10);
         if (!$this->memberDAOManager->idExist($id)) {
             $response->sendError();
@@ -460,7 +463,7 @@ class MembersController extends AdminController
         $request->addAttribute(self::ATT_SELECTED_ITEM_MENU, self::ATT_ITEM_MENU_WITHDRAWALS);
         
         /**
-         * @var \Entities\Member $member
+         * @var Member $member
          */
         $member = $this->memberDAOManager->getForId($id);
         
@@ -499,10 +502,10 @@ class MembersController extends AdminController
     
     /**
      * 
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeStateMember (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeStateMember (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Union members");
         $id = intval($request->getDataGET('id'), 10);
         if (!$this->memberDAOManager->idExist($id)) {
@@ -512,7 +515,7 @@ class MembersController extends AdminController
         $state = ($request->getDataGET('state') == 'enable');
         
         /**
-         * @var \Entities\Member $member
+         * @var Member $member
          */
         $member = $this->memberDAOManager->getForId($id);
         
@@ -526,10 +529,10 @@ class MembersController extends AdminController
     
     /**
      * 
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeUpgradeMember (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeUpgradeMember (Request $request, Response $response) : void {
         $id = intval($request->getDataGET('id'), 10);
         if (!$this->memberDAOManager->idExist($id)) {
             $response->sendError();
@@ -540,13 +543,13 @@ class MembersController extends AdminController
         }
         
         /**
-         * @var \Entities\Member $member
+         * @var Member $member
          */
         $member = $this->memberDAOManager->getForId($id);
         $gradeMember = $this->gradeMemberDAOManager->getCurrent($id);
         $gradeMember->setMember($member);
         
-        if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+        if ($request->getMethod() == Request::HTTP_POST) {
             $form = new GradeMemberFormValidator($this->getDaoManager());
             $request->addAttribute(GradeMemberFormValidator::FIELD_OFFICE_ADMIN, AdminApplication::getConnectedUser());
             $request->addAttribute($form::FIELD_MEMBER, $member->getId());
@@ -569,10 +572,10 @@ class MembersController extends AdminController
     
     /**
      *
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeCertifyMember (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeCertifyMember (Request $request, Response $response) : void {
         
         $id = intval($request->getDataGET('id'), 10);
         $gmId = intval($request->getDataGET('idGradeMember'), 10);
@@ -582,7 +585,7 @@ class MembersController extends AdminController
         }
         
         /**
-         * @var \Entities\GradeMember $gradeMember
+         * @var GradeMember $gradeMember
          */
         $gradeMember = $this->gradeMemberDAOManager->getForId($gmId);
         $member = $gradeMember->getMember();
