@@ -8,7 +8,6 @@ use PHPBackend\DAOException;
 use PHPBackend\Request;
 use PHPBackend\Config\VarList;
 use PHPBackend\File\UploadedFile;
-use PHPBackend\Http\HTTPRequest;
 use PHPBackend\Validator\IllegalFormValueException;
 
 /**
@@ -30,7 +29,11 @@ class MemberFormValidator extends UserFormValidator
      */
     private $processPhoto;
     
-    
+    /**
+     * validation du parent d'un du membre adhereant
+     * @param string $parent le matricule du parent
+     * @throws IllegalFormValueException
+     */
     private function validationParent ($parent) : void {
         try {
             if ($parent!=null && !$this->memberDAOManager->checkByMatricule($parent)) {
@@ -41,9 +44,19 @@ class MemberFormValidator extends UserFormValidator
         }
     }
     
+    /**
+     * validation du sponsor du membre
+     * @param string $sponsor le matricule du sponsor
+     * @throws IllegalFormValueException
+     */
     private function validationSponsor ($sponsor) : void {
+        
+        if ($sponsor == null) {
+            throw new IllegalFormValueException("sponsor can not be empty");
+        }
+        
         try {
-            if ($sponsor!=null && !$this->memberDAOManager->checkByMatricule($sponsor)) {
+            if (!$this->memberDAOManager->checkByMatricule($sponsor)) {
                 throw new IllegalFormValueException("unknown ID in system");
             }
         } catch (DAOException $e) {
@@ -52,20 +65,21 @@ class MemberFormValidator extends UserFormValidator
     }
     
     /**
+     * finalisation dela validation du pseudo de connexion d'un membre
      * {@inheritDoc}
      * @see \Core\Shivalik\Validators\UserFormValidator::validationPseudo()
      */
-    protected function validationPseudo($pseudo, bool $onConnection = false, $id = -1): void
+    protected function validationPseudo($pseudo, bool $onConnection = false, $id = null): void
     {
         parent::validationPseudo($pseudo, $onConnection, $id);
         try {    
             if ($onConnection) {
                 if (!$this->memberDAOManager->checkByPseudo($pseudo)) {
-                    throw new IllegalFormValueException("unknown user");
+                    throw new IllegalFormValueException("unknown user in system");
                 }
             } else {                
                 if ($this->memberDAOManager->checkByPseudo($pseudo, $id)) {
-                    throw new IllegalFormValueException("username are used");
+                    throw new IllegalFormValueException("this username are used");
                 }
             }
         } catch (DAOException $e) {
@@ -73,7 +87,13 @@ class MemberFormValidator extends UserFormValidator
         }
         
     }
-
+    
+    /**
+     * validation du peid sur le quel le membre doit doit etre affecter
+     * @param int $foot
+     * @param VarList $foots
+     * @throws IllegalFormValueException
+     */
     private function validationFoot ($foot, VarList $foots) : void {
         
         if ($foot == null) {
@@ -88,19 +108,77 @@ class MemberFormValidator extends UserFormValidator
         
         throw new IllegalFormValueException("the chosen allocation foot is unknown in the system configuration");
     }
-       
-    private function processingParent (Member $member, $parent) : void {
+    
+    /**
+     * processuce de traitement/validation du parent du membre adherant
+     * @param Member $member
+     * @param int $parent
+     */
+    private function processingParent (Member $member, $parent, VarList $foots) : void {
         try {
             $this->validationParent($parent);
             if ($parent != null) {
                 $member->setParent($this->memberDAOManager->findByMatricule($parent));
             }
+            
+            if ($member->getSponsor() == null) {
+                return;
+            }
+            
+            /**
+             * @var Member $parentNode
+             */
+            $parentNode = $member->getParent()!=null? $member->getParent() : $member->getSponsor();
+            $foot = null;
+            
+            foreach ($foots->getItems() as $item) {//verification des pieds du parent
+                if (!$this->memberDAOManager->checkChild($parentNode->getId(), intval($item->getValue()))) {
+                    $foot = intval($item->getValue(), 10);
+                    break;
+                }
+            }
+            
+            if ($foot === null) {
+                
+                while ($this->memberDAOManager->checkChilds($parentNode->getId())) {
+                    $childs =$this->memberDAOManager->findChilds($parentNode->getId());
+                    
+                    foreach ($childs as $child) {//verification des pieds de certains affants du reseau
+                        foreach ($foots->getItems() as $item) {
+                            if (!$this->memberDAOManager->checkChild($child->getId(), intval($item->getValue()))) {
+                                $foot = intval($item->getValue(), 10);
+                                $parentNode = $child;
+                                break;
+                            }
+                        }
+                        
+                        if ($parentNode == $child) {
+                            break;
+                        }
+                    }
+                    
+                    if ($foot !== null) {
+                        break;
+                    }
+                    
+                    $parentNode = $childs[array_key_first($childs)];
+                }
+            }
+            
+            $member->setFoot($foot);
+            $member->setParent($parentNode);
+            
         } catch (IllegalFormValueException $e) {
             $this->addError(self::FIELD_PARENT, $e->getMessage());
             $member->setParent(new Member(array('matricule' => $parent)));
         }
     }
     
+    /**
+     * processuce de traitement/validation du sponsor de membre
+     * @param Member $member
+     * @param string $sponsor le matricule du sponsor
+     */
     private function processingSponsor (Member $member, $sponsor) : void {
         try {
             $this->validationSponsor($sponsor);
@@ -113,33 +191,6 @@ class MemberFormValidator extends UserFormValidator
         }
     }
     
-    private function processingFoot (Member $member, VarList $foots) : void {
-        $foot = -1;
-        try {
-            if ($member->getParent() != null && $member->getParent()->getId()!=null && $member->getParent()->getId()>0) {
-                $parent = $member->getParent();
-                
-                foreach ($foots->getItems() as $item) {
-                    if (!$this->memberDAOManager->checkChild($parent->getId(), intval($item->getValue()))) {
-                        $foot = intval($item->getValue(), 10);
-                    }
-                }
-                
-            }else {
-                $member->setFoot(null);
-                return;
-            }
-        } catch (DAOException $e) {
-            $this->addError(self::FIELD_FOOT, $e->getMessage());
-        }
-        
-        if ($foot == -1) {
-            $this->addError(self::FIELD_FOOT, "All the parents' feet are already accupied");
-        }
-        
-        $member->setFoot($foot);
-    }
-    
     /**
      * @return UploadedFile|NULL
      */
@@ -150,10 +201,10 @@ class MemberFormValidator extends UserFormValidator
 
     /**
      * 
-     * @param HTTPRequest $request
+     * @param Request $request
      * @return Member
      */
-    public function processingMember (HTTPRequest $request) : Member {
+    public function processingMember (Request $request) : Member {
         $user = new Member();
         $name = $request->getDataPOST(self::FIELD_NAME);
         $postName = $request->getDataPOST(self::FIELD_POST_NAME);
@@ -176,21 +227,22 @@ class MemberFormValidator extends UserFormValidator
         $this->processingTelephone($user, $telephone);
         $this->processingPassword($user, $password, $confirmation, false);
         $this->processingPseudo($user, $pseudo);
-        if ($photo->isUploadedFile()) {
+        if ($photo->isFile()) {
 	        $this->processingPhoto($user, $photo);
         }
-        $this->processingParent($user, $parent);
         $this->processingSponsor($user, $sponsor);
-        $this->processingFoot($user, $request->getApplication()->getConfig()->get(self::DEFINE_CONFIG_FOOTS));
+        $this->processingParent($user, $parent, $request->getApplication()->getConfig()->get(self::DEFINE_CONFIG_FOOTS));
         $this->processPhoto = $photo;
 
-        return $user; 
+        return $user;
     }
     
     /**
+     * reinitialisation du mot de passe d'un membre par l'administrateur cetrale
+     * @param Request $request
      * @return Member
      */
-    public function resetPasswordAfterValidation (HTTPRequest $request) : Member {
+    public function resetPasswordAfterValidation (Request $request) : Member {
     	$member = new Member();
     	$password = $request->getDataPOST(self::FIELD_PASSWORD);
     	$confirmation = $request->getDataPOST(self::FIELD_CONFIRMATION);
@@ -212,6 +264,7 @@ class MemberFormValidator extends UserFormValidator
     }
     
     /**
+     * mise en jour du mot de passe du compte d'un membre, par le membre lui meme
      * {@inheritDoc}
      * @see \Core\Shivalik\Validators\UserFormValidator::updatePasswordAfterValidation()
      */
@@ -230,7 +283,7 @@ class MemberFormValidator extends UserFormValidator
         
         if (!$this->hasError()) {
             try {
-                $user = $this->memberDAOManager->getForId(MemberApplication::getConnectedMember()->getId());
+                $user = $this->memberDAOManager->findById(MemberApplication::getConnectedMember()->getId());
                 if ($user->getPassword() != sha1($old)) {
                     $this->addError('old', "invalid password");
                 }else {
@@ -241,12 +294,12 @@ class MemberFormValidator extends UserFormValidator
             }
         }
         
-        $this->result = $this->hasError()? "password update failed":"password update success";
-        
-        return $member;        
+        $this->result = $this->hasError()? "password update failed" : "password update success";
+        return $member;
     }
     
     /**
+     * modification de la photo de profil par le membre lui meme
      * {@inheritDoc}
      * @see \Core\Shivalik\Validators\UserFormValidator::updatePhotoAfterValidation()
      */
@@ -264,7 +317,7 @@ class MemberFormValidator extends UserFormValidator
         
         if (!$this->hasError()) {
             try {
-                $this->processingPhoto($member, $photo, true);
+                $this->processingPhoto($member, $photo, true, $request->getApplication()->getConfig());
                 $this->memberDAOManager->updatePhoto(MemberApplication::getConnectedMember()->getId(), $member->getPhoto());
                 MemberApplication::getConnectedMember()->setPhoto($member->getPhoto());
             } catch (DAOException $e) {
@@ -289,7 +342,7 @@ class MemberFormValidator extends UserFormValidator
        
         if (!$this->hasError()) {
             try {
-                $this->processingPhoto($user, $photo, true);
+                $this->processingPhoto($user, $photo, true, $request->getApplication()->getConfig());
             } catch (DAOException $e) {
                 $this->setMessage($e->getMessage());
             }

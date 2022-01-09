@@ -4,6 +4,7 @@ namespace Core\Shivalik\Validators;
 use Core\Shivalik\Entities\Office;
 use Core\Shivalik\Managers\MemberDAOManager;
 use Core\Shivalik\Managers\OfficeDAOManager;
+use PHPBackend\AppConfig;
 use PHPBackend\DAOException;
 use PHPBackend\Request;
 use PHPBackend\File\UploadedFile;
@@ -12,7 +13,6 @@ use PHPBackend\Image2D\Image;
 use PHPBackend\Image2D\ImageResizing;
 use PHPBackend\Validator\DefaultFormValidator;
 use PHPBackend\Validator\IllegalFormValueException;
-use React\Dns\Config\Config;
 
 /**
  *
@@ -42,6 +42,7 @@ class OfficeFormValidator extends DefaultFormValidator
     private $photo;
     
     /**
+     * validation du nom de l'office
      * @param string $name
      * @throws IllegalFormValueException
      */
@@ -51,6 +52,12 @@ class OfficeFormValidator extends DefaultFormValidator
         }
     }
     
+    /**
+     * validation de la photo de l'office
+     * @param UploadedFile $photo
+     * @param bool $onCreate
+     * @throws IllegalFormValueException
+     */
     private function validationPhoto (UploadedFile $photo, bool $onCreate=true) : void {
         if (!$photo->isFile() && $onCreate) {
             throw new IllegalFormValueException("select the desktop photo");
@@ -79,6 +86,12 @@ class OfficeFormValidator extends DefaultFormValidator
     	}
     }
     
+    
+    /**
+     * processuce de traitement/validation du nom de l'office
+     * @param Office $office
+     * @param string $name
+     */
     private function processingName (Office $office, $name) : void {
         try {
             $this->validationName($name);
@@ -90,12 +103,13 @@ class OfficeFormValidator extends DefaultFormValidator
     }
     
     /**
+     * processuce de validation du membre proprietaire de l'office
      * @param Office $office
      * @param string $matricule
      * @param boolean $onCreate
      * @param int $id
      */
-    private function processingMember (Office $office, $matricule, $onCreate = true, $id=-1) : void  {
+    private function processingMember (Office $office, $matricule, $onCreate = true, $id=null) : void  {
     	try {
     		
     		$this->validationMember($matricule);
@@ -121,13 +135,13 @@ class OfficeFormValidator extends DefaultFormValidator
     }
     
     /**
-     * 
+     * processuce de triatement/validation dela photo de profil de l'office
      * @param Office $office
      * @param UploadedFile $photo
      * @param bool $write
      * @param bool $onCreate
      */
-    public function processingPhoto (Office $office, UploadedFile $photo, bool $write = false, bool $onCreate = true) : void {
+    public function processingPhoto (Office $office, UploadedFile $photo, bool $write = false, bool $onCreate = true, AppConfig $config = null) : void {
         
     	try {
             $this->validationPhoto($photo, $onCreate);
@@ -137,9 +151,9 @@ class OfficeFormValidator extends DefaultFormValidator
         
         if ($write && $photo->isImage()) {
             $time = time();
-            $reelName = self::getAbsolutDataDirName($photo->getApplication()->getConfig(), $office->getId()).DIRECTORY_SEPARATOR.$office->getId().'-'.$time.'-reel.'.$photo->getExtension();
-            $reelFullName = self::getDataDirName($photo->getApplication()->getConfig(), $office->getId()).DIRECTORY_SEPARATOR.$office->getId().'-'.$time.'-reel.'.$photo->getExtension();
-            $photoName = self::getDataDirName($photo->getApplication()->getConfig(), $office->getId()).DIRECTORY_SEPARATOR.$office->getId().'-'.$time.'.'.$photo->getExtension();
+            $reelName = self::getAbsolutDataDirName($config, $office->getId()).DIRECTORY_SEPARATOR.$office->getId().'-'.$time.'-reel.'.$photo->getExtension();
+            $reelFullName = self::getDataDirName($config, $office->getId()).DIRECTORY_SEPARATOR.$office->getId().'-'.$time.'-reel.'.$photo->getExtension();
+            $photoName = self::getDataDirName($config, $office->getId()).DIRECTORY_SEPARATOR.$office->getId().'-'.$time.'.'.$photo->getExtension();
             $photo->getApplication()->writeUploadedFile($photo, $reelFullName);
             ImageResizing::profiling(new Image($reelName));
             $office->setPhoto($photoName);
@@ -195,9 +209,9 @@ class OfficeFormValidator extends DefaultFormValidator
         
         if (!$this->hasError()) {
             try {
-                $office->setCentral($request->getDataPOST('central') === 'central');
+                //$office->setCentral($request->getDataPOST('central') === 'central');
                 $this->officeDAOManager->create($office);
-                $this->processingPhoto($office, $this->photo, true);
+                $this->processingPhoto($office, $this->photo, true, true, $request->getApplication()->getConfig());
                 $this->officeDAOManager->updatePhoto($office->getId(), $office->getPhoto());
             } catch (DAOException $e) {
                 $this->setMessage($e->getMessage());
@@ -227,7 +241,7 @@ class OfficeFormValidator extends DefaultFormValidator
         if (!$this->hasError()) {
             try {
                 if ($photo->isImage()) {
-                    $this->processingPhoto($office, $photo, true);
+                    $this->processingPhoto($office, $photo, true, false, $request->getApplication()->getConfig());
                 }
             	$this->officeDAOManager->update($office, $office->getId());
             } catch (DAOException $e) {
@@ -242,11 +256,11 @@ class OfficeFormValidator extends DefaultFormValidator
     
     /**
      * recuperation du non du dossier qui confiendras les informations bruts d'un utilisateur
-     * @param Config $config
+     * @param AppConfig $config
      * @param int $id
      * @return string
      */
-    public final static function getDataDirName (Config $config, int $id) : string{
+    public final static function getDataDirName (AppConfig $config, int $id) : string{
         $fold = 'offices'.DIRECTORY_SEPARATOR.($id!=0? $id : '0');
         $dirPath = dirname(__DIR__).DIRECTORY_SEPARATOR.($config->get('webData')!=null? $config->get('webData') : 'Web').DIRECTORY_SEPARATOR.$fold;
         if (!is_dir($fold)) {
@@ -259,11 +273,11 @@ class OfficeFormValidator extends DefaultFormValidator
     
     /**
      * revoie le chemain absolute
-     * @param Config $config
+     * @param AppConfig $config
      * @param int $id
      * @return string
      */
-    public final static function getAbsolutDataDirName(Config $config, int $id) : string {
+    public final static function getAbsolutDataDirName(AppConfig $config, int $id) : string {
         $fold= self::getDataDirName($config, $id);
         return dirname(__DIR__).DIRECTORY_SEPARATOR.($config->get('webData')!=null? $config->get('webData') : 'Web').DIRECTORY_SEPARATOR.$fold;
     }

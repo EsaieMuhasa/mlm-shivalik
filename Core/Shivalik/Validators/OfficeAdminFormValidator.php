@@ -17,7 +17,11 @@ class OfficeAdminFormValidator extends UserFormValidator
     const FIELD_OFFICE = 'office';
     const FIELD_LOCALISATION = 'localisation';    
 
-    
+    /**
+     * validation de l'office dans le quel l'admin doit oeuvrer
+     * @param int $office
+     * @throws IllegalFormValueException
+     */
 	private function validationOffice ($office) : void {
         if ($office == null) {
             throw new IllegalFormValueException("the assignment office is mandatory");
@@ -26,7 +30,9 @@ class OfficeAdminFormValidator extends UserFormValidator
         }
         
         try {
-            
+            if (!$this->officeAdminDAOManager->checkById(intval($office, 10))) {
+                throw new IllegalFormValueException("know office in system");
+            }
         } catch (DAOException $e) {
             throw new IllegalFormValueException($e->getMessage(), IllegalFormValueException::APP_LIB_ERROR_CODE, $e);
         }
@@ -44,7 +50,7 @@ class OfficeAdminFormValidator extends UserFormValidator
         
         parent::validationEmail($email, $id);
         try {
-            if ($this->officeAdminDAOManager->emailExist($email, intval($id))) {
+            if ($this->officeAdminDAOManager->checkByEmail($email, intval($id))) {
                 throw new IllegalFormValueException("email already assigned to another user");
             }
         } catch (DAOException $e) {
@@ -52,13 +58,19 @@ class OfficeAdminFormValidator extends UserFormValidator
         }
     }
 
+    
+    /**
+     * processuce de traitement/validation de l'office où l'administrateur doit ouvrer
+     * @param OfficeAdmin $admin
+     * @param int $office
+     */
     private function processingOffice (OfficeAdmin $admin, $office) : void {
         try {
             $this->validationOffice($office);
+            $admin->setOffice($office);
         } catch (IllegalFormValueException $e) {
             $this->addError(self::FIELD_OFFICE, $e->getMessage());
         }
-        $admin->setOffice($office);
     }
     
     /**
@@ -76,7 +88,7 @@ class OfficeAdminFormValidator extends UserFormValidator
         $telephone = $request->getDataPOST(self::FIELD_TELEPHONE);
         $password = $request->getDataPOST(self::FIELD_PASSWORD);
         
-        $photo = $request->getFile(self::FIELD_PHOTO);
+        $photo = $request->getUploadedFile(self::FIELD_PHOTO);
         
         $this->processingName($user, $name);
         $this->processingPostName($user, $postName);
@@ -101,7 +113,7 @@ class OfficeAdminFormValidator extends UserFormValidator
         	$user->setOffice($request->getAttribute(self::FIELD_OFFICE));
             try {
                 $this->officeAdminDAOManager->create($user);
-                $this->processingPhoto($user, $photo, true);
+                $this->processingPhoto($user, $photo, true, $request->getApplication()->getConfig());
                 $this->officeAdminDAOManager->updatePhoto($user->getId(), $user->getPhoto());
             } catch (DAOException $e) {
                 $this->setMessage($e->getMessage());
@@ -118,13 +130,14 @@ class OfficeAdminFormValidator extends UserFormValidator
      */
     public function updateAfterValidation(Request $request)
     {
-        // TODO Auto-generated method stub
         
     }
 	
     /**
+     * modification du mot de passe
      * {@inheritDoc}
      * @see \Core\Shivalik\Validators\UserFormValidator::updatePasswordAfterValidation()
+     * @return OfficeAdmin
      */
     public function updatePasswordAfterValidation(Request $request): User {
     	$user = new OfficeAdmin();
@@ -151,10 +164,11 @@ class OfficeAdminFormValidator extends UserFormValidator
     /**
      * {@inheritDoc}
      * @see \Core\Shivalik\Validators\UserFormValidator::updatePhotoAfterValidation()
+     * @return OfficeAdmin
      */
     public function updatePhotoAfterValidation(Request $request): User {
     	$member = new OfficeAdmin();
-    	$photo = $request->getFile(self::FIELD_PHOTO);
+    	$photo = $request->getUploadedFile(self::FIELD_PHOTO);
     	
     	if (!$photo->isFile()) {
     		$this->addError(self::FIELD_PHOTO, "make sure you have selected a photo on your terminal");
@@ -165,7 +179,7 @@ class OfficeAdminFormValidator extends UserFormValidator
     	
     	if (!$this->hasError()) {
     		try {
-    			$this->processingPhoto($member, $photo, true);
+    			$this->processingPhoto($member, $photo, true, $request->getApplication()->getConfig());
     			$this->officeAdminDAOManager->updatePhoto($member->getId(), $member->getPhoto());
     		} catch (DAOException $e) {
     			$this->setMessage($e->getMessage());

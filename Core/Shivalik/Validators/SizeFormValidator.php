@@ -53,7 +53,7 @@ class SizeFormValidator extends DefaultFormValidator {
 	 * @param int $id
 	 * @throws IllegalFormValueException
 	 */
-	private function validationName ($name, $id=-1) : void {
+	private function validationName ($name, $id=null) : void {
 		if ($name == null) {
 			throw new IllegalFormValueException("full name is required");
 		}
@@ -90,7 +90,7 @@ class SizeFormValidator extends DefaultFormValidator {
 	 * @param string $abbreviation
 	 * @param number $id
 	 */
-	private function processingAbbreviation (Size $size, $abbreviation, $id = -1) : void {
+	private function processingAbbreviation (Size $size, $abbreviation, $id = null) : void {
 		try {
 			$this->validationAbbreviation($abbreviation, $id);
 		} catch (IllegalFormValueException $e) {
@@ -104,7 +104,7 @@ class SizeFormValidator extends DefaultFormValidator {
 	 * @param string $name
 	 * @param number $id
 	 */
-	private function processingName (Size $size, $name, $id = -1) : void {
+	private function processingName (Size $size, $name, $id = null) : void {
 		try {
 			$this->validationName($name, $id);
 		} catch (IllegalFormValueException $e) {

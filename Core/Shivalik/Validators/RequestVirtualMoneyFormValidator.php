@@ -31,6 +31,7 @@ class RequestVirtualMoneyFormValidator extends DefaultFormValidator {
 	private $virtualMoneyDAOManger;
 	
 	/**
+	 * validation du montant lors de l'envoie d'une requette
 	 * @param number $amount
 	 * @throws IllegalFormValueException
 	 */
@@ -41,6 +42,7 @@ class RequestVirtualMoneyFormValidator extends DefaultFormValidator {
 	}
 	
 	/**
+	 * processuce de traitement/validation du montant lors de l'enveoie d'une requette
 	 * @param RequestVirtualMoney $rv
 	 * @param number $amount
 	 */

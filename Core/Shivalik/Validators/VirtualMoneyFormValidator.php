@@ -78,9 +78,9 @@ class VirtualMoneyFormValidator extends DefaultFormValidator {
 			$money->setOffice($request->getAttribute(self::FIELD_OFFICE));
 			$money->setRequest($request->getAttribute(self::FIELD_REQUEST_MONEY));
 			try {
-			    if ($this->gradeMemberDAOManager->hasOperation($money->getOffice()->getId(), null, false)) {
+			    if ($this->gradeMemberDAOManager->checkByOffice($money->getOffice()->getId(), null, false)) {
 			        //si l'office a deja effectuer des operations, alors on verifie la dette
-    			    $debts = $this->gradeMemberDAOManager->getOperations($money->getOffice()->getId(), null, false);
+    			    $debts = $this->gradeMemberDAOManager->findByOffice($money->getOffice()->getId(), null, false);
     			    
     			    foreach ($debts as $d) {//calcul de la dette
     			        if ($money->getAmount() >= $d->getMembership()) {
@@ -93,7 +93,7 @@ class VirtualMoneyFormValidator extends DefaultFormValidator {
 			    }
     			
 			    
-			    $generator = $this->officeSizeDAOManager->getCurrent($money->getOffice()->getId());//le packet actuel de l'office
+			    $generator = $this->officeSizeDAOManager->findCurrentByOffice($money->getOffice()->getId());//le packet actuel de l'office
 			    
 			    //calcul du %
 			    $bonus = new OfficeBonus();

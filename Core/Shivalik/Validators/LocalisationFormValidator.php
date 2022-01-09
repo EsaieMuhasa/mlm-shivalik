@@ -6,7 +6,6 @@ use Core\Shivalik\Managers\CountryDAOManager;
 use Core\Shivalik\Managers\LocalisationDAOManager;
 use PHPBackend\DAOException;
 use PHPBackend\Request;
-use PHPBackend\Http\HTTPRequest;
 use PHPBackend\Validator\DefaultFormValidator;
 use PHPBackend\Validator\IllegalFormValueException;
 
@@ -33,7 +32,11 @@ class LocalisationFormValidator extends DefaultFormValidator
      */
     private $countryDAOManager;
     
-    
+    /**
+     * validation du pays
+     * @param int $country
+     * @throws IllegalFormValueException
+     */
     private function validationCountry ($country) : void {
         if ($country == null) {
             throw new IllegalFormValueException("country is required");
@@ -48,21 +51,36 @@ class LocalisationFormValidator extends DefaultFormValidator
         }
     }
     
+    /**
+     * validation du nom de la ville
+     * @param string $city
+     * @throws IllegalFormValueException
+     */
     private function validationCity ($city) : void {
         if ($city == null) {
             throw new IllegalFormValueException("city name in country is required");
         }
     }
     
+    /**
+     * processuce de traitement/validation du pays
+     * @param Localisation $localisation
+     * @param int $country
+     */
     private function processingCountry (Localisation $localisation, $country) : void {
         try {
             $this->validationCountry($country);
-            $localisation->setCountry($this->countryDAOManager->getForId(intval($country)));
+            $localisation->setCountry($this->countryDAOManager->findById(intval($country, 10)));
         } catch (IllegalFormValueException $e) {
             $this->addError(self::FIELD_COUNTRY, $e->getMessage());
         }
     }
     
+    /**
+     * processuce de traitement/validation du nom de la ville
+     * @param Localisation $localisation
+     * @param string $city
+     */
     private function processingCity (Localisation $localisation, $city) : void {
         try {
             $this->validationCity($city);
@@ -72,11 +90,21 @@ class LocalisationFormValidator extends DefaultFormValidator
         $localisation->setCity($city);
     }
     
+    /**
+     * processuce de traitement/valdation du nom du quartier
+     * @param Localisation $localisation
+     * @param string $district
+     */
     private function processingDistrict (Localisation $localisation, $district) : void {
         $localisation->setDistrict($district);
     }
     
-    public function processingLocalisation (HTTPRequest $request) : Localisation {
+    /**
+     * utilitaire de validation de la localisation
+     * @param Request $request
+     * @return Localisation
+     */
+    public function processingLocalisation (Request $request) : Localisation {
         $localisation = new Localisation();
         $country = $request->getDataPOST(self::FIELD_COUNTRY);
         $city = $request->getDataPOST(self::FIELD_CITY);
@@ -90,8 +118,10 @@ class LocalisationFormValidator extends DefaultFormValidator
     }
     
     /**
+     * processuce de validation de la localisation
      * {@inheritDoc}
      * @see \PHPBackend\Validator\FormValidator::createAfterValidation()
+     * @return Localisation
      */
     public function createAfterValidation(Request $request)
     {
@@ -112,8 +142,10 @@ class LocalisationFormValidator extends DefaultFormValidator
     }
 
     /**
+     * modification de 'adresse (localisation)
      * {@inheritDoc}
      * @see \PHPBackend\Validator\FormValidator::updateAfterValidation()
+     * @return Localisation
      */
     public function updateAfterValidation(Request $request)
     {

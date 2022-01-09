@@ -25,6 +25,12 @@ class GenerationFormValidator extends DefaultFormValidator
      */
     private $generationDAOManager;
     
+    /**
+     * validation de l'appelation d'une generation
+     * @param string $name
+     * @param int $id
+     * @throws IllegalFormValueException
+     */
     private function validationName ($name, $id = null) : void {
         if ($name == null) {
             throw new IllegalFormValueException("generation name is required");
@@ -39,6 +45,12 @@ class GenerationFormValidator extends DefaultFormValidator
         }
     }
     
+    /**
+     * validation de l'abreviation d'une generation
+     * @param string $abbreviation
+     * @param int $id
+     * @throws IllegalFormValueException
+     */
     private function validationAbbreviation ($abbreviation, $id = null) : void {
         if ($abbreviation == null) {
             throw new IllegalFormValueException("generation abbreviation is required");
@@ -53,6 +65,12 @@ class GenerationFormValidator extends DefaultFormValidator
         }
     }
     
+    /**
+     * validation du numero de la generation
+     * @param int $number
+     * @param int $id
+     * @throws IllegalFormValueException
+     */
     private function validationNumber ($number, $id = -1) : void {
         if ($number == null) {
             throw new IllegalFormValueException("generation number is required");
@@ -69,6 +87,11 @@ class GenerationFormValidator extends DefaultFormValidator
         }
     }
     
+    /**
+     * valisation du pourcentage de benefice pour la generation
+     * @param number $percentage
+     * @throws IllegalFormValueException
+     */
     private function validationPercentage ($percentage) : void {
         if ($percentage == null) {
             throw new IllegalFormValueException("generation percentage is required");
@@ -77,7 +100,12 @@ class GenerationFormValidator extends DefaultFormValidator
         }
     }
     
-    
+    /**
+     * processuce de traitement/validation du nom d'une generation
+     * @param Generation $generation
+     * @param string $name
+     * @param int $id
+     */
     private function processingName (Generation $generation, $name, $id=-1) : void {
         try {
             $this->validationName($name, $id);
@@ -87,6 +115,13 @@ class GenerationFormValidator extends DefaultFormValidator
         $generation->setName($name);
     }
     
+    
+    /**
+     * processuce de validation/traitement de l'abreviation d'une generation
+     * @param Generation $generation
+     * @param string $abbreviation
+     * @param string $id
+     */
     private function processingAbbreviation (Generation $generation, $abbreviation, $id=-1) : void {
         try {
             $this->validationAbbreviation($abbreviation, $id);
@@ -96,6 +131,12 @@ class GenerationFormValidator extends DefaultFormValidator
         $generation->setAbbreviation($abbreviation);
     }
     
+    /**
+     * traitement/validation du numero d'une generation
+     * @param Generation $generation
+     * @param int $number
+     * @param int $id
+     */
     private function processingNumber (Generation $generation, $number, $id=-1) : void {
         try {
             $this->validationNumber($number, $id);
@@ -105,6 +146,11 @@ class GenerationFormValidator extends DefaultFormValidator
         $generation->setNumber($number);
     }
     
+    /**
+     * traitement/validation du pourcentage pour la dite generation
+     * @param Generation $generation
+     * @param number $percentage
+     */
     private function processingPercentage (Generation $generation, $percentage) : void {
         try {
             $this->validationPercentage($percentage);
@@ -115,6 +161,7 @@ class GenerationFormValidator extends DefaultFormValidator
     }
     
     /**
+     * processuce de creation d'une nouvelle generation
      * {@inheritDoc}
      * @see \PHPBackend\Validator\FormValidator::createAfterValidation()
      * @return Generation
@@ -147,6 +194,7 @@ class GenerationFormValidator extends DefaultFormValidator
     }
 
     /**
+     * processuce d'edition d'une generation
      * {@inheritDoc}
      * @see \PHPBackend\Validator\FormValidator::updateAfterValidation()
      * @return Generation
@@ -178,7 +226,5 @@ class GenerationFormValidator extends DefaultFormValidator
         return $generation;
     }
 
-
-    
 }
 

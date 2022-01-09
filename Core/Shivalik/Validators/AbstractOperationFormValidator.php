@@ -15,6 +15,7 @@ abstract class AbstractOperationFormValidator extends DefaultFormValidator
     const FIELD_AMOUNT = 'amount';
     
     /**
+     * validation d'un montant
      * @param number $amount
      */
     protected  function validationAmount ($amount) : void {

@@ -10,6 +10,7 @@ use PHPBackend\DAOException;
 use PHPBackend\Request;
 use PHPBackend\Validator\DefaultFormValidator;
 use PHPBackend\Validator\IllegalFormValueException;
+use PHPBackend\PHPBackendException;
 
 /**
  *
@@ -37,7 +38,9 @@ class OfficeSizeFormValidator extends DefaultFormValidator {
 	private $officeDAOManager;
 	
 	/**
+	 * validation du packet de l'office
 	 * @param number $size
+	 * @throws IllegalFormValueException
 	 */
 	private function validationSize ($size) : void {
 		if ($size == null) {
@@ -56,6 +59,7 @@ class OfficeSizeFormValidator extends DefaultFormValidator {
 	}
 	
 	/**
+	 * processuce de traitement/validation du packet de l'office
 	 * @param OfficeSize $os
 	 * @param number $size
 	 */
@@ -110,7 +114,7 @@ class OfficeSizeFormValidator extends DefaultFormValidator {
      */
     public function updateAfterValidation(\PHPBackend\Request $request)
     {
-        
+        throw new PHPBackendException("you have not permission to perform this operation");
     }
 
 

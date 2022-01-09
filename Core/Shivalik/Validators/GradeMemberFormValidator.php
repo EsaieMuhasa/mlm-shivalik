@@ -7,8 +7,8 @@ use Core\Shivalik\Managers\GradeDAOManager;
 use Core\Shivalik\Managers\GradeMemberDAOManager;
 use Core\Shivalik\Managers\MemberDAOManager;
 use PHPBackend\DAOException;
+use PHPBackend\PHPBackendException;
 use PHPBackend\Request;
-use PHPBackend\Http\HTTPRequest;
 use PHPBackend\Validator\DefaultFormValidator;
 use PHPBackend\Validator\IllegalFormValueException;
 
@@ -41,7 +41,8 @@ class GradeMemberFormValidator extends DefaultFormValidator
     private $gradeDAOManager;
     
     /**
-     * @param string $grade
+     * validation du packet soliciter par le membre
+     * @param string|int $grade
      * @throws IllegalFormValueException
      */
     private function validationGrade ($grade) : void {
@@ -53,6 +54,7 @@ class GradeMemberFormValidator extends DefaultFormValidator
     }
     
     /**
+     * validation d'un identifiant d'un grade d'un membre
      * {@inheritDoc}
      * @see \PHPBackend\Validator\DefaultFormValidator::validationId()
      */
@@ -69,6 +71,11 @@ class GradeMemberFormValidator extends DefaultFormValidator
         }
     }
 
+    /**
+     * validation du membre proprietaire deu packet
+     * @param int $member
+     * @throws IllegalFormValueException
+     */
     private function validationMember ($member) : void {
         if ($member == null) {
             throw new IllegalFormValueException("the reference of the member concerned is mandatory");
@@ -85,6 +92,11 @@ class GradeMemberFormValidator extends DefaultFormValidator
         }
     }
     
+    /**
+     * validation du montant d'adhesion, payer par le membre du syndicat
+     * @param number $membership
+     * @throws IllegalFormValueException
+     */
     private function validationMembership ($membership) : void {
         if ($membership == null) {
             throw new IllegalFormValueException("the membership fee is mandatory");
@@ -93,6 +105,11 @@ class GradeMemberFormValidator extends DefaultFormValidator
         }
     }
     
+    /**
+     * validation du montant considerer comme achat produit lors de l'adhesion d'un membre
+     * @param number $product
+     * @throws IllegalFormValueException
+     */
     private function validationProduct ($product) : void {
         if ($product == null) {
             throw new IllegalFormValueException("the amount allocated to the products is mandatory");
@@ -101,6 +118,11 @@ class GradeMemberFormValidator extends DefaultFormValidator
         }
     }
     
+    /**
+     * processuce de traitemet/validation du packet soliciter par le membre
+     * @param GradeMember $gm
+     * @param int $grade
+     */
     private function processingGrade (GradeMember $gm, $grade) : void {
         try {
             $this->validationGrade($grade);
@@ -110,6 +132,11 @@ class GradeMemberFormValidator extends DefaultFormValidator
         }
     }
     
+    /**
+     * processuce de traitement/validation du membre qui solicite l'inscription au nouveau packet
+     * @param GradeMember $gm
+     * @param Member|int $member une instace de Member soit l'ID d'un membre du syndicat
+     */
     private function processingMember (GradeMember $gm, $member) : void {
         try {
             if ($member instanceof Member) {
@@ -169,9 +196,11 @@ class GradeMemberFormValidator extends DefaultFormValidator
         $gm = new GradeMember();
         $grade = $request->getDataPOST(self::FIELD_GRADE);
         
+        //validation du membre
         $formMember = new MemberFormValidator($this->getDaoManager());
         $member = $formMember->processingMember($request);
         
+        //validation de l'adresse du membre
         $formLocalisation = new LocalisationFormValidator($this->getDaoManager());
         $localisation = $formLocalisation->processingLocalisation($request);
         $member->setLocalisation($localisation);
@@ -205,7 +234,7 @@ class GradeMemberFormValidator extends DefaultFormValidator
                 try {
                     $this->gradeMemberDAOManager->create($gm);
                     if ($formMember->getProcessPhoto()->isFile()) {
-                        $formMember->processingPhoto($member, $formMember->getProcessPhoto(), true);
+                        $formMember->processingPhoto($member, $formMember->getProcessPhoto(), true, $request->getApplication()->getConfig());
                     }else{
                         $member->setPhoto('img/user.png');
                     }
@@ -241,7 +270,7 @@ class GradeMemberFormValidator extends DefaultFormValidator
             try {
                 
                 $member = $this->memberDAOManager->findById(intval($memberId, 10));
-                $old = $this->gradeMemberDAOManager->getCurrent($member->getId());
+                $old = $this->gradeMemberDAOManager->findCurrentByMember($member->getId());
                 
                 $require = $this->gradeDAOManager->findById($gradeId);
                 
@@ -287,37 +316,15 @@ class GradeMemberFormValidator extends DefaultFormValidator
      */
     public function updateAfterValidation(Request $request)
     {
-        $gm = new GradeMember();
-        $id = $request->getDataGET(self::CHAMP_ID);
-        $grade = $request->getDataPOST(self::FIELD_GRADE);
-        $member = $request->getDataPOST(self::FIELD_MEMBER);
-        $membership = $request->getDataPOST(self::FIELD_MEMBERSHIP);
-        $product = $request->getDataPOST(self::FIELD_PRODUCT);
-        
-        $this->processingProduct($gm, $product);
-        $this->processingMembership($gm, $membership);
-        $this->processingGrade($gm, $grade);
-        $this->processingMember($gm, $member);
-        $this->traitementId($gm, $id);
-        
-        if (!$this->hasError()) {
-            try {
-                
-            } catch (DAOException $e) {
-                $this->setMessage($e->getMessage());
-            }
-        }
-        
-        $this->result = $this->hasError()? "failure to register changes to member's rank" : "successful registration of member rank changes";
-        
-        return $gm;
+        throw new PHPBackendException("You not have permission to perfom this operation");
     }
     
     /**
-     * @param HTTPRequest $request
+     * activation d'un packet
+     * @param Request $request
      * @return GradeMember
      */
-    public function enableAfterValidation (HTTPRequest $request) : GradeMember {
+    public function enableAfterValidation (Request $request) : GradeMember {
         $gm = new GradeMember();
         $id = $request->getAttribute(self::CHAMP_ID);
         

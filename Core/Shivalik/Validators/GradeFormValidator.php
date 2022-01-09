@@ -11,7 +11,7 @@ use PHPBackend\Image2D\Image;
 use PHPBackend\Image2D\ImageResizing;
 use PHPBackend\Validator\DefaultFormValidator;
 use PHPBackend\Validator\IllegalFormValueException;
-use React\Dns\Config\Config;
+use PHPBackend\AppConfig;
 
 /**
  *
@@ -36,6 +36,12 @@ class GradeFormValidator extends DefaultFormValidator
      */
     private $gradeDAOManager;
     
+    /**
+     * valisation du nom d'un grade ou d'un packet
+     * @param string $name
+     * @param int $id
+     * @throws IllegalFormValueException
+     */
     private function validationName ($name, $id = null) : void {
         if ($name == null) {
             throw new IllegalFormValueException("the name is required");
@@ -50,6 +56,12 @@ class GradeFormValidator extends DefaultFormValidator
         }
     }
     
+    /**
+     * validation du montant de qu'il faut payer pour s'affilier au packet
+     * @param number $amount
+     * @param int $id
+     * @throws IllegalFormValueException
+     */
     private function validationAmount ($amount, $id = -1) : void {
         if ($amount == null) {
             throw new IllegalFormValueException("the amount to pay is required");
@@ -58,6 +70,12 @@ class GradeFormValidator extends DefaultFormValidator
         }
     }
     
+    
+    /**
+     * validation de l'icone d'un packet
+     * @param UploadedFile $icon
+     * @throws IllegalFormValueException
+     */
     private function validationIcon (UploadedFile $icon) : void {
         if (!$icon->isFile()) {
             throw new IllegalFormValueException("the grade icon is mandatory");
@@ -66,6 +84,12 @@ class GradeFormValidator extends DefaultFormValidator
         $this->validationImage($icon);
     }
     
+    /**
+     * validation du pourcentage de sponsoring pour le membre affilier au packet
+     * @param number $percentage
+     * @param int $id
+     * @throws IllegalFormValueException
+     */
     private function validationPercentage ($percentage, $id = null) : void {
         if ($percentage == null) {
             throw new IllegalFormValueException("the profit percentage is obligatory");
@@ -82,6 +106,11 @@ class GradeFormValidator extends DefaultFormValidator
         }
     }
     
+    /**
+     * validation de la generation max qu'un membre affileir au packet peut atteindre
+     * @param int $maxGeneration
+     * @throws IllegalFormValueException
+     */
     private function validationMaxGeneration ($maxGeneration) : void {
         try {
             if (!$this->generationDAOManager->checkById(intval($maxGeneration, 10))) {
@@ -92,6 +121,12 @@ class GradeFormValidator extends DefaultFormValidator
         }
     }
     
+    /**
+     * processuce de valisdation/traitement du nom d'un packet
+     * @param Grade $grade
+     * @param string $name
+     * @param int $id
+     */
     private function processingName (Grade $grade, $name, $id=-1) : void {
         try {
             $this->validationName($name, $id);
@@ -101,6 +136,12 @@ class GradeFormValidator extends DefaultFormValidator
         $grade->setName($name);
     }
     
+    /**
+     * processuce de validation/traitement du montant a payer pour s'affilier au packet
+     * @param Grade $grade
+     * @param number $amount
+     * @param int $id
+     */
     private function processingAmount (Grade $grade, $amount, $id=-1) : void {
         try {
             $this->validationAmount($amount, $id);
@@ -110,7 +151,12 @@ class GradeFormValidator extends DefaultFormValidator
         $grade->setAmount($amount);
     }
     
-    
+    /**
+     * processuce de validation/traitement du generation max que peut atteindre la personne 
+     * inscrit au packet
+     * @param Grade $grade
+     * @param int $maxGeneration
+     */
     private function processingMaxGeneration (Grade $grade, $maxGeneration) : void {
         try {
             $this->validationMaxGeneration($maxGeneration);
@@ -120,7 +166,13 @@ class GradeFormValidator extends DefaultFormValidator
         }
     }
     
-    private function processingIcon (Grade $grade, UploadedFile $icon, bool $write = false) : void {
+    /**
+     * processuce de traitement/validation de l'image icone du packet
+     * @param Grade $grade
+     * @param UploadedFile $icon
+     * @param bool $write faut-il directement l'ecrir sur le disque dur???
+     */
+    private function processingIcon (Grade $grade, UploadedFile $icon, bool $write = false, AppConfig $config=null) : void {
         try {
             $this->validationIcon($icon);
         } catch (IllegalFormValueException $e) {
@@ -138,6 +190,13 @@ class GradeFormValidator extends DefaultFormValidator
         }
     }
     
+    /**
+     * processuce de traitement/validation du pourcentage de sponsoring pour le membre affilier 
+     * au packet
+     * @param Grade $grade
+     * @param number $percentage
+     * @param int $id
+     */
     private function processingPercentage (Grade $grade, $percentage, $id=-1 ) : void {
         try {
             $this->validationPercentage($percentage, $id);
@@ -148,6 +207,7 @@ class GradeFormValidator extends DefaultFormValidator
     }
 
     /**
+     * processuce de creation d'un nouveau grade
      * {@inheritDoc}
      * @see \PHPBackend\Validator\FormValidator::createAfterValidation()
      * @return Grade
@@ -161,7 +221,6 @@ class GradeFormValidator extends DefaultFormValidator
          $amount = $request->getDataPOST(self::FIELD_AMOUNT);
          $maxGeneration = $request->getDataPOST(self::FIELD_MAX_GENERATION);
          
-         
          $this->processingName($grade, $name);
          $this->processingIcon($grade, $icon);
          $this->processingPercentage($grade, $percentage);
@@ -171,7 +230,7 @@ class GradeFormValidator extends DefaultFormValidator
          if (!$this->hasError()) {
              try {
                  $this->gradeDAOManager->create($grade);
-                 $this->processingIcon($grade, $icon, true);
+                 $this->processingIcon($grade, $icon, true, $request->getApplication()->getConfig());//ecriture de l'icone sur le serveur
                  $this->gradeDAOManager->updateIcon($grade->getId(), $grade->getIcon());
              } catch (DAOException $e) {
                  $this->setMessage($e->getMessage());
@@ -183,8 +242,10 @@ class GradeFormValidator extends DefaultFormValidator
     }
 
     /**
+     * processuce de modification d'une occurence (d'un packet dans la bdd)
      * {@inheritDoc}
      * @see \PHPBackend\Validator\FormValidator::updateAfterValidation()
+     * @return Grade
      */
     public function updateAfterValidation(Request $request)
     {
@@ -199,7 +260,7 @@ class GradeFormValidator extends DefaultFormValidator
         
         $this->traitementId($grade, $id);
         $this->processingName($grade, $name, $id);
-        if ($icon->isUploadedFile()) {
+        if ($icon->isFile()) {//s'il faut modifier l'icone
             $this->processingIcon($grade, $icon);
         }
         $this->processingAmount($grade, $amount, $id);
@@ -209,8 +270,8 @@ class GradeFormValidator extends DefaultFormValidator
         if (!$this->hasError()) {
             try {
                 $this->gradeDAOManager->update($grade, $grade->getId());
-                if ($icon->isUploadedFile()){
-                    $this->processingIcon($grade, $icon, true);
+                if ($icon->isFile()){
+                    $this->processingIcon($grade, $icon, true, $request->getApplication()->getConfig());//Ecriture de la nouvelle icone sur le disque dur du serveur
                     $this->gradeDAOManager->updateIcon($grade->getId(), $grade->getIcon());
                 }
             } catch (DAOException $e) {
@@ -224,11 +285,11 @@ class GradeFormValidator extends DefaultFormValidator
 
     /**
      * recuperation du non du dossier qui confiendras les informations bruts d'un utilisateur
-     * @param Config $config
+     * @param AppConfig $config
      * @param int $id
      * @return string
      */
-    public final static function getDataDirName (Config $config, int $id) : string{
+    public final static function getDataDirName (AppConfig $config, int $id) : string{
         $fold = 'grades'.DIRECTORY_SEPARATOR.($id!=0? $id : '0');
         $dirPath = dirname(__DIR__).DIRECTORY_SEPARATOR.($config->get('webData')!=null? $config->get('webData') : 'Web').DIRECTORY_SEPARATOR.$fold;
         if (!is_dir($fold)) {
@@ -241,11 +302,11 @@ class GradeFormValidator extends DefaultFormValidator
     
     /**
      * revoie le chemain absolute
-     * @param Config $config
+     * @param AppConfig $config
      * @param int $id
      * @return string
      */
-    public final static function getAbsolutDataDirName(Config $config, int $id) : string {
+    public final static function getAbsolutDataDirName(AppConfig $config, int $id) : string {
         $fold= self::getDataDirName($config, $id);
         return dirname(__DIR__).DIRECTORY_SEPARATOR.($config->get('webData')!=null? $config->get('webData') : 'Web').DIRECTORY_SEPARATOR.$fold;
     }

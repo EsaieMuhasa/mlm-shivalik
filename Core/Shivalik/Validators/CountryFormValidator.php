@@ -23,6 +23,12 @@ class CountryFormValidator extends DefaultFormValidator
      */
     private $countryDAOManager;
     
+    /**
+     * Validation du nom d'un pays
+     * @param string $name
+     * @param int $id
+     * @throws IllegalFormValueException
+     */
     private function validationName ($name, $id = null) : void {
         if ($name == null) {
             throw new IllegalFormValueException("country name is required");
@@ -37,6 +43,13 @@ class CountryFormValidator extends DefaultFormValidator
         }
     }
     
+    
+    /**
+     * validation de l'abreviation du nom d'un pays
+     * @param string $abbreviation
+     * @param int $id
+     * @throws IllegalFormValueException
+     */
     private function validationAbbreviation ($abbreviation, $id = null) : void {
         if ($abbreviation == null) {
             throw new IllegalFormValueException("country abbreviation is required");
@@ -51,6 +64,12 @@ class CountryFormValidator extends DefaultFormValidator
         }
     }
     
+    /**
+     * procesusuce de validation/traitement du nom d'un pays
+     * @param Country $country
+     * @param string $name
+     * @param int $id
+     */
     private function processingName (Country $country, $name, $id=-1) : void {
         try {
             $this->validationName($name, $id);
@@ -60,6 +79,12 @@ class CountryFormValidator extends DefaultFormValidator
         $country->setName($name);
     }
     
+    /**
+     * processuce de valisation/traitement du nom d'un pays
+     * @param Country $country
+     * @param string $abbreviation
+     * @param int $id
+     */
     private function processingAbbreviation (Country $country, $abbreviation, $id=-1) : void {
         try {
             $this->validationAbbreviation($abbreviation, $id);
@@ -70,8 +95,10 @@ class CountryFormValidator extends DefaultFormValidator
     }
     
     /**
+     * processuce de traitement avant enregistrement d'un nouveau pays
      * {@inheritDoc}
      * @see \PHPBackend\Validator\FormValidator::createAfterValidation()
+     * @return Country
      */
     public function createAfterValidation(Request $request)
     {
@@ -97,8 +124,10 @@ class CountryFormValidator extends DefaultFormValidator
     }
 
     /**
+     * processuce de modification des informations d'un pays
      * {@inheritDoc}
      * @see \PHPBackend\Validator\FormValidator::updateAfterValidation()
+     * @return Country
      */
     public function updateAfterValidation(Request $request)
     {
@@ -122,7 +151,6 @@ class CountryFormValidator extends DefaultFormValidator
         $this->result = $this->hasError()? "registration failure":"registration success";
         
         return $country;
-        
     }
 
 

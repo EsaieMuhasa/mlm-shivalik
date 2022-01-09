@@ -12,7 +12,7 @@ use PHPBackend\Image2D\Image;
 use PHPBackend\Image2D\ImageResizing;
 use PHPBackend\Validator\DefaultFormValidator;
 use PHPBackend\Validator\IllegalFormValueException;
-use React\Dns\Config\Config;
+use PHPBackend\AppConfig;
 
 /**
  *
@@ -47,6 +47,11 @@ abstract class UserFormValidator extends DefaultFormValidator
      */
     protected $officeAdminDAOManager;    
     
+    /**
+     * validation du nom d'un utilisateur
+     * @param string $name
+     * @throws IllegalFormValueException
+     */
     protected function validationName ($name) : void {
         if ($name == null) {
             throw new IllegalFormValueException("This field can not be empty");
@@ -55,7 +60,14 @@ abstract class UserFormValidator extends DefaultFormValidator
         }
     }
         
-    protected function validationPseudo ($pseudo, bool $onConnection = false, $id = -1) : void {
+    /**
+     * validation du pseudo de connexion d'un utilisateur
+     * @param string $pseudo
+     * @param bool $onConnection
+     * @param int $id
+     * @throws IllegalFormValueException
+     */
+    protected function validationPseudo ($pseudo, bool $onConnection = false, $id = null) : void {
         if ($pseudo == null) {
             throw new IllegalFormValueException("Username can not be empty");
         } else if (strlen($pseudo)> self::MAX_LENGHT_NAME) {
@@ -64,12 +76,12 @@ abstract class UserFormValidator extends DefaultFormValidator
     }
     
     /**
-     * 
+     * validation du numero de telephone d'un utilisateur
      * @param string $telephone
      * @param int $id
      * @throws IllegalFormValueException
      */
-    protected function validationTelephone ($telephone, $id=-1) : void {
+    protected function validationTelephone ($telephone, $id=null) : void {
         if ($telephone == null) {
             //throw new IllegalFormValueException("the user's phone number is required");
         } else if (!preg_match(self::RGX_TELEPHONE, $telephone) && !preg_match(self::RGX_TELEPHONE_RDC, $telephone)) {
@@ -77,7 +89,13 @@ abstract class UserFormValidator extends DefaultFormValidator
         }
     }
     
-    
+    /**
+     * validation du mot de passe d'un utilisatreur
+     * @param string $password
+     * @param string $confirmation
+     * @param bool $onCreate
+     * @throws IllegalFormValueException
+     */
     protected function validationPassword ($password, $confirmation=null, bool $onCreate=true) : void {
         if ($onCreate) {
             if ($password == null) {
@@ -96,6 +114,11 @@ abstract class UserFormValidator extends DefaultFormValidator
         }
     }
     
+    /**
+     * validation de la photo de profil d'un utilisateur
+     * @param UploadedFile $photo
+     * @throws IllegalFormValueException
+     */
     protected function validationPhoto (UploadedFile $photo) : void {
         if (!$photo->isFile()) {
             throw new IllegalFormValueException("select profile photo");
@@ -104,12 +127,23 @@ abstract class UserFormValidator extends DefaultFormValidator
         $this->validationImage($photo);
     }
     
+    /**
+     * validation du mail d'un utilisateur
+     * @param string $email
+     * @param string $id
+     * @throws IllegalFormValueException
+     */
     protected function validationEmail ($email, $id = -1) : void {
         if ($email!=null && !preg_match(self::RGX_EMAIL, $email)) {
             throw new IllegalFormValueException("e-mail format is invalid");
         }
     }
     
+    /**
+     * processuce de triatement/validation du nom d'un utilisateur
+     * @param User $user
+     * @param string $name
+     */
     protected function processingName (User $user, $name) : void {
         try {
             $this->validationName($name);
@@ -119,6 +153,11 @@ abstract class UserFormValidator extends DefaultFormValidator
         $user->setName($name);
     }
     
+    /**
+     * processuce de traitement/valisation du postnom d'un utilisateur
+     * @param User $user
+     * @param string $postName
+     */
     protected function processingPostName (User $user, $postName) : void {
         try {
             $this->validationName($postName);
@@ -128,6 +167,11 @@ abstract class UserFormValidator extends DefaultFormValidator
         $user->setPostName($postName);
     }
     
+    /**
+     * processuce de traitement/validation du prenom d'un utilisateur
+     * @param User $user
+     * @param string $lastName
+     */
     protected function processingLastName (User $user, $lastName) : void {
         try {
             $this->validationName($lastName);
@@ -137,7 +181,14 @@ abstract class UserFormValidator extends DefaultFormValidator
         $user->setLastName($lastName);
     }
     
-    protected function processingPseudo (User $user, $pseudo, bool $onConnection = false, $id=-1) : void {
+    /**
+     * processuce de validation/traitement du pseudo d'un utilisateur
+     * @param User $user
+     * @param string $pseudo
+     * @param bool $onConnection
+     * @param int $id
+     */
+    protected function processingPseudo (User $user, $pseudo, bool $onConnection = false, $id = null) : void {
         try {
             $this->validationPseudo($pseudo, $onConnection, $id);
         } catch (IllegalFormValueException $e) {
@@ -146,7 +197,13 @@ abstract class UserFormValidator extends DefaultFormValidator
         $user->setPseudo($pseudo);
     }
     
-    protected function processingTelephone (User $user, $telephone, $id = -1) : void {
+    /**
+     * processuce de traitement/validation du numero telephonique d'un utiilsateur
+     * @param User $user
+     * @param string $telephone
+     * @param int $id
+     */
+    protected function processingTelephone (User $user, $telephone, $id = null) : void {
         try {
             $this->validationTelephone($telephone, $id);
         } catch (IllegalFormValueException $e) {
@@ -155,7 +212,13 @@ abstract class UserFormValidator extends DefaultFormValidator
         $user->setTelephone($telephone);
     }
     
-    protected function processingEmail (User $user, $email, $id = -1) : void {
+    /**
+     * processuce de traitemnt/validation du mail d'un utlisateur
+     * @param User $user
+     * @param string $email
+     * @param int $id
+     */
+    protected function processingEmail (User $user, $email, $id = null) : void {
         try {
             $this->validationEmail($email, $id);
         } catch (IllegalFormValueException $e) {
@@ -164,6 +227,13 @@ abstract class UserFormValidator extends DefaultFormValidator
         $user->setEmail($email);
     }
     
+    /**
+     * processuce de traitement/validation du mot de passe d'un utilisateur
+     * @param User $user
+     * @param string $password
+     * @param string $confirmation
+     * @param bool $onCreate
+     */
     protected function processingPassword (User $user, $password, $confirmation=null, bool $onCreate=true) : void{
         try {
             $this->validationPassword($password, $confirmation, $onCreate);
@@ -173,7 +243,14 @@ abstract class UserFormValidator extends DefaultFormValidator
         $user->setPassword(sha1($password));
     }
     
-    public function processingPhoto (User $user, UploadedFile $photo, bool $write=false) : void {
+    /**
+     * processuce de traitement de la photo de profil d'un utilisateur
+     * @param User $user
+     * @param UploadedFile $photo
+     * @param bool $write
+     * @param AppConfig $config
+     */
+    public function processingPhoto (User $user, UploadedFile $photo, bool $write=false, AppConfig $config = null) : void {
         try {
             $this->validationPhoto($photo);
         } catch (IllegalFormValueException $e) {
@@ -182,9 +259,9 @@ abstract class UserFormValidator extends DefaultFormValidator
         
         if ($write && $photo->isImage()) {
             $time = time();
-            $reelName = self::getAbsolutDataDirName($photo->getApplication()->getConfig(), $user->getId()).DIRECTORY_SEPARATOR.$user->getId().'-'.$time.'-reel.'.$photo->getExtension();
-            $reelFullName = self::getDataDirName($photo->getApplication()->getConfig(), $user->getId()).DIRECTORY_SEPARATOR.$user->getId().'-'.$time.'-reel.'.$photo->getExtension();
-            $photoName = self::getDataDirName($photo->getApplication()->getConfig(), $user->getId()).DIRECTORY_SEPARATOR.$user->getId().'-'.$time.'.'.$photo->getExtension();
+            $reelName = self::getAbsolutDataDirName($config, $user->getId()).DIRECTORY_SEPARATOR.$user->getId().'-'.$time.'-reel.'.$photo->getExtension();
+            $reelFullName = self::getDataDirName($$config, $user->getId()).DIRECTORY_SEPARATOR.$user->getId().'-'.$time.'-reel.'.$photo->getExtension();
+            $photoName = self::getDataDirName($config, $user->getId()).DIRECTORY_SEPARATOR.$user->getId().'-'.$time.'.'.$photo->getExtension();
             $photo->getApplication()->writeUploadedFile($photo, $reelFullName);
             ImageResizing::profiling(new Image($reelName));
             $user->setPhoto($photoName);
@@ -204,6 +281,7 @@ abstract class UserFormValidator extends DefaultFormValidator
     public abstract function updatePhotoAfterValidation (HTTPRequest $request) : User;
     
     /**
+     * processuce de connection d'un utilisateur
      * @param HTTPRequest $request
      * @return User
      */
@@ -254,11 +332,11 @@ abstract class UserFormValidator extends DefaultFormValidator
     
     /**
      * recuperation du non du dossier qui confiendras les informations bruts d'un utilisateur
-     * @param Config $config
+     * @param AppConfig $config
      * @param int $id
      * @return string
      */
-    public final static function getDataDirName (Config $config, int $id) : string{
+    public final static function getDataDirName (AppConfig $config, int $id) : string{
         $fold = 'users';
         $dirPath = dirname(__DIR__).DIRECTORY_SEPARATOR.($config->get('webData')!=null? $config->get('webData') : 'Web').DIRECTORY_SEPARATOR.$fold;
         if (!is_dir($fold)) {
@@ -271,11 +349,11 @@ abstract class UserFormValidator extends DefaultFormValidator
     
     /**
      * revoie le chemain absolute
-     * @param Config $config
+     * @param AppConfig $config
      * @param int $id
      * @return string
      */
-    public final static function getAbsolutDataDirName(Config $config, int $id) : string {
+    public final static function getAbsolutDataDirName(AppConfig $config, int $id) : string {
         $fold= self::getDataDirName($config, $id);
         return dirname(__DIR__).DIRECTORY_SEPARATOR.($config->get('webData')!=null? $config->get('webData') : 'Web').DIRECTORY_SEPARATOR.$fold;
     }
