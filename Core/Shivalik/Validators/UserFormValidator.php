@@ -13,6 +13,7 @@ use PHPBackend\Image2D\ImageResizing;
 use PHPBackend\Validator\DefaultFormValidator;
 use PHPBackend\Validator\IllegalFormValueException;
 use PHPBackend\AppConfig;
+use PHPBackend\File\FileManager;
 
 /**
  *
@@ -81,7 +82,7 @@ abstract class UserFormValidator extends DefaultFormValidator
      * @param int $id
      * @throws IllegalFormValueException
      */
-    protected function validationTelephone ($telephone, $id=null) : void {
+    protected function validationTelephone ($telephone, $id = null) : void {
         if ($telephone == null) {
             //throw new IllegalFormValueException("the user's phone number is required");
         } else if (!preg_match(self::RGX_TELEPHONE, $telephone) && !preg_match(self::RGX_TELEPHONE_RDC, $telephone)) {
@@ -262,7 +263,7 @@ abstract class UserFormValidator extends DefaultFormValidator
             $reelName = self::getAbsolutDataDirName($config, $user->getId()).DIRECTORY_SEPARATOR.$user->getId().'-'.$time.'-reel.'.$photo->getExtension();
             $reelFullName = self::getDataDirName($$config, $user->getId()).DIRECTORY_SEPARATOR.$user->getId().'-'.$time.'-reel.'.$photo->getExtension();
             $photoName = self::getDataDirName($config, $user->getId()).DIRECTORY_SEPARATOR.$user->getId().'-'.$time.'.'.$photo->getExtension();
-            $photo->getApplication()->writeUploadedFile($photo, $reelFullName);
+            FileManager::writeUploadedFile($photo, $reelFullName);
             ImageResizing::profiling(new Image($reelName));
             $user->setPhoto($photoName);
         }

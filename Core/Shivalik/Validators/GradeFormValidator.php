@@ -12,6 +12,7 @@ use PHPBackend\Image2D\ImageResizing;
 use PHPBackend\Validator\DefaultFormValidator;
 use PHPBackend\Validator\IllegalFormValueException;
 use PHPBackend\AppConfig;
+use PHPBackend\File\FileManager;
 
 /**
  *
@@ -184,7 +185,7 @@ class GradeFormValidator extends DefaultFormValidator
             $reelName = self::getAbsolutDataDirName($icon->getApplication()->getConfig(), $grade->getId()).DIRECTORY_SEPARATOR.$grade->getId().'-'.$time.'-reel.'.$icon->getExtension();
             $reelFullName = self::getDataDirName($icon->getApplication()->getConfig(), $grade->getId()).DIRECTORY_SEPARATOR.$grade->getId().'-'.$time.'-reel.'.$icon->getExtension();
             $iconName = self::getDataDirName($icon->getApplication()->getConfig(), $grade->getId()).DIRECTORY_SEPARATOR.$grade->getId().'-'.$time.'.'.$icon->getExtension();
-            $icon->getApplication()->writeUploadedFile($icon, $reelFullName);
+            FileManager::writeUploadedFile($icon, $reelFullName);
             ImageResizing::profiling(new Image($reelName));
             $grade->setIcon($iconName);
         }
