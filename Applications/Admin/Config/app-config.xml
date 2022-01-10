@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE app-config SYSTEM "../../../Library/lib-dtd-conf.dtd" >
+<!DOCTYPE app-config SYSTEM "../../../PHPBackend/config.dtd" >
 <app-config>
 	<definitions>
 		<define name="maxMembers" value="50"/>
