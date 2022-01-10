@@ -23,7 +23,7 @@ final class HTTPRequest implements Request
      * @var HTTPSession
      */
     private $session;
-    
+
     /**
      * constructeur d'initialisation
      * @param HTTPApplication $application
@@ -32,6 +32,19 @@ final class HTTPRequest implements Request
         $this->application = $application;
         $this->session = HTTPSession::getCurrent();
         $this->addAttribute(self::ATT_APP_CONFIG, $application->getConfig());
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \PHPBackend\Request::addToast()
+     */
+    public function addToast(\PHPBackend\ToastMessage $toast): void
+    {
+       if ($this->getSession()->hasAttribute(self::ATT_TOAST_MESSAGES)) {
+           $this->getAttribute(self::ATT_TOAST_MESSAGES)[] = $toast;
+       } else {
+           $this->getSession()->addAttribute(self::ATT_TOAST_MESSAGES, [$toast]);
+       }
     }
 
     /**

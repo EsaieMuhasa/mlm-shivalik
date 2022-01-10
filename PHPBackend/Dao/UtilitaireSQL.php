@@ -624,7 +624,6 @@ class UtilitaireSQL
         }
         
         
-        
         $params = array();
         
         $params['dateMin'] = $dateMin->format('Y-m-d\T00:00:00');

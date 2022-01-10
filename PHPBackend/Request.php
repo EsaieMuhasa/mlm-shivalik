@@ -11,6 +11,7 @@ interface Request extends ApplicationComponent
     const HTTP_POST ='POST';
     const HTTP_GET ='GET';
     const ATT_APP_CONFIG = "PHP_BACKEND_CURRENT_APP_COFIGURATION";
+    const ATT_TOAST_MESSAGES = "PHP_BACKEND_TOAST_MESSAGES";
     
     /**
      * revoie voie une donnees associer au cle en parametre dans le GET
@@ -81,6 +82,12 @@ interface Request extends ApplicationComponent
      * @return string
      */
     public function getURI () : string;
+    
+    /**
+     * Evoie d'un message de toast, lors de la generation de la vue
+     * @param ToastMessage $toast
+     */
+    public function addToast (ToastMessage $toast) : void;
     
     /**
      * renvoie l'extension de l'URL
