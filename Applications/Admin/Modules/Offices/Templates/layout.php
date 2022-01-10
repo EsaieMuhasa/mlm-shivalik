@@ -1,7 +1,7 @@
 <?php
 use Applications\Admin\Modules\Offices\OfficesController;
-use Library\Page;
-use Entities\Office;
+use Core\Shivalik\Entities\Office;
+use PHPBackend\Page;
 
 /**
  * @var Office $office

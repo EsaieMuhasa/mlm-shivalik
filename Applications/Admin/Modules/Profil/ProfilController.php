@@ -97,7 +97,7 @@ class ProfilController extends HTTPController
             $localisation = AdminApplication::getConnectedUser()->getLocalisation();
         }
         
-        $request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->getAll());
+        $request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->findAll());
         $request->addAttribute(self::ATT_LOCALISATION, $localisation);
     }
 

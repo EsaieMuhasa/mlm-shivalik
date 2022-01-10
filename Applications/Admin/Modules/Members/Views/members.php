@@ -1,9 +1,12 @@
 <?php
 use Applications\Admin\Modules\Members\MembersController;
-use Library\Config;
+use PHPBackend\AppConfig;
+use PHPBackend\Request;
 
-
-$config = Config::getInstance();
+/**
+ * @var AppConfig $config
+ */
+$config = $_REQUEST[Request::ATT_APP_CONFIG];
 $maxMembers = intval($config->get('maxMembers')->getValue(), 10);
 $max = intval($_REQUEST[MembersController::PARAM_MEMBER_COUNT], 10);
 

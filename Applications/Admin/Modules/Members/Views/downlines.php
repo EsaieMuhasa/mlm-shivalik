@@ -1,8 +1,13 @@
 <?php
 use Applications\Member\Modules\Account\AccountController;
-use Library\Config;
+use PHPBackend\Request;
+use PHPBackend\Config\AppMetadata;
 
-$config = Config::getInstance();
+/**
+ * 
+ * @var AppMetadata $config
+ */
+$config = $_REQUEST[Request::ATT_APP_CONFIG];
 
 $foots = $config->get("footsMember");
 ?>

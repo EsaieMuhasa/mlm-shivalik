@@ -1,22 +1,25 @@
 <?php
-use Applications\Root\Modules\Settings\SettingsController;
 use Applications\Admin\Modules\Members\MembersController;
-use Entities\Generation;
+use Applications\Root\Modules\Settings\SettingsController;
+use Core\Shivalik\Entities\Account;
+use Core\Shivalik\Entities\Generation;
+use Core\Shivalik\Entities\GradeMember;
+use Core\Shivalik\Entities\Member;
 
 /**
- * @var \Entities\Member $member
+ * @var Member $member
  */
 $member = $_REQUEST[MembersController::ATT_MEMBER];
 
 /**
- * @var \Entities\Account $account
+ * @var Account $account
  */
 $account = isset($_REQUEST[MembersController::ATT_COMPTE])? $_REQUEST[MembersController::ATT_COMPTE] : null;
 
 
 /**
- * @var \Entities\GradeMember $gradeMember
- * @var \Entities\GradeMember $requestedGradeMember
+ * @var GradeMember $gradeMember
+ * @var GradeMember $requestedGradeMember
  */
 $gradeMember = isset($_REQUEST[MembersController::ATT_GRADE_MEMBER])? $_REQUEST[MembersController::ATT_GRADE_MEMBER] : null;
 $requestedGradeMember = isset($_REQUEST[MembersController::ATT_REQUESTED_GRADE_MEMBER])? $_REQUEST[MembersController::ATT_REQUESTED_GRADE_MEMBER]:null;

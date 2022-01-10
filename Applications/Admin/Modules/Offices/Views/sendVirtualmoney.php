@@ -1,6 +1,6 @@
 <?php 
 use Applications\Admin\Modules\Offices\OfficesController;
-use Entities\VirtualMoney;
+use Core\Shivalik\Entities\VirtualMoney;
 
 
 /**

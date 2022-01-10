@@ -1,7 +1,7 @@
 
 <?php
-use Entities\User;
-use Validators\MemberFormValidator;
+use Core\Shivalik\Entities\User;
+use Core\Shivalik\Validators\MemberFormValidator;
 ?>
 <section class="panel">
     <header class="panel-heading">

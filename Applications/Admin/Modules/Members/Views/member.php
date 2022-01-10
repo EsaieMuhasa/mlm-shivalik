@@ -1,27 +1,34 @@
 <?php
 use Applications\Admin\Modules\Members\MembersController;
-use Library\Config;
+use Core\Shivalik\Entities\Account;
+use Core\Shivalik\Entities\GradeMember;
+use Core\Shivalik\Entities\Member;
+use PHPBackend\AppConfig;
+use PHPBackend\Request;
 
 /**
- * @var \Entities\Member $member
+ * @var Member $member
  */
 $member = $_REQUEST[MembersController::ATT_MEMBER];
 
 /**
- * @var \Entities\Account $compte
+ * @var Account $compte
  */
 $compte = $_REQUEST[MembersController::ATT_COMPTE];
 
 if (isset($_REQUEST[MembersController::ATT_GRADE_MEMBER])) {
 	/**
-	 * @var \Entities\GradeMember $gradeMember
+	 * @var GradeMember $gradeMember
 	 */
 	$gradeMember = $_REQUEST[MembersController::ATT_GRADE_MEMBER];
 } else {
 	$gradeMember = null;
 }
 
-$config = Config::getInstance();
+/**
+ * @var AppConfig $config
+ */
+$config = $_REQUEST[Request::ATT_APP_CONFIG];
 ?>
 
 <div class="row">

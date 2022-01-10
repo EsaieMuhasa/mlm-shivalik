@@ -1,6 +1,6 @@
 <?php
 use Applications\Admin\Modules\Offices\OfficesController;
-use Entities\Office;
+use Core\Shivalik\Entities\Office;
 
 /**
  * @var Office $dashboard

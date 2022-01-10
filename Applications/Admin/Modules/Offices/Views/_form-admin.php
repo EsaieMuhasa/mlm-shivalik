@@ -1,5 +1,5 @@
 <?php
-use Entities\User;
+use Core\Shivalik\Entities\User;
 ?>
 <section class="panel">
     <header class="panel-heading">

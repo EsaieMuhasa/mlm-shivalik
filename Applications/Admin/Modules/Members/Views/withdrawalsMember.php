@@ -1,25 +1,32 @@
 <?php
-use Applications\Admin\Modules\Members\MembersController;
-use Library\Config;
 use Applications\Admin\AdminApplication;
-use Entities\Withdrawal;
+use Applications\Admin\Modules\Members\MembersController;
+use Core\Shivalik\Entities\Account;
+use Core\Shivalik\Entities\GradeMember;
+use Core\Shivalik\Entities\Member;
+use Core\Shivalik\Entities\Withdrawal;
+use PHPBackend\Request;
+use PHPBackend\AppConfig;
 
 /**
- * @var \Entities\Member $member
+ * @var Member $member
  */
 $member = $_REQUEST[MembersController::ATT_MEMBER];
 
 /**
- * @var \Entities\Account $compte
+ * @var Account $compte
  */
 $compte = $_REQUEST[MembersController::ATT_COMPTE];
 
 /**
- * @var \Entities\GradeMember $gradeMember
+ * @var GradeMember $gradeMember
  */
 $gradeMember = $_REQUEST[MembersController::ATT_GRADE_MEMBER];
 
-$config = Config::getInstance();
+/**
+ * @var AppConfig $config
+ */
+$config = $_REQUEST[Request::ATT_APP_CONFIG];
 
 /**
  * @var Withdrawal[] $operations

@@ -133,19 +133,19 @@ class OfficesController extends AdminController {
 	 * @param Response $response
 	 */
 	private function init (Request $request, Response $response) : void {
-		if ($request->existGET('id')) {
-			$id = intval($request->getDataGET('id'), 10);
+		if ($request->existInGET('id')) {
+			$id = intval($request->getDataGET('id'), 10);//l'identifiant de l'office
 			
-			if (!$this->officeDAOManager->idExist($id)) {
+			if (!$this->officeDAOManager->checkById($id)) {
 				$response->sendError();
 			}
 			
-			$office = $this->officeDAOManager->getForId($id);
+			$office = $this->officeDAOManager->findById($id);
 			$request->addAttribute(self::ATT_OFFICE, $office);
 			
 			$this->office = $office;
-			if ($this->officeAdminDAOManager->hasAdmin($id) || $this->officeAdminDAOManager->hasAdmin($id, false)) {
-				$admin = $this->officeAdminDAOManager->getAdmin($id);
+			if ($this->officeAdminDAOManager->checkByOffice($id) || $this->officeAdminDAOManager->checkByOffice($id, false)) {
+				$admin = $this->officeAdminDAOManager->findAdminByOffice($id);
 				$request->addAttribute(self::ATT_OFFICE_ADMIN, $admin);
 			}
 			
@@ -160,7 +160,7 @@ class OfficesController extends AdminController {
 	 */
 	public function executeIndex (Request $request, Response $response) : void {
 		if ($this->officeDAOManager->countAll()>0) {
-			$offices = $this->officeDAOManager->getAll();
+			$offices = $this->officeDAOManager->findAll();
 		}else {
 			$offices = array();
 		}
@@ -169,8 +169,8 @@ class OfficesController extends AdminController {
 		 * @var OfficeSize $office
 		 */
 		foreach ($offices as $office) {
-		    if ($this->officeSizeDAOManager->hasSize($office->getId())) {
-    		    $office->setOfficeSize($this->officeSizeDAOManager->getCurrent($office->getId()));
+		    if ($this->officeSizeDAOManager->checkByOffice($office->getId())) {
+    		    $office->setOfficeSize($this->officeSizeDAOManager->findCurrentByOffice($office->getId()));
 		    }
 		}
 		
@@ -197,8 +197,8 @@ class OfficesController extends AdminController {
 			$form->includeFeedback($request);
 		}
 		
-		$request->addAttribute(self::ATT_SIZES, $this->sizeDAOManager->getAll());
-		$request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->getAll());
+		$request->addAttribute(self::ATT_SIZES, $this->sizeDAOManager->findAll());
+		$request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->findAll());
 	}
 	
 	/**
@@ -224,7 +224,7 @@ class OfficesController extends AdminController {
 			$form->includeFeedback($request);
 		}
 		
-		$request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->getAll());
+		$request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->findAll());
 	}
 	
 	/**
@@ -233,15 +233,15 @@ class OfficesController extends AdminController {
 	 */
 	public function executeOfficeAdmin (Request $request, Response $response) : void {
 		$request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_OFFICE_ADMIN);
-		if ($request->existGET('adminId')) {
+		if ($request->existInGET('adminId')) {
 			$id = $request->getDataGET('adminId');
 			$option = $request->getDataGET('option');
 			
-			if (!$this->officeAdminDAOManager->idExist($id)) {
+			if (!$this->officeAdminDAOManager->checkById($id)) {
 				$response->sendError();
 			}
 			
-			$admin = $this->officeAdminDAOManager->getForId($id);
+			$admin = $this->officeAdminDAOManager->findById($id);
 			if ($admin->getOffice()->getId() != $this->office->getId()) {
 				$response->sendError();
 			}
@@ -263,7 +263,7 @@ class OfficesController extends AdminController {
 			$request->addAttribute(self::ATT_OFFICE_ADMIN, $admin);
 		}
 		
-		$request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->getAll());
+		$request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->findAll());
 	}
 	
 	/**
@@ -295,18 +295,18 @@ class OfficesController extends AdminController {
 	 */
 	public function executeDashboard (Request $request, Response $response) : void{
 		$request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_DASHBOARD);
-		$nombreMembre = $this->memberDAOManager->countCreatedBy($this->office->getId());
+		$nombreMembre = $this->memberDAOManager->countByOffice($this->office->getId());
 		
 		$this->office = $this->officeDAOManager->load($this->office);
 		
-		if ($this->requestVirtualMoneyDAOManager->hasWaiting($this->office->getId())) {
-		    $requests = $this->requestVirtualMoneyDAOManager->getWaiting($this->office->getId());
+		if ($this->requestVirtualMoneyDAOManager->checkWaiting($this->office->getId())) {
+		    $requests = $this->requestVirtualMoneyDAOManager->findWaiting($this->office->getId());
 		}else {
 		    $requests = array();
 		}
 		
-		if ($this->withdrawalDAOManager->hasRequest($this->office->getId(), null, false)) {
-		    $serveds = $this->withdrawalDAOManager->getOfficeRequests($this->office->getId(), null, false);
+		if ($this->withdrawalDAOManager->checkByOffice($this->office->getId(), null, false)) {
+		    $serveds = $this->withdrawalDAOManager->findByOffice($this->office->getId(), null, false);
 		    $request->addAttribute(self::ATT_WITHDRAWALS, $serveds);
 		}else {
 		    $request->addAttribute(self::ATT_WITHDRAWALS, array());
@@ -316,7 +316,7 @@ class OfficesController extends AdminController {
 		$request->addAttribute(self::ATT_COUNT_MEMEBERS, $nombreMembre);
 		
 		
-		$offices = $this->officeDAOManager->getAll();
+		$offices = $this->officeDAOManager->findAll();
 		$request->addAttribute(self::ATT_OFFICES, $offices);
 	}
 	
@@ -333,11 +333,11 @@ class OfficesController extends AdminController {
 	    $id = intval($request->getDataGET('withdrawalId'), 10);
 	    $office = intval($request->getDataGET('id'), 10);
 	    
-	    if (!$this->withdrawalDAOManager->idExist($id) || !$this->officeDAOManager->idExist($office)) {
+	    if (!$this->withdrawalDAOManager->checkById($id) || !$this->officeDAOManager->checkById($office)) {
 	        $response->sendError("no data match at request URL");
 	    }
 	    
-	    $withdrawal = $this->withdrawalDAOManager->getForId($id);
+	    $withdrawal = $this->withdrawalDAOManager->findById($id);
 	    if ($withdrawal->getAdmin() != null) {
 	        $response->sendError("no data match at request URL");
 	    }
@@ -348,7 +348,7 @@ class OfficesController extends AdminController {
         $request->addAttribute($form::FIELD_OFFICE, $office);
         $form->redirectAfterValidation($request);
         
-        $request->addAppMessage($form->buildAppMessage());
+        $request->addToast($form->buildAppMessage());
         $response->sendRedirect("/admin/offices/{$office}/");
 	}
 	
@@ -360,16 +360,16 @@ class OfficesController extends AdminController {
 	public function executeVirtualmoney(Request $request, Response $response) : void {
 		$request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_VIRTUAL_MONEY);
 		
-		if ($this->gradeMemberDAOManager->hasOperation($this->office->getId())) {
-			$this->office->setOperations($this->gradeMemberDAOManager->getOperations($this->office->getId()));
+		if ($this->gradeMemberDAOManager->checkByOffice($this->office->getId())) {
+			$this->office->setOperations($this->gradeMemberDAOManager->findByOffice($this->office->getId()));
 		}
 		
-		if ($this->virtualMoneyDAOManager->hasVirtualMoney($this->office->getId())) {
-			$this->office->setVirtualMoneys($this->virtualMoneyDAOManager->forOffice($this->office->getId()));
+		if ($this->virtualMoneyDAOManager->checkByOffice($this->office->getId())) {
+		    $this->office->setVirtualMoneys($this->virtualMoneyDAOManager->findByOffice($this->office->getId()));
 		}
 		
-		if ($this->requestVirtualMoneyDAOManager->hasWaiting($this->office->getId())) {
-		    $requests = $this->requestVirtualMoneyDAOManager->getWaiting($this->office->getId());
+		if ($this->requestVirtualMoneyDAOManager->checkWaiting($this->office->getId())) {
+		    $requests = $this->requestVirtualMoneyDAOManager->findWaiting($this->office->getId());
 		}else {
 		    $requests = array();
 		}
@@ -388,13 +388,13 @@ class OfficesController extends AdminController {
 	    $money = new RequestVirtualMoney();
 	    $virtual = new VirtualMoney();
 	    
-		if ($request->existGET('request')) {
+		if ($request->existInGET('request')) {
 		    $id = intval($request->getDataGET('request'), 10);
-		    if (!$this->requestVirtualMoneyDAOManager->idExist($id)) {
+		    if (!$this->requestVirtualMoneyDAOManager->checkById($id)) {
 		        $response->sendError();
 		    }
 		    
-		    $requestMoney = $this->requestVirtualMoneyDAOManager->getForId($id);
+		    $requestMoney = $this->requestVirtualMoneyDAOManager->findById($id);
 		    if ($requestMoney->getOffice()->getId() != $this->office->getId()) {
 		        $response->sendError();
 		    }
@@ -430,17 +430,17 @@ class OfficesController extends AdminController {
 	public function executeMembers (Request $request, Response $response) : void {
 	    $request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_MEMBERS);
 	    
-	    $nombre = $this->memberDAOManager->countCreatedBy($this->office->getId());
+	    $nombre = $this->memberDAOManager->countByOffice($this->office->getId());
 	    
 	    if ($nombre>0) {
-	        if ($request->existGET('limit')) {
+	        if ($request->existInGET('limit')) {
 	            $offset = intval($request->getDataGET('offset'), 10);
 	            $limit = intval($request->getDataGET('limit'), 10);
 	        } else {
 	            $limit = intval($request->getApplication()->getConfig()->get(self::CONFIG_MAX_MEMBER_VIEW_STEP)!=null? $request->getApplication()->getConfig()->get(self::CONFIG_MAX_MEMBER_VIEW_STEP)->getValue() : 50);
 	            $offset = 0;
 	        }
-	        $members = $this->memberDAOManager->getCreatedBy($this->office->getId(), $limit, $offset);
+	        $members = $this->memberDAOManager->findByOffice($this->office->getId(), $limit, $offset);
 	    }else {
 	        $members = array();
 	    }
@@ -456,8 +456,8 @@ class OfficesController extends AdminController {
 	public function executeUpgrades (Request $request, Response $response) : void {
 	    $request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_MEMBERS);
 	    //upgrades
-	    if ($this->gradeMemberDAOManager->hasOperation($this->office->getId(), true)) {
-	        $packets = $this->gradeMemberDAOManager->getOperations($this->office->getId(), true);
+	    if ($this->gradeMemberDAOManager->checkByOffice($this->office->getId(), true)) {
+	        $packets = $this->gradeMemberDAOManager->findByOffice($this->office->getId(), true);
 	    }else {
 	        $packets = array();
 	    }
@@ -475,11 +475,11 @@ class OfficesController extends AdminController {
 	    
 	    $date = null;
 	    
-	    if ($request->existGET('date')) {
+	    if ($request->existInGET('date')) {
 	        $date = new \DateTime($request->getDataGET('date'));
 	        $month = new Month(intval($date->format('m'), 10), intval($date->format('Y'), 10));
 	        $month->addSelectedDate($date);
-	    }elseif ($request->existGET('month')) {
+	    }elseif ($request->existInGET('month')) {
 	        $month = new Month(intval($request->getDataGET('month'), 10), intval($request->getDataGET('year'), 10));
 	    }else {	        
     	    $month = new Month();
@@ -490,8 +490,8 @@ class OfficesController extends AdminController {
 	    $dateMax = ($date!=null? $date : $month->getLastDay());
 	    
 	    //adhesion
-	    if ($this->memberDAOManager->hasCreationHistory($dateMin, $dateMax, array('office' => $this->office->getId()))) {
-	        $members = $this->memberDAOManager->getCreationHistory($dateMin, $dateMax, array('office' => $this->office->getId()));
+	    if ($this->memberDAOManager->checkCreationHistoryByOffice($this->office->getId(), $dateMin, $dateMax)) {
+	        $members = $this->memberDAOManager->findCreationHistoryByOffice($this->office->getId(), $dateMin, $dateMax);
 	    }else {
 	        $members = array();
 	    }
@@ -505,26 +505,26 @@ class OfficesController extends AdminController {
 
 	    
 	    //upgrades
-	    if ($this->gradeMemberDAOManager->hasUpgradeHistory($dateMin, $dateMax, array('office' => $this->office->getId()))) {
-	        $packets = $this->gradeMemberDAOManager->getUpgradeHistory($dateMin, $dateMax, array('office' => $this->office->getId()));
+	    if ($this->gradeMemberDAOManager->checkUpgradeHistory($dateMin, $dateMax,$this->office->getId())) {
+	        $packets = $this->gradeMemberDAOManager->findUpgradeHistory($dateMin, $dateMax, $this->office->getId());
 	    }else {
 	        $packets = array();
 	    }
 	    
 	    //retraits
-	    if ($this->withdrawalDAOManager->hasCreationHistory($dateMin, $dateMax, array('office' => $this->office->getId()))) {
-	        $withdrawals = $this->withdrawalDAOManager->getCreationHistory($dateMin, $dateMax, array('office' => $this->office->getId()));
+	    if ($this->withdrawalDAOManager->checkCreationHistoryByOffice($this->office->getId(), $dateMin, $dateMax)) {
+	        $withdrawals = $this->withdrawalDAOManager->findCreationHistoryByOffice($this->office->getId(), $dateMin, $dateMax);
 	    }else {
 	        $withdrawals = array();
 	    }
 	    
 	    //raports
-	    if ($this->raportWithdrawalDAOManager->hasRaportInInterval($dateMin, $dateMax, $this->office->getId())) {
-	        $raports = $this->raportWithdrawalDAOManager->getRaportInInterval($dateMin, $dateMax, $this->office->getId());
+	    if ($this->raportWithdrawalDAOManager->checkRaportInInterval($dateMin, $dateMax, $this->office->getId())) {
+	        $raports = $this->raportWithdrawalDAOManager->findRaportInInterval($dateMin, $dateMax, $this->office->getId());
 	        foreach ($raports as $raport) {
-	            $raport->setWithdrawals($this->withdrawalDAOManager->forRaport($raport->getId()));
+	            $raport->setWithdrawals($this->withdrawalDAOManager->findByRapport($raport->getId()));
 	        }
-	    }else {
+	    } else {
 	        $raports = array();
 	    }
 	    
