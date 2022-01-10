@@ -49,5 +49,33 @@ abstract class VirtualMoneyDAOManager extends DefaultDAOInterface {
 	}
 	
 	
+	/**
+	 * verification de l'historique des operations effectuer pas un office
+	 * @param int $officeId
+	 * @param \DateTime $dateMin
+	 * @param \DateTime $dateMax
+	 * @param int $limit
+	 * @param int $offset
+	 * @return bool
+	 */
+	public function checkCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : bool {
+	    return UtilitaireSQL::hasCreationHistory($this->getConnection(), $this->getTableName(), self::FIELD_DATE_AJOUT, true, $dateMin, $dateMax, ['office' => $officeId], $limit, $offset);
+	}
+	
+	/**
+	 * recuperation des l'historique des operations effectuer par un office
+	 * @param int $officeId
+	 * @param \DateTime $dateMin
+	 * @param \DateTime $dateMax
+	 * @param int $limit
+	 * @param int $offset
+	 * @return bool
+	 */
+	public function findCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : bool {
+	    return UtilitaireSQL::findCreationHistory($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, $dateMin, $dateMax, ['office' => $officeId], $limit, $offset);
+	}
+	
+	
+	
 }
 
