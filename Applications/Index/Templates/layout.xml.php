@@ -1,3 +1,2 @@
 
-<?php 
-echo '<shivalik>'.$_REQUEST[Library\Page::ATT_VIEW].'</shivalik>';?>
+<?php echo '<shivalik>'.$_REQUEST[PHPBackend\Page::ATT_VIEW].'</shivalik>';?>

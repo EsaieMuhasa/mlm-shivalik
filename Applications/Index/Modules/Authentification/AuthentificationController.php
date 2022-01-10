@@ -61,8 +61,8 @@ class AuthentificationController extends HTTPController
                         $response->sendRedirect("/office/");
                     }
                 }else if ($user  instanceof Member) {
-                    if ($this->officeDAOManager->hasOffice($user->getId())) {//our les utilisateur qui ont des bureau
-                        $office = $this->officeDAOManager->forMember($user->getId());
+                    if ($this->officeDAOManager->checkByMember($user->getId())) {//our les utilisateur qui ont des bureau
+                        $office = $this->officeDAOManager->findByMember($user->getId());
                         $user->setOfficeAccount($office);
                     }
                     
