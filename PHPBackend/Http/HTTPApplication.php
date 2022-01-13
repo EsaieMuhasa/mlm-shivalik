@@ -282,7 +282,7 @@ class HTTPApplication implements Application
                 $paramsNames = array();
                 
                 if ($route->hasAttribute('paramsNames')) {
-                    $paramsNames = explode(';', $route->getAttribute('paramsNames'));
+                    $paramsNames = explode(',', $route->getAttribute('paramsNames'));
                 }
                 $router->addRoute(new Route($urlPattern, $moduleName, $action, $paramsNames));
             }
