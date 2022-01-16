@@ -1,0 +1,214 @@
+
+.default-navbar{
+    border-bottom: $goutier/2 solid $custom-primary-color;
+    @extend %clear-margin-botstrap;
+
+    .default-navbar-header {
+        float: left;
+
+        * {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .header-txt {
+            font-size: 3.5rem;
+            font-weight: normal;
+        }
+
+        .txt-logo-1 {
+            color: $custom-primary-color;
+        }
+
+        .txt-logo-2 {
+            color: $custom-secodary-color;
+        }
+    }
+
+    .default-nav {
+        list-style-type: none;
+        padding: 0px;
+        margin: 0px;
+        @extend %clearfix;
+
+        padding-top: $goutier/2;
+        float: right;
+
+        li {
+            float: left;
+        }
+
+        li > a {
+            display: block;
+            padding: $goutier;
+            margin: 0 $goutier;
+            color: $custom-secodary-color;
+            font-weight: bold;
+            &:hover {
+                text-decoration: none;
+                color: $custom-primary-color;//darken(, $amount: 10%);
+            }
+            
+            &.active {
+                color: $custom-primary-color;//darken(, $amount: 10%);
+                border: 1px solid $custom-primary-color;
+            }
+        }
+    }
+}
+
+
+.banner {
+    //border: 1px solid black;
+    overflow: hidden;
+    position: relative;
+    @extend %clearfix;
+    @extend %clear-margin-botstrap;
+
+    background: rgba($color: $custom-primary-color, $alpha: 0.5);
+    min-height: 500px;
+
+    .welcom,
+    .sliders {
+        //border: 2px solid red;
+        width: 50%;
+    }
+    
+    .welcom {
+        float: left;
+
+        h1 {
+            font-size: 4rem;
+        }
+
+        p {
+            font-size: 1.8rem;
+        }
+    }
+
+    .sliders {
+        position: absolute;
+        right: 0px;
+        top: 0px;
+        overflow: hidden;
+        @include transform('rotate(15deg) translate3d(10%, -2.5%, 0) scale(1.25)');
+        *{
+            @include transform('rotate(-15deg) translate3d(-10%, -2.5%, 0)');
+        }
+
+        box-shadow: -1px 0px $goutier $black;
+        border-left: none;
+    }
+}
+
+.why-section {
+    //background: linear-gradient($white, $custom-primary-color);
+    h1 {
+        margin-bottom: $goutier-bootstrap;
+    }
+    .default-card {
+        border: 1px solid lighten($color: $black, $amount: 90%);
+        text-align: center;
+        padding: $goutier;
+        color: $custom-secodary-color;
+        margin-bottom: $goutier-bootstrap;
+        min-height: 250px;
+
+        &:hover {
+            @include transform ('scale(1.1)');
+            @include transition ('transform 200ms');
+            border-color: $custom-secodary-color;
+        }
+    
+        .card-icon .fa{
+            font-size: 7rem;
+            padding: 0px!important;
+            margin: 0px!important;
+        }
+        .card-caption p {
+            font-size: 2rem;
+        }
+    }
+}
+
+.default-products {
+    background: rgba($custom-primary-color, 0.5);
+    @extend %clear-margin-botstrap;
+    padding-bottom: $goutier-bootstrap;
+    h1 {
+        margin-bottom: $goutier-bootstrap;
+    }
+    
+    .product {
+        margin-bottom: $goutier-bootstrap;
+        box-shadow: 0px 0px $goutier darken($custom-primary-color, 25%);
+        //border: 1px solid $white;
+        //border-radius: $goutier;
+        overflow: hidden;
+        position: relative;
+        
+        .product-header {
+            position: relative;
+
+            .prix {
+                position: absolute;
+                padding: $goutier/2;
+                top: 20%;
+                right: 0px;
+                text-align: center;
+                width: 100%;
+                height: 100%;
+                font-weight: bold;
+                @include transform('rotate(45deg) translate(0%, -40%)');
+                
+                p{
+                    font-size: 1.8rem;
+                    background: rgba($custom-primary-color, 0.5);
+                    padding: 0px;
+                    margin: 0px;
+                    color: $custom-secodary-color;
+                    
+                    &.disable-prix {
+                        font-size: 1.6rem;
+                        color: lighten($color: $black, $amount: 40%);
+                        text-decoration:lighten($color: $black, $amount: 40%) line-through;
+                    }
+                }
+            }
+        }
+
+        
+        aside {
+            padding: $goutier-bootstrap/2 ;
+            strong {
+                font-size: 2.6rem;
+                font-weight: normal;
+                color: $custom-secodary-color;
+                display: block;
+                width: 100%;
+                border-bottom: 1px solid darken($color: $white, $amount: 10%);
+                margin-bottom: $goutier-bootstrap/2;
+            }
+            p{
+                font-size: 1.8rem;
+                text-align: justify;
+            }
+        }
+        
+        &:hover {
+            @include transform ('scale(1.025)');
+            @include transition ('transform 600ms');
+        }
+    }
+}
+
+.default-footer {
+    background: $white;
+    @extend %clear-margin-botstrap;
+    padding: {
+        top: $goutier-bootstrap;
+        bottom: $goutier-bootstrap;
+    }
+    border-top: $goutier/2 solid $custom-primary-color;
+}
+

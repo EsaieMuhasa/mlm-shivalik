@@ -1,0 +1,13 @@
+
+@import 'customs/variables';
+@import 'customs/mixins';
+@import 'customs/icons-awesome';
+@import 'customs/icons-elegant';
+
+@import 'templates/layout-index';
+@import 'templates/button';
+
+
+img {
+    max-width: 100%;
+}

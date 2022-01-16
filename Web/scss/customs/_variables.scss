@@ -1,0 +1,96 @@
+//screens break points
+$xs-screen-max-width : 768px;
+
+$sm-screen-min-width : $xs-screen-max-width+1;
+$sm-screen-max-width : 992px;
+
+$md-screen-min-width : $sm-screen-max-width+1;
+$md-screen-max-width : 1170px;
+
+$lg-screen-min-width : $md-screen-max-width+1;
+$lg-screen-max-width : 2800px;
+
+$xlg-screen-min-width : $lg-screen-max-width+1;
+$xlg-screen-max-width : 3800px;
+
+//screens names
+$xs-screen-name : 'xs';
+$sm-screen-name : 'sm';
+$md-screen-name : 'md';
+$lg-screen-name : 'lg';
+$xlg-screen-name : 'xlg';
+
+//Pour le body
+$body-bg: #fff;//Couleur d'arriere plan du boby
+$body-color: #0f0f0f;
+
+$headings-margin-bottom: .6rem;//Marge bas des tires
+$paragraph-margin-bottom: 0.5rem;//marge bas des paragraphes
+$text-line-height: 1.4rem!default;
+
+//Les plices
+$font-family-base: 'Montserrat', 'Lato', Helveltica, Arial, sans-serif;
+
+//Les couleurs
+$black: #000000;
+$white: #ffffff;
+$red: #ff0000;
+$blue: #0000ff;
+
+$custom-primary-color : #d04020;
+$custom-secodary-color : #3b3b97;
+
+
+//Pour les liens hypertexte
+$link-color: #1454ed;
+$link-decoration : 0.05em, solid, $link-color;
+
+//pour la grille
+$goutier: 10px;
+$goutier-bootstrap: 30px;
+$cols: 12;
+
+%after{//le pseudo element after
+    position: relative;
+    &::after{
+        content: '';
+        width: 0;
+        height: 0;
+        position: absolute;
+    }
+}
+%before{//le pseudo element before
+    position: relative;
+    &::before{
+        content: '';
+        width: 0;
+        height: 0;
+        position: absolute;
+    }
+}
+
+%clearfix{
+    &:before,
+    &:after{
+        content: "";
+        display: table;
+    }
+    &:after{
+        clear: both;
+    }
+    &{
+        zoom: 1;
+    }
+}
+
+%clear-margin-botstrap {
+    margin: {
+        left: $goutier-bootstrap * (-0.5);
+        right: $goutier-bootstrap * (-0.5);
+    }
+}
+
+$surfix-media : "-xs", "-sm",  "-md", "-lg", "-xs-land", "-xs-port", "-sm-land", "-sm-port";//Surfixe pour le type de mefia
+
+//Liste des media prise en cosideration
+$list-media :  "xs",   "sm", "md", "lg", "xs-landscape", "xs-portrait", "sm-landscape", "sm-portrait";

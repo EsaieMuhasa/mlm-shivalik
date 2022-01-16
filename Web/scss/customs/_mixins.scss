@@ -1,0 +1,355 @@
+
+//Pour les petits ecran
+@mixin xs-screen {
+	@media screen and (max-width: $xs-screen-max-width) { 
+		@content;
+	}
+}
+@mixin xs-screen-landscape {//pour les petits ecrans en paysage
+	@media screen and (max-width: $xs-screen-max-width) and (orientation: landscape) { 
+		@content;
+	}
+}
+@mixin xs-screen-portrait {//pour les petitis ecrans en portrais
+	@media screen and (max-width: $xs-screen-max-width) and (orientation: portrait) { 
+		@content;
+	}
+}
+
+
+//Pour le ecrant moyene (tablette, pad,...)
+@mixin sm-screen {
+	@media screen and (min-width: $sm-screen-min-width) and (max-width: $sm-screen-max-width){
+		@content;
+	}
+}
+@mixin sm-screen-landscape {//pour les ecrans moyens en mode portrait)
+	@media screen and (min-width: $sm-screen-min-width) and (max-width: $sm-screen-max-width) and (orientation: landscape){
+		@content;
+	}
+}
+@mixin sm-screen-portrait {//pour les ecrans moyens en mode paysage
+	@media screen and (min-width: $sm-screen-min-width) and (max-width: $sm-screen-max-width) and (orientation: portrait){
+		@content;
+	}
+}
+
+@mixin xs-sm-screen{
+	@media screen and (max-width: $sm-screen-max-width){
+		@content;
+	}
+}
+@mixin xs-sm-screen-landscape{
+	@media screen and (max-width: $sm-screen-max-width) and (orientation: landscape){
+		@content;
+	}
+}
+@mixin xs-sm-screen-portrait{
+	@media screen and (max-width: $sm-screen-max-width) and (orientation: portrait){
+		@content;
+	}
+}
+
+@mixin normal-screen{//le petit, moyent et grands ecrans
+	@media screen and (min-width: $sm-screen-min-width){
+		@content;
+	}
+}
+
+//Pour les ecrans moyene
+@mixin md-screen {
+	@media screen and (min-width: $md-screen-min-width){
+		@content;
+	}
+}
+
+@mixin md-screen-only {
+	@media screen and (min-width: $md-screen-min-width) and (max-width: $md-screen-max-width){
+		@content;
+	}
+}
+
+//Pour les grands ecrants
+@mixin lg-screen {
+	@media screen and (min-width: $lg-screen-min-width) {
+		@content;
+	}
+}
+
+@mixin media-screen ($screen-name) {
+	@if $screen-name == $xs-screen-name {
+		@include xs-screen(){
+			@content;
+		}
+	}@else if $screen-name == $sm-screen-name {
+		@include sm-screen(){
+			@content;
+		}
+	}@else if $screen-name == $md-screen-name {
+		@include md-screen(){
+			@content;
+		}
+	}@else if $screen-name == $lg-screen-name {
+		@include lg-screen(){
+			@content;
+		}
+	}@else if $screen-name == "xs-landscape"{
+		@include xs-screen-landscape(){
+			@content;
+		}
+	}@else if $screen-name == "xs-portrait"{	
+		@include xs-screen-portrait(){
+			@content;
+		}
+	}@else if $screen-name == "sm-landscape"{
+		@include sm-screen-landscape(){
+			@content;
+		}
+	}@else if $screen-name == "sm-portrait"{	
+		@include sm-screen-portrait(){
+			@content;
+		}
+	}
+	@else {
+		@error "\t+>'"+$screen-name+"': Ce type de media n'est pas prise en charge";
+	}
+}
+
+
+//Pour le prefixage de navigateurs
+//---------------------------------------
+
+//Pour les transitions
+@mixin transition($value) {
+	transition: #{$value};
+	-moz-transition: #{$value};
+	-webkit-transition: #{$value};
+	-o-transition:  #{$value};
+}
+
+//Pour les transformations
+@mixin transform ($value) {
+	transform: #{$value};
+	-ms-transform: #{$value};
+	-webkit-transform: #{$value};
+	-moz-transform: #{$value};
+	-o-transform: #{$value};
+}
+
+//costomisation du scrollbar
+//@param {string} $element , un selecteur css
+//@param {int} $width l'epaisseur du scrollbar
+//@param {string} $bkg-color la couleur du scrollbar
+//@param {string} $hover-color : null, la couleur lors du survol
+//@param {int} $radius : null, le radius
+@mixin custom-scrollbar ($element, $width, $bkg-color, $hover-color : null, $radius : null) {
+	#{$element}{
+		&::-webkit-scrollbar{
+			width: $width;
+		}
+
+		&::-webkit-scrollbar-thumb{
+			background-color: darken($color: $red, $amount: 20%);
+			border-radius: $radius;
+			&:hover {
+				@if $hover-color == null {
+					background-color: darken($color: $bkg-color, $amount: 5%);
+				} @else {
+					background-color: $hover-color;
+				}
+			}
+		}
+
+		&::-webkit-scrollbar-track{
+			background-color: darken($color: $white, $amount: 10%);
+		}
+	}
+}
+
+@mixin box-sizing ($value) {
+	box-sizing: #{$value};
+	-moz-box-sizing: #{$value};
+	-webkit-box-sizing: #{$value};
+}
+
+@mixin animation ($value) {
+	animation: #{$value};
+	-moz-animation: #{$value};
+	-webkit-animation: #{$value};
+	-o-animation: #{$value};
+}
+
+@mixin animation-delay ($delay) {
+	animation-delay: #{$delay};
+	-moz-animation-delay: #{$delay};
+	-o-animation-delay: #{$delay};
+	-webkit-animation-delay: #{$delay};
+}
+
+@mixin animation-iteration-count ($value) {
+	animation-iteration-count: #{$value};
+	-o-animation-iteration-count: #{$value};
+	-moz-animation-iteration-count: #{$value};
+	-webkit-animation-iteration-count: #{$value};
+}
+
+
+@mixin keyframes ($name) {
+	@keyframes #{$name} {
+		@content;
+	}
+	@-o-keyframes #{$name}{
+		@content;
+	}
+	@-moz-keyframes #{$name}{
+		@content;
+	}
+	@-webkit-keyframes #{$name} {
+		@content;
+	}
+}
+
+//compatibilite de la direction de flex-box
+@mixin flex-direction ($value){
+	@if $value == row-reverse {
+		-webkit-box-direction: reverse;
+		-webkit-box-orient: horizontal;
+		-moz-box-direction: reverse;
+		-moz-box-orient: horizontal;
+	  } @else if $value == column {
+		-webkit-box-direction: normal;
+		-webkit-box-orient: vertical;
+		-moz-box-direction: normal;
+		-moz-box-orient: vertical;
+	  } @else if $value == column-reverse {
+		-webkit-box-direction: reverse;
+		-webkit-box-orient: vertical;
+		-moz-box-direction: reverse;
+		-moz-box-orient: vertical;
+	  } @else {
+		-webkit-box-direction: normal;
+		-webkit-box-orient: horizontal;
+		-moz-box-direction: normal;
+		-moz-box-orient: horizontal;
+	  }
+	  -webkit-flex-direction: $value;
+	  -ms-flex-direction: $value;
+	  -ms-flex-direction: $value;
+	  flex-direction: $value;
+}
+
+@mixin flex-wrap ($value: wrap){
+	flex-wrap: $value;
+	-ms-flex-wrap: $value;
+	-webkit-flex-wrap: $value;
+}
+
+@mixin flex-flow($values: (row nowrap)) {
+	// No Webkit/FF Box fallback.
+	flex-flow: $values;
+	-webkit-flex-flow: $values;
+	-ms-flex-flow: $values;
+}
+
+@mixin flex-grow($int: 1) {
+	flex-grow: $int;
+	-webkit-box-flex: $int;
+	-moz-box-flex: $int;
+	-webkit-flex-grow: $int;
+	-ms-flex: $int;
+}
+
+@mixin flex-shrink($int: 0) {
+	flex-shrink: $int;
+	-webkit-flex-shrink: $int;
+	-moz-flex-shrink: $int;
+	-ms-flex: $int;
+}
+
+@mixin flex($fg: 1, $fs: 0, $fb: auto) {
+
+	// Définir une variable pour l'utiliser
+	// avec les propriétés box-flex
+	$fg-boxflex: $fg;
+  
+	// Box-Flex ne prend qu'une valeur, on prend donc
+	// la première valeur de la liste et on la renvoie.
+	@if type-of($fg) == 'list' {
+	  $fg-boxflex: nth($fg, 1);
+	}
+  
+	flex: $fg $fs $fb;
+	-webkit-box: $fg-boxflex;
+	-moz-box: $fg-boxflex;
+	-webkit-flex: $fg $fs $fb;
+	-ms-flex: $fg $fs $fb;
+}
+
+@mixin justify-content($value: flex-start) {
+	@if $value == flex-start {
+	  -webkit-box-pack: start;
+	  -moz-box-pack: start;
+	  -ms-flex-pack: start;
+	} @else if $value == flex-end {
+	  -webkit-box-pack: end;
+	  -moz-box-pack: end;
+	  -ms-flex-pack: end;
+	} @else if $value == space-between {
+	  -webkit-box-pack: justify;
+	  -moz-box-pack: justify;
+	  -ms-flex-pack: justify;
+	} @else if $value == space-around {
+	  -ms-flex-pack: distribute;
+	} @else {
+	  -webkit-box-pack: $value;
+	  -moz-box-pack: $value;
+	  -ms-flex-pack: $value;
+	}
+	justify-content: $value;
+	-webkit-justify-content: $value;
+}
+
+@mixin align-items($value: stretch) {
+	@if $value == flex-start {
+	  -webkit-box-align: start;
+	  -moz-box-align: start;
+	  -ms-flex-align: start;
+	} @else if $value == flex-end {
+	  -webkit-box-align: end;
+	  -moz-box-align: end;
+	  -ms-flex-align: end;
+	} @else {
+	  -webkit-box-align: $value;
+	  -moz-box-align: $value;
+	  -ms-flex-align: $value;
+	}
+	align-items: $value;
+	-webkit-align-items: $value;
+}
+
+@mixin align-self($value: auto) {
+	// No Webkit Box Fallback.
+	-webkit-align-self: $value;
+	@if $value == flex-start {
+	  -ms-flex-item-align: start;
+	} @else if $value == flex-end {
+	  -ms-flex-item-align: end;
+	} @else {
+	  -ms-flex-item-align: $value;
+	}
+	align-self: $value;
+}
+
+@mixin align-content($value: stretch) {
+	// No Webkit Box Fallback.
+	-webkit-align-content: $value;
+	@if $value == flex-start {
+	  -ms-flex-line-pack: start;
+	} @else if $value == flex-end {
+	  -ms-flex-line-pack: end;
+	} @else {
+	  -ms-flex-line-pack: $value;
+	}
+	align-content: $value;
+}
+

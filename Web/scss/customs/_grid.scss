@@ -1,0 +1,159 @@
+
+$cols : 12!default;//Nombre de collone de la grille
+$goutier : 30px!default;//la largeur du goutiere
+
+//Dimensionnement de collones
+%col{
+    padding: 0 ($goutier * 0.5);
+    @include transition('width 0.2s');
+    @include box-sizing('border-box');
+    min-height: 1px;
+    z-index: 1;
+    .row {
+        margin: {
+            left: ($goutier * -0.5);
+            right: ($goutier * -0.5) !important;
+        }
+    }
+}
+
+
+.container{
+    max-width: 100%;
+    width: 85%;
+    margin: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    @extend %clearfix;
+    min-height: 1px;
+
+    //border: 1px solid red;
+    &-fluid{
+        width: 100%;
+        margin: auto;
+        max-width: 100%;
+        @extend %clearfix;
+        @include xs-screen() {
+            width: 100%;
+        }
+    }
+    @include xs-screen(){
+        width: 98%;
+    }
+
+    @include sm-screen() {
+        width: 95%;
+    }
+    @include md-screen-only() {
+        width: 90%;
+    }
+}
+
+
+/**********************************************
+*MIXIN CREATEUR DES COLONNES
+*********************************************/
+@mixin responsive-columns($surfix: "") {
+    @for $i from 0 through $nombre-col {
+        @if $i!=0 {
+            .col#{$surfix}-#{$i}{
+                width: (($i/$nombre-col) * 100%);
+                //border: 2px solid #880000;
+                //border-radius: 3px;
+            }
+        }
+        .col#{$surfix}-offset-#{$i}{
+            margin-left: $i/$nombre-col * 100%;
+        }
+        
+    }
+    
+    .hidden#{$surfix}{
+        display: none;
+    }
+
+    .visible#{$surfix}{
+        display: inherit;
+    }
+
+    .block#{$surfix}{
+        display: block;
+        width: 100%;
+    }
+
+    //Les marges
+    @for $var from 5 to 100 {
+        @if $var%5==0 {
+            .pd#{$surfix}-#{$var}{
+                padding: #{$var}#{'px'};
+            }
+            .pd#{$surfix}-t-#{$var}{
+                padding-top: #{$var}#{'px'};
+            }
+            .pd#{$surfix}-b-#{$var}{
+                padding-bottom: #{$var}#{'px'};
+            }
+            .pd#{$surfix}-r-#{$var}{
+                padding-right: #{$var}#{'px'};
+            }
+            .pd#{$surfix}-l-#{$var}{
+                padding-left: #{$var}#{'px'};
+            }
+
+            .mg#{$surfix}-#{$var}{
+                margin: #{$var}#{'px'};
+            }
+            .mg#{$surfix}-t-#{$var}{
+                margin-top: #{$var}#{'px'};
+            }
+            .mg#{$surfix}-b-#{$var}{
+                margin-bottom: #{$var}#{'px'};
+            }
+            .mg#{$surfix}-r-#{$var}{
+                margin-right: #{$var}#{'px'};
+            }
+            .mg#{$surfix}-l-#{$var}{
+                margin-left: #{$var}#{'px'};
+            }
+        }
+    }
+}
+
+//La classe qui represente une ligne
+.row{
+    padding: 0px;
+    display: flex;
+    
+    @include flex-direction(row);
+    @include flex-wrap(wrap);
+    @include box-sizing(border-box);
+    @extend %clearfix;
+    z-index: 1;
+}
+
+//applications des regles par defaut
+@for $j from 1 through length($list-media) {
+    @for $i from 1 through $cols {
+        .col#{nth($surfix-media, $j)}-#{$i}{
+            @extend %col; 
+        }
+    }
+}
+
+@for $i from 1 through $cols {//Pour les colones par defaut
+    .col-#{$i}{
+        @extend %col;
+    }
+}
+
+//Grile par defaut
+@include responsive-columns("");
+
+//Generation de la grille responsive
+//----------------------------------------
+@for $j from 1 through length($list-media) {//Selection du type d'ecran
+    @include media-screen(nth($list-media, $j)){
+        @include responsive-columns($surfix: nth($surfix-media, $j));
+    }
+}
+

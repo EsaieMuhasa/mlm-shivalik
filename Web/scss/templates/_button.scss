@@ -1,0 +1,20 @@
+
+
+.custom-btn {
+    border-radius: 0px;
+    
+    &.big {
+
+    }
+}
+
+.btn-primary {
+    background: $custom-primary-color;
+    border-color: $custom-primary-color;
+}
+
+.btn-default {
+    background: $custom-secodary-color;
+    border-color: $custom-secodary-color;
+    color: $white;
+}
