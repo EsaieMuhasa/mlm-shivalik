@@ -6,7 +6,12 @@
 
 @import 'templates/layout-index';
 @import 'templates/button';
+@import 'customs/default-carousel';
 
+
+* {
+    @include box-sizing('border-box');
+}
 
 img {
     max-width: 100%;

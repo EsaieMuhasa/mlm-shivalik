@@ -1,16 +1,16 @@
 @charset "UTF-8";
-.default-navbar .default-nav:before, .banner:before, .default-navbar .default-nav:after, .banner:after {
+.default-navbar .default-nav:before, .banner:before, .default-carousel:before, .default-carousel-items:before, .default-navbar .default-nav:after, .banner:after, .default-carousel:after, .default-carousel-items:after {
   content: "";
   display: table;
 }
-.default-navbar .default-nav:after, .banner:after {
+.default-navbar .default-nav:after, .banner:after, .default-carousel:after, .default-carousel-items:after {
   clear: both;
 }
-.default-navbar .default-nav, .banner {
+.default-navbar .default-nav, .banner, .default-carousel, .default-carousel-items {
   zoom: 1;
 }
 
-.default-navbar, .banner, .default-products, .default-footer {
+.default-navbar, .banner, .why-section, .default-products, .default-footer {
   margin-left: -15px;
   margin-right: -15px;
 }
@@ -4957,6 +4957,9 @@ you can use the generic selector below, but it's slower:
 .default-navbar {
   border-bottom: 5px solid #d04020;
 }
+.default-navbar img {
+  width: inherit;
+}
 .default-navbar .default-navbar-header {
   float: left;
 }
@@ -5040,11 +5043,16 @@ you can use the generic selector below, but it's slower:
   -o-transform: rotate(-15deg) translate3d(-10%, -2.5%, 0);
 }
 
+.why-section {
+  background-color: #e6e6e6;
+  border-top: 5px solid #3b3b97;
+  border-bottom: 5px solid #3b3b97;
+}
 .why-section h1 {
   margin-bottom: 30px;
 }
 .why-section .default-card {
-  border: 1px solid #e6e6e6;
+  border: 1px solid #ffffff;
   text-align: center;
   padding: 10px;
   color: #3b3b97;
@@ -5080,8 +5088,8 @@ you can use the generic selector below, but it's slower:
   margin-bottom: 30px;
 }
 .default-products .product {
-  margin-bottom: 30px;
   box-shadow: 0px 0px 10px #621e0f;
+  margin-bottom: 30px;
   overflow: hidden;
   position: relative;
 }
@@ -5163,6 +5171,77 @@ you can use the generic selector below, but it's slower:
   background: #3b3b97;
   border-color: #3b3b97;
   color: #ffffff;
+}
+
+.default-carousel {
+  overflow-x: hidden;
+  position: relative;
+  border-left: 1px solid #ffffff;
+  border-right: 1px solid #ffffff;
+  padding-top: 15px;
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+.default-carousel-items {
+  transition: transform 300ms;
+  -moz-transition: transform 300ms;
+  -webkit-transition: transform 300ms;
+  -o-transition: transform 300ms;
+}
+
+.default-carousel-item {
+  float: left;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.default-carousel-miniatures {
+  padding: 5px;
+  border: 1px solid black;
+  text-align: center;
+}
+.default-carousel-miniatures .default-carousel-miniature-item {
+  width: 30px;
+  height: 10px;
+  background: black;
+  display: inline-block;
+  margin: 5px;
+}
+.default-carousel-miniatures .default-carousel-miniature-item.active {
+  background: red;
+}
+
+.default-carousel-navigation {
+  position: absolute;
+  top: 50%;
+  right: 0px;
+  left: 0px;
+}
+.default-carousel-navigation .default-carousel-next,
+.default-carousel-navigation .default-carousel-prev {
+  padding: 10px;
+  width: 45px;
+  height: 45px;
+  border-radius: 0px 50% 50% 0px;
+  box-shadow: 0px 0px 10px #000000;
+  background: #ffffff;
+}
+.default-carousel-navigation .default-carousel-next .fa,
+.default-carousel-navigation .default-carousel-prev .fa {
+  font-size: 2rem;
+  margin: 0px;
+  padding: 0px;
+}
+.default-carousel-navigation .default-carousel-next {
+  float: right;
+  border-radius: 50% 0px 0px 50%;
+}
+
+* {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
 }
 
 img {

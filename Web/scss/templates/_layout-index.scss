@@ -3,6 +3,10 @@
     border-bottom: $goutier/2 solid $custom-primary-color;
     @extend %clear-margin-botstrap;
 
+    img {
+        width: inherit;
+    }
+
     .default-navbar-header {
         float: left;
 
@@ -103,11 +107,18 @@
 
 .why-section {
     //background: linear-gradient($white, $custom-primary-color);
+    @extend %clear-margin-botstrap;
+    background-color: lighten($color: $black, $amount: 90%);
+    border: {
+        top: $goutier/2 solid $custom-secodary-color;
+        bottom: $goutier/2 solid $custom-secodary-color;
+    }
+
     h1 {
         margin-bottom: $goutier-bootstrap;
     }
     .default-card {
-        border: 1px solid lighten($color: $black, $amount: 90%);
+        border: 1px solid $white;
         text-align: center;
         padding: $goutier;
         color: $custom-secodary-color;
@@ -140,8 +151,8 @@
     }
     
     .product {
-        margin-bottom: $goutier-bootstrap;
         box-shadow: 0px 0px $goutier darken($custom-primary-color, 25%);
+        margin-bottom: $goutier-bootstrap;
         //border: 1px solid $white;
         //border-radius: $goutier;
         overflow: hidden;

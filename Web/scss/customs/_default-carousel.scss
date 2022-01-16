@@ -1,0 +1,82 @@
+
+.default-carousel {
+    @extend %clearfix;
+    overflow-x: hidden;
+    position: relative;
+    border: {
+        left: 1px solid $white;
+        right: 1px solid $white;
+    }
+    // border: 1px solid $red;
+    padding: {
+        top: $goutier-bootstrap * 0.5;
+        //bottom: $goutier-bootstrap * 0.5;
+    }
+    margin: {
+        left: $goutier-bootstrap * 0.5;
+        right: $goutier-bootstrap * 0.5;
+    }
+}
+
+.default-carousel-items{
+    // margin: {
+    //     left: $goutier-bootstrap * (-0.5);
+    //     right: $goutier-bootstrap * (-0.5);
+    // }
+    @extend %clearfix;
+    @include transition ('transform 300ms');
+}
+
+.default-carousel-item {
+    float: left;
+    padding: {
+        left: $goutier-bootstrap/2;
+        right: $goutier-bootstrap/2;
+    }
+}
+
+.default-carousel-miniatures{
+    padding: $goutier/2;
+    border: 1px solid black;
+    text-align: center;
+
+    .default-carousel-miniature-item {
+        width: $goutier * 3;
+        height: $goutier;
+        background: black;
+        display: inline-block;
+        margin: $goutier/2;
+
+        &.active {
+            background: red;
+        }
+    }
+}
+
+.default-carousel-navigation{
+    // border: 1px solid black;
+    position: absolute;
+    top: 50%;
+    right: 0px;
+    left: 0px;
+
+    .default-carousel-next,
+    .default-carousel-prev {
+        padding: $goutier-bootstrap / 3;
+        //border: 1px solid darken($color: $white, $amount: 30%);
+        width: 45px;
+        height: 45px;
+        border-radius:0px 50% 50% 0px;
+        box-shadow: 0px 0px $goutier $black;
+        background: $white;
+        .fa {
+            font-size: 2rem;
+            margin: 0px;
+            padding: 0px;
+        }
+    }
+    .default-carousel-next{
+        float: right;
+        border-radius:50% 0px 0px 50%;
+    }
+}
