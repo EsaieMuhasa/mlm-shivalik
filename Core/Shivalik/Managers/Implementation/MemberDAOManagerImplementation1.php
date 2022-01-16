@@ -5,8 +5,8 @@ namespace Core\Shivalik\Managers\Implementation;
 use Core\Shivalik\Entities\Localisation;
 use Core\Shivalik\Entities\Member;
 use Core\Shivalik\Managers\MemberDAOManager;
-use PHPBackend\DAOException;
 use PHPBackend\Dao\DAOEvent;
+use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
 
 /**
@@ -55,7 +55,11 @@ class MemberDAOManagerImplementation1 extends MemberDAOManager
      */
     public function checkChild(int $memberId, int $foot): bool
     {
-        return UtilitaireSQL::checkAll($this->getConnection(), $this->getTableName(), ['parent' => $memberId, 'foot' => $foot]);
+        return UtilitaireSQL::checkAll(
+            $this->getConnection(),
+            $this->getTableName(),
+            ['parent' => $memberId, 'foot' => $foot]
+        );
     }
 
     /**

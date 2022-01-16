@@ -2,12 +2,12 @@
 namespace Core\Shivalik\Managers;
 
 use Core\Shivalik\Entities\Account;
-use Core\Shivalik\Entities\Member;
-use PHPBackend\DAOException;
-use PHPBackend\Dao\UtilitaireSQL;
-use Core\Shivalik\Entities\PointValue;
 use Core\Shivalik\Entities\BonusGeneration;
+use Core\Shivalik\Entities\Member;
+use Core\Shivalik\Entities\PointValue;
 use Core\Shivalik\Entities\Withdrawal;
+use PHPBackend\Dao\DAOException;
+use PHPBackend\Dao\UtilitaireSQL;
 
 /**
  *
@@ -35,7 +35,7 @@ abstract class MemberDAOManager extends AbstractUserDAOManager
 	        $interface = $this->getManagerFactory()->getManagerOf($dao);
 	        
 	        if ($interface->checkByMember($account->getMember()->getId())) {
-    	        $operations = $interface->findByMember($account->getMember());
+    	        $operations = $interface->findByMember($account->getMember()->getId());
     	        $account->addOperations($operations, false);
 	        }
 	        
@@ -70,7 +70,7 @@ abstract class MemberDAOManager extends AbstractUserDAOManager
 	 * @throws DAOException
 	 */
 	public function findByOffice (int $officeId, ?int $limit = null, int $offset = 0) {
-		return UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, array('office' => $officeId), $limit, $offset);
+		return UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, array('office' => $officeId), $limit, $offset);
 	}
 	
 	/**
@@ -81,7 +81,7 @@ abstract class MemberDAOManager extends AbstractUserDAOManager
 	public function checkByOffice (int $officeId) : bool {
 		return $this->columnValueExist('office', $officeId);
 	}
-	
+
     /**
      * 
      * @param int $memberId
@@ -187,7 +187,7 @@ abstract class MemberDAOManager extends AbstractUserDAOManager
         $number = 0;
         
         if ($this->checkLeftChild($memberId)) {//s'il a un neud a gauche
-            $leftChild = $this->getLeftChild($memberId);
+            $leftChild = $this->findLeftChild($memberId);
             $number = 1;
             
             if ($this->checkChilds($leftChild->getId())) {//si le neud gauche a des afants
@@ -287,8 +287,8 @@ abstract class MemberDAOManager extends AbstractUserDAOManager
             
             default : {//all Member
                 $members = $this->findLeftDownlinesChilds($memberId);
-                $members = array_merge($members, $this->getMiddleDownlinesChilds($memberId));
-                $members = array_merge($members, $this->getRightDownlinesChilds($memberId));
+                $members = array_merge($members, $this->findMiddleDownlinesChilds($memberId));
+                $members = array_merge($members, $this->findRightDownlinesChilds($memberId));
                 return $members;
             }
             
@@ -359,7 +359,7 @@ abstract class MemberDAOManager extends AbstractUserDAOManager
         $members = array();
         
         if ($this->checkRightChild($memberId)) {//s'il a un neud a droite
-            $ringhtChild = $this->getRightChild($memberId);
+            $ringhtChild = $this->findRightChild($memberId);
             $members[] = $ringhtChild;
             
             if ($this->checkChilds($ringhtChild->getId())) {//si le neud as des neuds afant
@@ -625,11 +625,22 @@ abstract class MemberDAOManager extends AbstractUserDAOManager
      * @param \DateTime $dateMax
      * @param int $limit
      * @param int $offset
-     * @return bool
+     * @return Member[]
      */
-    public function findCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : bool {
+    public function findCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : array {
         return UtilitaireSQL::findCreationHistory($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, $dateMin, $dateMax, ['office' => $officeId], $limit, $offset);
     }
-    
+    	
+	/**
+	 * comptage de operations effectuer par un office en une intervale de temps en parametres
+	 * @param int $officeId
+	 * @param \DateTime $dateMin
+	 * @param \DateTime $dateMax
+	 * @return int
+	 */
+	public function countCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null) : int{
+	    return 0;
+	}
+	
 }
 

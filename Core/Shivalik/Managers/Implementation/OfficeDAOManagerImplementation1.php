@@ -3,8 +3,8 @@ namespace Core\Shivalik\Managers\Implementation;
 
 use Core\Shivalik\Entities\Office;
 use Core\Shivalik\Managers\OfficeDAOManager;
-use PHPBackend\DAOException;
 use PHPBackend\Dao\DAOEvent;
+use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
 
 /**

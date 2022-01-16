@@ -104,25 +104,25 @@ class MyOfficeController extends HTTPController
     public function executeIndex (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_DASHBOARD);
         
-        $nombreMembre = $this->memberDAOManager->countCreatedBy($this->office->getId());
-        if ($this->withdrawalDAOManager->hasRequest($this->office->getId(), null)) {
-            $withdrawals = $this->withdrawalDAOManager->getOfficeRequests($this->office->getId(), null);
+        $nombreMembre = $this->memberDAOManager->countByOffice($this->office->getId());
+        if ($this->withdrawalDAOManager->checkByOffice($this->office->getId(), null)) {
+            $withdrawals = $this->withdrawalDAOManager->findByOffice($this->office->getId(), null);
         }else {
             $withdrawals = array();
         }
         
-        if ($this->gradeMemberDAOManager->hasOperation($this->office->getId())) {
-            $this->office->setOperations($this->gradeMemberDAOManager->getOperations($this->office->getId()));
+        if ($this->gradeMemberDAOManager->checkByOffice($this->office->getId())) {
+            $this->office->setOperations($this->gradeMemberDAOManager->findByOffice($this->office->getId()));
         }
         
-        if ($this->virtualMoneyDAOManager->hasVirtualMoney($this->office->getId())) {
-            $this->office->setVirtualMoneys($this->virtualMoneyDAOManager->forOffice($this->office->getId()));
+        if ($this->virtualMoneyDAOManager->checkByOffice($this->office->getId())) {
+            $this->office->setVirtualMoneys($this->virtualMoneyDAOManager->findByOffice($this->office->getId()));
         }
         
         $this->office->setWithdrawals($withdrawals);
         
-        if ($this->withdrawalDAOManager->hasRequest($this->office->getId(), null, false)) {
-            $serveds = $this->withdrawalDAOManager->getOfficeRequests($this->office->getId(), null, false);
+        if ($this->withdrawalDAOManager->checkByOffice($this->office->getId(), null, false)) {
+            $serveds = $this->withdrawalDAOManager->findByOffice($this->office->getId(), null, false);
             $request->addAttribute(self::ATT_WITHDRAWALS, $serveds);
         }else {
             $request->addAttribute(self::ATT_WITHDRAWALS, array());
@@ -139,16 +139,16 @@ class MyOfficeController extends HTTPController
     public function executeVirtualmoney(Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_VIRTUAL_MONEY);
         
-        if ($this->gradeMemberDAOManager->hasOperation($this->office->getId())) {
-            $this->office->setOperations($this->gradeMemberDAOManager->getOperations($this->office->getId()));
+        if ($this->gradeMemberDAOManager->checkByOffice($this->office->getId())) {
+            $this->office->setOperations($this->gradeMemberDAOManager->findByOffice($this->office->getId()));
         }
         
-        if ($this->virtualMoneyDAOManager->hasVirtualMoney($this->office->getId())) {
-            $this->office->setVirtualMoneys($this->virtualMoneyDAOManager->forOffice($this->office->getId()));
+        if ($this->virtualMoneyDAOManager->checkByOffice($this->office->getId())) {
+            $this->office->setVirtualMoneys($this->virtualMoneyDAOManager->findByOffice($this->office->getId()));
         }
         
-        if ($this->requestVirtualMoneyDAOManager->hasWaiting($this->office->getId())) {
-            $requests = $this->requestVirtualMoneyDAOManager->getWaiting($this->office->getId());
+        if ($this->requestVirtualMoneyDAOManager->checkWaiting($this->office->getId())) {
+            $requests = $this->requestVirtualMoneyDAOManager->findWaiting($this->office->getId());
         }else {
             $requests = array();
         }
@@ -183,10 +183,10 @@ class MyOfficeController extends HTTPController
      * @param Response $response
      */
     public function executeSendRaportWithdrawals(Request $request, Response $response) : void {
-        if (!$this->raportWithdrawalDAOManager->canSendRaport($this->office->getId()) || !$this->withdrawalDAOManager->hasRequest($this->office->getId(), true)) {
+        if (!$this->raportWithdrawalDAOManager->canSendRaport($this->office->getId()) || !$this->withdrawalDAOManager->checkByOffice($this->office->getId(), true)) {
             $response->sendError("impossible to perform this operation because it is active for a precise time limit.");
         }
-        $withdrawals = $this->withdrawalDAOManager->getOfficeRequests($this->office->getId(), true);
+        $withdrawals = $this->withdrawalDAOManager->findByOffice($this->office->getId(), true);
         
         $raport = new RaportWithdrawal();
         $raport->setOffice($this->office);
@@ -204,7 +204,7 @@ class MyOfficeController extends HTTPController
     public function executeMembers (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_MEMBERS);
         
-        $nombre = $this->memberDAOManager->countCreatedBy($this->office->getId());
+        $nombre = $this->memberDAOManager->countByOffice($this->office->getId());
         
         if ($nombre>0) {
             if ($request->existGET('limit')) {
@@ -214,7 +214,7 @@ class MyOfficeController extends HTTPController
                 $limit = intval($request->getApplication()->getConfig()->get(self::CONFIG_MAX_MEMBER_VIEW_STEP)!=null? $request->getApplication()->getConfig()->get(self::CONFIG_MAX_MEMBER_VIEW_STEP)->getValue() : 50);
                 $offset = 0;
             }
-            $members = $this->memberDAOManager->getCreatedBy($this->office->getId(), $limit, $offset);
+            $members = $this->memberDAOManager->findByOffice($this->office->getId(), $limit, $offset);
         }else {
             $members = array();
         }
@@ -223,8 +223,8 @@ class MyOfficeController extends HTTPController
          * @var Member $member
          */
         foreach ($members as $member) {
-            if ($this->gradeMemberDAOManager->hasCurrent($member->getId())) {
-                $member->setPacket($this->gradeMemberDAOManager->getCurrent($member->getId()));
+            if ($this->gradeMemberDAOManager->checkCurrentByMember($member->getId())) {
+                $member->setPacket($this->gradeMemberDAOManager->findCurrentByMember($member->getId()));
             }
         }
         
@@ -239,8 +239,8 @@ class MyOfficeController extends HTTPController
     public function executeUpgrades (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_MEMBERS);
         //upgrades
-        if ($this->gradeMemberDAOManager->hasOperation($this->office->getId(), true)) {
-            $packets = $this->gradeMemberDAOManager->getOperations($this->office->getId(), true);
+        if ($this->gradeMemberDAOManager->checkByOffice($this->office->getId(), true)) {
+            $packets = $this->gradeMemberDAOManager->findByOffice($this->office->getId(), true);
         }else {
             $packets = array();
         }
@@ -273,29 +273,29 @@ class MyOfficeController extends HTTPController
         $dateMax = ($date!=null? $date : $month->getLastDay());
         
         //adhesion
-        if ($this->memberDAOManager->hasCreationHistory($dateMin, $dateMax, array('office' => $this->office->getId()))) {
-            $members = $this->memberDAOManager->getCreationHistory($dateMin, $dateMax, array('office' => $this->office->getId()));
+        if ($this->memberDAOManager->checkCreationHistoryByOffice($this->office->getId(), $dateMin, $dateMax)) {
+            $members = $this->memberDAOManager->findCreationHistoryByOffice($this->office->getId(), $dateMin, $dateMax);
         }else {
             $members = array();
         }
         
         //Monais virtuel
-        if ($this->virtualMoneyDAOManager->hasCreationHistory($dateMin, $dateMax, array('office' => $this->office->getId()))) {
-            $virtuals = $this->virtualMoneyDAOManager->getCreationHistory($dateMin, $dateMax, array('office' => $this->office->getId()));
+        if ($this->virtualMoneyDAOManager->checkCreationHistoryByOffice($this->office->getId(), $dateMin, $dateMax)) {
+            $virtuals = $this->virtualMoneyDAOManager->findCreationHistoryByOffice($this->office->getId(), $dateMin, $dateMax);
         }else {
             $virtuals = array();
         }
         
         //upgrades
-        if ($this->gradeMemberDAOManager->hasUpgradeHistory($dateMin, $dateMax, array('office' => $this->office->getId()))) {
-            $packets = $this->gradeMemberDAOManager->getUpgradeHistory($dateMin, $dateMax, array('office' => $this->office->getId()));
+        if ($this->gradeMemberDAOManager->checkUpgradeHistory($dateMin, $dateMax, $this->office->getId())) {
+            $packets = $this->gradeMemberDAOManager->findUpgradeHistory($dateMin, $dateMax, $this->office->getId());
         }else {
             $packets = array();
         }
         
         //retraits
-        if ($this->withdrawalDAOManager->hasCreationHistory($dateMin, $dateMax, array('office' => $this->office->getId()))) {
-            $withdrawals = $this->withdrawalDAOManager->getCreationHistory($dateMin, $dateMax, array('office' => $this->office->getId()));
+        if ($this->withdrawalDAOManager->checkCreationHistoryByOffice($this->office->getId(), $dateMin, $dateMax)) {
+            $withdrawals = $this->withdrawalDAOManager->findCreationHistoryByOffice($this->office->getId(), $dateMin, $dateMax);
         }else {
             $withdrawals = array();
         }

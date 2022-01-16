@@ -79,8 +79,8 @@ class MembersController extends AdminController
     {
         parent::__construct($application, $action, $module);
         $nombre = $this->memberDAOManager->countAll();
-        $application->getHttpRequest()->addAttribute(self::PARAM_MEMBER_COUNT, $nombre);
-        $application->getHttpRequest()->addAttribute(self::ATT_VIEW_TITLE, "Union members");
+        $application->getRequest()->addAttribute(self::PARAM_MEMBER_COUNT, $nombre);
+        $application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, "Union members");
     }
 
     /**
@@ -262,7 +262,7 @@ class MembersController extends AdminController
     		$form->includeFeedback($request);
     	}
     	
-    	$compte = $this->getAccount($member);
+    	$compte = $this->memberDAOManager->loadAccount($member);
     	
     	
     	
@@ -376,7 +376,7 @@ class MembersController extends AdminController
         $member->setParent(null);
         
         $formater = new TreeFormatter($member);
-        $account = $this->getAccount($member);
+        $account = $this->memberDAOManager->loadAccount($member);
         $account->calcul();
         $request->addAttribute(self::ATT_TREE_FORMATER, $formater);
         $request->addAttribute(self::ATT_COMPTE, $account);
@@ -437,7 +437,7 @@ class MembersController extends AdminController
         $render = new TernaryTreeRender($builder);
         
         $render->render();
-        $account = $this->getAccount($member);
+        $account = $this->memberDAOManager->loadAccount($member);
         $account->calcul();
         $request->addAttribute(self::ATT_COMPTE, $account);
         $request->addAttribute(self::ATT_MEMBER, $member);
@@ -480,7 +480,7 @@ class MembersController extends AdminController
         }
         
         //Chargement des PV;
-        $compte = $this->getAccount($member);
+        $compte = $this->memberDAOManager->loadAccount($member);
         
         if ($this->withdrawalDAOManager->checkByMember($member->getId())) {
             $withdrawals = $this->withdrawalDAOManager->checkByMember($member->getId());

@@ -3,9 +3,9 @@ namespace Core\Shivalik\Managers\Implementation;
 
 use Core\Shivalik\Entities\Withdrawal;
 use Core\Shivalik\Managers\WithdrawalDAOManager;
-use PHPBackend\DAOException;
-use PHPBackend\Dao\UtilitaireSQL;
 use PHPBackend\Dao\DAOEvent;
+use PHPBackend\Dao\DAOException;
+use PHPBackend\Dao\UtilitaireSQL;
 
 /**
  *
@@ -67,7 +67,7 @@ class WithdrawalDAOManagerImplementation1 extends WithdrawalDAOManager
     {
         $return = false;
         try {
-            $statement = $this->pdo->prepare("SELECT * FROM {$this->getTableName()} WHERE office=:office ".(($state !== null)? ("AND admin IS ".($state? 'NOT':'')." NULL") : ("")).(($sended !== null)? (" AND raport IS ".($sended? 'NOT':'')." NULL") : ("")));
+            $statement = $this->getConnection()->prepare("SELECT * FROM {$this->getTableName()} WHERE office=:office ".(($state !== null)? ("AND admin IS ".($state? 'NOT':'')." NULL") : ("")).(($sended !== null)? (" AND raport IS ".($sended? 'NOT':'')." NULL") : ("")));
             $statement->execute(array('office' => $officeId));
             if ($statement->fetch()) {
                 $return = true;
@@ -87,7 +87,7 @@ class WithdrawalDAOManagerImplementation1 extends WithdrawalDAOManager
     {
         $return = array();
         try {
-            $statement = $this->pdo->prepare("SELECT * FROM {$this->getTableName()} WHERE office={$officeId} ".(($state !== null)? ("AND admin IS ".($state? 'NOT':'')." NULL") : ("")).(($sended !== null)? (" AND raport IS ".($sended? 'NOT':'')." NULL") : ("")));
+            $statement = $this->getConnection()->prepare("SELECT * FROM {$this->getTableName()} WHERE office={$officeId} ".(($state !== null)? ("AND admin IS ".($state? 'NOT':'')." NULL") : ("")).(($sended !== null)? (" AND raport IS ".($sended? 'NOT':'')." NULL") : ("")));
             $statement->execute();
             if ($row = $statement->fetch()) {
                 $w = new Withdrawal($row);

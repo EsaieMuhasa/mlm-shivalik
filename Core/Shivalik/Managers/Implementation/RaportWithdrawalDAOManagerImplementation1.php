@@ -4,8 +4,8 @@ namespace Core\Shivalik\Managers\Implementation;
 use Core\Shivalik\Entities\RaportWithdrawal;
 use Core\Shivalik\Managers\OfficeDAOManager;
 use Core\Shivalik\Managers\RaportWithdrawalDAOManager;
-use PHPBackend\DAOException;
 use PHPBackend\Calendar\Month;
+use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
 
 /**
@@ -54,11 +54,11 @@ class RaportWithdrawalDAOManagerImplementation1 extends RaportWithdrawalDAOManag
                 
                 if ($row = $statement->fetch()) {
                     $rpr = new RaportWithdrawal($row, true);
-                    $rpr->setOffice($this->officeDAOManager->getForId($rpr->getOffice()->getId(), false));
+                    $rpr->setOffice($this->officeDAOManager->findById($rpr->getOffice()->getId(), false));
                     $return[] = $rpr;
                     while ($row = $statement->fetch()) {
                         $rpr = new RaportWithdrawal($row, true);
-                        $rpr->setOffice($this->officeDAOManager->getForId($rpr->getOffice()->getId(), false));
+                        $rpr->setOffice($this->officeDAOManager->findById($rpr->getOffice()->getId(), false));
                         $return[] = $rpr;
                     }
                     $statement->closeCursor();
@@ -84,7 +84,7 @@ class RaportWithdrawalDAOManagerImplementation1 extends RaportWithdrawalDAOManag
     {
         $return = false;
         try {
-            $statement = $this->pdo->prepare("SELECT id FROM {$this->getTableName()} WHERE dateAjout>=:dateMin AND dateAjout<=:dateMax ".($officeId!=null? "AND office={$officeId}":""));
+            $statement = $this->getConnection()->prepare("SELECT id FROM {$this->getTableName()} WHERE dateAjout>=:dateMin AND dateAjout<=:dateMax ".($officeId!=null? "AND office={$officeId}":""));
             if ($statement->execute(array('dateMin'  => $dateMin->format('Y-m-d\T00:00:00'), 'dateMax' => $dateMax->format('Y-m-d\T23:59:59')))) {
                 
                 if ($statement->fetch()) {

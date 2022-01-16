@@ -3,7 +3,7 @@ namespace Core\Shivalik\Managers\Implementation;
 
 use Core\Shivalik\Entities\Transfer;
 use Core\Shivalik\Managers\TransferDAOManager;
-use PHPBackend\DAOException;
+use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
 
 /**

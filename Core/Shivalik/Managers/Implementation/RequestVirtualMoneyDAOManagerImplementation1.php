@@ -4,7 +4,7 @@ namespace Core\Shivalik\Managers\Implementation;
 
 use Core\Shivalik\Entities\RequestVirtualMoney;
 use Core\Shivalik\Managers\RequestVirtualMoneyDAOManager;
-use PHPBackend\DAOException;
+use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
 
 /**

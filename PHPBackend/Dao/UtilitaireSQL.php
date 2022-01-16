@@ -1,7 +1,6 @@
 <?php
 namespace PHPBackend\Dao;
 
-use PHPBackend\DAOException;
 use PHPBackend\DBEntity;
 
 /**
@@ -248,11 +247,12 @@ class UtilitaireSQL
         if (!empty($filters)) {
             $where = ' WHERE ';
             foreach (array_keys($filters) as $key => $columnName) {
-                $where .= $columnName .'=:'.$columnName. (count($filters) == ($key-1) ? '' : ' AND ');
+                $where .= $columnName .'=:'.$columnName. (count($filters) == ($key+1) ? '' : ' AND ');
             }
         }
-        $SQL = "SELECT * FROM {$tableName} {$where} ORDER BY {$columnName} ".($deskOrder? "DESC" : "ASCK").($limit!==null ? (' LIMIT '.$limit.' OFFSET '.($offset==0? '0': $offset)) : (''));
+        $SQL = "SELECT * FROM {$tableName} {$where} ORDER BY {$columnOrder} ".($deskOrder? "DESC" : "ASCK").($limit!==null ? (' LIMIT '.$limit.' OFFSET '.($offset==0? '0': $offset)) : (''));
         try {
+            //die ($SQL);
             $statement = $pdo->prepare($SQL);
             $statut = $statement->execute($filters);
             if ($statut) {
@@ -269,7 +269,7 @@ class UtilitaireSQL
             }
             $statement->closeCursor();
         } catch (\Exception $e) {
-            throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
+            throw new DAOException("Error in selection query: {$SQL}", DAOException::ERROR_CODE, $e);
         }
         return $data;
     }
@@ -287,7 +287,7 @@ class UtilitaireSQL
         if (!empty($filters)) {
             $where = ' WHERE ';
             foreach (array_keys($filters) as $key => $columnName) {
-                $where .= $columnName .'=:'.$columnName. (count($filters) == ($key-1) ? '' : ' AND ');
+                $where .= $columnName .'=:'.$columnName. (((count($filters)-1) === $key) ? '' : ' AND ');
             }
         }
         try {
@@ -324,12 +324,17 @@ class UtilitaireSQL
         $where = '';
         if (!empty($filters)) {
             $where = ' WHERE ';
-            foreach (array_keys($filters) as $key => $columnName) {
-                $where .= $columnName .'=:'.$columnName. (count($filters) == ($key-1) ? '' : ' AND ');
+            
+            $keys = array_keys($filters);
+            $count = count($keys);
+            foreach ($keys as $key => $columnName) {
+                $where .= $columnName .'=:'.$columnName. ((($count-1) === $key) ? '' : ' AND ');
             }
         }
         try {
-            $statement = $pdo->prepare("SELECT * FROM {$tableName} {$where} LIMIT ".($limit!==null? $limit : "1")." OFFSET {$offset}");
+            $SQL  = "SELECT * FROM {$tableName} {$where} LIMIT ".($limit!==null? $limit : "1" )." OFFSET {$offset}";
+            //die($SQL);
+            $statement = $pdo->prepare($SQL);
             $statut = $statement->execute($filters);
             
             if($statut){
@@ -491,21 +496,20 @@ class UtilitaireSQL
         $params['dateMin'] = $dateMin->format('Y-m-d\T00:00:00');
         $params['dateMax'] = $dateMax->format('Y-m-d\T23:59:59');
         
-        $andFilter = "";
-        
         if (!empty($filters)) {
             $i = 0;
             $count = count($filters);
-            $andFilter = " AND ";
+            
+            $SQL .= ' AND ';
             
             foreach (array_keys($filters) as $name) {
-                $SQL .= "{$name}=:{$name}".($i < ($count-1)? ' AND ':'');
+                $SQL .= "{$name}=:{$name}".((($i + 1) == $count)? '':' AND ');
                 $params[$name] = $filters[$name];
                 $i++;
             }
         }
         
-        $SQL .= " {$andFilter} ".($limit !== null? (' LIMIT '.$limit.' OFFSET '.($offset!=0? $offset:'0')):'');
+        $SQL .= ($limit !== null? (" LIMIT {$limit} OFFSET ".($offset!=0? $offset:'0')):'');
         $data = array();
         try {
             $result = $pdo->prepare($SQL);
@@ -629,21 +633,20 @@ class UtilitaireSQL
         $params['dateMin'] = $dateMin->format('Y-m-d\T00:00:00');
         $params['dateMax'] = $dateMax->format('Y-m-d\T23:59:59');
         
-        $andFilter = "";
-        
         if (!empty($filters)) {
             $i = 0;
             $count = count($filters);
-            $andFilter = " AND ";
+            $SQL .= " AND ";
             
             foreach (array_keys($filters) as $name) {
-                $SQL .= "{$name}=:{$name}".($i < ($count-1)? ' AND ':'');
+                $SQL .= "{$name}=:{$name}".(($i + 1) != ($count)? ' AND ':'');
                 $params[$name] = $filters[$name];
                 $i++;
             }
         }
         
-        $SQL .= " {$andFilter} ".($limit !== null? (' LIMIT '.$limit.' OFFSET '.($offset!=0? $offset:'0')):'');
+        $SQL .= ($limit !== null? (' LIMIT '.$limit.' OFFSET '.($offset!=0? $offset:'0')):'');
+
         $return = false;
         
         try {

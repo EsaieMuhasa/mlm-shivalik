@@ -2,7 +2,6 @@
 namespace PHPBackend\Dao;
 
 use PHPBackend\Config\EntityMetadata;
-use PHPBackend\DAOException;
 
 /**
  * Implemetation par defaut d'une interface du DAO
@@ -62,6 +61,13 @@ abstract class DefaultDAOInterface implements DAOInterface
      */
     public function __construct(DAOManagerFactory $factory) {
         $this->factory = $factory;
+        
+        $class=get_class($this);
+        if (!preg_match('#^\\\\(.+)#', $class)) {
+            $class = "\\{$class}";
+        }
+        $this->metadata = $factory->getEntitiesConfig()->forImplementation($class);
+        
         $this->hydrateInterfaces($factory);
     }
     
@@ -86,7 +92,7 @@ abstract class DefaultDAOInterface implements DAOInterface
         
         if($this->tableName==null){
             $ref = new \ReflectionClass($this);
-            $this->tableName = $this->managers->getEntitiesConfig()->forImplementation('\\'.$ref->getName())->getSimpleName();
+            $this->tableName = $this->factory->getEntitiesConfig()->forImplementation('\\'.$ref->getName())->getSimpleName();
         }
         
         return $this->tableName;
@@ -213,7 +219,7 @@ abstract class DefaultDAOInterface implements DAOInterface
      */
     public function findAll(?int $limit = null, int $offset = 0): array
     {
-        return UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_ID, true, array(), $limit, $offset);
+        return UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, [], $limit, $offset);
     }
 
     /**
@@ -247,7 +253,7 @@ abstract class DefaultDAOInterface implements DAOInterface
      * {@inheritDoc}
      * @see \PHPBackend\Dao\DAOInterface::findByCreationHistory()
      */
-    public function findByCreationHistory(\DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, ?int $offset = 0): array
+    public function findByCreationHistory(\DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset = 0): array
     {
         return UtilitaireSQL::findCreationHistory($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, $dateMin, $dateMax, array(), $limit, $offset);
     }

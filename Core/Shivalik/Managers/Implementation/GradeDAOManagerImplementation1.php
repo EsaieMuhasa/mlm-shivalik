@@ -70,7 +70,7 @@ class GradeDAOManagerImplementation1 extends GradeDAOManager
      * @see \Core\Shivalik\Managers\GradeDAOManager::findAll()
      * @return Grade[]
      */
-    public function findAll(?int $limit = null, int $offset = 0)
+    public function findAll(?int $limit = null, int $offset = 0) : array
     {
         $all = UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), "percentage", true, [], $limit, $offset);
         

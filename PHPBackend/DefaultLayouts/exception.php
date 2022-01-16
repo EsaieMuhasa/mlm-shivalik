@@ -3,8 +3,10 @@ use PHPBackend\Text\HtmlFormater;
 ?>
 
 
-<div class="panel">
-    <h1 class="panel-title">HTTP/1.0 <?php echo $_REQUEST['exception']->getCode();?> Internal Server Error!</h1>
+<div class="panel panel-danger">
+	<div class="panel-heading panel-header">
+    	<h1 class="panel-title text-danger">HTTP/1.0 <?php echo $_REQUEST['exception']->getCode();?> Internal Server Error!</h1>
+	</div>
    	<div class="panel-body">
         <p>
         	<?php echo HtmlFormater::toHTML($_REQUEST['exception']->toHTML());?>

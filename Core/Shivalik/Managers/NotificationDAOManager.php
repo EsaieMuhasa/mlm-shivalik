@@ -1,7 +1,7 @@
 <?php
 namespace Core\Shivalik\Managers;
 
-use PHPBackend\DAOException;
+use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\DefaultDAOInterface;
 
 /**

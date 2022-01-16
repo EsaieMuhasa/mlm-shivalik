@@ -3,7 +3,7 @@ namespace Core\Shivalik\Managers\Implementation;
 
 use Core\Shivalik\Entities\OfficeBonus;
 use Core\Shivalik\Managers\OfficeBonusDAOManager;
-use PHPBackend\DAOException;
+use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
 
 /**

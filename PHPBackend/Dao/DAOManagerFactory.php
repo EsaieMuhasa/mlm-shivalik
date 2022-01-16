@@ -1,11 +1,10 @@
 <?php
 namespace PHPBackend\Dao;
 
-use PHPBackend\PHPBackendException;
-use PHPBackend\DAOException;
 use PHPBackend\PDOFactory;
-use PHPBackend\Config\EntitiesConfig;
+use PHPBackend\PHPBackendException;
 use PHPBackend\Config\DBConnection;
+use PHPBackend\Config\EntitiesConfig;
 
 /**
  *

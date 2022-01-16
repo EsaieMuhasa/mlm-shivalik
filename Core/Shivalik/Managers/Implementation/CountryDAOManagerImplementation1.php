@@ -20,7 +20,7 @@ class CountryDAOManagerImplementation1 extends CountryDAOManager
      * @see \PHPBackend\Dao\DAOInterface::update()
      * @param Country $entity
      */
-    public function update($entity, $id)
+    public function update($entity, $id) : void
     {
         UtilitaireSQL::update($this->getConnection(), $this->getTableName(), [
             'name' => $entity->getName(),

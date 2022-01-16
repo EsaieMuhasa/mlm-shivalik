@@ -1,7 +1,7 @@
 <?php 
-use Library\Config;
+use PHPBackend\Request;
 
-$config = Config::getInstance();
+$config = $_REQUEST[Request::ATT_APP_CONFIG];
 ?>
 <footer class="text-center" style="padding-top: 70px;">
 	<p style="border-top: 1px solid #c0c0c0;" class="">

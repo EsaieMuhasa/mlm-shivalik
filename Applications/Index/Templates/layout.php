@@ -15,28 +15,17 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];;
 <html lang="en">
     <head>
         <meta charset="UTF-8"/>
+        <title>Shivalik Herbals</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css"  href="/css/bootstrap.css">
         <link rel="stylesheet" href="/css/style.css"/>
-        <title>Shivalik</title>
         <link rel="icon" type="image/jpg" href="<?php echo $config->get('logo'); ?>" />
         
         <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
     	<link rel="apple-touch-icon" href="<?php echo $config->get('logo'); ?>">
     	<link rel="apple-touch-icon" sizes="72x72" href="<?php echo $config->get('logo'); ?>">
     	<link rel="apple-touch-icon" sizes="114x114" href="<?php echo $config->get('logo'); ?>">
-
-        <!-- Bootstrap -->
-        <link rel="stylesheet" type="text/css"  href="/css/bootstrap-index.css">
-        <link rel="stylesheet" type="text/css" href="/fonts/font-awesome/css/font-awesome.css">
-
-        <!-- Stylesheet
-            ================================================== -->
-        <link rel="stylesheet" type="text/css"  href="/css/style-index.css">
-        <link rel="stylesheet" type="text/css" href="/css/nivo-lightbox/nivo-lightbox.css">
-        <link rel="stylesheet" type="text/css" href="/css/nivo-lightbox/default.css">
-        <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,800,600,300' rel='stylesheet' type='text/css'>
-
         <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
         <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
         <!--[if lt IE 9]>
@@ -44,9 +33,8 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];;
           <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
         <![endif]-->
     </head>
-    <body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
-    	<!-- Navigation
-          ==========================================-->
+    
+    <body>
         <nav id="menu" class="navbar navbar-default navbar-fixed-top">
             <div class="container"> 
                 <!-- Brand and toggle get grouped for better mobile display -->
@@ -93,11 +81,11 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];;
             </div>
             <!-- /.container-fluid --> 
         </nav>
-        
         <!-- Header -->
         
-        
+		<section>
         <?php echo $_REQUEST[Page::ATT_VIEW]; ?>
+		</section>
         
         <div id="footer">
             <div class="container text-center">
@@ -106,12 +94,8 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];;
                   </div>
             </div>
         </div>
-        <script type="text/javascript" src="/js/jquery.1.11.1.js"></script> 
-        <script type="text/javascript" src="/js/bootstrap-index.js"></script> 
-        <script type="text/javascript" src="/js/SmoothScroll.js"></script> 
-        <script type="text/javascript" src="/js/nivo-lightbox.js"></script> 
-        <script type="text/javascript" src="/js/jquery.isotope.js"></script> 
-        <script type="text/javascript" src="/js/jqBootstrapValidation.js"></script> 
-        <script type="text/javascript" src="/js/main.js"></script>
+        <script type="text/javascript" src="/js/jquery.js"></script> 
+        <script type="text/javascript" src="/js/bootstrap.js"></script> 
+        <script type="text/javascript" src="/js/app.js"></script>
     </body>
 </html>

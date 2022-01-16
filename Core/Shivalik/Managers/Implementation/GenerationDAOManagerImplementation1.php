@@ -18,7 +18,7 @@ class GenerationDAOManagerImplementation1 extends GenerationDAOManager
      * {@inheritDoc}
      * @see \PHPBackend\Dao\DefaultDAOInterface::findAll()
      */
-    public function findAll(?int $limit = null, int $offset = 0)
+    public function findAll(?int $limit = null, int $offset = 0) : array
     {
         return UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), "number", true, [], $limit, $offset);
     }
@@ -28,7 +28,7 @@ class GenerationDAOManagerImplementation1 extends GenerationDAOManager
      * @see \PHPBackend\Dao\DAOInterface::update()
      * @param Generation $entity
      */
-    public function update($entity, $id)
+    public function update($entity, $id) : void
     {
         UtilitaireSQL::update($this->getConnection(), $this->getTableName(), [            
             'name' => $entity->getName(),

@@ -1,11 +1,11 @@
 <?php
 namespace PHPBackend\Graphics\ChartJS\Tools;
 
-use PHPBackend\Config;
+use PHPBackend\AppConfig;
 use PHPBackend\DBEntity;
-use PHPBackend\Graphics\ChartJS\ChartConfig;
-use PHPBackend\Graphics\ChartJS\Chart;
 use PHPBackend\Calendar\Month;
+use PHPBackend\Graphics\ChartJS\Chart;
+use PHPBackend\Graphics\ChartJS\ChartConfig;
 
 /**
  *
@@ -22,7 +22,7 @@ abstract class EntityChartBuilder
     
     /**
      * la configuration de l'application
-     * @var Config
+     * @var AppConfig
      */
     private $config;
     
@@ -39,11 +39,11 @@ abstract class EntityChartBuilder
 
     /**
      * constructeur d'initialisation
-     * @param Config $config
+     * @param AppConfig $config
      * @param array $options
      * @param array $elements
      */
-    public function __construct(?Config $config=null, array $options = array(), array $elements = array())
+    public function __construct(?AppConfig $config=null, array $options = array(), array $elements = array())
     {
         $this->config=$config;
         $this->options = $options;
@@ -148,7 +148,7 @@ abstract class EntityChartBuilder
      * @param Config
      * @return ChartConfig
      */
-    protected abstract function doGenerate (?Config $config) : ChartConfig;
+    protected abstract function doGenerate (?AppConfig $config) : ChartConfig;
     
 }
 

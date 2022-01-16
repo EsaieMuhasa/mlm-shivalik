@@ -1,19 +1,24 @@
 <?php
-use Library\Config;
 use Applications\Member\MemberApplication;
 use Applications\Member\Modules\Account\AccountController;
-
+use Core\Shivalik\Entities\Account;
+use Core\Shivalik\Entities\Member;
+use PHPBackend\Request;
+use PHPBackend\AppConfig;
 /**
- * @var \Entities\Member $member
+ * @var Member $member
  */
 $member = MemberApplication::getConnectedMember();
 
 /**
- * @var \Entities\Account $compte
+ * @var Account $compte
  */
 $compte = $_REQUEST[AccountController::ATT_ACCOUNT];
 
-$config = Config::getInstance();
+/**
+ * @var AppConfig $config
+ */
+$config = $_REQUEST[Request::ATT_APP_CONFIG];
 ?>
 <div class="row">
     <div class="col-lg-12">

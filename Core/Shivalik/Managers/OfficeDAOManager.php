@@ -6,7 +6,8 @@ use Core\Shivalik\Entities\Office;
 use Core\Shivalik\Entities\RequestVirtualMoney;
 use Core\Shivalik\Entities\VirtualMoney;
 use Core\Shivalik\Entities\Withdrawal;
-use PHPBackend\DAOException;
+use function Core\Shivalik\Managers\RequestVirtualMoneyDAOManager\checkWaiting;
+use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\DefaultDAOInterface;
 use PHPBackend\Dao\UtilitaireSQL;
 
@@ -83,7 +84,7 @@ abstract class OfficeDAOManager extends DefaultDAOInterface
 	        $return->setVirtualMoneys($this->getDaoManager()->getManagerOf(VirtualMoney::class)->findByOffice($return->getId()));
 	    }
 	    
-	    if ($this->getDaoManager()->getManagerOf(RequestVirtualMoney::class)-checkWaiting($return->getId())) {//Les demandes des monais virtuel effectuer par le proprietaire de l'argent
+	    if ($this->getDaoManager()->getManagerOf(RequestVirtualMoney::class)->checkWaiting($return->getId())) {//Les demandes des monais virtuel effectuer par le proprietaire de l'argent
 	        $requests = $this->getDaoManager()->getManagerOf(RequestVirtualMoney::class)->findWaiting($return->getId());
 	        $return->setRequests($requests);
 	    }
@@ -107,8 +108,6 @@ abstract class OfficeDAOManager extends DefaultDAOInterface
      * @throws DAOException
      */
     public function findByMember (int $memberId) : Office {
-    	$o = $this->pdo_uniqueFromTableColumnValue($this->getTableName(), $this->getMetadata()->getName(), 'member', $memberId);
-    	$o->setLocalisation($this->localisationDAOManager->getForId($o->localisation->id));
     	return $this->findByColumnName("member", $memberId);
     }
     

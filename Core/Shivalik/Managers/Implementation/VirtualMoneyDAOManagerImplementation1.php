@@ -2,11 +2,11 @@
 
 namespace Core\Shivalik\Managers\Implementation;
 
+use Core\Shivalik\Entities\OfficeBonus;
 use Core\Shivalik\Entities\VirtualMoney;
 use Core\Shivalik\Managers\VirtualMoneyDAOManager;
-use PHPBackend\DAOException;
+use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
-use Core\Shivalik\Entities\OfficeBonus;
 
 /**
  *
@@ -19,7 +19,7 @@ class VirtualMoneyDAOManagerImplementation1 extends VirtualMoneyDAOManager {
 	 * {@inheritDoc}
 	 * @see \PHPBackend\Dao\DAOInterface::update()
 	 */
-	public function update($entity, $id) {
+	public function update($entity, $id) : void {
 		throw new DAOException("unsupported operation");
 	}
 	

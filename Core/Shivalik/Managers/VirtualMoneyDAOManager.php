@@ -26,7 +26,7 @@ abstract class VirtualMoneyDAOManager extends DefaultDAOInterface {
 	 * @param int $officeId
 	 * @return bool
 	 */
-	public function ckeckByOffice (int $officeId) : bool {
+	public function checkByOffice (int $officeId) : bool {
 		return $this->columnValueExist('office', $officeId);
 	}
 	
@@ -69,9 +69,9 @@ abstract class VirtualMoneyDAOManager extends DefaultDAOInterface {
 	 * @param \DateTime $dateMax
 	 * @param int $limit
 	 * @param int $offset
-	 * @return bool
+	 * @return VirtualMoney[]
 	 */
-	public function findCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : bool {
+	public function findCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : array {
 	    return UtilitaireSQL::findCreationHistory($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, $dateMin, $dateMax, ['office' => $officeId], $limit, $offset);
 	}
 	

@@ -5,7 +5,7 @@ use Core\Shivalik\Entities\PointValue;
 use Core\Shivalik\Managers\GradeMemberDAOManager;
 use Core\Shivalik\Managers\MemberDAOManager;
 use Core\Shivalik\Managers\PointValueDAOManager;
-use PHPBackend\DAOException;
+use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
 
 /**

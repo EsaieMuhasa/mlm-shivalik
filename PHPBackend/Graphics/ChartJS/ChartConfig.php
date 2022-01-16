@@ -13,8 +13,9 @@ class ChartConfig
     const TYPE_LINE_CHART = 'line';
     const TYPE_PIE_CHART = 'pie';
     const TYPE_BAR_CHART = 'bar';
+    const TYPE_DOUGHNUT_CHART = 'doughnut';
     
-    private static $TYPE_CHARTS = ['line', 'pie', 'bar'];
+    private static $TYPE_CHARTS = ['line', 'pie', 'bar', 'doughnut'];
     
     
     /**

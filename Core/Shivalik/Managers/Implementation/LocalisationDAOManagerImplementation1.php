@@ -2,8 +2,8 @@
 namespace Core\Shivalik\Managers\Implementation;
 
 use Core\Shivalik\Managers\LocalisationDAOManager;
-use PHPBackend\DAOException;
 use PHPBackend\Dao\DAOEvent;
+use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
 
 /**

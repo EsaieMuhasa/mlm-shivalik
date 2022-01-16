@@ -7,7 +7,7 @@ use Core\Shivalik\Entities\GradeMember;
 use Core\Shivalik\Entities\Member;
 use Core\Shivalik\Entities\PointValue;
 use Core\Shivalik\Managers\GradeMemberDAOManager;
-use PHPBackend\DAOException;
+use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
 
 /**
@@ -24,7 +24,7 @@ class GradeMemberDAOManagerImplementation1 extends GradeMemberDAOManager
      */
     public function findCurrentByMember(int $memberId): GradeMember
     {
-        if (!$this->hasCurrent($memberId)) {
+        if (!$this->checkCurrentByMember($memberId)) {
             throw new DAOException("no activation of the current account grade");
         }
         
@@ -91,7 +91,7 @@ class GradeMemberDAOManagerImplementation1 extends GradeMemberDAOManager
 	public function checkRequest(): bool {
 		$requests = false;
 		try {
-			$statement = $this->pdo->prepare("SELECT * FROM {$this->getTableName()} WHERE initDate IS NULL AND closeDate IS NULL");
+			$statement = $this->getConnection()->prepare("SELECT * FROM {$this->getTableName()} WHERE initDate IS NULL AND closeDate IS NULL");
 			if ($statement->execute()) {
 				if ($statement->fetch()) {
 					$requests = true;
@@ -119,7 +119,7 @@ class GradeMemberDAOManagerImplementation1 extends GradeMemberDAOManager
         
         $requested = null;
         try {
-            $statement = $this->pdo->prepare("SELECT * FROM {$this->getTableName()} WHERE member=:member AND enable = 0 AND initDate IS NULL AND closeDate IS NULL");
+            $statement = $this->getConnection()->prepare("SELECT * FROM {$this->getTableName()} WHERE member=:member AND enable = 0 AND initDate IS NULL AND closeDate IS NULL");
             if ($statement->execute(array('member'=>$memberId))) {
                 if ($row = $statement->fetch()) {
                     $requested = new GradeMember($row);
@@ -146,7 +146,7 @@ class GradeMemberDAOManagerImplementation1 extends GradeMemberDAOManager
 	public function findByOffice(?int $officeId, ?bool $upgrade = null, ?bool $virtual=null) {
 		$return = array();
 		try {
-			$statement = $this->pdo->prepare("SELECT * FROM {$this->getTableName()} WHERE office =:office ".($upgrade === null? "":(" AND old IS ".($upgrade? "NOT":"")." NULL")).($virtual === null? "":(" AND virtualMoney IS ".($virtual? " NOT ":"")." NULL")));
+			$statement = $this->getConnection()->prepare("SELECT * FROM {$this->getTableName()} WHERE office =:office ".($upgrade === null? "":(" AND old IS ".($upgrade? "NOT":"")." NULL")).($virtual === null? "":(" AND virtualMoney IS ".($virtual? " NOT ":"")." NULL")));
 			if($statement->execute(array('office' => $officeId))){
 				if ($row = $statement->fetch()) {
 					$ob = new GradeMember($row);
@@ -183,7 +183,7 @@ class GradeMemberDAOManagerImplementation1 extends GradeMemberDAOManager
 		$return = false;
 		try {
 		    $sql = "SELECT id FROM {$this->getTableName()} WHERE office =:office ".($upgrade === null? "":(" AND old IS ".($upgrade? "NOT":"")." NULL")).($virtual === null? "":(" AND virtualMoney IS".($virtual? " NOT":"")." NULL"));
-		    $statement = $this->pdo->prepare($sql);
+		    $statement = $this->getConnection()->prepare($sql);
 			if($statement->execute(array('office' => $officeId))){
 				if ($statement->fetch()) {
 					$return = true;
@@ -252,7 +252,7 @@ class GradeMemberDAOManagerImplementation1 extends GradeMemberDAOManager
      * {@inheritDoc}
      * @see \PHPBackend\Dao\DefaultDAOInterface::findById()
      */
-    public function findById(int $id, bool $forward = true)
+    public function findById($id, bool $forward = true)
     {
         /**
          * @var GradeMember $gm
@@ -308,7 +308,7 @@ class GradeMemberDAOManagerImplementation1 extends GradeMemberDAOManager
             $params['office'] = $officeId;
         }
         
-        $SQL .= ' AND '.(($limit>-1 && $offset>-1)? (' LIMIT '.$limit.' OFFSET '.($offset!=0? $offset:'0')):'');
+        $SQL .= (($limit !== null)? (' LIMIT '.$limit.' OFFSET '.($offset!=0? $offset:'0')):'');
         $data = array();
         
         try {
@@ -357,7 +357,7 @@ class GradeMemberDAOManagerImplementation1 extends GradeMemberDAOManager
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\GradeMemberDAOManager::checkUpgradeHistory()
      */
-    public function checkUpgradeHistory(\DateTime $dateMin, \DateTime $dateMax = null, ?int $officeId=null, ?int $limit = null,int $offset = 0): bool
+    public function checkUpgradeHistory(\DateTime $dateMin, \DateTime $dateMax = null, ?int $officeId=null, ?int $limit = null, int $offset = 0): bool
     {
         $SQL = 'SELECT * FROM '.$this->getTableName().' WHERE dateAjout >= :dateMin  AND dateAjout <=:dateMax AND old IS NOT NULL';
         
@@ -375,7 +375,7 @@ class GradeMemberDAOManagerImplementation1 extends GradeMemberDAOManager
             $params['office'] = $officeId;
         }
         
-        $SQL .= ' AND '.(($limit>-1 && $offset>-1)? (' LIMIT '.$limit.' OFFSET '.($offset!=0? $offset:'0')):'');
+        $SQL .= " LIMIT ".($limit === null? '1' : $limit).' OFFSET '.($offset!=0? $offset:'0');
         
         $return = false;
         try {
@@ -633,7 +633,7 @@ class GradeMemberDAOManagerImplementation1 extends GradeMemberDAOManager
      * {@inheritDoc}
      * @see \PHPBackend\Dao\DAOInterface::update()
      */
-    public function update($entity, $id)
+    public function update($entity, $id) : void
     {
         throw new DAOException("Cannot perform this operation");
     }
@@ -646,7 +646,7 @@ class GradeMemberDAOManagerImplementation1 extends GradeMemberDAOManager
     {
         $return = 0;
         try {
-            $statement = $this->pdo->prepare("SELECT COUNT(*) AS nombre FROM {$this->getTableName()} WHERE old IS NOT NULL ".($officeId === null? "":(" AND office=:office")));
+            $statement = $this->getConnection()->prepare("SELECT COUNT(*) AS nombre FROM {$this->getTableName()} WHERE old IS NOT NULL ".($officeId === null? "":(" AND office=:office")));
             if($statement->execute(array('office' => $officeId))){
                 if ($row = $statement->fetch()) {
                     $return = intval($row['nombre']);
@@ -670,7 +670,7 @@ class GradeMemberDAOManagerImplementation1 extends GradeMemberDAOManager
     {
         $return = array();
         try {
-            $statement = $this->pdo->prepare("SELECT * FROM {$this->getTableName()} WHERE membership > 0  AND virtual ".($virtualId == null? "IS NULL" : " = {$virtualId}"));
+            $statement = $this->getConnection()->prepare("SELECT * FROM {$this->getTableName()} WHERE membership > 0  AND virtual ".($virtualId == null? "IS NULL" : " = {$virtualId}"));
             if($statement->execute(array())){
                 if ($row = $statement->fetch()) {
                     $return[] = new GradeMember($row);
@@ -701,7 +701,7 @@ class GradeMemberDAOManagerImplementation1 extends GradeMemberDAOManager
     {
         $return = false;
         try {
-            $statement = $this->pdo->prepare("SELECT * FROM {$this->getTableName()} WHERE membership > 0  AND virtual ".($virtualId == null? "IS NULL" : " = {$virtualId}"));
+            $statement = $this->getConnection()->prepare("SELECT * FROM {$this->getTableName()} WHERE membership > 0  AND virtual ".($virtualId == null? "IS NULL" : " = {$virtualId}"));
             if($statement->execute(array())){
                 if ($statement->fetch()) {
                     $return = true;

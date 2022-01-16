@@ -2,7 +2,7 @@
 namespace PHPBackend\Config;
 
 use PHPBackend\PHPBackendException;
-use PHPBackend\DAOException;
+use PHPBackend\Dao\DAOException;
 
 /**
  *
@@ -128,13 +128,19 @@ class EntitiesConfig
      * @return EntityMetadata
      */
     public function getMetadata (string $name) : EntityMetadata{
+        
+        if (preg_match("#(.*)\\\\(.*)#", $name)) {
+            $ref = new \ReflectionClass($name);
+            $name = $ref->getShortName();
+        }
+        
         foreach ($this->metadatas as $metadata) {
-            if ($metadata->getName() == $name || $metadata->getSimpleName() == $name) {
+            if ($metadata->getName() == $name || $metadata == "\\\\{$name}" || $metadata->getSimpleName() == $name) {
                 return $metadata;
             }
         }
         
-        throw new DAOException("Aucune metadonnée dans la configuration du DAO ne fait reference à '{$name}'");
+        throw new DAOException("Aucune metadonnée dans la configuration du DAO ne fait reference à '{$name}' ");
     }
 }
 

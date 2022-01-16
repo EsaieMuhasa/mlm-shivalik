@@ -91,7 +91,7 @@ class AccountController extends HTTPController
     public function __construct(Application $application, string $action, string $module)
     {
         parent::__construct($application, $action, $module);
-        $application->getHttpRequest()->addAttribute(self::ATT_VIEW_TITLE, "Account");
+        $application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, "Account");
     }
     
     /**
@@ -99,7 +99,7 @@ class AccountController extends HTTPController
      */
     private function getAccount () : Account {
         $member = MemberApplication::getConnectedMember();
-        return $this->memberDAOManager->getAccount($member);
+        return $this->memberDAOManager->loadAccount($member);
     }
 
     /**
@@ -114,7 +114,7 @@ class AccountController extends HTTPController
          * @var Member $member
          */
         $member = MemberApplication::getConnectedMember();
-        $gradeMember = $this->gradeMemberDAOManager->getCurrent($member->getId());
+        $gradeMember = $this->gradeMemberDAOManager->findCurrentByMember($member->getId());
         $gradeMember->setMember($member);
         
 
@@ -141,22 +141,22 @@ class AccountController extends HTTPController
             //chargement des downlines
             switch ($request->getDataGET('foot')){
                 case 'left' : {//left
-                    $members = $this->memberDAOManager->getLeftDownlinesChilds($member->getId());
+                    $members = $this->memberDAOManager->findLeftDownlinesChilds($member->getId());
                     $count = $this->memberDAOManager->countLeftChild($member->getId());
                 }break;
                 
                 case 'middle' : {//middle
-                    $members = $this->memberDAOManager->getMiddleDownlinesChilds($member->getId());
+                    $members = $this->memberDAOManager->findMiddleDownlinesChilds($member->getId());
                     $count = $this->memberDAOManager->countRightChild($member->getId());
                 }break;
                 
                 case 'right' : {//right
-                    $members = $this->memberDAOManager->getRightDownlinesChilds($member->getId());
+                    $members = $this->memberDAOManager->findRightDownlinesChilds($member->getId());
                     $count = $this->memberDAOManager->countMiddleChild($member->getId());
                 }break;
                 
                 default : {//all Member
-                    $members = $this->memberDAOManager->getDownlinesChilds($member->getId());
+                    $members = $this->memberDAOManager->findDownlinesChilds($member->getId());
                     $count = $this->memberDAOManager->countChilds($member->getId());
                 }
             }
@@ -193,8 +193,8 @@ class AccountController extends HTTPController
         $request->addAttribute(self::ATT_ACCOUNT, $compte);
         
         //retraits
-        if ($this->withdrawalDAOManager->hasOperation($member->getId())) {
-            $withdrawals = $this->withdrawalDAOManager->forMember($member->getId());
+        if ($this->withdrawalDAOManager->checkByMember($member->getId())) {
+            $withdrawals = $this->withdrawalDAOManager->findByMember($member->getId());
         }else {
             $withdrawals = array();
         }
@@ -226,7 +226,7 @@ class AccountController extends HTTPController
             $request->addAttribute(self::ATT_WITHDRAWEL, $withdrawel);
         }
         
-        $request->addAttribute(self::ATT_OFFICES, $this->officeDAOManager->getAll());
+        $request->addAttribute(self::ATT_OFFICES, $this->officeDAOManager->findAll());
         $request->addAttribute(self::ATT_MEMBER, MemberApplication::getConnectedMember());
     }
     
@@ -238,11 +238,11 @@ class AccountController extends HTTPController
         $id = intval($request->getDataGET('id'), 10);
         $member = MemberApplication::getConnectedMember();
         
-        if (!$this->withdrawalDAOManager->idExist($id)) {
+        if (!$this->withdrawalDAOManager->checkById($id)) {
             $response->sendError("no data match at request URL");
         }
         
-        $withdrawal = $this->withdrawalDAOManager->getForId($id);
+        $withdrawal = $this->withdrawalDAOManager->findById($id);
         if ($member->getId() != $withdrawal->getMember()->getId() || $withdrawal->getAdmin() != null) {
             $response->sendError("no data match at request URL");
         }
@@ -268,7 +268,7 @@ class AccountController extends HTTPController
         }
         
         $request->addAttribute(self::ATT_WITHDRAWEL, $withdrawal);
-        $request->addAttribute(self::ATT_OFFICES, $this->officeDAOManager->getAll());
+        $request->addAttribute(self::ATT_OFFICES, $this->officeDAOManager->findAll());
     }
     
     /**
@@ -293,22 +293,22 @@ class AccountController extends HTTPController
             $members = [];
             switch ($request->getDataGET('foot')){
                 case 'left' : {//left
-                    $members[] = $this->memberDAOManager->getLeftDownlineStack($member->getId());
+                    $members[] = $this->memberDAOManager->findLeftDownlineStack($member->getId());
                     $count = $this->memberDAOManager->countLeftChild($member->getId());
                 }break;
                 
                 case 'middle' : {//middle
-                    $members[] = $this->memberDAOManager->getMiddleDownlineStack($member->getId());
+                    $members[] = $this->memberDAOManager->findMiddleDownlineStack($member->getId());
                     $count = $this->memberDAOManager->countRightChild($member->getId());
                 }break;
                 
                 case 'right' : {//right
-                    $members[] = $this->memberDAOManager->getRightDownlineStack($member->getId());
+                    $members[] = $this->memberDAOManager->findRightDownlineStack($member->getId());
                     $count = $this->memberDAOManager->countMiddleChild($member->getId());
                 }break;
                 
                 default : {//all Member
-                    $members = $this->memberDAOManager->getDownlinesStacks($member->getId());
+                    $members = $this->memberDAOManager->findDownlinesStacks($member->getId());
                     $count = $this->memberDAOManager->countChilds($member->getId());
                 }
             }
@@ -343,6 +343,12 @@ class AccountController extends HTTPController
         }
     }
     
+    
+    /**
+     * consultation de l'historique des hoperation dans le compte d'un membre
+     * @param Request $request
+     * @param Response $response
+     */
     public function executeHistory (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Account history");
         
@@ -365,20 +371,20 @@ class AccountController extends HTTPController
         
         $member = MemberApplication::getConnectedMember();
         
-        if ($this->withdrawalDAOManager->hasCreationHistory($dateMin, $dateMax, array('member' => $member->getId()))) {
-            $withdrawals = $this->withdrawalDAOManager->getCreationHistory($dateMin, $dateMax, array('member' => $member->getId()));
+        if ($this->withdrawalDAOManager->checkHistoryByMember($member->getId(), $dateMin, $dateMax)) {
+            $withdrawals = $this->withdrawalDAOManager->findHistoryByMember($member->getId(), $dateMin, $dateMax);
         }else {
             $withdrawals = array();
         }
         
-        if ($this->pointValueDAOManager->hasCreationHistory($dateMin, $dateMax, array('member' => $member->getId()))) {
-            $points = $this->pointValueDAOManager->getCreationHistory($dateMin, $dateMax, array('member' => $member->getId()));
+        if ($this->pointValueDAOManager->checkHistoryByMember($member->getId(), $dateMin, $dateMax)) {
+            $points = $this->pointValueDAOManager->findHistoryByMember($member->getId(), $dateMin, $dateMax);
         }else {
             $points = array();
         }
         
-        if ($this->bonusGenerationDAOManager->hasCreationHistory($dateMin, $dateMax, array('member' => $member->getId()))) {
-            $bonus = $this->bonusGenerationDAOManager->getCreationHistory($dateMin, $dateMax, array('member' => $member->getId()));
+        if ($this->bonusGenerationDAOManager->checkHistoryByMember($member->getId(), $dateMin, $dateMax)) {
+            $bonus = $this->bonusGenerationDAOManager->findHistoryByMember($member->getId(), $dateMin, $dateMax);
         }else {
             $bonus = array();
         }

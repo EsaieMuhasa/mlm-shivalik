@@ -1,7 +1,6 @@
 <?php
 namespace Core\Shivalik\Managers;
 
-use Core\Shivalik\Entities\Country;
 use Core\Shivalik\Entities\Localisation;
 use PHPBackend\Dao\DefaultDAOInterface;
 
@@ -23,7 +22,7 @@ abstract class LocalisationDAOManager extends DefaultDAOInterface
          * @var Localisation $localisation
          */
         $localisation = parent::findById($id, $forward);
-        $localisation->setCountry($this->getDaoManager()->getManagerOf(Country::class)->findById($localisation->getCountry()->getId()));
+        $localisation->setCountry($this->getDaoManager()->getManagerOf('Country')->findById($localisation->getCountry()->getId()));
         return $localisation;
     }
 }

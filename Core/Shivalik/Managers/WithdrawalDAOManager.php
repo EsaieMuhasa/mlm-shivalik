@@ -2,7 +2,7 @@
 namespace Core\Shivalik\Managers;
 
 use Core\Shivalik\Entities\Withdrawal;
-use PHPBackend\DAOException;
+use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
 
 /**
@@ -59,7 +59,7 @@ abstract class WithdrawalDAOManager extends AbstractOperationDAOManager
         /**
          * @var Withdrawal[] $raports
          */
-        $raports = UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, array('rapport' => $raportId), $limit, $offset);
+        $raports = UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, array('raport' => $raportId), $limit, $offset);
         foreach ($raports as $raport) {
             $raport->setMember($this->memberDAOManager->findById($raport->getMember()->getId(), false));
         }
@@ -79,12 +79,12 @@ abstract class WithdrawalDAOManager extends AbstractOperationDAOManager
      * {@inheritDoc}
      * @see \PHPBackend\Dao\DefaultDAOInterface::findByCreationHistory()
      */
-    public function findByCreationHistory(\DateTime $dateMin, \DateTime $dateMax = null, array $filters = array(), $limit = - 1, $offset = - 1)
+    public function findByCreationHistory(\DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset = 0) : array
     {
         /**
          * @var Withdrawal[] $withs
          */
-        $withs = parent::findByCreationHistory($dateMin, $dateMax, $filters, $limit, $offset);
+        $withs = parent::findByCreationHistory($dateMin, $dateMax, $limit, $offset);
         foreach ($withs as $withdrawel) {
             $withdrawel->setOffice($this->officeDAOManager->findById($withdrawel->office->id, false));
             $withdrawel->setMember($this->memberDAOManager->findById($withdrawel->member->id, false));
@@ -133,9 +133,9 @@ abstract class WithdrawalDAOManager extends AbstractOperationDAOManager
      * @param \DateTime $dateMax
      * @param int $limit
      * @param int $offset
-     * @return bool
+     * @return Withdrawal[]
      */
-    public function findCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : bool {
+    public function findCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : array {
         return UtilitaireSQL::findCreationHistory($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, $dateMin, $dateMax, ['office' => $officeId], $limit, $offset);
     }
     

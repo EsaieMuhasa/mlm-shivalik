@@ -1,5 +1,7 @@
 <?php
-namespace PHPBackend;
+namespace PHPBackend\Dao;
+
+use PHPBackend\PHPBackendException;
 
 
 /**

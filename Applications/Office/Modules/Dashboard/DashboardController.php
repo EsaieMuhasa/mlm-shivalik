@@ -56,7 +56,7 @@ class DashboardController extends HTTPController {
 	 */
 	public function __construct(Application $application, $action, $module) {
 		parent::__construct ( $application, $action, $module );
-		$application->getHttpRequest()->addAttribute(self::ATT_VIEW_TITLE, "Dashboard");
+		$application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, "Dashboard");
 	}
 
 	

@@ -16,7 +16,7 @@ class RootApplication extends HTTPApplication
      * {@inheritDoc}
      * @see HTTPApplication::run()
      */
-    public function run()
+    public function run() : void
     {
         if (isset($_SESSION[self::ATT_CONNECTED_ROOT])  && $_SESSION[self::ATT_CONNECTED_ROOT] instanceof User) {            
             parent::run();

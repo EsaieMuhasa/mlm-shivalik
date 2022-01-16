@@ -1,9 +1,10 @@
 <?php
 namespace Core\Shivalik\Managers;
 
-use PHPBackend\DAOException;
+use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\DefaultDAOInterface;
 use PHPBackend\Dao\UtilitaireSQL;
+use Core\Shivalik\Entities\Grade;
 
 /**
  *
@@ -21,8 +22,9 @@ abstract class GradeDAOManager extends DefaultDAOInterface
     /**
      * {@inheritDoc}
      * @see \PHPBackend\Dao\DefaultDAOInterface::findAll()
+     * @return Grade[]
      */
-    public function findAll(?int $limit = null, int $offset = 0) 
+    public function findAll(?int $limit = null, int $offset = 0) : array
     {
         $grades = parent::findAll($limit, $offset);
         foreach ($grades as $grade) {
@@ -35,8 +37,9 @@ abstract class GradeDAOManager extends DefaultDAOInterface
     /**
      * {@inheritDoc}
      * @see \PHPBackend\Dao\DefaultDAOInterface::findById()
+     * @return Grade
      */
-    public function findById(int $id, bool $forward = true)
+    public function findById($id, bool $forward = true)
     {
         $grade = parent::findById($id, $forward);
         $grade->setMaxGeneration($this->generationDAOManager->findById($grade->getMaxGeneration()->getId(), false));

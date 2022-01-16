@@ -5,9 +5,9 @@ use Core\Shivalik\Entities\NotifiableComponent;
 use Core\Shivalik\Entities\Notification;
 use Core\Shivalik\Entities\NotificationReceiver;
 use Core\Shivalik\Managers\NotificationReceiverDAOmanager;
-use PHPBackend\DAOException;
-use PHPBackend\Dao\UtilitaireSQL;
 use PHPBackend\Dao\DAOEvent;
+use PHPBackend\Dao\DAOException;
+use PHPBackend\Dao\UtilitaireSQL;
 
 /**
  *

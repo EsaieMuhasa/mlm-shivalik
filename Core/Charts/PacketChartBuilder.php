@@ -1,12 +1,12 @@
 <?php
 namespace Core\Charts;
 
-use Library\Graphics\ChartJS\Tools\EntityChartBuilder;
-use Library\Config;
-use Library\Graphics\ChartJS\ChartConfig;
-use Library\Graphics\ChartJS\ChartData;
-use Entities\Member;
-use Library\Graphics\ChartJS\ChartDataset;
+use Core\Shivalik\Entities\Member;
+use PHPBackend\AppConfig;
+use PHPBackend\Graphics\ChartJS\ChartConfig;
+use PHPBackend\Graphics\ChartJS\ChartData;
+use PHPBackend\Graphics\ChartJS\ChartDataset;
+use PHPBackend\Graphics\ChartJS\Tools\EntityChartBuilder;
 
 /**
  *
@@ -17,11 +17,10 @@ class PacketChartBuilder extends EntityChartBuilder
 {
 
     /**
-     * (non-PHPdoc)
-     *
-     * @see \Library\Graphics\ChartJS\Tools\EntityChartBuilder::doGenerate()
+     * {@inheritDoc}
+     * @see \PHPBackend\Graphics\ChartJS\Tools\EntityChartBuilder::doGenerate()
      */
-    protected function doGenerate(?Config $config) : ChartConfig
+    protected function doGenerate(?AppConfig $config) : ChartConfig
     {
         /**
          * @var array $poits

@@ -1,9 +1,8 @@
 <?php
 namespace PHPBackend\Dao;
 
-use PHPBackend\Config\EntityMetadata;
 use PHPBackend\DBEntity;
-use PHPBackend\DAOException;
+use PHPBackend\Config\EntityMetadata;
 
 /**
  *

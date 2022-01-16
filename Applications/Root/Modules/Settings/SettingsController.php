@@ -1,30 +1,31 @@
 <?php
 namespace Applications\Root\Modules\Settings;
 
-use Library\Controller;
-use Library\HTTPRequest;
-use Library\HTTPResponse;
 use Applications\Root\RootApplication;
-use Validators\OfficeAdminFormValidator;
-use Managers\OfficeAdminDAOManager;
-use Managers\OfficeDAOManager;
-use Managers\GenerationDAOManager;
-use Managers\GradeDAOManager;
-use Managers\CountryDAOManager;
-use Validators\GradeFormValidator;
-use Validators\GenerationFormValidator;
-use Validators\OfficeFormValidator;
-use Validators\CountryFormValidator;
-use Validators\LocalisationFormValidator;
-use Validators\SizeFormValidator;
-use Managers\SizeDAOManager;
+use Core\Shivalik\Managers\CountryDAOManager;
+use Core\Shivalik\Managers\GenerationDAOManager;
+use Core\Shivalik\Managers\GradeDAOManager;
+use Core\Shivalik\Managers\OfficeAdminDAOManager;
+use Core\Shivalik\Managers\OfficeDAOManager;
+use Core\Shivalik\Managers\SizeDAOManager;
+use Core\Shivalik\Validators\CountryFormValidator;
+use Core\Shivalik\Validators\GenerationFormValidator;
+use Core\Shivalik\Validators\GradeFormValidator;
+use Core\Shivalik\Validators\LocalisationFormValidator;
+use Core\Shivalik\Validators\OfficeAdminFormValidator;
+use Core\Shivalik\Validators\OfficeFormValidator;
+use Core\Shivalik\Validators\SizeFormValidator;
+use PHPBackend\Application;
+use PHPBackend\Request;
+use PHPBackend\Response;
+use PHPBackend\Http\HTTPController;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-class SettingsController extends Controller
+class SettingsController extends HTTPController
 {
     
     const ATT_ADMIN = 'admin';
@@ -80,21 +81,21 @@ class SettingsController extends Controller
     
     /**
 	 * {@inheritDoc}
-	 * @see \Library\Controller::__construct()
+	 * @see \PHPBackend\Http\HTTPController::__construct()
 	 */
-	public function __construct(\Library\Application $application, $action, $module) {
+	public function __construct(Application $application, $action, $module) {
 		parent::__construct($application, $action, $module);
-		$application->getHttpRequest()->addAttribute(self::ATT_VIEW_TITLE, "Settings");
+		$application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, "Settings");
 	}
 
 	/**
      * 
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeLogin (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeLogin (Request $request, Response $response) : void {
         
-        if ($request->getMethod() == HTTPRequest::HTTP_POST){
+        if ($request->getMethod() == Request::HTTP_POST){
             $pseudo = $request->getDataPOST('pseudo');
             $password = $request->getDataPOST('password');
             $errors = [];
@@ -120,30 +121,30 @@ class SettingsController extends Controller
     }
 
     /**
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeIndex (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeIndex (Request $request, Response $response) : void {
         
     }
     
     /**
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeServer (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeServer (Request $request, Response $response) : void {
     	
     }
     
     /**
      * 
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeAdmins (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeAdmins (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "System admin");
         if ($this->officeAdminDAOManager->countAll() > 0) {
-            $request->addAttribute(self::ATT_ADMINS, $this->officeAdminDAOManager->getAll());
+            $request->addAttribute(self::ATT_ADMINS, $this->officeAdminDAOManager->findAll());
         }else {
             $request->addAttribute(self::ATT_ADMINS, array());
         }
@@ -151,13 +152,13 @@ class SettingsController extends Controller
     
     /**
      * 
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeAddAdmin (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeAddAdmin (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "System admin");
         
-        if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+        if ($request->getMethod() == Request::HTTP_POST) {
             $form = new OfficeAdminFormValidator($this->getDaoManager());
             $admin = $form->createAfterValidation($request);
             
@@ -170,27 +171,27 @@ class SettingsController extends Controller
             $form->includeFeedback($request);
         }
         
-        $request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->getAll());
-        $request->addAttribute(self::ATT_OFFICES, $this->officeDAOManager->getAll());
+        $request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->findAll());
+        $request->addAttribute(self::ATT_OFFICES, $this->officeDAOManager->findAll());
     }
     
     
     /**
      * to update the admin acount
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeUpdateAdmin (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeUpdateAdmin (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "System admin");
         
         $id = intval($request->getDataGET('id'), 10);
-        if ($this->officeAdminDAOManager->idExist($id)) {
-            $admin = $this->officeAdminDAOManager->getForId($id);
+        if ($this->officeAdminDAOManager->checkById($id)) {
+            $admin = $this->officeAdminDAOManager->findById($id);
         } else {
             $response->sendError();
         }
         
-        if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+        if ($request->getMethod() == Request::HTTP_POST) {
             $form = new OfficeAdminFormValidator($this->getDaoManager());
             $admin = $form->updateAfterValidation($request);
             if (!$form->hasError()) {
@@ -200,20 +201,20 @@ class SettingsController extends Controller
         }
         
         $request->addAttribute(self::ATT_ADMIN, $admin);
-        $request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->getAll());
+        $request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->findAll());
     }
     
     
     /***
      * process action to show all grade in database
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeGrades (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeGrades (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Grades configuration");
         
         if ($this->gradeDAOManager->countAll() > 0) {
-            $request->addAttribute(self::ATT_GRADES, $this->gradeDAOManager->getAll());
+            $request->addAttribute(self::ATT_GRADES, $this->gradeDAOManager->findAll());
         }else {
             $request->addAttribute(self::ATT_GRADES, array());
         }
@@ -223,21 +224,21 @@ class SettingsController extends Controller
     
     /**
      * process action to create a new grade
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeAddGrade (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeAddGrade (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Grades configuration");
         
         if ($this->generationDAOManager->countAll()>=0) {
-            $generations = $this->generationDAOManager->getAll();
+            $generations = $this->generationDAOManager->findAll();
         }else {
             $generations = array();
         }
         
         $request->addAttribute(self::ATT_GENERATIONS, $generations);
         
-        if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+        if ($request->getMethod() == Request::HTTP_POST) {
             $form = new GradeFormValidator($this->getDaoManager());
             $grade = $form->createAfterValidation($request);
             
@@ -252,18 +253,18 @@ class SettingsController extends Controller
     
     /**
      * update a new grade
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeUpdateGrade (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeUpdateGrade (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Grades configuration");
         
         $id = intval($request->getDataGET('id'), 10);
         
-        if ($this->gradeDAOManager->idExist($id)) {
-            $grade = $this->gradeDAOManager->getForId($id);
+        if ($this->gradeDAOManager->checkById($id)) {
+            $grade = $this->gradeDAOManager->findById($id);
             if ($this->generationDAOManager->countAll()>=0) {
-                $generations = $this->generationDAOManager->getAll();
+                $generations = $this->generationDAOManager->findAll();
             }else {
                 $generations = array();
             }
@@ -272,7 +273,7 @@ class SettingsController extends Controller
             $response->sendError();
         }
         
-        if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+        if ($request->getMethod() == Request::HTTP_POST) {
             $form = new GradeFormValidator($this->getDaoManager());
             $grade = $form->updateAfterValidation($request);
             if (!$form->hasError()) {
@@ -285,14 +286,14 @@ class SettingsController extends Controller
     
     /**
      * 
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeGenerations (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeGenerations (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Generations configuration");
         
         if ($this->generationDAOManager->countAll() > 0){
-            $generations = $this->generationDAOManager->getAll();
+            $generations = $this->generationDAOManager->findAll();
         }else {
             $generations = array();
         }
@@ -302,13 +303,13 @@ class SettingsController extends Controller
     
     /**
      * 
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeCountrys (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeCountrys (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Countrys configuration");
         if ($this->countryDAOManager->countAll() > 0) {
-            $countrys = $this->countryDAOManager->getAll();
+            $countrys = $this->countryDAOManager->findAll();
         }else {
             $countrys = array();
         }
@@ -317,13 +318,13 @@ class SettingsController extends Controller
     }
     
     /**
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeAddCountry (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeAddCountry (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Countrys configuration");
         
-        if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+        if ($request->getMethod() == Request::HTTP_POST) {
             $form = new CountryFormValidator($this->getDaoManager());
             $country= $form->createAfterValidation($request);
             
@@ -339,20 +340,20 @@ class SettingsController extends Controller
     
     /**
      * 
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeUpdateCountry (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeUpdateCountry (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Countrys configuration");
         
         $id = intval($request->getDataGET('id'), 10);
-        if ($this->countryDAOManager->idExist($id)) {
-            $country = $this->countryDAOManager->getForId($id);
+        if ($this->countryDAOManager->checkById($id)) {
+            $country = $this->countryDAOManager->findById($id);
         } else {
             $response->sendError();
         }
         
-        if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+        if ($request->getMethod() == Request::HTTP_POST) {
             $form = new CountryFormValidator($this->getDaoManager());
             $country= $form->updateAfterValidation($request);
             
@@ -368,13 +369,13 @@ class SettingsController extends Controller
     
     /**
      * 
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeAddGeneration (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeAddGeneration (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Generations configuration");
         
-        if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+        if ($request->getMethod() == Request::HTTP_POST) {
             
             $form = new GenerationFormValidator($this->getDaoManager());
             
@@ -390,21 +391,21 @@ class SettingsController extends Controller
     }
     
     /**
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeUpdateGeneration (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeUpdateGeneration (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Generations configuration");
         
         $id = intval($request->getDataGET('id'));
         
-        if ($this->generationDAOManager->idExist($id)) {
-            $generation = $this->generationDAOManager->getForId($id);
+        if ($this->generationDAOManager->checkById($id)) {
+            $generation = $this->generationDAOManager->findById($id);
         }else {
             $response->sendError();
         }
         
-        if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+        if ($request->getMethod() == Request::HTTP_POST) {
             $form = new GenerationFormValidator($this->getDaoManager());
             $generation = $form->updateAfterValidation($request);
             
@@ -420,14 +421,14 @@ class SettingsController extends Controller
     }
     
     /**
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeOffices (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeOffices (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Offices configuration");
         
         if ($this->officeDAOManager->countAll() > 0){
-            $offices = $this->officeDAOManager->getAll();
+            $offices = $this->officeDAOManager->findAll();
         }else {
             $offices = array();
         }
@@ -437,13 +438,13 @@ class SettingsController extends Controller
     
     /**
      * 
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeAddOffice (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeAddOffice (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Offices configuration");
         
-        if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+        if ($request->getMethod() == Request::HTTP_POST) {
             $form = new OfficeFormValidator($this->getDaoManager());
             
             $office = $form->createAfterValidation($request);
@@ -458,20 +459,20 @@ class SettingsController extends Controller
             $request->addAttribute(self::ATT_OFFICE, $office);
         }
         
-        $request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->getAll());
+        $request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->findAll());
     }
     
     /**
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeSizes(HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeSizes(Request $request, Response $response) : void {
     	$request->addAttribute(self::ATT_VIEW_TITLE, "Offices size configuration");
     	
     	if ($this->sizeDAOManager->countAll() <= 0){
     		$sizes = array();
     	}else {
-    		$sizes = $this->sizeDAOManager->getAll();
+    		$sizes = $this->sizeDAOManager->findAll();
     	}
     	
     	$request->addAttribute(self::ATT_SIZES, $sizes);
@@ -479,12 +480,12 @@ class SettingsController extends Controller
     
     
     /**
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeAddSize(HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeAddSize(Request $request, Response $response) : void {
     	$request->addAttribute(self::ATT_VIEW_TITLE, "Offices size configuration");
-    	if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+    	if ($request->getMethod() == Request::HTTP_POST) {
     		$form = new SizeFormValidator($this->getDaoManager());
     		$size = $form->createAfterValidation($request);
     		
@@ -499,20 +500,20 @@ class SettingsController extends Controller
     }
     
     /**
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeUpdateSize (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeUpdateSize (Request $request, Response $response) : void {
     	$request->addAttribute(self::ATT_VIEW_TITLE, "Offices size configuration");
     	$id = intval($request->getDataGET('id'), 10);
     	
-    	if (!$this->sizeDAOManager->idExist($id)) {
+    	if (!$this->sizeDAOManager->checkById($id)) {
     		$response->sendError();
     	}
     	
-    	$size = $this->sizeDAOManager->getForId($id);
+    	$size = $this->sizeDAOManager->findById($id);
     	
-    	if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+    	if ($request->getMethod() == Request::HTTP_POST) {
     		$form = new SizeFormValidator($this->getDaoManager());
     		$request->addAttribute($form::CHAMP_ID, $id);
     		$size = $form->updateAfterValidation($request);
@@ -530,21 +531,21 @@ class SettingsController extends Controller
     
     /**
      * 
-     * @param HTTPRequest $request
-     * @param HTTPResponse $response
+     * @param Request $request
+     * @param Response $response
      */
-    public function executeUpdateOffice (HTTPRequest $request, HTTPResponse $response) : void {
+    public function executeUpdateOffice (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Offices configuration");
         
         $id = intval($request->getDataGET('id'), 10);
         
-        if ($this->officeDAOManager->idExist($id)) {
-            $office = $this->officeDAOManager->getForId($id);
+        if ($this->officeDAOManager->checkById($id)) {
+            $office = $this->officeDAOManager->findById($id);
         }else {
             $response->sendError();
         }
         
-        if ($request->getMethod() == HTTPRequest::HTTP_POST) {
+        if ($request->getMethod() == Request::HTTP_POST) {
             $form = new OfficeFormValidator($this->getDaoManager());
             
             $office = $form->updateAfterValidation($request);
@@ -557,7 +558,7 @@ class SettingsController extends Controller
         }
         
         $request->addAttribute(self::ATT_OFFICE, $office);
-        $request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->getAll());
+        $request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->findAll());
     }
     
     

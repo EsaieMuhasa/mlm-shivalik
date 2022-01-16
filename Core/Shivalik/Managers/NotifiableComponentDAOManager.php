@@ -2,7 +2,7 @@
 namespace Core\Shivalik\Managers;
 
 use Core\Shivalik\Entities\NotifiableComponent;
-use PHPBackend\DAOException;
+use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\DefaultDAOInterface;
 use PHPBackend\Dao\UtilitaireSQL;
 

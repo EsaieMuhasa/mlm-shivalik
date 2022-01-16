@@ -1,12 +1,12 @@
 <?php
 namespace Core\Shivalik\Managers\Implementation;
 
+use Core\Shivalik\Entities\Localisation;
 use Core\Shivalik\Entities\OfficeAdmin;
 use Core\Shivalik\Managers\OfficeAdminDAOManager;
-use PHPBackend\DAOException;
-use PHPBackend\Dao\UtilitaireSQL;
-use Core\Shivalik\Entities\Localisation;
 use PHPBackend\Dao\DAOEvent;
+use PHPBackend\Dao\DAOException;
+use PHPBackend\Dao\UtilitaireSQL;
 
 /**
  * 
@@ -22,7 +22,7 @@ class OfficeAdminDAOManagerImplementation1 extends OfficeAdminDAOManager
 	public function findActiveByOffice(int $officeId): OfficeAdmin {
 		$return = null;
 		try {
-			$statement = $this->pdo->prepare("SELECT * FROM {$this->getTableName()} WHERE office={$officeId} AND enable = 1");
+			$statement = $this->getConnection()->prepare("SELECT * FROM {$this->getTableName()} WHERE office={$officeId} AND enable = 1");
 			$statement->execute();
 			if ($row = $statement->fetch()) {
 				$return = new OfficeAdmin($row);
@@ -44,7 +44,7 @@ class OfficeAdminDAOManagerImplementation1 extends OfficeAdminDAOManager
 	public function findAdminByOffice(int $officeId): OfficeAdmin {
 		$return = null;
 		try {
-			$statement = $this->pdo->prepare("SELECT * FROM {$this->getTableName()} WHERE office={$officeId}");
+			$statement = $this->getConnection()->prepare("SELECT * FROM {$this->getTableName()} WHERE office={$officeId}");
 			$statement->execute();
 			if ($row = $statement->fetch()) {
 				$return = new OfficeAdmin($row);

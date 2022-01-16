@@ -5,9 +5,9 @@ use Core\Shivalik\Entities\OfficeSize;
 use Core\Shivalik\Managers\OfficeDAOManager;
 use Core\Shivalik\Managers\OfficeSizeDAOManager;
 use Core\Shivalik\Managers\SizeDAOManager;
-use PHPBackend\DAOException;
-use PHPBackend\Dao\UtilitaireSQL;
 use PHPBackend\Dao\DAOEvent;
+use PHPBackend\Dao\DAOException;
+use PHPBackend\Dao\UtilitaireSQL;
 /**
  *
  * @author Esaie MHS

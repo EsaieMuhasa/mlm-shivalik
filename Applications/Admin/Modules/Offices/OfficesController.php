@@ -122,8 +122,8 @@ class OfficesController extends AdminController {
 	 */
 	public function __construct(Application $application, string $action, string $module) {
 		parent::__construct($application, $action, $module);
-		$application->getHttpRequest()->addAttribute(self::ATT_VIEW_TITLE, "Offices");
-		$this->init($application->getHttpRequest(), $application->getHttpResponse());
+		$application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, "Offices");
+		$this->init($application->getRequest(), $application->getResponse());
 	}
 	
 	/**
@@ -497,8 +497,8 @@ class OfficesController extends AdminController {
 	    }
 	    
 	    //Monais virtuel
-	    if ($this->virtualMoneyDAOManager->hasCreationHistory($dateMin, $dateMax, array('office' => $this->office->getId()))) {
-	        $virtuals = $this->virtualMoneyDAOManager->getCreationHistory($dateMin, $dateMax, array('office' => $this->office->getId()));
+	    if ($this->virtualMoneyDAOManager->checkCreationHistoryByOffice($this->office->getId(), $dateMin, $dateMax)) {
+	        $virtuals = $this->virtualMoneyDAOManager->findCreationHistoryByOffice($this->office->getId(), $dateMin, $dateMax);
 	    }else {
 	        $virtuals = array();
 	    }

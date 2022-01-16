@@ -2,7 +2,7 @@
 namespace Core\Shivalik\Managers;
 
 use Core\Shivalik\Entities\OfficeBonus;
-use PHPBackend\DAOException;
+use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
 
 /**

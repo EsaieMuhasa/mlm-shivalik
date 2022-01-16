@@ -114,7 +114,7 @@ class DashboardController extends AdminController {
         $served = 0;
         
         foreach ($members as $member) {
-            $account = $this->getAccount($member);
+            $account = $this->memberDAOManager->loadAccount($member);
             $solde += $account->getSolde();
             $withdrawal += $account->getWithdrawRequest();
         }
