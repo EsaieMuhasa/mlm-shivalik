@@ -2,46 +2,77 @@
 .default-navbar{
     border-bottom: $goutier/2 solid $custom-primary-color;
     @extend %clear-margin-botstrap;
-
+    
     img {
         width: inherit;
     }
-
+    
     .default-navbar-header {
         float: left;
-
         * {
-            display: inline-block;
+            //display: inline-block;
             vertical-align: middle;
+        }
+        
+        @include xs-screen {
+            a {
+                display: flex;
+            }
         }
 
         .header-txt {
             font-size: 3.5rem;
             font-weight: normal;
-        }
+            @include sm-screen {
+                font-size: 3rem;
+            }
 
+            @include xs-screen {
+                
+                font-size: 3rem;
+                // border: 1px solid red;
+            }
+        }
+        
         .txt-logo-1 {
             color: $custom-primary-color;
         }
-
+        
         .txt-logo-2 {
             color: $custom-secodary-color;
         }
     }
 
+    .default-nav-xs {
+        float: right;
+        padding-top: $goutier/2;
+        display: none;
+
+        @include xs-sm-screen {
+            display: inline-block;
+        }
+    }
+
+    .toggle-sm-screen {
+        border: none;
+        padding: $goutier;
+        margin: 0px;
+    }
+    
     .default-nav {
         list-style-type: none;
         padding: 0px;
         margin: 0px;
         @extend %clearfix;
-
+        
         padding-top: $goutier/2;
         float: right;
-
+        
         li {
             float: left;
         }
-
+        
+        
         li > a {
             display: block;
             padding: $goutier;
@@ -58,6 +89,53 @@
                 border: 1px solid $custom-primary-color;
             }
         }
+
+        
+        @include xs-sm-screen {
+            // display: none;
+            position: fixed;
+            left: 0px;
+            top: 0px;
+            bottom: 0px;
+            float: none;
+            background: $white;
+            z-index: 100;
+            box-shadow: 1px 0px $goutier lighten($color: $black, $amount: 30%);
+
+            padding-top: $goutier-bootstrap/2;
+
+            @include transition ('transform 200ms');
+            @include transform ('translateX(-110%)');
+
+            &.show-menu {
+                @include transform ('translateX(0%)');
+            }
+            
+            li {
+                float: none;
+                display: block;
+
+                a {
+                    padding: $goutier 0px;
+
+                    &.active {
+                        border: none;
+                    }
+                }
+            }
+
+            li+li {
+                border-top: 1px solid lighten($color: $black, $amount: 70%);
+            }
+
+        }
+
+        @include xs-screen {
+            width: 80%;
+        }
+        @include sm-screen {
+            width: 40%;
+        }
     }
 }
 
@@ -68,40 +146,102 @@
     position: relative;
     @extend %clearfix;
     @extend %clear-margin-botstrap;
-
-    background: rgba($color: $custom-primary-color, $alpha: 0.5);
+    
     min-height: 500px;
+    
+    @include xs-sm-screen {
+        height: auto;
+        overflow-x: inherit;
+    }
 
     .welcom,
     .sliders {
-        //border: 2px solid red;
-        width: 50%;
+        width: 100%;
     }
     
     .welcom {
-        float: left;
+
+        margin-top: $goutier;
+        padding: $goutier;
+        border-radius: $goutier $goutier 0px 0px;
+        box-shadow: 0px 0px $goutier/2 lighten($color: $black, $amount: 20%);
 
         h1 {
-            font-size: 4rem;
+            margin-top: 0px;
+            font-size: 3.5rem;
+            color: $black;
+            text-align: center;
+            @include md-screen-only {
+                font-size: 3rem;
+            }
         }
 
         p {
             font-size: 1.8rem;
+            padding-right: $goutier * 20;
+            color: $black;
+            padding: $goutier 0px;
+            text-align: justify;
+        }
+
+        .btn {
+            border-radius: $goutier-bootstrap;
         }
     }
 
     .sliders {
-        position: absolute;
-        right: 0px;
-        top: 0px;
         overflow: hidden;
-        @include transform('rotate(15deg) translate3d(10%, -2.5%, 0) scale(1.25)');
-        *{
-            @include transform('rotate(-15deg) translate3d(-10%, -2.5%, 0)');
+        
+        @include xs-sm-screen {
+            box-shadow: none;
+            padding: 0px;
+            // margin-top: $goutier-bootstrap/2;
         }
 
-        box-shadow: -1px 0px $goutier $black;
-        border-left: none;
+        .banner-carousel{
+            overflow: hidden;
+
+            max-height: 550px;
+
+            @include xs-sm-screen {
+                overflow: inherit;
+                max-height: inherit;
+            }
+
+        }
+
+        .home-carousel-mins {
+            transform-origin: 0px 0px;
+            padding-left: $goutier;
+            text-align: center;
+            
+            @include xs-sm-screen {
+                padding: $goutier/2 $goutier ;
+            }
+            @include md-screen-only {
+                padding: $goutier/2 $goutier ;
+
+            }
+            
+            * {
+                @include transition('transform 200ms');
+                display: inline-block;
+                width: $goutier;
+                height: $goutier;
+                background-color: transparent;
+                border: 1px solid $custom-primary-color;
+                margin: 0px 1px;
+                border-radius: 50%;
+                @include transform ('scale(1.2)'); 
+                 
+            }
+            
+            .active {
+                background-color: $custom-primary-color;
+                @include transform ('scale(1.5)');
+            }
+        }
+
     }
 }
 
@@ -116,6 +256,10 @@
 
     h1 {
         margin-bottom: $goutier-bootstrap;
+
+        @include xs-screen {
+            font-size: 3rem;
+        }
     }
     .default-card {
         border: 1px solid $white;
@@ -146,6 +290,7 @@
     background: rgba($custom-primary-color, 0.5);
     @extend %clear-margin-botstrap;
     padding-bottom: $goutier-bootstrap;
+
     h1 {
         margin-bottom: $goutier-bootstrap;
     }

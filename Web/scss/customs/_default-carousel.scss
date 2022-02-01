@@ -1,82 +1,128 @@
-
-.default-carousel {
+%carousel-container {
     @extend %clearfix;
-    overflow-x: hidden;
+    //overflow: hidden;
     position: relative;
-    border: {
-        left: 1px solid $white;
-        right: 1px solid $white;
-    }
-    // border: 1px solid $red;
-    padding: {
-        top: $goutier-bootstrap * 0.5;
-        //bottom: $goutier-bootstrap * 0.5;
-    }
-    margin: {
-        left: $goutier-bootstrap * 0.5;
-        right: $goutier-bootstrap * 0.5;
-    }
 }
 
-.default-carousel-items{
-    // margin: {
-    //     left: $goutier-bootstrap * (-0.5);
-    //     right: $goutier-bootstrap * (-0.5);
-    // }
+%carousel-items {
     @extend %clearfix;
     @include transition ('transform 300ms');
 }
 
-.default-carousel-item {
+%carousel-item {
     float: left;
+}
+
+.default-carousel {
+    // border: 1px solid red;
+    @extend %carousel-container;
+    padding: {
+        top: $goutier-bootstrap * 0.5;
+    }
+    margin: {
+        left: auto;
+        right: auto;
+    }
+    @media (min-width: $screen-sm-min) {
+        width: $container-sm;
+    }
+    @media (min-width: $screen-md-min) {
+        width: $container-md;
+    }
+    @media (min-width: $screen-lg-min) {
+        width: $container-lg;
+    }
+}
+
+.default-carousel-items {
+    // margin: {
+    //     left: $goutier-bootstrap * (-0.5);
+    //     right: $goutier-bootstrap * (-0.5);
+    // }
+    @extend %carousel-items;
+}
+
+.default-carousel-item {
+    @extend %carousel-item;
     padding: {
         left: $goutier-bootstrap/2;
         right: $goutier-bootstrap/2;
     }
 }
 
-.default-carousel-miniatures{
+.default-carousel-miniatures {
+    // border: 1px solid black;
     padding: $goutier/2;
-    border: 1px solid black;
     text-align: center;
-
     .default-carousel-miniature-item {
         width: $goutier * 3;
         height: $goutier;
-        background: black;
+        // background: rgba($color: $custom-primary-color, $alpha : 0.5);
+        background: transparent;
         display: inline-block;
+        vertical-align: middle;
         margin: $goutier/2;
-
+        box-shadow: 0px 0px $goutier/5 $black;
+        @include transition('height 250ms');
+        &:hover {
+            cursor: pointer;
+        }
         &.active {
-            background: red;
+            height: $goutier + $goutier * 0.5;
+            //@include transform('scale(1.5)');
         }
     }
 }
 
-.default-carousel-navigation{
+.default-carousel-navigation {
     // border: 1px solid black;
     position: absolute;
     top: 50%;
-    right: 0px;
-    left: 0px;
-
+    right: -30px;
+    left: -30px;
+    padding: {
+        left: $goutier;
+        right: $goutier;
+    }
+    @include xs-screen {
+        left: $goutier;
+        right: $goutier;
+    }
     .default-carousel-next,
     .default-carousel-prev {
-        padding: $goutier-bootstrap / 3;
         //border: 1px solid darken($color: $white, $amount: 30%);
+        // border-radius:0px 50% 50% 0px;
+        padding: $goutier-bootstrap / 3;
+        border: none;
         width: 45px;
         height: 45px;
-        border-radius:0px 50% 50% 0px;
-        box-shadow: 0px 0px $goutier $black;
-        background: $white;
+        border-radius: 50%;
+        box-shadow: 0px 0px $goutier/2 $black;
+        background: rgba($color: $white, $alpha: 0.5);
+        @include transition('background 200ms');
         .fa {
             font-size: 2rem;
             margin: 0px;
             padding: 0px;
         }
+        &:hover {
+            background: rgba($color: $white, $alpha: 1);
+        }
     }
-    .default-carousel-next{
+    .default-carousel-next {
         float: right;
-        border-radius:50% 0px 0px 50%;
+        // border-radius:50% 0px 0px 50%;
     }
+}
+
+.home-carousel {
+    @extend %carousel-container;
+}
+
+.home-carousel-items {
+    @extend %carousel-items;
+}
+
+.home-carousel-item {
+    @extend %carousel-item;
 }

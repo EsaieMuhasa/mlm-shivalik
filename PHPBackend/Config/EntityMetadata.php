@@ -1,7 +1,7 @@
 <?php
 namespace PHPBackend\Config;
 
-use PHPBackend\DAOException;
+use PHPBackend\Dao\DAOException;
 
 /**
  *

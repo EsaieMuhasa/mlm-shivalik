@@ -6,8 +6,8 @@ use Applications\Member\MemberApplication;
 use Core\Shivalik\Entities\RequestVirtualMoney;
 use Core\Shivalik\Managers\RequestVirtualMoneyDAOManager;
 use Core\Shivalik\Managers\VirtualMoneyDAOManager;
-use PHPBackend\DAOException;
 use PHPBackend\Request;
+use PHPBackend\Dao\DAOException;
 use PHPBackend\Validator\DefaultFormValidator;
 use PHPBackend\Validator\IllegalFormValueException;
 

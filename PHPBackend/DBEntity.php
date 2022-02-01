@@ -51,7 +51,11 @@ abstract class DBEntity implements ArrayAccess
      */
     public function __construct(?array $data = array())
     {
-        $this->hydrate($data);
+        $this->hydrate($data); 
+        
+        if ($this->getDateAjout() == null || empty($data)) {
+            $this->setDateAjout(new \DateTime());
+        }
     }
     
     /**
@@ -70,14 +74,14 @@ abstract class DBEntity implements ArrayAccess
             $method = 'set'.ucfirst(trim($attr));
             if (is_callable(array($this, $method))) {
                 $refMethode = $class->getMethod($method);
-                //Si les donnees sont cryptable
-                if (count($refMethode->getParameters())==2 && $encrypted==true) {
+                if (count($refMethode->getParameters())==2 && $encrypted==true) {//Si les donnees sont cryptable
                     $this->$method($value, true);
                 }else{
                     $this->$method($value);
                 }
             }
         }
+
     }
     
     /**
@@ -102,7 +106,7 @@ abstract class DBEntity implements ArrayAccess
      * @return string|NULL
      */
     public function getFormatedDateAjout (string $format = \DateTime::W3C) : ?string {
-        return $this->getDateAjout()!=null? $this->getDateAjout()->format($format) : null;
+        return ($this->getDateAjout() != null? $this->getDateAjout()->format($format) : null);
     }
 
     /**

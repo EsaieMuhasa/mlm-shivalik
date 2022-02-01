@@ -266,8 +266,8 @@ abstract class DefaultFormValidator implements FormValidator
     }
     
     /**
-     * Pour verifier s'il y a eu erreur lors de la validation d'un formulaire
-     * @return boolean
+     * {@inheritDoc}
+     * @see \PHPBackend\Validator\FormValidator::hasError()
      */
     public function hasError(?string $key = null) : bool
     {
@@ -320,7 +320,8 @@ abstract class DefaultFormValidator implements FormValidator
     }
     
     /**
-     * @return array
+     * {@inheritDoc}
+     * @see \PHPBackend\Validator\FormValidator::getErrors()
      */
     public function getErrors() : array
     {
@@ -328,7 +329,8 @@ abstract class DefaultFormValidator implements FormValidator
     }
 
     /**
-     * @return array
+     * {@inheritDoc}
+     * @see \PHPBackend\Validator\FormValidator::getMessages()
      */
     public function getMessages() : array
     {
@@ -336,7 +338,8 @@ abstract class DefaultFormValidator implements FormValidator
     }
 
     /**
-     * @return string
+     * {@inheritDoc}
+     * @see \PHPBackend\Validator\FormValidator::getResult()
      */
     public function getResult() : ?string
     {
@@ -344,7 +347,8 @@ abstract class DefaultFormValidator implements FormValidator
     }
 
     /**
-     * @return string
+     * {@inheritDoc}
+     * @see \PHPBackend\Validator\FormValidator::getMessage()
      */
     public function getMessage() : ?string
     {
@@ -352,7 +356,8 @@ abstract class DefaultFormValidator implements FormValidator
     }
 
     /**
-     * @param array $messages
+     * {@inheritDoc}
+     * @see \PHPBackend\Validator\FormValidator::setMessages()
      */
     public function setMessages(array $messages) : void
     {
@@ -368,8 +373,8 @@ abstract class DefaultFormValidator implements FormValidator
     }
 
     /**
-     * @param string $message
-     * @param boolean $inErrors
+     * {@inheritDoc}
+     * @see \PHPBackend\Validator\FormValidator::setMessage()
      */
     public function setMessage(string $message, bool $inErrors=true) : void
     {
@@ -411,9 +416,8 @@ abstract class DefaultFormValidator implements FormValidator
     }
     
     /**
-     * Pour inclure les message de feedback dans la requette
-     * @param Request $request
-     * @return void
+     * {@inheritDoc}
+     * @see \PHPBackend\Validator\FormValidator::includeFeedback()
      */
     public function includeFeedback(Request $request) : void
     {

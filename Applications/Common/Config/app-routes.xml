@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE app-routes SYSTEM "../../../PHPBackend/config.dtd" >
+<app-routes>
+	
+	<module name="Index">
+	 	<route action="index" urlPattern="/"/>
+	 	<route action="index" urlPattern="/index.html"/>
+	 	<route action="about" urlPattern="/about.html"/>
+	 	<route action="contact" urlPattern="/contact.html"/>
+	</module>
+	
+	<module name="News">
+		<route action="index" urlPattern="/news/"/>
+		<route action="index" urlPattern="/news/index.html"/>
+	</module>
+	
+	<module name="Authentification">
+	 	<route action="login" urlPattern="/login\.html"/>
+	 	<route action="logout" urlPattern="/logout\.html"/>
+	</module>
+	
+</app-routes>

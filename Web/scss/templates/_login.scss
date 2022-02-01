@@ -1,0 +1,57 @@
+.login-page {
+    background: lighten($color: $black, $amount: 90%);
+    .default-navbar,
+    .navbar {
+        background: $white;
+    }
+}
+
+.login-container {
+    padding-top: $goutier-bootstrap;
+    padding-bottom: $goutier-bootstrap;
+    .login-form-header {
+        text-align: center;
+        margin-bottom: $goutier-bootstrap;
+        .icon {
+            display: inline-block;
+            border-radius: 50%;
+            box-shadow: 0px 0px $goutier/2 $kbd-bg;
+            background: lighten($color: $black, $amount: 92%);
+        }
+        .fa {
+            font-size: 6rem;
+        }
+    }
+    .login-form-body {
+        .input-group,
+        .form-control,
+        .input-group-addon {
+            border-radius: 0px;
+            background: $white;
+        }
+        .form-control {
+            border-left: none;
+        }
+    }
+    .login-form-footer {
+        .btn {
+            display: block;
+            border-radius: 0px;
+            width: 100%;
+            &+.btn {
+                margin-top: $goutier/2;
+            }
+        }
+    }
+}
+
+.login-footer {
+    .navbar {
+        border-top: $goutier/2 solid $custom-primary-color;
+    }
+    .navbar-nav {
+        float: none;
+        display: flex;
+        @include justify-content(center);
+    }
+}

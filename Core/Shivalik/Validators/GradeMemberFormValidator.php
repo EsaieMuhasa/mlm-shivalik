@@ -6,9 +6,9 @@ use Core\Shivalik\Entities\Member;
 use Core\Shivalik\Managers\GradeDAOManager;
 use Core\Shivalik\Managers\GradeMemberDAOManager;
 use Core\Shivalik\Managers\MemberDAOManager;
-use PHPBackend\DAOException;
 use PHPBackend\PHPBackendException;
 use PHPBackend\Request;
+use PHPBackend\Dao\DAOException;
 use PHPBackend\Validator\DefaultFormValidator;
 use PHPBackend\Validator\IllegalFormValueException;
 

@@ -88,6 +88,11 @@
 			implementation="\Core\Shivalik\Managers\Implementation\PointValueDAOManagerImplementation1"/>
 			
 		<entity 
+			name="\Core\Shivalik\Entities\Product" 
+			specification="\Core\Shivalik\Managers\ProductDAOManager" 
+			implementation="\Core\Shivalik\Managers\Implementation\ProductDAOManagerImplementation1"/>
+			
+		<entity 
 			name="\Core\Shivalik\Entities\Withdrawal" 
 			specification="\Core\Shivalik\Managers\WithdrawalDAOManager" 
 			implementation="\Core\Shivalik\Managers\Implementation\WithdrawalDAOManagerImplementation1"/>

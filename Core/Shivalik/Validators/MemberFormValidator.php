@@ -4,9 +4,9 @@ namespace Core\Shivalik\Validators;
 use Applications\Member\MemberApplication;
 use Core\Shivalik\Entities\Member;
 use Core\Shivalik\Entities\User;
-use PHPBackend\DAOException;
 use PHPBackend\Request;
 use PHPBackend\Config\VarList;
+use PHPBackend\Dao\DAOException;
 use PHPBackend\File\UploadedFile;
 use PHPBackend\Validator\IllegalFormValueException;
 

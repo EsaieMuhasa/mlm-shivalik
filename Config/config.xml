@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE config SYSTEM "../PHPbackend/config.dtd" >
-<config webData="Web/data" webLogger="Web/logger">
+<config webData="Web" webLogger="Web/logger">
 	
 	<applications foldName="Applications">
-		<application name="Index"/>
+		<application name="Common"/>
 		<application name="Member" urlPattern="/member/(.*)"/>
 		<application name="Office" urlPattern="/office/(.*)"/>
 		<application name="Admin" urlPattern="/admin/(.*)"/>
@@ -21,7 +21,7 @@
 		<define name="icone_paypal" value="/img/paypal.jpg"/>
 		<define name="icone_crypto" value="/img/crypto.jpg"/>
 		
-		<define name="designerName" value="Ing. Jhon Brow"/>
+		<define name="designerName" value="Ing. EMM"/>
 		<define name="designerEmail" value="webmaster@shivalikherbals.org"/>
 		<define name="devise" value="$"/>
 		<define name="minWithdrawal" value="10"/><!-- La plus petite valeur retirable en dolar -->

@@ -1,6 +1,8 @@
 <?php
 namespace PHPBackend;
 
+use PHPBackend\Dao\DAOException;
+
 /**
  *
  * @author Esaie MHS

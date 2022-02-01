@@ -20,25 +20,20 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
         <meta name="description" content=""/>
         <meta name="keyword" content="">
     	<meta name="viewport" content="width=device-width,height=device-height,user-scalable=1"/>
+
+		<link href="/css/dist/bootstrap-index.css" rel="stylesheet">
+        <link href="/css/dist/bootstrap.min.css" rel="stylesheet">
+        <link href="/css/dist/bootstrap-theme.css" rel="stylesheet">
+        <link href="/css/dist/elegant-icons-style.css" rel="stylesheet" />
+        <link href="/css/dist/font-awesome.min.css" rel="stylesheet" />
+        <link href="/css/dist/style.css" rel="stylesheet">
+        <link href="/css/dist/style-responsive.css" rel="stylesheet" />
+        
     
-        <!-- Bootstrap CSS -->
-        <link href="/css/bootstrap-index.css" rel="stylesheet">
-        <link href="/css/bootstrap.min.css" rel="stylesheet">
-        <!-- bootstrap theme -->
-        <link href="/css/bootstrap-theme.css" rel="stylesheet">
-        <!--external css-->
-        <!-- font icon -->
-        <link href="/css/elegant-icons-style.css" rel="stylesheet" />
-        <link href="/css/font-awesome.min.css" rel="stylesheet" />
-        <!-- Custom styles -->
-        <link href="/css/style.css" rel="stylesheet">
-        <link href="/css/style-responsive.css" rel="stylesheet" />
-    
-        <!-- HTML5 shim and Respond.js IE8 support of HTML5 -->
         <!--[if lt IE 9]>
-          <script src="/js/html5shiv.js"></script>
-          <script src="/js/respond.min.js"></script>
-          <script src="/js/lte-ie7.js"></script>
+          <script src="/js/dist/html5shiv.js"></script>
+          <script src="/js/dist/respond.min.js"></script>
+          <script src="/js/dist/lte-ie7.js"></script>
         <![endif]-->
     
     </head>
@@ -63,19 +58,20 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
         </section>
         <!-- container section end -->
         <!-- javascripts -->
-        <script src="/js/jquery.js"></script>
-        <script src="/js/bootstrap.min.js"></script>
+        <script src="/js/dist/jquery.js"></script>
+        <script src="/js/dist/bootstrap.min.js"></script>
         <!-- nice scroll -->
-        <script src="/js/jquery.scrollTo.min.js"></script>
-        <script src="/js/jquery.nicescroll.js" type="text/javascript"></script>
+        <script src="/js/dist/jquery.scrollTo.min.js"></script>
+        <script src="/js/dist/jquery.nicescroll.js" type="text/javascript"></script>
         <!--custome script for all page-->
-        <script src="/js/scripts.js"></script>
-        <script src="/js/chartjs.js" type="text/javascript"></script>
-        <script src="/js/app.js" type="text/javascript"></script>
+        <script src="/js/dist/scripts.js"></script>
+        <script src="/js/dist/chartjs.js" type="text/javascript"></script>
+        <script src="/js/dist/app.js" type="text/javascript"></script>
         <script type="text/javascript">
             $(function (){
             	$('#modal-session-message').modal('show');
             });
         </script>
+        <script type="text/javascript" src="/js/dist/ckeditor.js"></script>
     </body>
 </html>

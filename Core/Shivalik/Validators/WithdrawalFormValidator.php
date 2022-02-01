@@ -7,8 +7,8 @@ use Core\Shivalik\Entities\Member;
 use Core\Shivalik\Entities\Withdrawal;
 use Core\Shivalik\Managers\OfficeDAOManager;
 use Core\Shivalik\Managers\WithdrawalDAOManager;
-use PHPBackend\DAOException;
 use PHPBackend\Request;
+use PHPBackend\Dao\DAOException;
 use PHPBackend\Validator\IllegalFormValueException;
 
 /**

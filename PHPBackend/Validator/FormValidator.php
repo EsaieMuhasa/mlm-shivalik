@@ -40,6 +40,14 @@ interface FormValidator
     public function hasFeedback(?string $key=null) : bool;
     
     /**
+     * ce erreur existe dans la collection des messages d'erreurs???
+     * ou la collection des messages d'erreur n'est-elle pas vide??
+     * @param string $key
+     * @return bool
+     */
+    public function hasError(?string $key = null) : bool;
+    
+    /**
      * supresseion de d'un feedback dans la collection des feedbacks
      * @param string $key
      */

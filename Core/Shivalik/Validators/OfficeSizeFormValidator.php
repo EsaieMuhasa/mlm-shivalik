@@ -6,11 +6,11 @@ use Core\Shivalik\Entities\OfficeSize;
 use Core\Shivalik\Managers\OfficeDAOManager;
 use Core\Shivalik\Managers\OfficeSizeDAOManager;
 use Core\Shivalik\Managers\SizeDAOManager;
-use PHPBackend\DAOException;
+use PHPBackend\PHPBackendException;
 use PHPBackend\Request;
+use PHPBackend\Dao\DAOException;
 use PHPBackend\Validator\DefaultFormValidator;
 use PHPBackend\Validator\IllegalFormValueException;
-use PHPBackend\PHPBackendException;
 
 /**
  *

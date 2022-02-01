@@ -51,7 +51,7 @@ class UtilitaireSQL
             $initData[$paramName] =  $data[$columnName];
             
             $SQL .= $columnName.($colone==$nombreColones?  ' ) ' :', ');
-            $SQL_SUITE .= ':'.$paramName.($colone==$nombreColones? '' : ', ');
+            $SQL_SUITE .= ':'.$paramName.($colone==$nombreColones? ' )' : ', ');
             if ($colone != $nombreColones) {
                 $colone++;
             }
@@ -359,7 +359,7 @@ class UtilitaireSQL
      * @return bool
      */
     public static function hasData (\PDO $pdo, string $tableName) : bool {
-        return self::check($pdo, $tableName);
+        return self::checkAll($pdo, $tableName);
     }
     
     

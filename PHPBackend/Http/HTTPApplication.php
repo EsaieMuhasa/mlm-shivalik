@@ -137,8 +137,8 @@ class HTTPApplication implements Application
         try {
             $controller = $this->getController();
             $controller->execute();
-            $this->httpResponse->setPage($controller->getPage());
-            $this->httpResponse->send();
+            $this->getResponse()->setPage($controller->getPage());
+            $this->getResponse()->send();
         } catch (\RuntimeException $e) {
             if ($e instanceof RouteNotFoundException) {
                 $this->getHttpResponse()->sendError($e->getMessage(),$e->getCode());
@@ -185,7 +185,7 @@ class HTTPApplication implements Application
          * @var \DOMDocument $readUploadedFile
          */
         $readUploadedFile = $xmlGeneral->load($xmlUploadedFileGeneral);
-        if ($readUploadedFile===false) {
+        if ($readUploadedFile === false) {
             throw new PHPBackendException("Impossible de parser le fichier de configuration globale: {$xmlUploadedFileGeneral}");
         }
         

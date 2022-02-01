@@ -64,4 +64,10 @@
 		<route action="history" urlPattern="/admin/offices/([0-9]+)/history/([0-9]{1,2})-([0-9]{4})\.html" paramsNames="id,month,year"/>
 	</module>
 	
+	<module name="Products">
+		<route action="index" urlPattern="/admin/products/"/>
+		<route action="addProduct" urlPattern="/admin/products/add\.html"/>
+		<route action="updateProduct" urlPattern="/admin/products/([0-9]+)/update\.html" paramsNames="id"/>
+	</module>
+	
 </app-routes>

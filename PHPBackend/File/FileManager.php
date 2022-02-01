@@ -29,10 +29,11 @@ class FileManager
         $matches = array();
         $simpleFileName = null;
         
-        if ($fileName != null && preg_match('`^(.+)(/|\\\\)([a-zA-Z0-9_]+)(\\.[a-zA-Z0-9]{1,6])$`', $fileName)) { //recuprerationd de la hierarchie des dossiers
+        //(.+)(/|\\)([a-zA-Z0-9_]+)\.([a-zA-Z0-9]{1,6})
+        if ($fileName != null && preg_match("#^(.+)(/|\\\\)(.+)(\.[a-zA-Z]{2,10})$#", $fileName, $matches)) { //recuprerationd de la hierarchie des dossiers
             $dir = $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.GlobalConfig::getInstance()->getPublicDirectory().DIRECTORY_SEPARATOR."{$matches[1]}";
-            $simpleFileName = "{$matches[2]}{$matches[3]}";
-        }   
+            $simpleFileName = "{$matches[3]}{$matches[4]}";
+        }
         
         if (!is_dir($dir)) {
             @mkdir($dir, 0777, true);
@@ -41,7 +42,7 @@ class FileManager
         $reelFileName = $dir.DIRECTORY_SEPARATOR.($fileName == null? ($file->getName()) : ($simpleFileName == null? $fileName : $simpleFileName));
         
         if(!(@move_uploaded_file($file->getTmpName(), $reelFileName))){
-            throw new PHPBackendException('Erreur de configuration du serveur. tmpfile_name = '.$file->getTmpName().'; filename='.$fileName.'. Echec de recuperation du fichier dans le tmp du serveur');
+            throw new PHPBackendException('Erreur de configuration du serveur. tmpfile_name = '.$file->getTmpName().'; filename='.$reelFileName.'. Echec de recuperation du fichier dans le tmp du serveur');
         }
         
         return $reelFileName;

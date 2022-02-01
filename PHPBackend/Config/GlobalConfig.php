@@ -53,18 +53,26 @@ class GlobalConfig
     
     
     /**
+     * Revoie le chemain vers le dossier publique
      * @return string
      */
     public function getPublicDirectory() : string
     {
+        if ($this->publicDirectory == null) {
+            $this->loadConfig();
+        }
         return $this->publicDirectory;
     }
 
     /**
+     * Revoie le chemain vers le dossier de journalisation des erreurs
      * @return string
      */
     public function getLoggDirectory() : string
     {
+        if ($this->loggDirectory == null) {
+            $this->loadConfig();
+        }
         return $this->loggDirectory;
     }
 
@@ -77,40 +85,51 @@ class GlobalConfig
     public function get ($name)
     {
         if (empty($this->definitions)) {
-            //Lecture des parametres genereaux
-            //======================================================
-            $xml = new \DOMDocument();
-            $xmlFile = dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR.'Config'.DIRECTORY_SEPARATOR.'config.xml';
-            
-            /**
-             * @var \DOMDocument $readFile
-             */
-            $readFile = $xml->load($xmlFile);
-            if ($readFile === false) {
-                throw new PHPBackendException('Impossible de parser le fichier de configuration globale "'.$this->getApplication()->getName().'" => ('.$xmlFile.')');
-            }
-            
-            $root = $xml->getElementsByTagName("config")->item(0);
-            $this->publicDirectory = $root->getAttribute('webData');
-            $this->loggDirectory = $root->getAttribute('webLogger');
-            
-            $defines = $xml->getElementsByTagName('definitions');
-            if ($defines->count() != 0) {
-                $elements = $defines[0]->childNodes;
-                for ($i = 0; $i < $elements->length; $i++) {
-                    $element = $elements->item($i);
-                    if ($element->nodeName === 'list') {
-                        $list = $this->readList($element);
-                        $this->definitions[$list->getName()] = $list;
-                    }else if ($element->nodeName === 'define') {
-                        $label = $element->hasAttribute('label')? $element->getAttribute('label') : null;
-                        $var = new VarDefine($element->getAttribute('name'), $element->getAttribute('value'), $label);
-                        $this->definitions[$element->getAttribute('name')] = $var;
-                    }
+            $this->loadConfig();
+        }
+        return isset($this->definitions[$name])? $this->definitions[$name] : null;
+    }
+    
+    /**
+     * chargement du fichier de configuration globale
+     * @throws PHPBackendException
+     */
+    protected function loadConfig () : void {
+        $this->definitions = [];
+        $xml = new \DOMDocument();
+        $xmlFile = $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.'Config'.DIRECTORY_SEPARATOR.'config.xml';
+        
+        /**
+         * @var \DOMDocument $readFile
+         */
+        $readFile = $xml->load($xmlFile);
+        if ($readFile === false) {
+            throw new PHPBackendException('Impossible de parser le fichier de configuration globale "'.$this->getApplication()->getName().'" => ('.$xmlFile.')');
+        }
+        
+        $root = $xml->getElementsByTagName("config")->item(0);
+        $this->publicDirectory = $root->getAttribute('webData');
+        $this->loggDirectory = $root->getAttribute('webLogger');
+        
+        
+        //var_dump('var_dump', $root, $this->publicDirectory, $this->loggDirectory);exit();
+        
+        $defines = $xml->getElementsByTagName('definitions');
+        if ($defines->count() != 0) {
+            $elements = $defines[0]->childNodes;
+            for ($i = 0; $i < $elements->length; $i++) {
+                $element = $elements->item($i);
+                if ($element->nodeName === 'list') {
+                    $list = $this->readList($element);
+                    $this->definitions[$list->getName()] = $list;
+                }else if ($element->nodeName === 'define') {
+                    $label = $element->hasAttribute('label')? $element->getAttribute('label') : null;
+                    $var = new VarDefine($element->getAttribute('name'), $element->getAttribute('value'), $label);
+                    $this->definitions[$element->getAttribute('name')] = $var;
                 }
             }
         }
-        return isset($this->definitions[$name])? $this->definitions[$name] : null;
+        
     }
 
     

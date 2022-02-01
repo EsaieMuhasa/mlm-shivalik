@@ -37,7 +37,7 @@ $white: #ffffff;
 $red: #ff0000;
 $blue: #0000ff;
 
-$custom-primary-color : #d04020;
+$custom-primary-color : #cf4d33;
 $custom-secodary-color : #3b3b97;
 
 
@@ -94,3 +94,7 @@ $surfix-media : "-xs", "-sm",  "-md", "-lg", "-xs-land", "-xs-port", "-sm-land",
 
 //Liste des media prise en cosideration
 $list-media :  "xs",   "sm", "md", "lg", "xs-landscape", "xs-portrait", "sm-landscape", "sm-portrait";
+
+//pour ajouter d'autre colones a ceux que propose bootrap 3.3.7
+$surfix-media-custom : "-xs-land", "-xs-port", "-sm-land", "-sm-port";
+$list-media-custom :  "xs-landscape", "xs-portrait", "sm-landscape", "sm-portrait";

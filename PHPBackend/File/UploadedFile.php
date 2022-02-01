@@ -24,8 +24,8 @@ class UploadedFile
      * @return string|null
      */
     public function getName() {
-        if (in_array('name', $this->data)) {
-            return $this->data['name'];
+        if (in_array('name', $this->metadata)) {
+            return $this->metadata['name'];
         }
         return null;
     }
@@ -43,7 +43,7 @@ class UploadedFile
         
         $name = false;
         $size = false;
-        foreach ($this->data as $cle => $value) {
+        foreach ($this->metadata as $cle => $value) {
             if (in_array($cle, $params)) {
                 if (($cle=='name') && (($value != null && $value != ''))) {
                     $name = true;
@@ -60,8 +60,8 @@ class UploadedFile
      * @return int
      */
     public function getSize(){
-        if (in_array('size', $this->data)) {
-            return $this->data['size'];
+        if (in_array('size', $this->metadata)) {
+            return $this->metadata['size'];
         }
         return 0;
     }
@@ -71,16 +71,14 @@ class UploadedFile
      * @return boolean
      */
     public function hasError(){
-        if (in_array('error', $this->data)) {
-            return $this->data['error']==UPLOAD_ERR_OK? false : true;
+        if (in_array('error', $this->metadata)) {
+            return $this->metadata['error']==UPLOAD_ERR_OK? false : true;
         }
         return true;
     }
     
     public function isImage(){
-        $ext=array('png', 'jpg', 'jpeg', 'PNG','JPG', 'JPEG');
-        if (in_array($this->getExtension(), $ext)) return true;
-        else return false;
+        return in_array($this->getExtension(), ['png', 'jpg', 'jpeg', 'PNG','JPG', 'JPEG']);
     }
     
     /**
@@ -88,16 +86,14 @@ class UploadedFile
      * @return bool
      */
     public function isPhpFile () : bool {
-        return $this->getExtension() == 'php';
+        return ($this->getExtension() == 'php' || $this->getExtension() == 'php5');
     }
     
     /**
      * @return bool
      */
     public function isWebFile () : bool {
-        $ext=array('php', 'html', 'xhtml', 'js', 'htm', 'php5', 'css');
-        if (in_array($this->getExtension(), $ext)) return true;
-        else return false;
+        return in_array($this->getExtension(), ['php', 'html', 'xhtml', 'js', 'htm', 'php5', 'css']);
     }
     
     /**
@@ -114,9 +110,11 @@ class UploadedFile
      * @return string
      */
     public function getTmpName() : ?string{
-        if (in_array('tmp_name', $this->data)) {
-            return $this->data['tmp_name'];
+        if (in_array('tmp_name', $this->metadata)) {
+            return $this->metadata['tmp_name'];
         }
+        
+        return null;
     }
 }
 

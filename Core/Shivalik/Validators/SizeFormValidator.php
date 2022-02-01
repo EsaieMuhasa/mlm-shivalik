@@ -4,8 +4,8 @@ namespace Core\Shivalik\Validators;
 
 use Core\Shivalik\Entities\Size;
 use Core\Shivalik\Managers\SizeDAOManager;
-use PHPBackend\DAOException;
 use PHPBackend\Request;
+use PHPBackend\Dao\DAOException;
 use PHPBackend\Validator\DefaultFormValidator;
 use PHPBackend\Validator\IllegalFormValueException;
 

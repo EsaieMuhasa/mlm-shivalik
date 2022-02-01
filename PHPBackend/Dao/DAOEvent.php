@@ -1,7 +1,6 @@
 <?php
 namespace PHPBackend\Dao;
 
-use PHPBackend\DAOException;
 
 /**
  *

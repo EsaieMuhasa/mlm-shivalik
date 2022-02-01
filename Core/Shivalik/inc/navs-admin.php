@@ -44,6 +44,33 @@ $admin = AdminApplication::getConnectedUser();
 	</li>
 	
 	<li>
+		<a href="/admin/products/">
+    		<span class="nav-item-icon">
+        		<span class="fa fa-leaf"></span>
+    		</span>
+    		<span class="nav-item-caption">Products</span>
+		</a>
+	</li>
+	
+	<li>
+		<a href="/admin/stock/">
+    		<span class="nav-item-icon">
+        		<span class="fa fa-database"></span>
+    		</span>
+    		<span class="nav-item-caption">Stocks</span>
+		</a>
+	</li>
+	
+	<li>
+		<a href="/admin/news/">
+    		<span class="nav-item-icon">
+        		<span class="glyphicon glyphicon-bullhorn"></span>
+    		</span>
+    		<span class="nav-item-caption">News</span>
+		</a>
+	</li>
+	
+	<li>
 		<a href="/admin/settings/">
     		<span class="nav-item-icon">
         		<span class="icon_cog"></span>

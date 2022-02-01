@@ -26,7 +26,7 @@ interface Response extends ApplicationComponent
      * @param string $message
      * @param int $code
      */
-    public function sendError (string $message, int $code=self::ERROR_NOT_FOUND) : void;
+    public function sendError (?string $message, int $code=self::ERROR_NOT_FOUND) : void;
     
     /**
      * revoie une exception sous forme 'un message d'erreur

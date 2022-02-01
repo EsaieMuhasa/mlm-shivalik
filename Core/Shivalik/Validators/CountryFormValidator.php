@@ -3,8 +3,8 @@ namespace Core\Shivalik\Validators;
 
 use Core\Shivalik\Entities\Country;
 use Core\Shivalik\Managers\CountryDAOManager;
-use PHPBackend\DAOException;
 use PHPBackend\Request;
+use PHPBackend\Dao\DAOException;
 use PHPBackend\Validator\DefaultFormValidator;
 use PHPBackend\Validator\IllegalFormValueException;
 
