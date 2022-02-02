@@ -75,12 +75,12 @@ $admin = AdminApplication::getConnectedUser();
     		<span class="nav-item-icon">
         		<span class="icon_document"></span>
     		</span>
-    		<span class="nav-item-caption">Home page senting </span>
+    		<span class="nav-item-caption">Home page setting </span>
 		</a>
 	</li>
 	
 	<li>
-		<a href="/admin/settings/">
+		<a href="/admin/dashboard/settings/">
     		<span class="nav-item-icon">
         		<span class="icon_cog"></span>
     		</span>

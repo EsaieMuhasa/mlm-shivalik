@@ -19,6 +19,9 @@ use PHPBackend\Application;
 use PHPBackend\Request;
 use PHPBackend\Response;
 use PHPBackend\Graphics\ChartJS\ChartConfig;
+use Core\Shivalik\Managers\GradeDAOManager;
+use Core\Shivalik\Managers\GenerationDAOManager;
+use Core\Shivalik\Managers\SizeDAOManager;
 
 /**
  *
@@ -37,6 +40,24 @@ class DashboardController extends AdminController {
 	const ATT_RAPORT_WITHDRAWALS = 'raportWithdrawals';
 	
 	const ATT_CHART_CONFIG = 'chartConfig';
+	const ATT_GRADES = 'packets';
+	const ATT_GENERATIONS = 'generations';
+	const ATT_SIZES = 'sizes';//office sizes
+	
+	/**
+	 * @var GradeDAOManager
+	 */
+	private $gradeDAOManager;
+	
+	/**
+	 * @var GenerationDAOManager
+	 */
+	private $generationDAOManager;
+	
+	/**
+	 * @var SizeDAOManager
+	 */
+	private $sizeDAOManager;
 	
 	/**
 	 * @var GradeMemberDAOManager
@@ -68,17 +89,18 @@ class DashboardController extends AdminController {
 	 */
 	private $raportWithdrawalDAOManager;
 	
-
+	
 	public function __construct(Application $application, string $action, string $module) {
 		parent::__construct ( $application, $action, $module );
 		$application->getHttpRequest()->addAttribute(self::ATT_VIEW_TITLE, "Dashboard");
 	}
 
 	
-   /**
-     * @param Request $request
-     * @param Response $response
-     */
+   /***
+    * visualisation de l'etat actuel du systeme
+    * @param Request $request
+    * @param Response $response
+    */
     public function executeIndex (Request $request, Response $response) : void{
         
         //virtualMoney
@@ -178,6 +200,37 @@ class DashboardController extends AdminController {
         $builder = new PacketChartBuilder($request->getApplication()->getConfig(), array(), $members);
         $builder->getChart()->getConfig()->setType(ChartConfig::TYPE_DOUGHNUT_CHART);
         $request->addAttribute(self::ATT_CHART_CONFIG, $builder->getChart());
+    }
+    
+    /**
+     * Afffichage de la configuration actuel du reseau
+     * -les packets
+     * -la configuration des bonus negerationnnels
+     * @param Request $request
+     */
+    public function executeSettings (Request $request) : void {
+        
+        if ($this->gradeDAOManager->hasData()) {
+            $grades = $this->gradeDAOManager->findAll();
+        } else {
+            $grades = [];
+        }
+        
+        if ($this->generationDAOManager->hasData()) {
+            $generations =  $this->generationDAOManager->findAll();
+        } else {
+            $generations = [];
+        }
+        
+        if ($this->sizeDAOManager->hasData()) {
+            $sizes = $this->sizeDAOManager->findAll();
+        } else {
+            $sizes = [];
+        }
+        
+        $request->addAttribute(self::ATT_SIZES, $sizes);
+        $request->addAttribute(self::ATT_GENERATIONS, $generations);
+        $request->addAttribute(self::ATT_GRADES, $grades);
     }
 
 }

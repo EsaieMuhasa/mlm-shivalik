@@ -6,6 +6,7 @@
 	 	<route action="index" urlPattern="/admin/"/>
 	 	<route action="statistics" urlPattern="/admin/dashboard/statistics/"/>
 		<route action="chartPackets" urlPattern="/admin/dashboard/statistics/config-chart-packets\.json"/>
+		<route action="settings" urlPattern="/admin/dashboard/settings/"/>
 	</module>
 	
 	<module name="Profil">

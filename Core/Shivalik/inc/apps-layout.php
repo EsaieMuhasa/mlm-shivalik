@@ -12,23 +12,21 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
 
 <html lang="en">
     <head>
-    
      	<title>Shivalik</title>
     	<link rel="icon" type="image/jpg" href="<?php echo $config->get('logo'); ?>" />
     	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content=""/>
-        <meta name="keyword" content="">
+        <meta name="keyword" content=""/>
     	<meta name="viewport" content="width=device-width,height=device-height,user-scalable=1"/>
 
-		<link href="/css/dist/bootstrap-index.css" rel="stylesheet">
-        <link href="/css/dist/bootstrap.min.css" rel="stylesheet">
+		<link href="/css/dist/bootstrap-index.css" rel="stylesheet"/>
+        <link href="/css/dist/bootstrap.min.css" rel="stylesheet"/>
         <link href="/css/dist/bootstrap-theme.css" rel="stylesheet">
         <link href="/css/dist/elegant-icons-style.css" rel="stylesheet" />
         <link href="/css/dist/font-awesome.min.css" rel="stylesheet" />
         <link href="/css/dist/style.css" rel="stylesheet">
         <link href="/css/dist/style-responsive.css" rel="stylesheet" />
-        
     
         <!--[if lt IE 9]>
           <script src="/js/dist/html5shiv.js"></script>
