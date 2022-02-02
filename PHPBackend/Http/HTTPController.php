@@ -98,7 +98,9 @@ abstract class HTTPController implements Controller
             throw new PHPBackendException('L\'action "'.$this->action.'" n\'est pas définie dans le controleur "'.$reflexClass->getName().'".');
         }
         $reflexMethod = $reflexClass->getMethod($methodName);
-        if ($reflexMethod->getNumberOfParameters()==2) {
+        if($reflexMethod->getNumberOfParameters()==1) {
+            $this->$methodName($this->getApplication()->getRequest());
+        }else if ($reflexMethod->getNumberOfParameters()==2) {
             $this->$methodName($this->getApplication()->getRequest(), $this->getApplication()->getResponse());
         } elseif ($reflexMethod->getNumberOfParameters()==0) {
             $this->$methodName();
