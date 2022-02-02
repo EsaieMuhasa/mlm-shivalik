@@ -3,6 +3,7 @@
 <app-config>
 	<definitions>
 		<define name="maxMembers" value="50"/>
+		<define name="productsSteep" value="12"/>
 	</definitions>
 	<users>
 		<user password="esaie@01056" pseudo="esaiemuhasa.dev@gmail.com"/>

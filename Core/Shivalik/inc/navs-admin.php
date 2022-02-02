@@ -53,15 +53,6 @@ $admin = AdminApplication::getConnectedUser();
 	</li>
 	
 	<li>
-		<a href="/admin/stock/">
-    		<span class="nav-item-icon">
-        		<span class="fa fa-database"></span>
-    		</span>
-    		<span class="nav-item-caption">Stocks</span>
-		</a>
-	</li>
-	
-	<li>
 		<a href="/admin/news/">
     		<span class="nav-item-icon">
         		<span class="glyphicon glyphicon-bullhorn"></span>
@@ -71,20 +62,29 @@ $admin = AdminApplication::getConnectedUser();
 	</li>
 	
 	<li>
-		<a href="/admin/settings/">
-    		<span class="nav-item-icon">
-        		<span class="icon_cog"></span>
-    		</span>
-    		<span class="nav-item-caption">Settings</span>
-		</a>
-	</li>
-	
-	<li>
 		<a href="/admin/dashboard/statistics/">
     		<span class="nav-item-icon">
         		<span class="icon_piechart"></span>
     		</span>
     		<span class="nav-item-caption">Statistics</span>
+		</a>
+	</li>
+	
+	<li>
+		<a href="/admin/stock/">
+    		<span class="nav-item-icon">
+        		<span class="icon_document"></span>
+    		</span>
+    		<span class="nav-item-caption">Home page senting </span>
+		</a>
+	</li>
+	
+	<li>
+		<a href="/admin/settings/">
+    		<span class="nav-item-icon">
+        		<span class="icon_cog"></span>
+    		</span>
+    		<span class="nav-item-caption">System configuration</span>
 		</a>
 	</li>
 	

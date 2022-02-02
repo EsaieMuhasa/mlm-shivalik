@@ -49,10 +49,14 @@ class Product extends DBEntity
     }
 
     /**
+     * @param int $limit
      * @return string
      */
-    public function getDescription() : ?string
+    public function getDescription(?int $limit=null) : ?string
     {
+        if ($limit !== null && $this->description !== null) {
+            return substr($this->description, 0, $limit)."...";
+        }
         return $this->description;
     }
 

@@ -1,7 +1,7 @@
 <?php
 ?>
 <section class="panel">
-    <header class="panel-heading">New product creation form</header>
+    <header class="panel-heading">Product <?php echo (isset($_GET['id'])? 'edition':'creation') ?> form</header>
     <div class="panel-body">
     	<form role="form" action="" method="POST" enctype="multipart/form-data">
     		<?php if (isset($_REQUEST['result'])) : ?>
@@ -52,19 +52,9 @@
         			<?php }?>
         		</div>
     		</fieldset>
-    		
-    		<fieldset>
-    			<legend>Full description</legend>
-        		<div class="form-group <?php echo (isset($_REQUEST['errors']['size'])? 'has-error':'');?>">
-    				<textarea class="form-control ckeditor" name="editor1" id="editoid1" rows="6"></textarea>
-        			<?php if (isset($_REQUEST['errors']['size'])){?>
-        			<p class="help-block"><?php echo htmlspecialchars($_REQUEST['errors']['size']);?></p>
-        			<?php }?>
-    			</div>
-    		</fieldset>
     		    		
     		<div class="text-center">
-        		<button class="btn btn-primary"><span class="fa fa-send"></span> Save</button>
+        		<button class="btn btn-primary"><span class="fa fa-send"></span> Save <?php echo (isset($_GET['id'])? 'modification':'') ?></button>
     		</div>
     	</form>
     </div>

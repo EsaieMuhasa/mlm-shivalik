@@ -86,11 +86,12 @@ class ProductValidator extends DefaultFormValidator
     /**
      * validation de l'image du produit
      * @param UploadedFile $file
+     * @param bool $onCreate
      * @throws IllegalFormValueException
      */
-    private function validationPicture (UploadedFile $file) : void {
+    private function validationPicture (UploadedFile $file, bool $onCreate = true) : void {
         parent::validationImage($file);
-        if (!$file->isFile()) {
+        if (!$file->isFile() && $onCreate) {
             throw new IllegalFormValueException("photo is required");
         }
     }
@@ -126,7 +127,7 @@ class ProductValidator extends DefaultFormValidator
                 ImageResizing::builder(new Image($reelName));
                 $product->setPicture($picture);
             } else {
-                $this->validationPicture($file);
+                $this->validationPicture($file, $product->getId() === null);
             }
         } catch (IllegalFormValueException $e) {
             $this->addError(self::FIELD_PICTURE, $e->getMessage());
@@ -201,8 +202,34 @@ class ProductValidator extends DefaultFormValidator
      */
     public function updateAfterValidation(\PHPBackend\Request $request)
     {
-        // TODO Auto-generated method stub
+        $product = new Product();
+        $name = $request->getDataPOST(self::FIELD_NAME);
+        $description = $request->getDataPOST(self::FIELD_DESCRIPTION);
+        $defaultUnitPrice = $request->getDataPOST(self::FIELD_DEFAULT_UNIT_PRICE);
+        $file = $request->getUploadedFile(self::FIELD_PICTURE);
         
+        $product->setId($request->getDataGET(self::FIELD_ID));
+        
+        $this->processName($product, $name);
+        $this->processDefaultUnitPrice($product, $defaultUnitPrice);
+        $this->processDescription($product, $description);
+        $this->processPicture($product, $file);
+        
+        if (!$this->hasError()) {
+            try {
+                $this->productDAOManager->update($product, $product->getId());
+                if ($file->isImage()) {
+                    $this->processPicture($product, $file, true);
+                    $this->productDAOManager->updatePicture($product->getPicture(), $product->getId());
+                }
+            } catch (DAOException $e) {
+                $this->setMessage($e->getMessage());
+            }
+        }
+        
+        $this->result = $this->hasError()? "Failure registration" : "Success full registration";
+        
+        return $product;
     }
 
 }
