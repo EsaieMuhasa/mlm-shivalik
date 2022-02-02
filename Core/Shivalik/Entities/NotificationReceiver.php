@@ -80,6 +80,28 @@ class NotificationReceiver extends DBEntity
     {
         $this->received = self::isTrue($received);
     }
+    
+    /**
+     * generation d'une nouvelle notification
+     * @param string $title
+     * @param string $description
+     * @param Notifiable $notificable
+     * @return NotificationReceiver
+     */
+    public static function buildNotificationReceiver (string $title, string $description, Notifiable $notificable) : NotificationReceiver {
+        $notification = new Notification();
+        $notification->setTitle($title);
+        $notification->setDescription($description);
+        
+        $receiver = new NotifiableComponent();
+        $receiver->setNotifiable($notificable);
+        
+        $notificationReceiver = new NotificationReceiver();
+        $notificationReceiver->setNotification($notification);
+        $notificationReceiver->setReceiver($receiver);
+        
+        return $notificationReceiver;
+    }
 
 }
 

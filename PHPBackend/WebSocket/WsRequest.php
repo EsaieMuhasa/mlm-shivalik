@@ -4,6 +4,7 @@ namespace PHPBackend\WebSocket;
 use PHPBackend\Request;
 use PHPBackend\File\UploadedFile;
 use PHPBackend\Session;
+use PHPBackend\Application;
 
 /**
  *
@@ -191,6 +192,27 @@ class WsRequest implements Request
         // TODO Auto-generated method stub
         
     }
+    
+    /**
+     * {@inheritDoc}
+     * @see \PHPBackend\Request::addToast()
+     */
+    public function addToast(\PHPBackend\ToastMessage $toast): void
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \PHPBackend\ApplicationComponent::getApplication()
+     */
+    public function getApplication(): Application
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
 
     
 }

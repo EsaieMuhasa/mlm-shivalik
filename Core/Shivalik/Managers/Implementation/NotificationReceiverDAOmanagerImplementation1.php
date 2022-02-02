@@ -8,6 +8,7 @@ use Core\Shivalik\Managers\NotificationReceiverDAOmanager;
 use PHPBackend\Dao\DAOEvent;
 use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
+use Core\Shivalik\Entities\Notifiable;
 
 /**
  *
@@ -20,37 +21,40 @@ class NotificationReceiverDAOmanagerImplementation1 extends NotificationReceiver
     /**
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\NotificationReceiverDAOmanager::createItems()
-     * @param NotificationReceiver $entity
      */
-    public function createItems(Notification $notification, array $components): void
+    public function createItems(Notification $notification, array $notifiables): void
     {
         try {
             $pdo = $this->getConnection();
             if ($pdo->beginTransaction()) {
                 
                 $this->getManagerFactory()->getManagerOf(Notification::class)->createInTransaction($notification, $pdo);
+                $receivers = [];
+                
                 /**
-                 * @var NotifiableComponent $component
+                 * @var Notifiable $notificable
                  */
-                foreach ($components as $component) {
+                foreach ($notifiables as $notifiable) {
                     $receiver = new NotificationReceiver();
+                    $component = new NotifiableComponent();
+                    $component->setNotifiable($notifiable);
                     $receiver->setNotification($notification);
                     $receiver->setReceiver($component);
                     $this->createInTransaction($receiver, $pdo);
+                    $receivers [] = $receiver;
                 }
-                $this->pdo->commit();
+                $pdo->commit();
                 
-                foreach ($component as $component) {
-                    $event = new DAOEvent($this, DAOEvent::TYPE_CREATION, $component);
+                foreach ($receivers as $rs) {
+                    $event = new DAOEvent($this, DAOEvent::TYPE_CREATION, $rs);
                     $this->dispatchEvent($event);
-                }
-                
+                }                
             } else {
                 throw new DAOException("an error occurred while starting the transaction");
             }
         } catch (\PDOException $e) {
             try {
-                $this->pdo->rollBack();
+                $pdo->rollBack();
             } catch (\PDOException $e) {}
             throw new DAOException("An error occurred during the transaction");
         }

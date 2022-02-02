@@ -74,6 +74,9 @@ class NotifiableComponent extends DBEntity
     public function setNotifiable (Notifiable $notifiable) : void
     {
         $this->notifiable = $notifiable;
+        $ref = new \ReflectionClass($notifiable);
+        $this->setEntity($ref->getName());
+        $this->setDataKey($notifiable->getKey());
     }
 
 }

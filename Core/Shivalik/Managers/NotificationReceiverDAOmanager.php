@@ -3,9 +3,9 @@ namespace Core\Shivalik\Managers;
 
 use Core\Shivalik\Entities\Notification;
 use PHPBackend\Dao\DefaultDAOInterface;
-use Core\Shivalik\Entities\NotifiableComponent;
-use Core\Shivalik\Entities\NotificationReceiver;
 use PHPBackend\Dao\UtilitaireSQL;
+use Core\Shivalik\Entities\Notifiable;
+use Core\Shivalik\Entities\NotificationReceiver;
 
 /**
  *
@@ -17,9 +17,9 @@ abstract class NotificationReceiverDAOmanager extends DefaultDAOInterface
     /**
      * envoie d'une notification a une collection de composent notifiable
      * @param Notification $notification
-     * @param NotifiableComponent[] $components
+     * @param Notifiable[] $notificables
      */
-    public abstract function createItems (Notification $notification, array $components) : void;
+    public abstract function createItems (Notification $notification, array $notificables) : void;
     
     /**
      * verification des message

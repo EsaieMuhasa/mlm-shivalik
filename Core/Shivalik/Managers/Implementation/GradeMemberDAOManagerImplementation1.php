@@ -9,6 +9,8 @@ use Core\Shivalik\Entities\PointValue;
 use Core\Shivalik\Managers\GradeMemberDAOManager;
 use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
+use Core\Shivalik\Entities\NotificationReceiver;
+use PHPBackend\Dao\DAOEvent;
 
 /**
  *
@@ -451,9 +453,10 @@ class GradeMemberDAOManagerImplementation1 extends GradeMemberDAOManager
      */
     public function enable(GradeMember $entity): void
     {
+        $pdo = $this->getConnection();
         try {
             
-            $pdo = $this->getConnection();
+            $notificationReceivers = [];//collection des recepteurs des notifications
             
             if (!$pdo->beginTransaction()) {
                 throw new DAOException("an unknown error occurred while creating a member's rank activation transaction");
@@ -474,6 +477,10 @@ class GradeMemberDAOManagerImplementation1 extends GradeMemberDAOManager
                 'enable' => 1
             ], $entity->getId());
             
+            //envoie de la notification du proprietaire du compte
+            $title = "Account package activation";
+            $description = "{$entity->getMember()->getNames()} the package activation '{$entity->getGrade()->getName()}' of your account is done successfully";
+            $notificationReceivers[] = NotificationReceiver::buildNotificationReceiver($title, $description, $entity->getMember());
             
             if ($sponsor != null) {
                 $sponsorGrade = $this->findCurrentByMember($sponsor->getId());
@@ -488,7 +495,12 @@ class GradeMemberDAOManagerImplementation1 extends GradeMemberDAOManager
                     'dateAjout' => new \DateTime()
                 ));
                 
-                $this->getDaoManager()->getManagerOf('BonusGeneration')->createInTransaction($bonusSponsor, $pdo);
+                $this->getDaoManager()->getManagerOf(BonusGeneration::class)->createInTransaction($bonusSponsor, $pdo);
+                
+                //Envoie de la notification du sponsor du compte
+                $title = "Sponsoring bonus";
+                $description = " Congratulations {$entity->getMember()->getSponsor()->getNames()}. You got $ {$bonusSponsor->getAmount()} bonus, for sponsoring {$entity->getMember()->getMatricule()} account.";
+                $notificationReceivers[] = NotificationReceiver::buildNotificationReceiver($title, $description, $entity->getMember()->getSponsor());
                 
                 /**
                  * @var Member $parent
@@ -518,6 +530,11 @@ class GradeMemberDAOManagerImplementation1 extends GradeMemberDAOManager
                         ));
                         
                         $this->getDaoManager()->getManagerOf(BonusGeneration::class)->createInTransaction($bonusGeneration, $pdo);
+                        
+                        //Envoie de la notification des uplines du compte
+                        $title = "Generationnel bonus";
+                        $description = "Congratulations {$parent->getNames()}. You got $ {$bonusSponsor->getAmount()} bonus, for your downline {$entity->getMember()->getMatricule()} account.";
+                        $notificationReceivers[] = NotificationReceiver::buildNotificationReceiver($title, $description, $parent);
                     }
                     
                     $generationNumber++;
@@ -525,7 +542,7 @@ class GradeMemberDAOManagerImplementation1 extends GradeMemberDAOManager
                 
             }
             
-            //dispaching des PV
+            //dispatching des PV
             
             /**
              * les PV sont appercue au pied du parent,
@@ -546,17 +563,31 @@ class GradeMemberDAOManagerImplementation1 extends GradeMemberDAOManager
                     $value = round(($entity->getProduct()/2), 0);
                     $pv->setValue($value);
                     $this->getDaoManager()->getManagerOf(PointValue::class)->createInTransaction($pv, $pdo);
+                    
+                    $title = "Generationnel bonus";
+                    $description = "Congratulations {$child->getNames()}. You got  {$pv->getValue()} PV, for your downline {$entity->getMember()->getMatricule()} account, sponsorized by {$entity->getMember()->getSponsor()->getNames()}";
+                    $notificationReceivers[] = NotificationReceiver::buildNotificationReceiver($title, $description, $parent);
                 }
             }
             
+            foreach ($notificationReceivers as $receiver) {
+                $this->getDaoManager()->getManagerOf(NotificationReceiver::class)->createInTransaction($receiver, $pdo);
+            }
+            
             $commit = $pdo->commit();
+            
             if (!$commit) {
                 throw new DAOException("Transaction validation failure");
             }
             
+            foreach ($notificationReceivers as $rs) {
+                $event = new DAOEvent($this->getDaoManager()->getManagerOf(NotificationReceiver::class), DAOEvent::TYPE_CREATION, $rs);
+                $this->dispatchEvent($event);
+            }
+            
         } catch (\PDOException $e) {
             try {
-                $this->pdo->rollBack();
+                $pdo->rollBack();
             } catch (\Exception $e) {
             }
             throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
@@ -595,7 +626,7 @@ class GradeMemberDAOManagerImplementation1 extends GradeMemberDAOManager
             
         } catch (\PDOException $e) {
             try {
-                $this->pdo->rollBack();
+                $pdo->rollBack();
             } catch (\Exception $e) {
             }
             throw new DAOException("an error occurred during the transaction: {$e->getMessage()}");
