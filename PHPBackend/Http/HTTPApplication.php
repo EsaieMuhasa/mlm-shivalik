@@ -47,23 +47,34 @@ class HTTPApplication implements Application
      */
     protected $config;
     
+    /**
+     * L'application source qui autrait fait naissance a l'actuel
+     * @var Application
+     */
+    protected $source;
+    
 
     /**
-     * @param string $name
-     * @param string $container
+     * constructeur d'initialisation d'une application
+     * @param string $name le nom de l'application (le nom du dossier de l'app dans le dossier contaienr)
+     * @param string $container le nom du dossier contenneur des applications
+     * @param Application $source l'application source dans le cas où cette application est demarrer dans le processuce d'execution
+     * d'un autre application
      */
-    public function __construct(string $name, string $container)
+    public function __construct(string $name, string $container, ?Application $source = null)
     {
+        if ($source == null) {
+            $hadler = new HTTPSessionHandler();
+            session_set_save_handler($hadler, true);
+            session_start();
+        }
+        
         $this->name = $name;
         $this->container = $container;
-        $this->config = AppConfig::getInstance($this->getName());
+        $this->config = AppConfig::getInstance($name);
         $this->httpRequest = new HTTPRequest($this);
         $this->httpResponse = new HTTPResponse($this);
-        
-        $hadler = new HTTPSessionHandler($this);
-        session_set_save_handler($hadler, true);
-        session_start();
-        
+        $this->source = $source;
         //HTTPSessionHandler::getSessions();
     }
     
@@ -74,6 +85,15 @@ class HTTPApplication implements Application
     public function getConfig() : AppConfig
     {
         return $this->config;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \PHPBackend\Application::getSource()
+     */
+    public function getSource(): ?Application
+    {
+        return $this->source;
     }
 
     /**
@@ -316,7 +336,7 @@ class HTTPApplication implements Application
      */
     protected function runFilter (FilterConfig $config) : void {
         $name = $config->getName();
-        $fileName = dirname(__DIR__).str_replace("\\", DIRECTORY_SEPARATOR, $name).'.php';
+        $fileName = dirname(dirname(__DIR__)).str_replace("\\", DIRECTORY_SEPARATOR, $name).'.php';
         
         if (!file_exists($fileName)) {
             throw new PHPBackendException("Le fichier de definition de la classe {$name} du filtre n'existe pas: {$fileName}");

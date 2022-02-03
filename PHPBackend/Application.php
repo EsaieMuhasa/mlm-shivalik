@@ -15,6 +15,13 @@ interface Application
     public function getConfig () : AppConfig;
     
     /**
+     * renvoie la source qui executer l'application encours
+     * si l'actuel application est celui qui a ete executer en premier, alors cette methode renvoie null
+     * @return Application|NULL
+     */
+    public function getSource () : ?Application;
+    
+    /**
      * Revoie le controller concerner, pour la requette encours
      * @return Controller
      */

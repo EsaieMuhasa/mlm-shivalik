@@ -273,30 +273,24 @@ final class HTTPRequest implements Request
     public function forward(string $action, ?string $module=null, ?string $applicationName=null) : void
     {
         if ($applicationName==null) {
-            $controllerClass = '\\Applications\\'.$this->getApplication()->getName().'\\Modules\\'.$module.'\\'.$module.'Controller';
+            $controllerClass = "{$this->getApplication()->getContainer()}\\{$this->getApplication()->getName()}\\Modules\\{$module}\\{$module}Controller";
             /**
              * @var HTTPController $constrollerInstance
              */
-            $controllerInstance = new $controllerClass($this->getApplication(), $action, $module);
+            $controllerInstance = new $controllerClass($this->getApplication(), $module, $action);
             $controllerInstance->execute();
-            $this->getApplication()->getHttpResponse()->setPage($controllerInstance->getPage());
-            $this->getApplication()->getHttpResponse()->send();
-            return;
-        }else {
-            $applicationClass  = '\\Applications\\'.$applicationName.'\\'.$applicationName.'Application';
-            
-            /**
-             * @var HTTPApplication $applicationInstance
-             */
-            $applicationInstance = new $applicationClass();
-            $controllerClass = '\\Applications\\'.$applicationInstance->getName().'\\Modules\\'.$module.'\\'.$module.'Controller';
-            
-            $controllerInstance = new $controllerClass($applicationInstance, $action, $module);
-            $controllerInstance->execute();
-            $applicationInstance->getHttpResponse()->setPage($controllerInstance->getPage());
-            $applicationInstance->getHttpResponse()->send();
+            $this->getApplication()->getResponse()->setPage($controllerInstance->getPage());
+            $this->getApplication()->getResponse()->send();
             return;
         }
+        
+        $applicationInstance = new HTTPApplication($applicationName, $this->getApplication()->getContainer(), $this->getApplication());
+        $controllerClass = "\\{$applicationInstance->getContainer()}\\{$applicationInstance->getName()}\\Modules\\{$module}\\{$module}Controller";
+        
+        $controllerInstance = new $controllerClass($applicationInstance, $module, $action);
+        $controllerInstance->execute();
+        $applicationInstance->getResponse()->setPage($controllerInstance->getPage());
+        $applicationInstance->getResponse()->send();
     }
     
     /**
