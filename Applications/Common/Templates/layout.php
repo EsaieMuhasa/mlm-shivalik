@@ -2,11 +2,14 @@
 use PHPBackend\AppConfig;
 use PHPBackend\Page;
 use PHPBackend\Request;
+use Applications\Common\Modules\Index\IndexController;
 
 /**
  * @var AppConfig $config
  */
-$config = $_REQUEST[Request::ATT_APP_CONFIG];;
+$config = $_REQUEST[Request::ATT_APP_CONFIG];
+
+$activeMenu = isset($_REQUEST[IndexController::ACTIVE_ITEM_MENU])? $_REQUEST[IndexController::ACTIVE_ITEM_MENU] : '';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,7 +19,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];;
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="/css/style.css"/>
-        <link rel="icon" type="image/jpg" href="/logo-32x32.png" />
+        <link rel="icon" type="image/jpg" href="/img/logo-32x32.png" />
         
         <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
         <!--[if lt IE 9]>
@@ -48,17 +51,18 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];;
                     </div>
                         
                     <ul class="default-nav">
-                        <li><a href="/" class="active">Home</a></li>
+                        <li><a href="/" class="<?php echo ($activeMenu == IndexController::ITEM_MENU_HOME? 'active' : ''); ?>">Home</a></li>
                         <li><a href="/products/">Products</a></li>
                         <li><a href="/news/">News</a></li>
-                        <li><a href="/about.html">About</a></li>
-                        <li><a href="/contact.html">Contact</a></li>
+                        <li><a href="/about.html" class="<?php echo ($activeMenu == IndexController::ITEM_MENU_ABOUT? 'active' : ''); ?>">About</a></li>
+                        <li><a href="/contact.html" class="<?php echo ($activeMenu == IndexController::ITEM_MENU_CONTACT? 'active' : ''); ?>">Contact</a></li>
                         <li>
                             <a href="/login.html">Login</a>
                         </li>
                     </ul>
                 </div>
             </nav>
+            
             <!-- Header -->
             <?php echo $_REQUEST[Page::ATT_VIEW]; ?>
             
@@ -69,6 +73,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];;
                     </div>
                 </div>
             </div>
+            
         </div>
         <!-- /.container-fluid --> 
         <script type="text/javascript" src="/js/jquery.js"></script>

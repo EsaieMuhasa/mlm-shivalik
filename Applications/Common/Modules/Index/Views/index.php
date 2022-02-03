@@ -41,10 +41,10 @@ use Applications\Common\Modules\Index\IndexController;
             		<?php echo htmlspecialchars(MemberApplication::getConnectedMember()->getLastName()); ?>
         		</a>
             	<?php } else {?>
-                <a class="btn btn-primary btn-lg custom-btn" href="login.html">Login</a>
+                <a class="btn btn-primary btn-lg custom-btn" href="/login.html">Login</a>
             	<?php }?>
             	
-                <a class="btn btn-default btn-lg custom-btn" href="">Learn more</a>
+                <a class="btn btn-default btn-lg custom-btn" href="/about.html">Learn more</a>
             </div>
         </div>
     </div>

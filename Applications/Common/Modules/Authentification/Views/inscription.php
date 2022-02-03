@@ -94,12 +94,12 @@
             <div class="form-group">
                 <div class="alert alert-info">
                 	<strong>
-                		<a href="">
+                		<a href="/license.html">
                 			<span class="fa fa-book"></span>
                 			License Agreement
             			</a>
             		</strong>
-            		<br/>By clicking on the registration button, you accept the license agreement described on <a href="">this page</a>
+            		<br/>By clicking on the registration button, you accept the license agreement described on <a href="/license.html">this page</a>
                 </div>
             </div>
             
@@ -112,9 +112,9 @@
             <div class="form-group" style="padding-top: 15px;">
                 <div class="alert alert-warning">
                 	<strong>
-                		<a href="" class="text-warning"><span class="fa fa-login"></span> Login</a>
+                		<a href="/login.html" class="text-warning"><span class="fa fa-login"></span> Login</a>
                 	</strong>
-        			<p>Already have an account? click <a href=""><span class="fa fa-right-hand"></span> here</a> to login to your account</p>
+        			<p>Already have an account? click <a href="/login.html"><span class="fa fa-right-hand"></span> here</a> to login to your account</p>
                 </div>
             </div>
         </div>

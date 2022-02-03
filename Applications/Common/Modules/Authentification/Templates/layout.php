@@ -47,19 +47,19 @@ use PHPBackend\Page;
                 <nav class="navbar navbar-default navbar-fixed-bottom">
                     <ul class="nav navbar-nav">
                         <li>
-                            <a href="">
+                            <a href="/license.html">
                                 <span class="fa fa-book"></span>
                                 <span class="hidden-xs"> Politics</span>
                             </a>
                         </li>
                         <li>
-                            <a href="">
+                            <a href="/help/">
                                 <span class="fa fa-help-circled"></span>
                                 <span class="hidden-xs"> Help</span>
                             </a>
                         </li>
                         <li>
-                            <a href="">
+                            <a href="/contact.html">
                                 <span class="fa fa-address-book"></span>
                                 <span class="hidden-xs"> Contact</span>
                             </a>
