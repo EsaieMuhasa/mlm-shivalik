@@ -79,6 +79,15 @@ class AuthentificationController extends HTTPController
     }
     
     /**
+     * demande d'adhesion effectuer par un internaute
+     * @param Request $request
+     * @param Response $response
+     */
+    public function executeInscription (Request $request, Response $response) : void {
+        
+    }
+    
+    /**
      * 
      * @param Request $request
      * @param Response $response

@@ -31,6 +31,7 @@ class MemberFormValidator extends UserFormValidator
     
     /**
      * validation du parent d'un du membre adhereant
+     * si le parent est null, on laisse passer. sinon on verifie si le parent est dans la BDD
      * @param string $parent le matricule du parent
      * @throws IllegalFormValueException
      */

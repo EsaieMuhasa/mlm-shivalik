@@ -47,13 +47,22 @@
             </div>
         </div>
         <div class="login-form-footer">
+        	<p class="text-right">
+        		<a href="">Forgot your password?</a>
+        	</p>
             <button type="submit" class="btn btn-primary">
                 <span class="fa fa-login"></span> Login
             </button>
+            
+            <div class="form-group" style="padding-top: 15px;">
+                <div class="alert alert-info">
+                	<strong>
+                		<a href="/inscription.html"><span class="fa fa-user-plus"></span> Subcribe now</a>
+                	</strong>
+                	<p>You don't have an account? click <a href="/inscription.html"><span class="fa fa-right-hand"></span> here</a> to create an account now</p>
+                </div>
+            </div>
 
-            <a href="" class="btn btn-default">
-                <span class="fa fa-user-plus"></span> Signup
-            </a>
         </div>
     </form>
 </section>

@@ -38,8 +38,8 @@ abstract class NotifiableComponentDAOManager extends DefaultDAOInterface
      * @param NotifiableComponent $notifiable
      */
     public function loadNotifiable (NotifiableComponent $notifiable) : void {
-        if ($this->getDaoManager()->getManagerOf($notifiable->getEntity())->idExist($notifiable->getDataKey())) {
-            $notifiable->setNotifiable($this->getDaoManager()->getManagerOf($notifiable->getEntity())->getForId($notifiable->getDataKey()));
+        if ($this->getDaoManager()->getManagerOf($notifiable->getEntity())->checkById($notifiable->getDataKey())) {
+            $notifiable->setNotifiable($this->getDaoManager()->getManagerOf($notifiable->getEntity())->findById($notifiable->getDataKey()));
         } else {
             throw new DAOException("An error occurred while loading data. Data integrity is not correct.");
         }

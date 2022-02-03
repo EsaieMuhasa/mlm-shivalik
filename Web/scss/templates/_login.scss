@@ -33,6 +33,13 @@
             border-left: none;
         }
     }
+    .registrer-form-body {
+        .form-control {
+            border-radius: 0px;
+            background: $white;
+        }
+        padding-bottom: $goutier-bootstrap * 2;
+    }
     .login-form-footer {
         .btn {
             display: block;

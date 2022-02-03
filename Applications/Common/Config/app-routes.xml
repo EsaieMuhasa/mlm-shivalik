@@ -17,6 +17,7 @@
 	<module name="Authentification">
 	 	<route action="login" urlPattern="/login\.html"/>
 	 	<route action="logout" urlPattern="/logout\.html"/>
+	 	<route action="inscription" urlPattern="/inscription\.html"/>
 	</module>
 	
 </app-routes>
