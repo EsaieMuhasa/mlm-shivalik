@@ -1,9 +1,6 @@
 <?php
 namespace Applications\Common\Modules\Authentification;
 
-use Applications\Admin\AdminApplication;
-use Applications\Member\MemberApplication;
-use Applications\Office\OfficeApplication;
 use PHPBackend\Http\HTTPController;
 use Core\Shivalik\Managers\OfficeDAOManager;
 use PHPBackend\Request;
@@ -11,6 +8,9 @@ use PHPBackend\Response;
 use Core\Shivalik\Validators\MemberFormValidator;
 use Core\Shivalik\Entities\OfficeAdmin;
 use Core\Shivalik\Entities\Member;
+use Core\Shivalik\Filters\SessionAdminFilter;
+use Core\Shivalik\Filters\SessionOfficeFilter;
+use Core\Shivalik\Filters\SessionMemberFilter;
 
 /**
  *
@@ -33,20 +33,7 @@ class AuthentificationController extends HTTPController
      * @param Response $response
      */
     public function executeLogin (Request $request, Response $response) : void {
-        
-        if (AdminApplication::getConnectedUser()!=null) {
-            $response->sendRedirect("/admin/");
-        }
-        
-        if (MemberApplication::getConnectedMember()!=null) {
-            $response->sendRedirect("/member/");
-        }
-        
-        if (OfficeApplication::getConnectedUser()!=null) {
-        	$response->sendRedirect("/office/");
-        }
-        
-        
+        $this->redirect($request, $response);
         if ($request->getMethod() == Request::HTTP_POST) {
             $form = new MemberFormValidator($this->getDaoManager());
             $user = $form->connectionProcess($request);
@@ -54,11 +41,9 @@ class AuthentificationController extends HTTPController
             if (!$form->hasError()) {
                 if ($user  instanceof OfficeAdmin) {
                     if ($user->getOffice()->isCentral()) {
-                        $_SESSION[AdminApplication::CONNECTED_USER] = $user;
-                        $response->sendRedirect("/admin/");
+                        $request->getSession()->addAttribute(SessionAdminFilter::ADMIN_CONNECTED_SESSION, $user);
                     }else {
-                    	$_SESSION[OfficeApplication::ATT_CONNETED_OFFICE_ADMIN] = $user;
-                        $response->sendRedirect("/office/");
+                    	$request->getSession()->addAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION, $user);
                     }
                 }else if ($user  instanceof Member) {
                     if ($this->officeDAOManager->checkByMember($user->getId())) {//our les utilisateur qui ont des bureau
@@ -66,15 +51,36 @@ class AuthentificationController extends HTTPController
                         $user->setOfficeAccount($office);
                     }
                     
-                    $_SESSION[MemberApplication::ATT_CONNECTED_MEMBER] = $user;
-                    $response->sendRedirect("/member/");
+                    $request->getSession()->addAttribute(SessionMemberFilter::MEMBER_CONNECTED_SESSION, $user);
                 }else {
                     $response->sendError();
                 }
+                
+                $this->redirect($request, $response);
             }
+            
             
             $form->includeFeedback($request);
             $request->addAttribute(self::ATT_USER, $user);
+        }
+    }
+    
+    /**
+     * Depamde de redirection de l'utilisateur actuelement connecteer
+     * @param Request $request
+     * @param Response $response
+     */
+    private function redirect (Request $request, Response $response) : void {
+        if ($request->getSession()->hasAttribute(SessionAdminFilter::ADMIN_CONNECTED_SESSION)) {
+            $response->sendRedirect("/admin/");
+        }
+        
+        if ($request->getSession()->hasAttribute(SessionMemberFilter::MEMBER_CONNECTED_SESSION)) {
+            $response->sendRedirect("/member/");
+        }
+        
+        if ($request->getSession()->hasAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)) {
+            $response->sendRedirect("/office/");
         }
     }
     
@@ -84,7 +90,7 @@ class AuthentificationController extends HTTPController
      * @param Response $response
      */
     public function executeInscription (Request $request, Response $response) : void {
-        
+        $this->redirect($request, $response);
     }
     
     /**

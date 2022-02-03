@@ -45,39 +45,45 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
           Author URL: https://bootstrapmade.com
         ======================================================= -->
     </head>
-    <body class="login-img3-body">
+    <body>
     
         <div class="container">
-        
-            <form class="login-form" action="" method="post">
-                <div class="login-wrap">
-                    <p class="login-img"><i class="icon_lock_alt"></i></p>
-                    <?php if (isset($_REQUEST['result'])){?>
-                    	<div class="alert alert-danger">
-                    		<h3 class="text-danger text-center"><?php echo ($_REQUEST['result']);?></h3>
-                    		<?php if (isset($_REQUEST['errors']['message'])){?>
-                    		<p class="text-danger"><?php echo htmlspecialchars($_REQUEST['errors']['message']);?></p>
-                    		<?php }?>
+        	<div class="row">
+        		<div class="col-lg-6 col-md-6 col-sm-8 col-xs-10 col-lg-offset-3 col-md-offset-3 col-sm-offset-2 col-xs-offset-1" style="padding-top: 50px;">
+                    <form class="jumbotron" action="" method="post">
+                        <div class="text-center" style="padding-bottom: 25px;">
+                        	<img alt="" src="/img/logo-50x50.png"/>
+                        </div>
+                        <?php if (isset($_REQUEST['result'])){?>
+                        	<div class="alert alert-danger">
+                        		<strong class="text-danger text-center">
+                        			<?php echo ($_REQUEST['result']);?>
+                        		</strong>
+                        		<?php if (isset($_REQUEST['errors']['message'])){?>
+                        		<br/><span><?php echo htmlspecialchars($_REQUEST['errors']['message']);?></span>
+                        		<?php }?>
+                        	</div>
+                    	<?php }?>
+                    	<div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="icon_profile"></i></span>
+                                <input type="text" name="pseudo" class="form-control input-lg" placeholder="Username" value="<?php echo htmlspecialchars(isset($_REQUEST['user'])? $_REQUEST['user']->getPseudo(): ''); ?>" autofocus>
+                            </div>
                     	</div>
-                	<?php }?>
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="icon_profile"></i></span>
-                        <input type="text" name="pseudo" class="form-control" placeholder="Username" value="<?php echo htmlspecialchars(isset($_REQUEST['user'])? $_REQUEST['user']->getPseudo(): ''); ?>" autofocus>
-                    </div>
-                    <div class="input-group">
-                    	<span class="input-group-addon"><i class="icon_key_alt"></i></span>
-                    	<input type="password" name="password" class="form-control" placeholder="Password">
-                    </div>
-                    <label class="checkbox">
-                        <input type="checkbox" value="remember-me"> Remember me
-                        <span class="pull-right"> <a href="/forgot-password.html"> Forgot Password?</a></span>
-                    </label>
-                    <button class="btn btn-primary btn-lg btn-block" type="submit">Login</button>
-                    <a class="btn btn-info btn-lg btn-block" href="/signup.html">Signup</a>
-                </div>
-            </form>
+                    	
+                    	<div class="form-group">
+                            <div class="input-group">
+                            	<span class="input-group-addon"><i class="icon_key_alt"></i></span>
+                            	<input type="password" name="password" class="form-control input-lg" placeholder="Password">
+                            </div>
+                    	</div>
+                    	
+                        <button class="btn btn-primary btn-lg btn-block" type="submit">Login</button>
+                    </form>
+        		</div>
+        	</div>
             
-            <div class="text-right">
+            <div class="text-center">
         		<div class="credits">
                  	Designed by <a href="mailto:<?php echo $config->get('designerEmail'); ?>"><?php echo $config->get('designerName'); ?></a>
         		</div>

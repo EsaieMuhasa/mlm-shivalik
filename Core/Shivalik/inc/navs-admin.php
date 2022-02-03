@@ -1,8 +1,9 @@
 <?php 
 
-use Applications\Admin\AdminApplication;
 
-$admin = AdminApplication::getConnectedUser();
+use Core\Shivalik\Filters\SessionAdminFilter;
+
+$admin = $_SESSION[SessionAdminFilter::ADMIN_CONNECTED_SESSION];
 ?>
 
 <ul class="sidebar-menu">

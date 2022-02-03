@@ -1,8 +1,12 @@
 <?php
-use Applications\Admin\AdminApplication;
-use Applications\Member\MemberApplication;
-use Applications\Office\OfficeApplication;
 use Applications\Common\Modules\Index\IndexController;
+use Core\Shivalik\Filters\SessionAdminFilter;
+use Core\Shivalik\Filters\SessionOfficeFilter;
+use Core\Shivalik\Filters\SessionMemberFilter;
+
+$admin = isset($_SESSION[SessionAdminFilter::ADMIN_CONNECTED_SESSION])? $_SESSION[SessionAdminFilter::ADMIN_CONNECTED_SESSION] : null;//admin centrale
+$office = isset($_SESSION[SessionOfficeFilter::OFFICE_CONNECTED_SESSION])? $_SESSION[SessionOfficeFilter::OFFICE_CONNECTED_SESSION] : null;//admin d'un office secondaire
+$member = isset($_SESSION[SessionMemberFilter::MEMBER_CONNECTED_SESSION])? $_SESSION[SessionMemberFilter::MEMBER_CONNECTED_SESSION] : null;//membre adherant
 ?>
 <header class="banner">
     <div class="sliders">
@@ -25,20 +29,20 @@ use Applications\Common\Modules\Index\IndexController;
             </p>
 
             <div class="text-center">
-                <?php if (AdminApplication::getConnectedUser() != null) { ?>
-            	<a class="btn btn-primary btn-lg custom-btn" href="/admin/" title="<?php echo htmlspecialchars(AdminApplication::getConnectedUser()->getNames()); ?>">
-            		<img style="width: 20px;border-radius: 50%;" alt="" src="/<?php echo (AdminApplication::getConnectedUser()->getPhoto()); ?>">
-            		<?php echo htmlspecialchars(AdminApplication::getConnectedUser()->getLastName()); ?>
+                <?php if ($admin != null) { ?>
+            	<a class="btn btn-primary btn-lg custom-btn" href="/admin/" title="<?php echo htmlspecialchars($admin->getNames()); ?>">
+            		<img style="width: 20px;border-radius: 50%;" alt="" src="/<?php echo ($admin->getPhoto()); ?>">
+            		<?php echo htmlspecialchars($admin->getLastName()); ?>
         		</a>
-        		<?php } else if (OfficeApplication::getConnectedUser() != null) { ?>
-            	<a class="btn btn-primary btn-lg custom-btn" href="/office/" title="<?php echo htmlspecialchars(OfficeApplication::getConnectedUser()->getNames()); ?>">
-            		<img style="width: 20px;border-radius: 50%;" alt="" src="/<?php echo (OfficeApplication::getConnectedUser()->getPhoto()); ?>">
-            		<?php echo htmlspecialchars(OfficeApplication::getConnectedUser()->getLastName()); ?>
+        		<?php } else if ($office != null) { ?>
+            	<a class="btn btn-primary btn-lg custom-btn" href="/office/" title="<?php echo htmlspecialchars($office->getNames()); ?>">
+            		<img style="width: 20px;border-radius: 50%;" alt="" src="/<?php echo ($office->getPhoto()); ?>">
+            		<?php echo htmlspecialchars($office->getLastName()); ?>
         		</a>
-            	<?php } else if (MemberApplication::getConnectedMember() != null) { ?>
-            	<a class="btn btn-primary btn-lg custom-btn" href="/member/" title="<?php echo htmlspecialchars(MemberApplication::getConnectedMember()->getNames()); ?>">
-            		<img style="width: 20px;border-radius: 50%;" alt="" src="/<?php echo (MemberApplication::getConnectedMember()->getPhoto()); ?>">
-            		<?php echo htmlspecialchars(MemberApplication::getConnectedMember()->getLastName()); ?>
+            	<?php } else if ($member != null) { ?>
+            	<a class="btn btn-primary btn-lg custom-btn" href="/member/" title="<?php echo htmlspecialchars($member->getNames()); ?>">
+            		<img style="width: 20px;border-radius: 50%;" alt="" src="/<?php echo ($member->getPhoto()); ?>">
+            		<?php echo htmlspecialchars($member->getLastName()); ?>
         		</a>
             	<?php } else {?>
                 <a class="btn btn-primary btn-lg custom-btn" href="/login.html">Login</a>

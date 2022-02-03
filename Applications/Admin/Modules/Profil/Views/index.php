@@ -1,8 +1,7 @@
 <?php 
 
-use Applications\Admin\AdminApplication;
 
-$admin = AdminApplication::getConnectedUser();
+$admin = $_REQUEST['user'];
 ?>
 <div class="row">
     <div class="col-lg-12">

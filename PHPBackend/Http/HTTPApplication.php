@@ -346,7 +346,7 @@ class HTTPApplication implements Application
          * @var HTTPFilter $filter
          */
         $filter = new $name($this, $config);
-        $filter->doFilter($this->getHttpRequest(), $this->getHttpResponse());
+        $filter->doFilter($this->getRequest(), $this->getResponse());
     }
  
 

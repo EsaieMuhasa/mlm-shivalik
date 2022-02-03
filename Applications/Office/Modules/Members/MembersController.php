@@ -2,24 +2,24 @@
 
 namespace Applications\Office\Modules\Members;
 
-use Applications\Office\OfficeApplication;
-use PHPBackend\Http\HTTPController;
-use Core\Shivalik\Managers\MemberDAOManager;
-use Core\Shivalik\Managers\GradeDAOManager;
-use Core\Shivalik\Managers\CountryDAOManager;
-use Core\Shivalik\Managers\PointValueDAOManager;
-use Core\Shivalik\Managers\GradeMemberDAOManager;
-use Core\Shivalik\Managers\BonusGenerationDAOManager;
-use Core\Shivalik\Managers\WithdrawalDAOManager;
-use Core\Shivalik\Managers\VirtualMoneyDAOManager;
-use PHPBackend\Application;
-use Core\Shivalik\Entities\Member;
 use Core\Shivalik\Entities\Account;
+use Core\Shivalik\Entities\Member;
+use Core\Shivalik\Filters\SessionOfficeFilter;
+use Core\Shivalik\Managers\BonusGenerationDAOManager;
+use Core\Shivalik\Managers\CountryDAOManager;
+use Core\Shivalik\Managers\GradeDAOManager;
+use Core\Shivalik\Managers\GradeMemberDAOManager;
+use Core\Shivalik\Managers\MemberDAOManager;
+use Core\Shivalik\Managers\PointValueDAOManager;
+use Core\Shivalik\Managers\VirtualMoneyDAOManager;
+use Core\Shivalik\Managers\WithdrawalDAOManager;
 use Core\Shivalik\Validators\GradeMemberFormValidator;
-use PHPBackend\Request;
-use Core\Shivalik\Validators\MemberFormValidator;
 use Core\Shivalik\Validators\LocalisationFormValidator;
+use Core\Shivalik\Validators\MemberFormValidator;
+use PHPBackend\Application;
+use PHPBackend\Request;
 use PHPBackend\ToastMessage;
+use PHPBackend\Http\HTTPController;
 
 /**
  *
@@ -90,9 +90,9 @@ class MembersController extends HTTPController {
 	 * {@inheritDoc}
 	 * @see HTTPController::__construct()
 	 */
-	public function __construct(Application $application, string $action, string $module)
+	public function __construct(Application $application, string $module, string $action)
 	{
-		parent::__construct($application, $action, $module);
+		parent::__construct($application, $module, $action);
 		$nombre = $this->memberDAOManager->countAll();
 		$application->getRequest()->addAttribute(self::PARAM_MEMBER_COUNT, $nombre);
 		$application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, "Union members");
@@ -122,8 +122,8 @@ class MembersController extends HTTPController {
 	public function executeIndex (Request $request, Request $response) : void{
 		$withdrawal = 0;
 
-		if ($this->withdrawalDAOManager->hasRequest(OfficeApplication::getConnectedUser()->getOffice()->getId())) {
-			$all = $this->withdrawalDAOManager->getOfficeRequests(OfficeApplication::getConnectedUser()->getOffice()->getId());
+		if ($this->withdrawalDAOManager->hasRequest($request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice()->getId())) {
+			$all = $this->withdrawalDAOManager->getOfficeRequests($request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice()->getId());
 			foreach ($all as $one) {
 				$withdrawal += $one->getAmount();
 			}
@@ -141,7 +141,7 @@ class MembersController extends HTTPController {
 	 */
 	public function executeMembers (Request $request, Request $response) : void {
 		
-		$office = OfficeApplication::getConnectedUser()->getOffice();
+		$office = $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice();
 		
 		if ($request->getMethod() == Request::HTTP_POST) {
 		    
@@ -192,7 +192,7 @@ class MembersController extends HTTPController {
 	 */
 	public function executeAddMember (Request $request, Request $response) : void {
 		
-		$office = OfficeApplication::getConnectedUser()->getOffice();
+		$office = $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice();
 		
 		if ($this->gradeMemberDAOManager->hasOperation($office->getId())) {
 			$office->setOperations($this->gradeMemberDAOManager->getOperations($office->getId()));
@@ -204,7 +204,7 @@ class MembersController extends HTTPController {
 		
 		if ($request->getMethod() == Request::HTTP_POST) {
 			$form = new GradeMemberFormValidator($this->getDaoManager());
-			$request->addAttribute(GradeMemberFormValidator::FIELD_OFFICE_ADMIN, OfficeApplication::getConnectedUser());
+			$request->addAttribute(GradeMemberFormValidator::FIELD_OFFICE_ADMIN, $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION));
 			$gm = $form->createAfterValidation($request);
 			
 			if (!$form->hasError()) {
@@ -335,7 +335,7 @@ class MembersController extends HTTPController {
 		$member = $this->memberDAOManager->getForId($id);
 		
 		if ($request->existGET('requestId')) {
-			$this->withdrawalDAOManager->validate(intval($request->getDataGET('requestId')), OfficeApplication::getConnectedUser()->getId());
+			$this->withdrawalDAOManager->validate(intval($request->getDataGET('requestId')), $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getId());
 		}
 		
 		
@@ -409,7 +409,7 @@ class MembersController extends HTTPController {
 			$response->sendRedirect("/office/members/{$id}/");
 		}
 		
-		$office = OfficeApplication::getConnectedUser()->getOffice();
+		$office = $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice();
 		
 		if ($this->gradeMemberDAOManager->hasOperation($office->getId())) {
 			$office->setOperations($this->gradeMemberDAOManager->getOperations($office->getId()));
@@ -428,7 +428,7 @@ class MembersController extends HTTPController {
 		
 		if ($request->getMethod() == Request::HTTP_POST) {
 			$form = new GradeMemberFormValidator($this->getDaoManager());
-			$request->addAttribute(GradeMemberFormValidator::FIELD_OFFICE_ADMIN, OfficeApplication::getConnectedUser());
+			$request->addAttribute(GradeMemberFormValidator::FIELD_OFFICE_ADMIN, $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION));
 			$request->addAttribute($form::FIELD_MEMBER, $member->getId());
 			$gradeMember = $form->upgradeAfterValidation($request);
 			

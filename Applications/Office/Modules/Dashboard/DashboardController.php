@@ -2,15 +2,15 @@
 
 namespace Applications\Office\Modules\Dashboard;
 
-use Applications\Office\OfficeApplication;
-use Core\Shivalik\Managers\WithdrawalDAOManager;
-use Core\Shivalik\Managers\RequestVirtualMoneyDAOManager;
-use Core\Shivalik\Managers\MemberDAOManager;
 use Core\Shivalik\Managers\GradeMemberDAOManager;
+use Core\Shivalik\Managers\MemberDAOManager;
+use Core\Shivalik\Managers\RequestVirtualMoneyDAOManager;
 use Core\Shivalik\Managers\VirtualMoneyDAOManager;
-use PHPBackend\Http\HTTPController;
+use Core\Shivalik\Managers\WithdrawalDAOManager;
 use PHPBackend\Application;
 use PHPBackend\Request;
+use PHPBackend\Http\HTTPController;
+use Core\Shivalik\Filters\SessionOfficeFilter;
 
 
 /**
@@ -54,8 +54,8 @@ class DashboardController extends HTTPController {
 	 * {@inheritDoc}
 	 * @see HTTPController::__construct()
 	 */
-	public function __construct(Application $application, $action, $module) {
-		parent::__construct ( $application, $action, $module );
+	public function __construct(Application $application, $module, $action) {
+		parent::__construct ( $application, $module , $action);
 		$application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, "Dashboard");
 	}
 
@@ -66,7 +66,7 @@ class DashboardController extends HTTPController {
      */
     public function executeIndex (Request $request, Request $response) : void{
         //$response->sendRedirect("/admin/members/");
-        $office = OfficeApplication::getConnectedUser()->getOffice();
+        $office = $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice();
         
         if ($this->withdrawalDAOManager->hasRequest($office->getId(), null)) {
             $withdrawals = $this->withdrawalDAOManager->getOfficeRequests($office->getId(), null);
@@ -106,7 +106,7 @@ class DashboardController extends HTTPController {
     public function executeVirtualMoney (Request $request, Request $response) : void {
     	$request->addAttribute(self::ATT_VIEW_TITLE, "Dashboard virtual money");
     	
-    	$office = OfficeApplication::getConnectedUser()->getOffice();
+    	$office = $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice();
     	
     	if ($this->withdrawalDAOManager->hasRequest($office->getId(), null)) {
     		$withdrawals = $this->withdrawalDAOManager->getOfficeRequests($office->getId(), null);

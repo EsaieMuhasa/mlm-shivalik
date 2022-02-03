@@ -1,7 +1,7 @@
 <?php 
-use Applications\Member\MemberApplication;
+use Core\Shivalik\Filters\SessionMemberFilter;
 
-$member = MemberApplication::getConnectedMember();
+$member = $_SESSION[SessionMemberFilter::MEMBER_CONNECTED_SESSION];
 
 ?>
 <ul class="sidebar-menu">

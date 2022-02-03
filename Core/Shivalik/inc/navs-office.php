@@ -1,7 +1,8 @@
 <?php 
-use Applications\Office\OfficeApplication;
 
-$admin = OfficeApplication::getConnectedUser();
+use Core\Shivalik\Filters\SessionOfficeFilter;
+
+$admin = $_SESSION[SessionOfficeFilter::OFFICE_CONNECTED_SESSION];
 ?>
 
 <ul class="sidebar-menu">

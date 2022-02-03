@@ -1,22 +1,22 @@
 <?php
 namespace Applications\Member\Modules\Account;
 
-use Applications\Member\MemberApplication;
-use PHPBackend\Http\HTTPController;
-use Core\Shivalik\Managers\MemberDAOManager;
-use Core\Shivalik\Managers\GradeMemberDAOManager;
+use Core\Shivalik\Entities\Account;
+use Core\Shivalik\Entities\Member;
+use Core\Shivalik\Filters\SessionMemberFilter;
 use Core\Shivalik\Managers\BonusGenerationDAOManager;
+use Core\Shivalik\Managers\GradeMemberDAOManager;
+use Core\Shivalik\Managers\MemberDAOManager;
 use Core\Shivalik\Managers\OfficeBonusDAOManager;
+use Core\Shivalik\Managers\OfficeDAOManager;
 use Core\Shivalik\Managers\PointValueDAOManager;
 use Core\Shivalik\Managers\WithdrawalDAOManager;
-use Core\Shivalik\Managers\OfficeDAOManager;
+use Core\Shivalik\Validators\WithdrawalFormValidator;
 use PHPBackend\Application;
-use Core\Shivalik\Entities\Account;
 use PHPBackend\Request;
 use PHPBackend\Response;
 use PHPBackend\Calendar\Month;
-use Core\Shivalik\Entities\Member;
-use Core\Shivalik\Validators\WithdrawalFormValidator;
+use PHPBackend\Http\HTTPController;
 use PHPBackend\Image2D\Mlm\TreeFormatter;
 use PHPBackend\Image2D\Mlm\Ternary\TernaryTreeBuilder;
 use PHPBackend\Image2D\Mlm\Ternary\TernaryTreeRender;
@@ -88,9 +88,9 @@ class AccountController extends HTTPController
      * {@inheritDoc}
      * @see HTTPController::__construct()
      */
-    public function __construct(Application $application, string $action, string $module)
+    public function __construct(Application $application, string $module, string $action)
     {
-        parent::__construct($application, $action, $module);
+        parent::__construct($application, $module, $action);
         $application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, "Account");
     }
     
@@ -98,7 +98,7 @@ class AccountController extends HTTPController
      * @return Account
      */
     private function getAccount () : Account {
-        $member = MemberApplication::getConnectedMember();
+        $member = $this->getApplication()->getRequest()->getSession()->getAttribute(SessionMemberFilter::MEMBER_CONNECTED_SESSION);
         return $this->memberDAOManager->loadAccount($member);
     }
 
@@ -113,7 +113,7 @@ class AccountController extends HTTPController
         /**
          * @var Member $member
          */
-        $member = MemberApplication::getConnectedMember();
+        $member = $request->getSession()->getAttribute(SessionMemberFilter::MEMBER_CONNECTED_SESSION);
         $gradeMember = $this->gradeMemberDAOManager->findCurrentByMember($member->getId());
         $gradeMember->setMember($member);
         
@@ -134,7 +134,7 @@ class AccountController extends HTTPController
      */
     public function executeDownlines (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Downlines");
-        $member = MemberApplication::getConnectedMember();
+        $member = $request->getSession()->getAttribute(SessionMemberFilter::MEMBER_CONNECTED_SESSION);
         
         
         if ($request->existGET('foot')) {
@@ -182,7 +182,7 @@ class AccountController extends HTTPController
      */
     public function executeWithdrawals (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Withdrawal Money");
-        $member = MemberApplication::getConnectedMember();
+        $member = $request->getSession()->getAttribute(SessionMemberFilter::MEMBER_CONNECTED_SESSION);
         
         $compte = $this->getAccount();
         
@@ -227,7 +227,7 @@ class AccountController extends HTTPController
         }
         
         $request->addAttribute(self::ATT_OFFICES, $this->officeDAOManager->findAll());
-        $request->addAttribute(self::ATT_MEMBER, MemberApplication::getConnectedMember());
+        $request->addAttribute(self::ATT_MEMBER, $account->getMember());
     }
     
     /**
@@ -236,7 +236,7 @@ class AccountController extends HTTPController
      */
     public function executeUpdateWithdrawal (Request $request, Response $response) : void {
         $id = intval($request->getDataGET('id'), 10);
-        $member = MemberApplication::getConnectedMember();
+        $member = $request->getSession()->getAttribute(SessionMemberFilter::MEMBER_CONNECTED_SESSION);
         
         if (!$this->withdrawalDAOManager->checkById($id)) {
             $response->sendError("no data match at request URL");
@@ -285,7 +285,7 @@ class AccountController extends HTTPController
      */
     public function executeTree (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Tree");
-        $member = MemberApplication::getConnectedMember();
+        $member = $request->getSession()->getAttribute(SessionMemberFilter::MEMBER_CONNECTED_SESSION);
         
         
         if ($request->existGET('foot')) {
@@ -369,7 +369,7 @@ class AccountController extends HTTPController
         }
         
         
-        $member = MemberApplication::getConnectedMember();
+        $member = $request->getSession()->getAttribute(SessionMemberFilter::MEMBER_CONNECTED_SESSION);
         
         if ($this->withdrawalDAOManager->checkHistoryByMember($member->getId(), $dateMin, $dateMax)) {
             $withdrawals = $this->withdrawalDAOManager->findHistoryByMember($member->getId(), $dateMin, $dateMax);

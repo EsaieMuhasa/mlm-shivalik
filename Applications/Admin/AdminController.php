@@ -9,6 +9,8 @@ use Core\Shivalik\Managers\PointValueDAOManager;
 use Core\Shivalik\Managers\WithdrawalDAOManager;
 use PHPBackend\Application;
 use PHPBackend\Http\HTTPController;
+use Core\Shivalik\Entities\OfficeAdmin;
+use Core\Shivalik\Filters\SessionAdminFilter;
 
 /**
  *
@@ -43,9 +45,17 @@ abstract class AdminController extends HTTPController {
 	 * {@inheritdoc}
 	 * @see \PHPBackend\Http\HTTPController::__construct()
 	 */
-	public function __construct(Application $application, string $action, string $module) {
-		parent::__construct($application, $action, $module);
-		$application->getHttpRequest()->addAttribute(self::ATT_VIEW_TITLE, "Shivalik");
+	public function __construct(Application $application, string $module, string $action) {
+		parent::__construct($application, $module, $action);
+		$application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, "Shivalik");
+	}
+	
+	/**
+	 * revoie l'administrateur actuelement connectee
+	 * @return OfficeAdmin
+	 */
+	protected function getConnectedAdmin () : OfficeAdmin {
+	    return $this->getApplication()->getRequest()->getSession()->getAttribute(SessionAdminFilter::ADMIN_CONNECTED_SESSION);
 	}
 
 }

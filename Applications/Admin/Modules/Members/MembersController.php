@@ -11,7 +11,6 @@ use PHPBackend\Response;
 use Core\Shivalik\Entities\GradeMember;
 use Core\Shivalik\Validators\GradeMemberFormValidator;
 use Core\Shivalik\Entities\Member;
-use Applications\Admin\AdminApplication;
 use PHPBackend\Image2D\Mlm\Ternary\TernaryTreeBuilder;
 use PHPBackend\Image2D\Mlm\Ternary\TernaryTreeRender;
 use PHPBackend\Image2D\Mlm\TreeFormatter;
@@ -75,9 +74,9 @@ class MembersController extends AdminController
      * {@inheritDoc}
      * @see \Applications\Admin\AdminController::__construct()
      */
-    public function __construct(Application $application, string $action, string $module)
+    public function __construct(Application $application, string $module, string $action)
     {
-        parent::__construct($application, $action, $module);
+        parent::__construct($application, $module, $action);
         $nombre = $this->memberDAOManager->countAll();
         $application->getRequest()->addAttribute(self::PARAM_MEMBER_COUNT, $nombre);
         $application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, "Union members");
@@ -141,7 +140,7 @@ class MembersController extends AdminController
         
         if ($request->getMethod() == Request::HTTP_POST) {
             $form = new GradeMemberFormValidator($this->getDaoManager());
-            $request->addAttribute(GradeMemberFormValidator::FIELD_OFFICE_ADMIN, AdminApplication::getConnectedUser());
+            $request->addAttribute(GradeMemberFormValidator::FIELD_OFFICE_ADMIN, $this->getConnectedAdmin());
             $gm = $form->createAfterValidation($request);
             
             if (!$form->hasError()) {
@@ -463,7 +462,7 @@ class MembersController extends AdminController
         $member = $this->memberDAOManager->findById($id);
         
         if ($request->existInGET('requestId')) {
-            $this->withdrawalDAOManager->validate(intval($request->getDataGET('requestId')), AdminApplication::getConnectedUser()->getId());
+            $this->withdrawalDAOManager->validate(intval($request->getDataGET('requestId')), $this->getConnectedAdmin()->getId());
         }
         
         
@@ -546,7 +545,7 @@ class MembersController extends AdminController
         
         if ($request->getMethod() == Request::HTTP_POST) {
             $form = new GradeMemberFormValidator($this->getDaoManager());
-            $request->addAttribute(GradeMemberFormValidator::FIELD_OFFICE_ADMIN, AdminApplication::getConnectedUser());
+            $request->addAttribute(GradeMemberFormValidator::FIELD_OFFICE_ADMIN, $this->getConnectedAdmin());
             $request->addAttribute($form::FIELD_MEMBER, $member->getId());
             $gradeMember = $form->upgradeAfterValidation($request);
             

@@ -64,7 +64,7 @@ abstract class HTTPController implements Controller
         $this->daoManager = DAOManagerFactory::getInstance();
         $this->setView($action);
         $this->hydrateInterfaces($this->getDaoManager());
-        $application->getHttpRequest()->addAttribute(self::ATT_VIEW_TITLE, "");
+        $application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, "");
     }
     
     

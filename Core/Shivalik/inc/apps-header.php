@@ -1,20 +1,16 @@
 <?php 
 
-use Applications\Admin\AdminApplication;
-use Applications\Member\MemberApplication;
-use Applications\Office\OfficeApplication;
+
 use Core\Shivalik\Entities\Member;
 use Core\Shivalik\Entities\OfficeAdmin;
+use Core\Shivalik\Filters\SessionAdminFilter;
+use Core\Shivalik\Filters\SessionMemberFilter;
+use Core\Shivalik\Filters\SessionOfficeFilter;
 
-if (AdminApplication::getConnectedUser() != null) {
-    $user = AdminApplication::getConnectedUser();
-} elseif (MemberApplication::getConnectedMember() != null){
-    $user = MemberApplication::getConnectedMember();
-}elseif (OfficeApplication::getConnectedUser() != null){
-	$user = OfficeApplication::getConnectedUser();
-} else {
-    $user = null;
-}
+
+$user = isset($_SESSION[SessionAdminFilter::ADMIN_CONNECTED_SESSION])? ($_SESSION[SessionAdminFilter::ADMIN_CONNECTED_SESSION]) : 
+    (isset($_SESSION[SessionOfficeFilter::OFFICE_CONNECTED_SESSION])? ($_SESSION[SessionOfficeFilter::OFFICE_CONNECTED_SESSION]) : 
+    (isset($_SESSION[SessionMemberFilter::MEMBER_CONNECTED_SESSION])? $_SESSION[SessionMemberFilter::MEMBER_CONNECTED_SESSION] : null));
 ?>
 
 <header class="header dark-bg">

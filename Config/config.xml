@@ -7,7 +7,23 @@
 		<application name="Member" urlPattern="/member/(.*)"/>
 		<application name="Office" urlPattern="/office/(.*)"/>
 		<application name="Admin" urlPattern="/admin/(.*)"/>
+		<application name="Root" urlPattern="/root/(.*)"/>
 	</applications>
+	
+	<filters>
+		<filter name="\Core\Shivalik\Filters\SessionAdminFilter">
+			<filter-route urlPattern="/admin/(.*)"/>
+		</filter>
+		<filter name="\Core\Shivalik\Filters\SessionMemberFilter">
+			<filter-route urlPattern="/member/(.*)"/>
+		</filter>
+		<filter name="\Core\Shivalik\Filters\SessionOfficeFilter">
+			<filter-route urlPattern="/office/(.*)"/>
+		</filter>
+		<filter name="\Core\Shivalik\Filters\SessionRootFilter">
+			<filter-route urlPattern="/root/(.*)"/>
+		</filter>
+	</filters>
 	
 	<definitions>
 		<define name="webData" value="Web/data"/>

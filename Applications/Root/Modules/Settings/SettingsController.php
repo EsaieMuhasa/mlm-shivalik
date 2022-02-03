@@ -1,7 +1,7 @@
 <?php
 namespace Applications\Root\Modules\Settings;
 
-use Applications\Root\RootApplication;
+use Core\Shivalik\Filters\SessionRootFilter;
 use Core\Shivalik\Managers\CountryDAOManager;
 use Core\Shivalik\Managers\GenerationDAOManager;
 use Core\Shivalik\Managers\GradeDAOManager;
@@ -83,8 +83,8 @@ class SettingsController extends HTTPController
 	 * {@inheritDoc}
 	 * @see \PHPBackend\Http\HTTPController::__construct()
 	 */
-	public function __construct(Application $application, $action, $module) {
-		parent::__construct($application, $action, $module);
+	public function __construct(Application $application, $module, $action) {
+		parent::__construct($application, $module, $action);
 		$application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, "Settings");
 	}
 
@@ -110,7 +110,7 @@ class SettingsController extends HTTPController
             }
             
             if (empty($errors)) {
-                $_SESSION[RootApplication::ATT_CONNECTED_ROOT] = $root;
+                $request->getSession()->addAttribute(SessionRootFilter::ROOT_CONNECTED_SESSION, $root);
                 $response->sendRedirect($request->getURI());
             }else {
                 $request->addAttribute('user', $root);

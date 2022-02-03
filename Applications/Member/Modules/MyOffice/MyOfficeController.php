@@ -1,22 +1,22 @@
 <?php
 namespace Applications\Member\Modules\MyOffice;
 
-use Applications\Member\MemberApplication;
-use PHPBackend\Http\HTTPController;
-use Core\Shivalik\Managers\GradeMemberDAOManager;
-use Core\Shivalik\Managers\VirtualMoneyDAOManager;
-use Core\Shivalik\Managers\MemberDAOManager;
-use Core\Shivalik\Managers\WithdrawalDAOManager;
-use Core\Shivalik\Managers\RequestVirtualMoneyDAOManager;
-use Core\Shivalik\Entities\Office;
-use Core\Shivalik\Managers\RaportWithdrawalDAOManager;
-use PHPBackend\Application;
-use PHPBackend\Response;
-use PHPBackend\Request;
-use PHPBackend\Calendar\Month;
-use Core\Shivalik\Validators\RequestVirtualMoneyFormValidator;
-use Core\Shivalik\Entities\RaportWithdrawal;
 use Core\Shivalik\Entities\Member;
+use Core\Shivalik\Entities\Office;
+use Core\Shivalik\Entities\RaportWithdrawal;
+use Core\Shivalik\Filters\SessionMemberFilter;
+use Core\Shivalik\Managers\GradeMemberDAOManager;
+use Core\Shivalik\Managers\MemberDAOManager;
+use Core\Shivalik\Managers\RaportWithdrawalDAOManager;
+use Core\Shivalik\Managers\RequestVirtualMoneyDAOManager;
+use Core\Shivalik\Managers\VirtualMoneyDAOManager;
+use Core\Shivalik\Managers\WithdrawalDAOManager;
+use Core\Shivalik\Validators\RequestVirtualMoneyFormValidator;
+use PHPBackend\Application;
+use PHPBackend\Request;
+use PHPBackend\Response;
+use PHPBackend\Calendar\Month;
+use PHPBackend\Http\HTTPController;
 
 class MyOfficeController extends HTTPController
 {
@@ -87,13 +87,14 @@ class MyOfficeController extends HTTPController
      * {@inheritDoc}
      * @see HTTPController::__construct()
      */
-    public function __construct(Application $application, string $action, $module)
+    public function __construct(Application $application, $module, string $action)
     {
-        parent::__construct($application, $action, $module);
-        if (MemberApplication::getConnectedMember()->getOfficeAccount() == null) {
-            $application->getHttpResponse()->sendError();
+        parent::__construct($application, $module, $action);
+        $member = $application->getRequest()->getSession()->getAttribute(SessionMemberFilter::MEMBER_CONNECTED_SESSION);
+        if ($member->getOfficeAccount() == null) {
+            $application->getResponse()->sendError();
         }
-        $this->office = MemberApplication::getConnectedMember()->getOfficeAccount();
+        $this->office = $member->getOfficeAccount();
     }
     
     /**

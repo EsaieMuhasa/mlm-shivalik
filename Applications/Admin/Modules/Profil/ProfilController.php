@@ -1,13 +1,13 @@
 <?php
 namespace Applications\Admin\Modules\Profil;
 
-use Applications\Admin\AdminApplication;
 use Core\Shivalik\Managers\CountryDAOManager;
 use PHPBackend\Http\HTTPController;
 use PHPBackend\Request;
 use PHPBackend\Response;
 use Core\Shivalik\Validators\OfficeAdminFormValidator;
 use Core\Shivalik\Validators\LocalisationFormValidator;
+use Core\Shivalik\Filters\SessionAdminFilter;
 
 /**
  *
@@ -31,7 +31,7 @@ class ProfilController extends HTTPController
      * @param Response $response
      */
     public function executeIndex (Request $request, Response $response) : void {
-        
+        $request->addAttribute("user", $request->getSession()->getAttribute(SessionAdminFilter::ADMIN_CONNECTED_SESSION));
     }
     
     
@@ -44,7 +44,7 @@ class ProfilController extends HTTPController
         
         if ($request->getMethod() == Request::HTTP_POST) {
             $form = new OfficeAdminFormValidator($this->getDaoManager());
-            $request->addAttribute($form::CHAMP_ID, AdminApplication::getConnectedUser()->getId());
+            $request->addAttribute($form::CHAMP_ID, $this->getConnectedAdmin()->getId());
             $form->updatePasswordAfterValidation($request);
             
             if (!$form->hasError()) {
@@ -62,11 +62,11 @@ class ProfilController extends HTTPController
     public function executePhoto (Request $request, Response $response) : void{
         if ($request->getMethod() == Request::HTTP_POST) {
             $form = new OfficeAdminFormValidator($this->getDaoManager());
-            $request->addAttribute($form::CHAMP_ID, AdminApplication::getConnectedUser()->getId());
+            $request->addAttribute($form::CHAMP_ID, $this->getConnectedAdmin()->getId());
             $user = $form->updatePhotoAfterValidation($request);
             
             if (!$form->hasError()) {
-            	AdminApplication::getConnectedUser()->setPhoto($user->getPhoto());
+            	$this->getConnectedAdmin()->setPhoto($user->getPhoto());
                 $response->sendRedirect("/admin/profil/");
             }
             
@@ -84,17 +84,17 @@ class ProfilController extends HTTPController
         
         if ($request->getMethod() == Request::HTTP_POST) {
             $form = new LocalisationFormValidator($this->getDaoManager());
-            $request->addAttribute($form::CHAMP_ID, AdminApplication::getConnectedUser()->getLocalisation()->getId());
+            $request->addAttribute($form::CHAMP_ID, $this->getConnectedAdmin()->getLocalisation()->getId());
             $localisation = $form->updateAfterValidation($request);
             
             if (!$form->hasError()) {
-                AdminApplication::getConnectedUser()->setLocalisation($localisation);
+                $this->getConnectedAdmin()->setLocalisation($localisation);
                 $response->sendRedirect("/admin/profil/");
             }
             
             $form->includeFeedback($request);
         } else {
-            $localisation = AdminApplication::getConnectedUser()->getLocalisation();
+            $localisation = $this->getConnectedAdmin()->getLocalisation();
         }
         
         $request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->findAll());

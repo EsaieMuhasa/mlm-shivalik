@@ -1,13 +1,13 @@
 <?php
 namespace Applications\Office\Modules\Profil;
 
-use Applications\Office\OfficeApplication;
-use PHPBackend\Http\HTTPController;
+use Core\Shivalik\Filters\SessionOfficeFilter;
 use Core\Shivalik\Managers\CountryDAOManager;
-use PHPBackend\Request;
-use PHPBackend\Response;
 use Core\Shivalik\Validators\LocalisationFormValidator;
 use Core\Shivalik\Validators\OfficeAdminFormValidator;
+use PHPBackend\Request;
+use PHPBackend\Response;
+use PHPBackend\Http\HTTPController;
 
 /**
  *
@@ -44,7 +44,7 @@ class ProfilController extends HTTPController
         
         if ($request->getMethod() == Request::HTTP_POST) {
             $form = new OfficeAdminFormValidator($this->getDaoManager());
-            $request->addAttribute($form::CHAMP_ID, OfficeApplication::getConnectedUser()->getId());
+            $request->addAttribute($form::CHAMP_ID, $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getId());
             $form->updatePasswordAfterValidation($request);
             
             if (!$form->hasError()) {
@@ -62,11 +62,11 @@ class ProfilController extends HTTPController
     public function executePhoto (Request $request, Response $response) : void{
         if ($request->getMethod() == Request::HTTP_POST) {
             $form = new OfficeAdminFormValidator($this->getDaoManager());
-            $request->addAttribute($form::CHAMP_ID, OfficeApplication::getConnectedUser()->getId());
+            $request->addAttribute($form::CHAMP_ID, $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getId());
             $user = $form->updatePhotoAfterValidation($request);
             
             if (!$form->hasError()) {
-            	OfficeApplication::getConnectedUser()->setPhoto($user->getPhoto());
+            	$request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->setPhoto($user->getPhoto());
                 $response->sendRedirect("/office/profil/");
             }
             
@@ -83,17 +83,17 @@ class ProfilController extends HTTPController
         
         if ($request->getMethod() == Request::HTTP_POST) {
             $form = new LocalisationFormValidator($this->getDaoManager());
-            $request->addAttribute($form::CHAMP_ID, OfficeApplication::getConnectedUser()->getLocalisation()->getId());
+            $request->addAttribute($form::CHAMP_ID, $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getLocalisation()->getId());
             $localisation = $form->updateAfterValidation($request);
             
             if (!$form->hasError()) {
-                OfficeApplication::getConnectedUser()->setLocalisation($localisation);
+                $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->setLocalisation($localisation);
                 $response->sendRedirect("/office/profil/");
             }
             
             $form->includeFeedback($request);
         } else {
-            $localisation = OfficeApplication::getConnectedUser()->getLocalisation();
+            $localisation = $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getLocalisation();
         }
         
         $request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->getAll());

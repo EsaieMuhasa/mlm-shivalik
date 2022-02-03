@@ -39,9 +39,9 @@ class ProductsController extends AdminController
      * {@inheritDoc}
      * @see \Applications\Admin\AdminController::__construct()
      */
-    public function __construct(Application $application, string $action, string $module)
+    public function __construct(Application $application, string $module, string $action)
     {
-        parent::__construct($application, $action, $module);
+        parent::__construct($application, $module, $action);
         $application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, "Products");
         
     }

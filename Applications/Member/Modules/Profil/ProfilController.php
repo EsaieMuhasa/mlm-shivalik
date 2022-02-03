@@ -1,13 +1,13 @@
 <?php
 namespace Applications\Member\Modules\Profil;
 
-use Applications\Member\MemberApplication;
-use PHPBackend\Http\HTTPController;
 use Core\Shivalik\Managers\CountryDAOManager;
-use PHPBackend\Request;
-use PHPBackend\Response;
 use Core\Shivalik\Validators\LocalisationFormValidator;
 use Core\Shivalik\Validators\MemberFormValidator;
+use PHPBackend\Request;
+use PHPBackend\Response;
+use PHPBackend\Http\HTTPController;
+use Core\Shivalik\Filters\SessionMemberFilter;
 
 /**
  *
@@ -76,20 +76,21 @@ class ProfilController extends HTTPController
      * @param Response $response
      */
     public function executeAddress (Request $request, Response $response) : void{
+        $member = $request->getSession()->getAttribute(SessionMemberFilter::MEMBER_CONNECTED_SESSION);
         
         if ($request->getMethod() == Request::HTTP_POST) {
             $form = new LocalisationFormValidator($this->getDaoManager());
-            $request->addAttribute($form::CHAMP_ID, MemberApplication::getConnectedMember()->getLocalisation()->getId());
+            $request->addAttribute($form::CHAMP_ID, $member->getLocalisation()->getId());
             $localisation = $form->updateAfterValidation($request);
             
             if (!$form->hasError()) {
-                MemberApplication::getConnectedMember()->setLocalisation($localisation);
+                $member->setLocalisation($localisation);
                 $response->sendRedirect("/member/profil/");
             }
             
             $form->includeFeedback($request);
         } else {
-            $localisation = MemberApplication::getConnectedMember()->getLocalisation();
+            $localisation = $member->getLocalisation();
         }
         
         $request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->getAll());

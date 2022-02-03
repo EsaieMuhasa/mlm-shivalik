@@ -106,17 +106,17 @@ class AppConfig
     {
         if (empty($this->users)) {
             $xml = new \DOMDocument();
-            $xmlFile = dirname(__DIR__).'/Applications/'.$this->getApplication()->getName().'/Config/app-config.xml';
+            $xmlFile = dirname(__DIR__).'/Applications/'.$this->appName.'/Config/app-config.xml';
             
             if (!file_exists($xmlFile)) {
-                throw new PHPBackendException('Le fichier de configuration de l\'application "'.$this->getApplication()->getName().'" n\'existe pas sur le serveur. =>'.$xmlFile);
+                throw new PHPBackendException('Le fichier de configuration de l\'application "'.$this->appName.'" n\'existe pas sur le serveur. =>'.$xmlFile);
             }
             /**
              * @var \DOMDocument $readFile
              */
             $readFile = $xml->load($xmlFile);
             if ($readFile===false) {
-                throw new PHPBackendException('Impossible de parser le fichier de configuration de l\'application "'.$this->getApplication()->getName().'" => ('.$xmlFile.')');
+                throw new PHPBackendException('Impossible de parser le fichier de configuration de l\'application "'.$this->appName.'" => ('.$xmlFile.')');
             }
             
             /**
@@ -125,7 +125,7 @@ class AppConfig
             $users = $xml->getElementsByTagName('user');
             
             foreach ($users as $user) {
-                $u = new User($this->getApplication());
+                $u = new User();
                 $u->setPseudo($user->getAttribute('pseudo'));
                 $u->setPassword($user->getAttribute('password'));
                 $this->users[] = $u;

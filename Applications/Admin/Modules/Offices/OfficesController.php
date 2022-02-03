@@ -120,8 +120,8 @@ class OfficesController extends AdminController {
 	 * {@inheritDoc}
 	 * @see \Applications\Admin\AdminController::__construct()
 	 */
-	public function __construct(Application $application, string $action, string $module) {
-		parent::__construct($application, $action, $module);
+	public function __construct(Application $application, string $module, string $action) {
+		parent::__construct($application, $module, $action);
 		$application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, "Offices");
 		$this->init($application->getRequest(), $application->getResponse());
 	}

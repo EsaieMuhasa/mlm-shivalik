@@ -2,26 +2,25 @@
 
 namespace Applications\Admin\Modules\Dashboard;
 
-use Applications\Admin\AdminApplication;
 use Applications\Admin\AdminController;
 use Core\Charts\PacketChartBuilder;
+use Core\Shivalik\Entities\Member;
+use Core\Shivalik\Entities\OfficeBonus;
+use Core\Shivalik\Entities\VirtualMoney;
+use Core\Shivalik\Entities\Withdrawal;
+use Core\Shivalik\Managers\GenerationDAOManager;
+use Core\Shivalik\Managers\GradeDAOManager;
 use Core\Shivalik\Managers\GradeMemberDAOManager;
-use Core\Shivalik\Managers\VirtualMoneyDAOManager;
 use Core\Shivalik\Managers\OfficeBonusDAOManager;
 use Core\Shivalik\Managers\OfficeDAOManager;
 use Core\Shivalik\Managers\OfficeSizeDAOManager;
 use Core\Shivalik\Managers\RaportWithdrawalDAOManager;
-use Core\Shivalik\Entities\Withdrawal;
-use Core\Shivalik\Entities\VirtualMoney;
-use Core\Shivalik\Entities\OfficeBonus;
-use Core\Shivalik\Entities\Member;
+use Core\Shivalik\Managers\SizeDAOManager;
+use Core\Shivalik\Managers\VirtualMoneyDAOManager;
 use PHPBackend\Application;
 use PHPBackend\Request;
 use PHPBackend\Response;
 use PHPBackend\Graphics\ChartJS\ChartConfig;
-use Core\Shivalik\Managers\GradeDAOManager;
-use Core\Shivalik\Managers\GenerationDAOManager;
-use Core\Shivalik\Managers\SizeDAOManager;
 
 /**
  *
@@ -89,19 +88,24 @@ class DashboardController extends AdminController {
 	 */
 	private $raportWithdrawalDAOManager;
 	
-	
-	public function __construct(Application $application, string $action, string $module) {
-		parent::__construct ( $application, $action, $module );
-		$application->getHttpRequest()->addAttribute(self::ATT_VIEW_TITLE, "Dashboard");
+	/**
+	 * 
+	 * @param Application $application
+	 * @param string $module
+	 * @param string $action
+	 */
+	public function __construct(Application $application, string $module, string $action) {
+		parent::__construct ( $application, $module , $action);
+		$application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, "Dashboard");
+		
 	}
 
 	
    /***
     * visualisation de l'etat actuel du systeme
     * @param Request $request
-    * @param Response $response
     */
-    public function executeIndex (Request $request, Response $response) : void{
+    public function executeIndex (Request $request) : void{
         
         //virtualMoney
         /**
@@ -150,13 +154,13 @@ class DashboardController extends AdminController {
          */
         $allWithdrawals = $this->withdrawalDAOManager->findAll();
         foreach ($allWithdrawals as $withd) {
-            if ($withd->getAdmin() != null && $withd->getRaport()==null && $withd->getOffice()->getId() != AdminApplication::getConnectedUser()->getOffice()->getId()) {
+            if ($withd->getAdmin() != null && $withd->getRaport()==null && $withd->getOffice()->getId() != $this->getConnectedAdmin()->getOffice()->getId()) {
                 $served += $withd->getAmount();
             }
         }
         
-        if ($this->withdrawalDAOManager->checkByOffice(AdminApplication::getConnectedUser()->getOffice()->getId())) {
-            $all = $this->withdrawalDAOManager->findByOffice(AdminApplication::getConnectedUser()->getOffice()->getId());
+        if ($this->withdrawalDAOManager->checkByOffice($this->getConnectedAdmin()->getOffice()->getId())) {
+            $all = $this->withdrawalDAOManager->findByOffice($this->getConnectedAdmin()->getOffice()->getId());
         }else {
             $all = array();
         }
