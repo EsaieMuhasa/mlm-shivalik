@@ -30,11 +30,16 @@ class HTTPSession implements Session
     
     /**
      * constructeur d'initialisation
-     * @param HTTPApplication $application
+     * @param string $data
+     * @param string $id
+     * <p>
+     * Le parametres du contructeurs sont optionnels. mais dans le cas où l'un etre eux est spécifier,
+     * alors tout les deux doivents l'être, si non le décodage des données en parametre n'aura pas lieux
+     * </p> 
      */
     public function __construct( ?string $data =  null, ?string $id=null) {
         
-        if ($data != null) {
+        if ($data != null && $id != null) {
             $current = $_SESSION;
             
             session_decode($data);
@@ -139,5 +144,31 @@ class HTTPSession implements Session
         return array_key_exists($name, $this->getAttributes());
     }
     
+    /**
+     * {@inheritDoc}
+     * @see \PHPBackend\Session::destroy()
+     */
+    public function destroy(): void
+    {
+        if ($this->auto) {
+            session_destroy();
+        } else {
+            $this->attributes = [];
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \PHPBackend\Session::getAttribute()
+     */
+    public function getAttribute(string $name)
+    {
+        if ($this->hasAttribute($name)) {
+            return $this->getAttributes()[$name];
+        }
+        
+        return null;
+    }
+  
 }
 

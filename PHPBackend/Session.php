@@ -39,6 +39,14 @@ interface Session
     public function getAttributes() : array;
     
     /**
+     * Renvoie l'attribut correspondant au name en parametre,
+     * dans la session encours
+     * @param string $name
+     * @return mixed
+     */
+    public function getAttribute (string $name);
+    
+    /**
      * Suprime un attribut dans la session en cours
      * @param string $name
      */
@@ -62,5 +70,12 @@ interface Session
      * @param array $attribute
      */
     public function addAttributes (array $attribute) : void;
+
+    /**
+     * descruction de la session
+     * apres appel a cette methode, tout les attribut dans la session sont suprimer, 
+     * et l'id de la session n'est plus reconue
+     */
+    public function destroy () : void;
 }
 
