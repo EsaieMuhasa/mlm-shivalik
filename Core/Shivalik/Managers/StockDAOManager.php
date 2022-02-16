@@ -44,6 +44,6 @@ abstract class StockDAOManager extends DefaultDAOInterface
      * @param int $offset
      * @return Stock[]
      */
-    public abstract function findByStatus (bool $empty = false, ?int $limit = null, int $offset = 0) : bool;
+    public abstract function findByStatus (bool $empty = false, ?int $limit = null, int $offset = 0) : array;
 }
 

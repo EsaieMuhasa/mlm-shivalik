@@ -73,6 +73,9 @@
 		<route action="product" urlPattern="/admin/products/([0-9]+)/" paramsNames="id"/>
 		<route action="product" urlPattern="/admin/products/([0-9]+)/([0-9]+)-more-skips-([0-9]+)\.html" paramsNames="id,limit,offset"/>
 		<route action="updateProduct" urlPattern="/admin/products/([0-9]+)/update\.html" paramsNames="id"/>
+		
+		<route action="stocks" urlPattern="/admin/stocks/"/>
+		<route action="stocks" urlPattern="/admin/stocks/([0-9]+)-([0-9]+)\.html" paramsNames="limit,offset"/>
 	</module>
 	
 </app-routes>

@@ -7,6 +7,7 @@ use Core\Shivalik\Validators\ProductValidator;
 use PHPBackend\Application;
 use PHPBackend\Request;
 use PHPBackend\Response;
+use Core\Shivalik\Managers\StockDAOManager;
 
 /**
  *
@@ -19,6 +20,8 @@ class ProductsController extends AdminController
     const ATT_PRODUCTS ='products';
     const ATT_COUNT_PRODUCT = 'count_products';
     
+    const ATT_STOCK ='stock';
+    const ATT_STOCKS ='stocks';    
     
     //activation/desactivation des menus
     const ATT_ACTIVE_MENU = 'PRODUCT_ACTIVE_ITEM_MENU';
@@ -34,6 +37,11 @@ class ProductsController extends AdminController
      */
     private $productDAOManager;
     
+    /**
+     * @var StockDAOManager
+     */
+    private $stockDAOManager;
+    
     
     /**
      * {@inheritDoc}
@@ -43,7 +51,7 @@ class ProductsController extends AdminController
     {
         parent::__construct($application, $module, $action);
         $application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, "Products");
-        
+        $application->getRequest()->addAttribute(self::ATT_COUNT_PRODUCT, $this->productDAOManager->countAll());
     }
     
     /**
@@ -162,6 +170,29 @@ class ProductsController extends AdminController
         
         $request->addAttribute(self::ATT_PRODUCT, $product);
         $this->itemMenuProduct($request);
+    }
+    
+    /**
+     * visualisation des stocks
+     * @param Request $request
+     * @param Response $response
+     */
+    public function executeStocks (Request $request, Response $response) : void {
+        
+        if (!$this->stockDAOManager->hasData()) {
+            $response->sendRedirect("/admin/products/");
+        }
+        
+        $limit = $request->existInGET("limit")? intval($request->getDataGET("limit"), 10) : 10;
+        $offset = $request->existInGET("offset")? intval($request->getDataGET("offset"), 10) : 0;
+        
+        if (!$this->stockDAOManager->checkAll($limit, $offset)) {
+            $response->sendError();
+        }
+        
+        $stocks = $this->stockDAOManager->findAll($limit, $offset);
+        $request->addAttribute(self::ATT_STOCKS, $stocks);
+        $request->addAttribute(self::ATT_ACTIVE_MENU, self::ITEM_MENU_STOCKS);
     }
 }
 

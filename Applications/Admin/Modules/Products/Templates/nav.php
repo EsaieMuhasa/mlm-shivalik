@@ -6,7 +6,7 @@ use Applications\Admin\Modules\Products\ProductsController;
     <div class="col-lg-12">
     	<h3 class="page-header">
     		<i class="fa fa-leaf"></i> <?php echo ($_REQUEST[ProductsController::ATT_VIEW_TITLE]); ?>
-    		<span class="badge"><?php echo (10); ?></span>
+    		<span class="badge"><?php echo ($_REQUEST[ProductsController::ATT_COUNT_PRODUCT]); ?></span>
     	</h3>
     </div>
 </div>

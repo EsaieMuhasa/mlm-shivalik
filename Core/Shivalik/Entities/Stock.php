@@ -2,6 +2,7 @@
 namespace Core\Shivalik\Entities;
 
 use PHPBackend\DBEntity;
+use PHPBackend\PHPBackendException;
 
 /**
  *
@@ -31,6 +32,11 @@ class Stock extends DBEntity
      * @var \DateTime
      */
     private $expiryDate;
+    
+    /**
+     * @var Product
+     */
+    private $product;
     
     /**
      * @return number
@@ -95,6 +101,28 @@ class Stock extends DBEntity
     {
         $this->expiryDate = $expiryDate;
     }
+    /**
+     * @return \Core\Shivalik\Entities\Product
+     */
+    public function getProduct() :?Product
+    {
+        return $this->product;
+    }
+
+    /**
+     * @param \Core\Shivalik\Entities\Product | int $product
+     */
+    public function setProduct($product)
+    {
+        if ($product == null || $product instanceof Product) {
+            $this->product = $product;
+        } else if (self::isInt($product)) {
+            $this->product = new Product(['id' => $product]);
+        } else {
+            throw new PHPBackendException("invalide argument in setProduct param method");
+        }
+    }
+
 
     
 }
