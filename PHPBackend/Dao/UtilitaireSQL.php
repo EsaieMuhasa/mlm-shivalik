@@ -24,6 +24,32 @@ class UtilitaireSQL
     private function __construct(){}
     
     /**
+     * preparation d'un requette
+     * @param \PDO $pdo
+     * @param string $sql
+     * @param array $params
+     * @throws DAOException
+     * @throws \PDOException
+     * @return \PDOStatement
+     */
+    public static  function prepareStatement (\PDO $pdo, string $sql, array $params = []) : \PDOStatement
+    {
+        /**
+         * @var \PDOStatement $result
+         */
+        $statement = $pdo->prepare($sql);
+        if ($statement === false){
+            throw new DAOException('Une erreur est survenue lors de la préparation de la requête.');
+        }
+        $status = $statement->execute($params);
+        if(!$status){
+            throw new DAOException('Une erreur est survenue lars de l\'execution de la requête');
+        }
+        
+        return $statement;
+    }
+    
+    /**
      * Pour enregistrer une occurence dans une table de la base dde donnee
      * @param \PDO $pdo
      * @param string $tableName le nom de la table dans la catalogue de l'intance de PDO

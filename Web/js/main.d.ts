@@ -47,6 +47,9 @@ interface CarouselStyle {
  * @returns l'element HTML fraichement cree
  */
 declare function cerateElementByClass<E extends HTMLElement>(nodeName: string, className: string): E;
+/**
+ * generateur d'evenement en fonction de variation de la largeur context Web du navigateur
+ */
 declare class WindowConfig {
     private listeners;
     private configNames;
@@ -102,6 +105,10 @@ declare class Carousel<T extends HTMLElement> {
      * mis en jour des minuatures
      */
     private updateMiniatures;
+    /**
+     * renvoie le nombre de slider a scroller
+     * @returns {number}
+     */
     getSlidesToScroll(): number;
     /**
      * deplacement du carousel

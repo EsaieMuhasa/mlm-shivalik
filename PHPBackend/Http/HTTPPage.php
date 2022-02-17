@@ -93,7 +93,7 @@ class HTTPPage implements Page
         $extension = $this->getApplication()->getHttpRequest()->getExtensionURI();
         if ($extension == 'json' || $extension == 'xml' || $extension == 'htm') {//pour les vues specifiques
             if ($extension == 'json' || $extension == 'xml') {
-                $this->getApplication()->getHttpResponse()->addHeader('Content-Type: text/'.$extension.'; charset=UTF-8');
+                $this->getApplication()->getHttpResponse()->addHeader('Content-Type: application/'.$extension.'; charset=UTF-8');
                 $vue = $this->viewFile.'.'.$extension.'.php';
             }else {                
                 $vue = $this->viewFile.'.php';

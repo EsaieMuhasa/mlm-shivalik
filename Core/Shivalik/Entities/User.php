@@ -234,7 +234,7 @@ abstract class User extends DBEntity implements Notifiable
      */
     public function setPhoto($photo) : void
     {
-        $this->photo = $photo;
+        $this->photo = str_replace("\\", "/", $photo);
     }
     
     /**

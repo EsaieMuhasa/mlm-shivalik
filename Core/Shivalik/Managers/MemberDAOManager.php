@@ -379,8 +379,8 @@ abstract class MemberDAOManager extends AbstractUserDAOManager
     
     
     /**
-     * revoie une collection de afent d'un membre
-     * les enfant en question sont empilee les unes dans les autres selons la hierchie
+     * revoie une collection des enfants d'un membre
+     * les enfants en question sont empilee les unes dans les autres selons la hierchie
      * @param int $memberId
      * @param int $foot
      * @return Member[]
@@ -641,6 +641,14 @@ abstract class MemberDAOManager extends AbstractUserDAOManager
 	public function countCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null) : int{
 	    return 0;
 	}
+	
+	/**
+	 * Effectue une recherche et renvoie les membres qui correspondent aux indices de recherche en parametre
+	 * @param string[]|string $index
+	 * @return Member[]
+	 * @throws DAOException
+	 */
+	public abstract function search ($index) : array;
 	
 }
 

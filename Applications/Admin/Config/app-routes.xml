@@ -21,6 +21,7 @@
 	 	<route action="members" urlPattern="/admin/members/(table|grid)/" paramsNames="affichage"/>
 	 	<route action="members" urlPattern="/admin/members/([0-9]+)-([0-9]+)\.html" paramsNames="limit,offset"/>
 	 	<route action="members" urlPattern="/admin/members/(table|grid)/([0-9]+)-([0-9]+)\.html" paramsNames="affichage,limit,offset"/>
+	 	<route action="search" urlPattern="/admin/members/search\.json"/>
 	 	<route action="addMember" urlPattern="/admin/members/add\.html"/>
 	 	
 	 	<route action="member" urlPattern="/admin/members/([0-9]+)/" paramsNames="id"/>

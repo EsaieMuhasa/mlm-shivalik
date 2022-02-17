@@ -33,7 +33,6 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
           <script src="/js/dist/respond.min.js"></script>
           <script src="/js/dist/lte-ie7.js"></script>
         <![endif]-->
-    
     </head>
     
     <body>
@@ -41,9 +40,11 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
         <section id="container" class="">
             <!--header start-->
             <?php require 'apps-header.php';?>
+            
             <!--sidebar start-->
             <?php require 'apps-navigation.php';?>
             <!--sidebar end-->
+            
             <!--main content start-->
             <section id="main-content">
                 <section class="wrapper">
@@ -71,5 +72,6 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
             });
         </script>
         <script type="text/javascript" src="/js/dist/ckeditor.js"></script>
+        <script src="/js/admin.js"></script>
     </body>
 </html>

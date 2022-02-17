@@ -35,9 +35,9 @@ $offset = isset($_GET['offset'])? $_GET['offset'] : 0;
 	</div>
     <?php } ?>
 	<div class="col-xs-12 col-sm-8 col-md-6">
-		<form action="" method="post">
+		<form action="" method="post" id="form-search-members">
 			<div class="input-group">
-    			<input type="text" name="id" value="<?php echo htmlspecialchars(isset($_REQUEST['withdrawal'])? $_REQUEST['withdrawal']->amount:'');?>" id="amount-office" class="form-control" placeholder="put here member ID" autocomplete="off"/>
+    			<input type="search" name="index" value="<?php echo htmlspecialchars(isset($_REQUEST['withdrawal'])? $_REQUEST['withdrawal']->amount:'');?>" id="search-members" class="form-control" placeholder="put here member ID" autocomplete="off"/>
 				<span class="input-group-btn">
 					<button class="btn btn-primary">Go</button>
 				</span>
@@ -46,6 +46,8 @@ $offset = isset($_GET['offset'])? $_GET['offset'] : 0;
 	</div>
 </div>
 <hr/>
+<div id="container-search-members">
+</div>
 <?php if (!empty($_REQUEST[MembersController::ATT_MEMBERS_REQUEST])) : ?>
 <div class="thumbnail">
 	<h1 class="">Requests</h1>

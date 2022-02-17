@@ -13,6 +13,9 @@ function cerateElementByClass(nodeName, className) {
     element.setAttribute('class', className);
     return element;
 }
+/**
+ * generateur d'evenement en fonction de variation de la largeur context Web du navigateur
+ */
 class WindowConfig {
     constructor() {
         this.listeners = [];
@@ -89,11 +92,11 @@ class Carousel {
         this.containerItems = cerateElementByClass('div', styles.containerItems); //le conteneur des items
         this.containerNavigations = cerateElementByClass('div', styles.containerNavigations);
         this.containerMiniatures = containerMiniatures ? containerMiniatures : cerateElementByClass('div', styles.containerMiniatures);
-        this.btnNext = cerateElementByClass('button', this.styles.nextBtn);
-        this.btnPrev = cerateElementByClass('button', this.styles.prevBtn);
+        this.btnNext = cerateElementByClass('button', styles.nextBtn);
+        this.btnPrev = cerateElementByClass('button', styles.prevBtn);
         this.updateDom();
         this.resizeItems();
-        this.gotoSlide(0);
+        // this.gotoSlide(0);
         this.windowConfig.addListener((value) => { this.resizeItems(); });
         //Evements du clavier
         this.container.setAttribute('tabindex', '1');
@@ -196,15 +199,15 @@ class Carousel {
             });
         }
     }
+    /**
+     * renvoie le nombre de slider a scroller
+     * @returns {number}
+     */
     getSlidesToScroll() {
         if (this.options.slidesToScroll && !this.options.configSlidesToScroll) {
             return this.options.slidesToScroll;
         }
-        if (this.options.configSlidesToScroll) {
-            const key = this.windowConfig.getCurrentConfig();
-            return this.options.configSlidesToScroll[key];
-        }
-        return 1;
+        return (this.options.configSlidesToScroll) ? this.options.configSlidesToScroll[this.windowConfig.getCurrentConfig()] : 1;
     }
     /**
      * deplacement du carousel
@@ -338,12 +341,10 @@ $(function () {
     };
     if (element) {
         new Carousel(element, styles, options, windowConfig);
-        console.log(element);
     }
     const home = document.querySelector('.banner-carousel');
     const homeMins = document.querySelector('.home-carousel-mins');
     if (home) {
         new Carousel(home, stylesHome, optionsHome, windowConfig, homeMins);
-        console.log(home);
     }
 });

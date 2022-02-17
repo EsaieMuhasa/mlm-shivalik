@@ -35,9 +35,9 @@ trait JSONSerialize
         
         //le metadonnees de la classe
         $json.='"metadatas" : {';
-        $json.='"classFullName" : "'.str_replace('\\', '\\\\', $refClass->getName()).'",';
+        $json.='"classFullName" : "'.str_replace('\\', '.', $refClass->getName()).'",';
         $json.='"className" : "'.$refClass->getShortName().'",';
-        $json.='"namespace" : "'.str_replace('\\', '\\\\', $refClass->getNamespaceName()).'"';
+        $json.='"namespace" : "'.str_replace('\\', '.', $refClass->getNamespaceName()).'"';
         $json.='}';
         
         foreach ($properties as $numero => $properie)

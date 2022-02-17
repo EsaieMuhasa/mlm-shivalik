@@ -2,21 +2,21 @@
 namespace Applications\Admin\Modules\Members;
 
 use Applications\Admin\AdminController;
-use Core\Shivalik\Managers\GradeDAOManager;
+use Core\Shivalik\Entities\GradeMember;
+use Core\Shivalik\Entities\Member;
 use Core\Shivalik\Managers\CountryDAOManager;
+use Core\Shivalik\Managers\GradeDAOManager;
 use Core\Shivalik\Managers\GradeMemberDAOManager;
+use Core\Shivalik\Validators\GradeMemberFormValidator;
+use Core\Shivalik\Validators\LocalisationFormValidator;
+use Core\Shivalik\Validators\MemberFormValidator;
 use PHPBackend\Application;
 use PHPBackend\Request;
 use PHPBackend\Response;
-use Core\Shivalik\Entities\GradeMember;
-use Core\Shivalik\Validators\GradeMemberFormValidator;
-use Core\Shivalik\Entities\Member;
+use PHPBackend\ToastMessage;
+use PHPBackend\Image2D\Mlm\TreeFormatter;
 use PHPBackend\Image2D\Mlm\Ternary\TernaryTreeBuilder;
 use PHPBackend\Image2D\Mlm\Ternary\TernaryTreeRender;
-use PHPBackend\Image2D\Mlm\TreeFormatter;
-use Core\Shivalik\Validators\MemberFormValidator;
-use Core\Shivalik\Validators\LocalisationFormValidator;
-use PHPBackend\ToastMessage;
 
 /**
  *
@@ -81,8 +81,29 @@ class MembersController extends AdminController
         $application->getRequest()->addAttribute(self::PARAM_MEMBER_COUNT, $nombre);
         $application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, "Union members");
     }
-
+    
     /**
+     * Pour effectuer une recherche dans la liste des membres du syndicat
+     * la recherche s'effectuer sur:
+     * -les noms
+     * -le poseudo de connexion
+     * -le matricule
+     * @param Request $request
+     * @param Response $response
+     */
+    public function executeSearch (Request $request, Response $response) : void {
+        if ($request->getMethod() == Request::HTTP_POST) {
+            $form = new MemberFormValidator($this->getDaoManager());
+            $members = $form->searchAfterValidation($request);
+            foreach ($members as $member) {
+                $member->setPacket($this->gradeMemberDAOManager->findCurrentByMember($member->getId()));
+            }
+            $request->addAttribute(self::ATT_FORM_VALIDATOR, $form->toFeedback());
+            $request->addAttribute(self::ATT_MEMBERS, $members);
+        }
+    }
+
+    /** consulter la liste des membres du systeme
      * @param Request $request
      * @param Response $response
      */

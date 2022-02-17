@@ -1,9 +1,9 @@
 <?php
 namespace Core\Shivalik\Validators;
 
-use Applications\Member\MemberApplication;
 use Core\Shivalik\Entities\Member;
 use Core\Shivalik\Entities\User;
+use Core\Shivalik\Filters\SessionMemberFilter;
 use PHPBackend\Request;
 use PHPBackend\Config\VarList;
 use PHPBackend\Dao\DAOException;
@@ -284,7 +284,7 @@ class MemberFormValidator extends UserFormValidator
         
         if (!$this->hasError()) {
             try {
-                $user = $this->memberDAOManager->findById(MemberApplication::getConnectedMember()->getId());
+                $user = $this->memberDAOManager->findById($request->getSession()->getAttribute(SessionMemberFilter::MEMBER_CONNECTED_SESSION)->getId());
                 if ($user->getPassword() != sha1($old)) {
                     $this->addError('old', "invalid password");
                 }else {
@@ -312,22 +312,25 @@ class MemberFormValidator extends UserFormValidator
         if (!$photo->isUploadedFile()) {
             $this->addError(self::FIELD_PHOTO, "make sure you have selected a photo on your terminal");
         }
-        
-        $member->setId(MemberApplication::getConnectedMember()->getId());
+        /**
+         * le membre actuelement connecter
+         * @var Member $inSession
+         */
+        $inSession = $request->getSession()->getAttribute(SessionMemberFilter::MEMBER_CONNECTED_SESSION);
+        $member->setId($inSession->getId());
         $this->processingPhoto($member, $photo);
         
         if (!$this->hasError()) {
             try {
                 $this->processingPhoto($member, $photo, true, $request->getApplication()->getConfig());
-                $this->memberDAOManager->updatePhoto(MemberApplication::getConnectedMember()->getId(), $member->getPhoto());
-                MemberApplication::getConnectedMember()->setPhoto($member->getPhoto());
+                $this->memberDAOManager->updatePhoto($inSession->getId(), $member->getPhoto());
+                $inSession->setPhoto($member->getPhoto());
             } catch (DAOException $e) {
                 $this->setMessage($e->getMessage());
             }
         }
         
         $this->result = $this->hasError()? "failed to update profile picture" : "profile picture update success";
-        
         return $member;
     }
 
@@ -388,6 +391,37 @@ class MemberFormValidator extends UserFormValidator
     	}
     	$this->result = $this->hasError()? "update failure":"";
         return $user;
+    }
+    
+    /**
+     * Pour effectuer une recherche
+     * @param Request $request
+     * @return Member[]
+     */
+    public function searchAfterValidation (Request $request) {
+        $searchData = [];
+        $value = $request->existInPOST('index')? $request->getDataPOST("index") : $request->getDataGET('index');
+        $count = 0;
+        if ($value == null || empty($value)) {
+            $this->setMessage("no results match the search index");
+        } else {
+            $index = explode(" ", $value);
+            $selectedIndex = [];
+            foreach ($index as $item) {
+                if (strlen($item) >= 3) {
+                    $selectedIndex[] = $item;
+                }
+            }
+            try {
+                $searchData = $this->memberDAOManager->search(count($selectedIndex) != 0? $selectedIndex : $value);
+                $count = count($searchData);
+            } catch (DAOException $e) {
+                $this->setMessage($e->getMessage());
+            }
+        }
+        
+        $this->result = $this->hasError()? "Failed to fulfill request" : "{$count} search result for indexes '{$value}'";
+        return  $searchData;
     }
 
 }
