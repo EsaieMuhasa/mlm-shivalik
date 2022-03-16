@@ -6,7 +6,7 @@ namespace Core\Shivalik\Managers;
  * @author Esaie MHS
  *        
  */
-abstract class TransferDAOManager extends AbstractOperationDAOManager
+interface TransferDAOManager extends OperationDAOManager
 {
 }
 

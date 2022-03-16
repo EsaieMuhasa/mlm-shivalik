@@ -1,15 +1,15 @@
 <?php
 namespace Core\Shivalik\Managers;
 
-use PHPBackend\Dao\DefaultDAOInterface;
 use Core\Shivalik\Entities\Commande;
+use PHPBackend\Dao\DAOInterface;
 
 /**
  *
  * @author Esaie MUHASA
  *        
  */
-abstract class CommandeDAOManager extends DefaultDAOInterface
+interface CommandeDAOManager extends DAOInterface
 {
     
     /**
@@ -18,7 +18,7 @@ abstract class CommandeDAOManager extends DefaultDAOInterface
      * @param bool $delivered
      * @return bool
      */
-    public abstract function checkByMember (int $memberId, ?bool $delivered=null) : bool;
+    public function checkByMember (int $memberId, ?bool $delivered=null) : bool;
     
     /**
      * comptage de commandes deja effectuer par un membre
@@ -26,7 +26,7 @@ abstract class CommandeDAOManager extends DefaultDAOInterface
      * @param bool $delivered
      * @return int
      */
-    public abstract function countByMember (int $memberId, ?bool $delivered=null) : int;
+    public function countByMember (int $memberId, ?bool $delivered=null) : int;
     
     /**
      * Recuperation des commandes d'un membre
@@ -34,7 +34,7 @@ abstract class CommandeDAOManager extends DefaultDAOInterface
      * @param bool $delivered, filtrage du colone deliveryDate
      * @return Commande
      */
-    public abstract function findByMember (int $memberId, ?bool $delivered=null) : array;
+    public function findByMember (int $memberId, ?bool $delivered=null) : array;
     
     /**
      * 
@@ -43,7 +43,7 @@ abstract class CommandeDAOManager extends DefaultDAOInterface
      * @param int $offset
      * @return bool
      */
-    public abstract function checkByStatus (bool $delivered=false, ?int $limit = null, int $offset=0) : bool;
+    public function checkByStatus (bool $delivered=false, ?int $limit = null, int $offset=0) : bool;
     
     /**
      * recuperation des commandes ayant le status en parametre
@@ -52,13 +52,13 @@ abstract class CommandeDAOManager extends DefaultDAOInterface
      * @param int $offset
      * @return Commande[]
      */
-    public abstract function findByStatus (bool $delivered=false, ?int $limit = null, int $offset=0) : array;
+    public function findByStatus (bool $delivered=false, ?int $limit = null, int $offset=0) : array;
     
     /**
      * comptage des commandes ayants le status en parametre
      * @param bool $delivered
      * @return int
      */
-    public abstract function countByStatus (bool $delivered=false) : int;
+    public function countByStatus (bool $delivered=false) : int;
 }
 

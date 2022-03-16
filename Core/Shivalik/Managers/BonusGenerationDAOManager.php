@@ -7,7 +7,7 @@ namespace Core\Shivalik\Managers;
  * @author Esaie MHS
  *        
  */
-abstract class BonusGenerationDAOManager extends AbstractBonusDAOManager
+interface BonusGenerationDAOManager extends BonusDAOManager
 {
     
 }

@@ -2,9 +2,7 @@
 namespace Core\Shivalik\Managers;
 
 use Core\Shivalik\Entities\Notification;
-use PHPBackend\Dao\DefaultDAOInterface;
-use PHPBackend\Dao\UtilitaireSQL;
-use Core\Shivalik\Entities\Notifiable;
+use PHPBackend\Dao\DAOInterface;
 use Core\Shivalik\Entities\NotificationReceiver;
 
 /**
@@ -12,14 +10,14 @@ use Core\Shivalik\Entities\NotificationReceiver;
  * @author Esaie MUHASA
  *        
  */
-abstract class NotificationReceiverDAOmanager extends DefaultDAOInterface
+interface  NotificationReceiverDAOmanager extends DAOInterface
 {
     /**
      * envoie d'une notification a une collection de composent notifiable
      * @param Notification $notification
-     * @param Notifiable[] $notificables
+     * @param Notifiable [] $notificables
      */
-    public abstract function createItems (Notification $notification, array $notificables) : void;
+    public function createItems (Notification $notification, array $notificables) : void;
     
     /**
      * verification des message
@@ -27,12 +25,7 @@ abstract class NotificationReceiverDAOmanager extends DefaultDAOInterface
      * @param bool $received
      * @return bool
      */
-    public function checkByNotifiable (int $componentId, bool $received = false, ?int $limit = null, int $offset = 0) : bool{
-        return UtilitaireSQL::checkAll($this->getConnection(), $this->getTableName(), [
-            'id' => $componentId,
-            'received' => $received? '1' : '0'
-        ], $limit, $offset);
-    }
+    public function checkByNotifiable (int $componentId, bool $received = false, ?int $limit = null, int $offset = 0) : bool;
     
     /**
      * revoie une collection des notification d'un notificationcomponent
@@ -42,12 +35,7 @@ abstract class NotificationReceiverDAOmanager extends DefaultDAOInterface
      * @param int $offset
      * @return NotificationReceiver[]
      */
-    public function findByNotifiable (int $componentId, bool $received = false, ?int $limit = null, int $offset = 0) : array{
-        return UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, [
-            'id' => $componentId,
-            'received' => $received? '1' : '0'
-        ], $limit, $offset);
-    }
+    public function findByNotifiable (int $componentId, bool $received = false, ?int $limit = null, int $offset = 0) : array;
     
     
     /**
@@ -56,11 +44,6 @@ abstract class NotificationReceiverDAOmanager extends DefaultDAOInterface
      * @param bool $received
      * @return int
      */
-    public function countNotifications (int $componentId, bool $received = false) : int {
-        return UtilitaireSQL::count($this->getConnection(), $this->getTableName(), [
-            'id' => $componentId,
-            'received' => $received? '1' : '0'
-        ]);
-    }
+    public function countNotifications (int $componentId, bool $received = false) : int ;
 }
 

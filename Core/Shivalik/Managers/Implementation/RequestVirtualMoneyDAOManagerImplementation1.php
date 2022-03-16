@@ -6,15 +6,27 @@ use Core\Shivalik\Entities\RequestVirtualMoney;
 use Core\Shivalik\Managers\RequestVirtualMoneyDAOManager;
 use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
+use PHPBackend\Dao\DefaultDAOInterface;
+use Core\Shivalik\Managers\OfficeDAOManager;
+use Core\Shivalik\Managers\VirtualMoneyDAOManager;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-class RequestVirtualMoneyDAOManagerImplementation1 extends RequestVirtualMoneyDAOManager {
+class RequestVirtualMoneyDAOManagerImplementation1 extends DefaultDAOInterface implements RequestVirtualMoneyDAOManager {
 
-
+    /**
+     * @var OfficeDAOManager
+     */
+    protected $officeDAOManager;
+    
+    /**
+     * @var VirtualMoneyDAOManager
+     */
+    protected $virtualMoneyDAOManager;
+    
 	/**
      * {@inheritDoc}
      * @see \PHPBackend\Dao\DAOInterface::createInTransaction()
@@ -98,6 +110,35 @@ class RequestVirtualMoneyDAOManagerImplementation1 extends RequestVirtualMoneyDA
         }
         return $return;
     }
+    
+    
+    /**
+     * {@inheritDoc}
+     * @see \PHPBackend\Dao\DefaultDAOInterface::findByColumnName()
+     */
+    public function findByColumnName(string $columnName, $value, bool $forward = true)
+    {
+        $request = parent::findByColumnName($columnName, $value, $forward);
+        $request->setOffice($this->officeDAOManager->findById($request->office->id, false));
+        return $request;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\RequestVirtualMoneyDAOManager::checkByOffice()
+     */
+    public function checkByOffice (int $officeId)  {
+        return  $this->columnValueExist('office', $officeId);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\RequestVirtualMoneyDAOManager::findByOffice()
+     */
+    public function findByOffice (int $officeId) {
+        return UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, array("office" => $officeId));
+    }
+    
 
 
 }

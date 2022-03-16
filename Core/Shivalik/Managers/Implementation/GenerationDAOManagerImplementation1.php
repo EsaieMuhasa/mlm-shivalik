@@ -5,13 +5,14 @@ use Core\Shivalik\Entities\Generation;
 use Core\Shivalik\Managers\GenerationDAOManager;
 use PHPBackend\Dao\DAOEvent;
 use PHPBackend\Dao\UtilitaireSQL;
+use PHPBackend\Dao\DefaultDAOInterface;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-class GenerationDAOManagerImplementation1 extends GenerationDAOManager
+class GenerationDAOManagerImplementation1 extends DefaultDAOInterface implements GenerationDAOManager
 {
 
     /**
@@ -56,6 +57,39 @@ class GenerationDAOManagerImplementation1 extends GenerationDAOManager
             
         ]);
         $entity->setId($id);
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\GenerationDAOManager::checkByName()
+     */
+    public function checkByName (string $name, ?int $id = null) : bool {
+        return $this->columnValueExist('name', $name, $id);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\GenerationDAOManager::checkByAbreviation()
+     */
+    public function checkByAbreviation(string $abbreviation, ?int $id = null) : bool {
+        return $this->columnValueExist('abbreviation', $abbreviation, $id);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\GenerationDAOManager::checkByNumber()
+     */
+    public function checkByNumber (int $number, ?int $id = null) : bool {
+        return $this->columnValueExist('number', $number, $id);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\GenerationDAOManager::findByNumber()
+     */
+    public function findByNumber (int $number) : Generation {
+        return UtilitaireSQL::findUnique($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), "number", $number);
     }
   
 }

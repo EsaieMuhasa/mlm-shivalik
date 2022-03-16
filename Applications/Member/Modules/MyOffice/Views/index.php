@@ -1,10 +1,10 @@
 <?php
 use Applications\Member\Modules\MyOffice\MyOfficeController;
-use Applications\Member\MemberApplication;
 use PHPBackend\AppConfig;
 use PHPBackend\Request;
 use Core\Shivalik\Entities\Office;
 use Core\Shivalik\Entities\Withdrawal;
+use Core\Shivalik\Filters\SessionMemberFilter;
 
 /**
  * @var AppConfig $config
@@ -13,7 +13,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
 /**
  * @var Office $office
  */
-$office = MemberApplication::getConnectedMember()->getOfficeAccount();
+$office = $_SESSION[SessionMemberFilter::MEMBER_CONNECTED_SESSION]->officeAccount;
 
 /**
  * @var Withdrawal[] $withdrawals

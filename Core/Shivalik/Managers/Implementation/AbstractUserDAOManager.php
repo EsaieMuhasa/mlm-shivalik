@@ -1,22 +1,24 @@
 <?php
-namespace Core\Shivalik\Managers;
+namespace Core\Shivalik\Managers\Implementation;
 
-use PHPBackend\DBEntity;
+use Core\Shivalik\Managers\LocalisationDAOManager;
+use Core\Shivalik\Managers\UserDAOManager;
 use PHPBackend\Dao\DefaultDAOInterface;
 use PHPBackend\Dao\UtilitaireSQL;
 
 /**
  *
- * @author Esaie MHS
+ * @author Esaie MUHASA
  *        
  */
-abstract class AbstractUserDAOManager extends DefaultDAOInterface
+abstract class AbstractUserDAOManager extends DefaultDAOInterface implements UserDAOManager
 {
     
     /**
      * @var LocalisationDAOManager
      */
     protected $localisationDAOManager;
+    
     
     /**
      * mis sen jour du statut d'un telephone
@@ -26,12 +28,10 @@ abstract class AbstractUserDAOManager extends DefaultDAOInterface
     public function updateState (int $id, bool $enable) : void {
         UtilitaireSQL::update($this->getConnection(), $this->getTableName(), array('enable' => ($enable? 1:'0')), $id);
     }
-
+    
     /**
-     * ce numero telephonique exist dans la BD?
-     * @param string $telephone
-     * @param int $id
-     * @return bool
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\UserDAOManager::checkByTelephone()
      */
     public function checkByTelephone (string $telephone, ?int $id = null) : bool {
         return $this->columnValueExist('telephone', $telephone, $id);
@@ -41,7 +41,7 @@ abstract class AbstractUserDAOManager extends DefaultDAOInterface
      * {@inheritDoc}
      * @see \PHPBackend\Dao\DefaultDAOInterface::findByColumnName()
      */
-    public function findByColumnName(string $columnName, $value, bool $forward = true)
+    public function findByColumnName (string $columnName, $value, bool $forward = true)
     {
         $user =parent::findByColumnName($columnName, $value, $forward);
         if ($user->getLocalisation() != null) {
@@ -49,12 +49,10 @@ abstract class AbstractUserDAOManager extends DefaultDAOInterface
         }
         return $user;
     }
-
+    
     /**
-     * ce pseudo existe dans la BD?
-     * @param string $pseudo
-     * @param int $id
-     * @return bool
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\UserDAOManager::checkByPseudo()
      */
     public function checkByPseudo (string $pseudo, ?int $id = null) : bool {
         return $this->columnValueExist('pseudo', $pseudo, $id);
@@ -62,31 +60,24 @@ abstract class AbstractUserDAOManager extends DefaultDAOInterface
     
     
     /**
-     * cette e-mail existe dans la BD?
-     * @param string $email
-     * @param int $id
-     * @return bool
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\UserDAOManager::checkByEmail()
      */
     public function checkByEmail (string $email, ?int $id = null) : bool {
         return $this->columnValueExist('email', $email, $id);
     }
     
     /**
-     * revoie le proprietaire du pseudo en parmatere
-     * @param string $pseudo
-     * @param bool $forward
-     * @return DBEntity
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\UserDAOManager::findByPseudo()
      */
     public function findByPseudo (string $pseudo, bool $forward = false) {
         return $this->findByColumnName("pseudo", $pseudo, $forward);
     }
     
-    
     /**
-     * recuperation de l'utilisateur propritaire de l'email en parmetre
-     * @param string $email
-     * @param bool $forward
-     * @return DBEntity
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\UserDAOManager::findByEmail()
      */
     public function findByEmail (string $email, bool $forward = false) {
         return $this->findByColumnName('email', $email, $forward);
@@ -94,29 +85,24 @@ abstract class AbstractUserDAOManager extends DefaultDAOInterface
     
     
     /**
-     * recuperation du proprietaire du mero de telephone en parmetre
-     * @param string $telephone
-     * @param bool $forward
-     * @return DBEntity
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\UserDAOManager::findByTelephone()
      */
     public function findByTelephone (string $telephone, bool $forward = false) {
         return $this->findByColumnName('telephone', $telephone);
     }
     
     /**
-     * mise en jour de la photo d'un utilisateur
-     * @param int $userId
-     * @param string $photo
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\UserDAOManager::updatePhoto()
      */
     public function updatePhoto (int $userId, string $photo) : void {
         UtilitaireSQL::update($this->getConnection(), $this->getTableName(), array('photo' => $photo), $userId);
     }
     
-    
     /**
-     * mis en jour du mot de passe d'un utilisateur
-     * @param int $userId
-     * @param string $password
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\UserDAOManager::updatePassword()
      */
     public function updatePassword (int $userId, string $password) : void {
         UtilitaireSQL::update($this->getConnection(), $this->getTableName(), array('password' => $password), $userId);

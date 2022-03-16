@@ -3,49 +3,23 @@ namespace Core\Shivalik\Managers;
 
 use Core\Shivalik\Entities\Withdrawal;
 use PHPBackend\Dao\DAOException;
-use PHPBackend\Dao\UtilitaireSQL;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-abstract class WithdrawalDAOManager extends AbstractOperationDAOManager
+interface WithdrawalDAOManager extends OperationDAOManager
 {
-    
-    /**
-     * @var OfficeDAOManager
-     */
-    protected $officeDAOManager;
-    
-    /**
-     * @var MemberDAOManager
-     */
-    protected $memberDAOManager;
+
     
     /**
      * validation du retrait d'argent par un administrateur d'un office
      * @param int $d
      * @param int $adminId
      */
-    public function validate (int $id, int $adminId) : void {
-        UtilitaireSQL::update($this->getConnection(), $this->getTableName(), array('admin' => $adminId), $id);
-    }
+    public function validate (int $id, int $adminId) : void ;
     
-
-    /**
-     * {@inheritDoc}
-     * @see \Core\Shivalik\Managers\AbstractOperationDAOManager::findByMember()
-     * @return Withdrawal[]
-     */
-    public function findByMember(int $memberId, ?int $limit = null, int $offset = 0): array
-    {
-        $operations = parent::findByMember($memberId, $limit, $offset);
-        foreach ($operations as $operation) {
-            $operation->setOffice($this->officeDAOManager->findById($operation->office->id, false));
-        }
-        return $operations;
-    }
     
     /**
      * Recuperaion des element d'un raport
@@ -55,42 +29,14 @@ abstract class WithdrawalDAOManager extends AbstractOperationDAOManager
      * @return Withdrawal[]
      * @throws DAOException
      */
-    public function findByRapport(int $raportId, ?int $limit = null, int $offset = 0): array{
-        /**
-         * @var Withdrawal[] $raports
-         */
-        $raports = UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, array('raport' => $raportId), $limit, $offset);
-        foreach ($raports as $raport) {
-            $raport->setMember($this->memberDAOManager->findById($raport->getMember()->getId(), false));
-        }
-        return $raports;
-    }
+    public function findByRapport(int $raportId, ?int $limit = null, int $offset = 0): array;
     
     /**
      * comptage des opperations qui ont ete envoyer dans un rappot
      * @param int $rapportId
      * @return int
      */
-    public function countByRapport (int $rapportId) : int  {
-        return UtilitaireSQL::count($this->getConnection(), $this->getTableName(), array('rapport' => $rapportId));
-    }
-    
-    /**
-     * {@inheritDoc}
-     * @see \PHPBackend\Dao\DefaultDAOInterface::findByCreationHistory()
-     */
-    public function findByCreationHistory(\DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset = 0) : array
-    {
-        /**
-         * @var Withdrawal[] $withs
-         */
-        $withs = parent::findByCreationHistory($dateMin, $dateMax, $limit, $offset);
-        foreach ($withs as $withdrawel) {
-            $withdrawel->setOffice($this->officeDAOManager->findById($withdrawel->office->id, false));
-            $withdrawel->setMember($this->memberDAOManager->findById($withdrawel->member->id, false));
-        }
-        return $withs;
-    }
+    public function countByRapport (int $rapportId) : int ;
     
     /**
      * verifie si l'office as des operations qui y ont transiter
@@ -99,7 +45,7 @@ abstract class WithdrawalDAOManager extends AbstractOperationDAOManager
      * @param bool $sended
      * @return bool
      */
-    public  abstract function checkByOffice (int $officeId, ?bool $state = false, ?bool $sended=null, ?int $limit = null, int $offset = 0) : bool;
+    public  function checkByOffice (int $officeId, ?bool $state = false, ?bool $sended=null, ?int $limit = null, int $offset = 0) : bool;
     
     /**
      * renvoie les operations qui ont transiter par l'office en premier parametre
@@ -110,7 +56,7 @@ abstract class WithdrawalDAOManager extends AbstractOperationDAOManager
      * @param int $offset
      * @return Withdrawal[]
      */
-    public abstract function findByOffice (int $officeId, ?bool $state = false, ?bool $sended=null, ?int $limit = null, int $offset = 0);
+    public function findByOffice (int $officeId, ?bool $state = false, ?bool $sended=null, ?int $limit = null, int $offset = 0);
 
     
     /**
@@ -122,9 +68,7 @@ abstract class WithdrawalDAOManager extends AbstractOperationDAOManager
      * @param int $offset
      * @return bool
      */
-    public function checkCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : bool {
-        return UtilitaireSQL::hasCreationHistory($this->getConnection(), $this->getTableName(), self::FIELD_DATE_AJOUT, true, $dateMin, $dateMax, ['office' => $officeId], $limit, $offset);
-    }
+    public function checkCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : bool ;
     
     /**
      * recuperation des l'historique des operations effectuer par un office
@@ -135,9 +79,7 @@ abstract class WithdrawalDAOManager extends AbstractOperationDAOManager
      * @param int $offset
      * @return Withdrawal[]
      */
-    public function findCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : array {
-        return UtilitaireSQL::findCreationHistory($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, $dateMin, $dateMax, ['office' => $officeId], $limit, $offset);
-    }
+    public function findCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : array;
     
     
     /**
@@ -145,6 +87,6 @@ abstract class WithdrawalDAOManager extends AbstractOperationDAOManager
      * @param Withdrawal $with
      * @throws DAOException
      */
-    public abstract function redirect (Withdrawal $with) : void;
+    public function redirect (Withdrawal $with) : void;
 
 }

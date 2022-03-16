@@ -4,13 +4,14 @@ namespace Core\Shivalik\Managers\Implementation;
 use Core\Shivalik\Entities\Stock;
 use Core\Shivalik\Managers\StockDAOManager;
 use PHPBackend\Dao\UtilitaireSQL;
+use PHPBackend\Dao\DefaultDAOInterface;
 
 /**
  *
  * @author Esaie MUHASA
  *        
  */
-class StockDAOManagerImplementation1 extends StockDAOManager
+class StockDAOManagerImplementation1 extends DefaultDAOInterface implements StockDAOManager
 {
     /**
      * {@inheritDoc}

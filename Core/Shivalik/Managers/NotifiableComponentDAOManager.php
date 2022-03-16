@@ -3,15 +3,14 @@ namespace Core\Shivalik\Managers;
 
 use Core\Shivalik\Entities\NotifiableComponent;
 use PHPBackend\Dao\DAOException;
-use PHPBackend\Dao\DefaultDAOInterface;
-use PHPBackend\Dao\UtilitaireSQL;
+use PHPBackend\Dao\DAOInterface;
 
 /**
  *
  * @author Esaie MUHASA
  *        
  */
-abstract class NotifiableComponentDAOManager extends DefaultDAOInterface
+interface NotifiableComponentDAOManager extends DAOInterface
 {
     /**
      * recherche du composentant notifiable
@@ -20,7 +19,7 @@ abstract class NotifiableComponentDAOManager extends DefaultDAOInterface
      * @return NotifiableComponent
      * @throws DAOException
      */
-    public abstract function findByNotifiable ($dataKey, string $entity): NotifiableComponent;
+    public function findByNotifiable ($dataKey, string $entity): NotifiableComponent;
     
     /**
      * est-ce que ce composent notifiable existe??
@@ -29,20 +28,12 @@ abstract class NotifiableComponentDAOManager extends DefaultDAOInterface
      * @return bool
      * @throws DAOException s'il y a erreur lors de la communication avec la BDD
      */
-    public function checkByNotifiable ($dataKey, string $entity) : bool {
-        return UtilitaireSQL::checkAll($this->getConnection(), $this->getTableName(), ['dataKey' => $dataKey, 'entity' => $entity]);
-    }
+    public function checkByNotifiable ($dataKey, string $entity) : bool;
     
     /**
      * chargement du notifiable dans le component
      * @param NotifiableComponent $notifiable
      */
-    public function loadNotifiable (NotifiableComponent $notifiable) : void {
-        if ($this->getDaoManager()->getManagerOf($notifiable->getEntity())->checkById($notifiable->getDataKey())) {
-            $notifiable->setNotifiable($this->getDaoManager()->getManagerOf($notifiable->getEntity())->findById($notifiable->getDataKey()));
-        } else {
-            throw new DAOException("An error occurred while loading data. Data integrity is not correct.");
-        }
-    }
+    public function loadNotifiable (NotifiableComponent $notifiable) : void ;
 }
 

@@ -5,17 +5,37 @@ use Core\Shivalik\Entities\Notification;
 use Core\Shivalik\Managers\NotificationDAOManager;
 use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
+use PHPBackend\Dao\DefaultDAOInterface;
 
 /**
  *
  * @author Esaie MUHASA
  *        
  */
-class NotificationDAOManagerImplementation1 extends NotificationDAOManager
+class NotificationDAOManagerImplementation1 extends DefaultDAOInterface implements NotificationDAOManager
 {
+    
     /**
      * {@inheritDoc}
-     * @see \PHPBackend\Dao\DAOInterface::createInTransaction()
+     * @see \PHPBackend\Dao\DAOInterface::create()
+     */
+    public function create($entity)
+    {
+        throw new DAOException("Operation not supported");
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \PHPBackend\Dao\DAOInterface::update()
+     */
+    public function update($entity, $id)
+    {
+        throw new DAOException("Operation not supported");
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \PHPBackend\Dao\DefaultDAOInterface::createInTransaction()
      * @param Notification $entity
      */
     public function createInTransaction($entity, $api): void

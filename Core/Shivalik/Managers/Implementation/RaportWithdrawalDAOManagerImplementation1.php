@@ -7,13 +7,14 @@ use Core\Shivalik\Managers\RaportWithdrawalDAOManager;
 use PHPBackend\Calendar\Month;
 use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
+use PHPBackend\Dao\DefaultDAOInterface;
 
 /**
  *
  * @author Esaie MUHASA
  *        
  */
-class RaportWithdrawalDAOManagerImplementation1 extends RaportWithdrawalDAOManager
+class RaportWithdrawalDAOManagerImplementation1 extends DefaultDAOInterface implements RaportWithdrawalDAOManager
 {
     /**
      * @var OfficeDAOManager
@@ -45,7 +46,7 @@ class RaportWithdrawalDAOManagerImplementation1 extends RaportWithdrawalDAOManag
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\RaportWithdrawalDAOManager::findRaportInInterval()
      */
-    public function findRaportInInterval(\DateTime $dateMin, \DateTime $dateMax, ?int $officeId = null)
+    public function findRaportInInterval(\DateTime $dateMin, \DateTime $dateMax, ?int $officeId = null) : array
     {
         $return = array();
         try {
@@ -125,6 +126,24 @@ class RaportWithdrawalDAOManagerImplementation1 extends RaportWithdrawalDAOManag
     public function update($entity, $id) : void
     {
         throw new DAOException("update operation is not supported");
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\RaportWithdrawalDAOManager::checkByOffice()
+     */
+    public function checkByOffice (int $officeId) : bool {
+        return $this->columnValueExist('office', $officeId);
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\RaportWithdrawalDAOManager::findByOffice()
+     */
+    public function findByOffice(int $officeId, ?int $limit = null, int $offset = 0) : array {
+        return UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, array("office" => $officeId), $limit, $offset);
     }
 
     

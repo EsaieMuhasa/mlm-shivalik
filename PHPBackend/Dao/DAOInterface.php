@@ -65,13 +65,7 @@ interface DAOInterface
      * @param DBEntity[] $entities
      */
     public function createAll(array $entities) : void;
-    
-    /**
-     * creation d'une occurence dans une trasaction
-     * @param DBEntity $entity
-     * @param \PDO $pdo
-     */
-    public function createInTransaction ($entity, \PDO $pdo) : void;
+
 
     /**
      * mis en jour d'une occurence
@@ -81,14 +75,6 @@ interface DAOInterface
      * @throws DAOException
      */
     public function update ($entity, $id) : void;
-    
-    /**
-     * mise en jour d'une occurerence dans une transaction
-     * @param DBEntity $entity
-     * @param int|string $entity
-     * @param \PDO $pdo
-     */
-    public function updateInTransaction ($entity, $id, \PDO $pdo) : void;
     
     /**
      * surpession definitive d'un element dans dans la bdd
@@ -103,14 +89,6 @@ interface DAOInterface
      * @return array collection d'identifiants des occureces suprimer
      */
     public function deleteAll(array $ids = array()) : array;
-
-    /**
-     * supression d'une collection d'occurence dans une transaction
-     * @param \PDO $pdo
-     * @param array $ids
-     * @return array
-     */
-    public function deleteAllInTransaction(\PDO $pdo, array $ids = array()) : array;
     
     /**
      * depplace une occurence dans la corbeil
@@ -124,15 +102,6 @@ interface DAOInterface
      * @return array
      */
     public function moveAllToTrash (array $ids = array()) : array;
-
-    /**
-     * depacement de tout les occurences dont leurs IDs sont en parametre dans la corbeille.
-     * l'operation s'effectue dans une transaction
-     * @param array $ids
-     * @param \PDO $pdo
-     * @return array
-     */
-    public function moveAllToTrashInTransaction(array $ids = array(), \PDO $pdo) : array;
 
     /**
      * Revoie l'occurence dont l'ID est en parametre

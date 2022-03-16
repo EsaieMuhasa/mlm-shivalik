@@ -1,7 +1,7 @@
 <?php
 namespace Core\Shivalik\Managers;
 
-use PHPBackend\Dao\DefaultDAOInterface;
+use PHPBackend\Dao\DAOInterface;
 use Core\Shivalik\Entities\Stock;
 
 /**
@@ -9,7 +9,7 @@ use Core\Shivalik\Entities\Stock;
  * @author Esaie MUHASA
  *        
  */
-abstract class StockDAOManager extends DefaultDAOInterface
+interface StockDAOManager extends DAOInterface
 {
     /**
      * verifie si le produit a un stock
@@ -18,7 +18,7 @@ abstract class StockDAOManager extends DefaultDAOInterface
      * null si verification du stock sans tenir compte de son etat
      * @return bool
      */
-    public abstract function checkByProduct (int $productId, ?bool $empty = null) : bool;
+    public function checkByProduct (int $productId, ?bool $empty = null) : bool;
     
     /**
      * recuperation des stocks du'un produit
@@ -26,7 +26,7 @@ abstract class StockDAOManager extends DefaultDAOInterface
      * @param bool $empty : confert le parametre $empty de la method checkByProduct() : bool
      * @return array
      */
-    public abstract function findByProduct (int $productId, ?bool $empty = null) : array;
+    public function findByProduct (int $productId, ?bool $empty = null) : array;
     
     /**
      * verification des stock, en fonction de leurs etat
@@ -35,7 +35,7 @@ abstract class StockDAOManager extends DefaultDAOInterface
      * @param int $offset
      * @return bool
      */
-    public abstract function checkByStatus (bool $empty = false, ?int $limit = null, int $offset = 0) : bool;
+    public function checkByStatus (bool $empty = false, ?int $limit = null, int $offset = 0) : bool;
     
     /**
      * recuperation des stocks. filtrage en fonction de leurs etat
@@ -44,6 +44,6 @@ abstract class StockDAOManager extends DefaultDAOInterface
      * @param int $offset
      * @return Stock[]
      */
-    public abstract function findByStatus (bool $empty = false, ?int $limit = null, int $offset = 0) : array;
+    public function findByStatus (bool $empty = false, ?int $limit = null, int $offset = 0) : array;
 }
 

@@ -2,7 +2,6 @@
 namespace Core\Shivalik\Managers\Implementation;
 
 
-use Core\Shivalik\Entities\BonusGeneration;
 use Core\Shivalik\Managers\BonusGenerationDAOManager;
 use PHPBackend\Dao\UtilitaireSQL;
 
@@ -11,13 +10,11 @@ use PHPBackend\Dao\UtilitaireSQL;
  * @author Esaie MHS
  *        
  */
-class BonusGenerationDAOManagerImplementation1 extends BonusGenerationDAOManager
+class BonusGenerationDAOManagerImplementation1 extends AbstractBonusDAOManager implements  BonusGenerationDAOManager
 {
-    
     /**
      * {@inheritDoc}
-     * @see \PHPBackend\Dao\DAOInterface::createInTransaction()
-     * @param BonusGeneration $bonus
+     * @see \PHPBackend\Dao\DefaultDAOInterface::createInTransaction()
      */
     public function createInTransaction($bonus, \PDO $pdo): void
     {        

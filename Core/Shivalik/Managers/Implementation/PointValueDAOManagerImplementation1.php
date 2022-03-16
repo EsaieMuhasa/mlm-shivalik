@@ -13,9 +13,8 @@ use PHPBackend\Dao\UtilitaireSQL;
  * @author Esaie MHS
  *        
  */
-class PointValueDAOManagerImplementation1 extends PointValueDAOManager
+class PointValueDAOManagerImplementation1 extends AbstractBonusDAOManager implements PointValueDAOManager
 {
-
     /**
      * @var MemberDAOManager
      */
@@ -44,9 +43,9 @@ class PointValueDAOManagerImplementation1 extends PointValueDAOManager
 
     /**
      * {@inheritDoc}
-     * @see \Core\Shivalik\Managers\AbstractOperationDAOManager::update()
+     * @see \Core\Shivalik\Managers\Implementation\AbstractOperationDAOManager::update()
      */
-    public function update($entity, $id) : void
+    public function update ($entity, $id) : void
     {
         throw new DAOException("no subsequent update of the point value is authorized");
     }
@@ -82,6 +81,54 @@ class PointValueDAOManagerImplementation1 extends PointValueDAOManager
             'member' => $memberId,
             'foot' => $memberFoot
         ]);        
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\PointValueDAOManager::checkLeftPv()
+     */
+    public function checkLeftPv (int $memberId) : bool{
+        return $this->checkPv($memberId, PointValue::FOOT_LEFT);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\PointValueDAOManager::checkRightPv()
+     */
+    public function checkRightPv (int $memberId) : bool{
+        return $this->checkPv($memberId, PointValue::FOOT_RIGTH);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\PointValueDAOManager::checkMiddlePv()
+     */
+    public function checkMiddlePv (int $memberId) : bool{
+        return $this->checkPv($memberId, PointValue::FOOT_MIDDEL);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\PointValueDAOManager::findLeftByMember()
+     */
+    public function findLeftByMember (int $memberId) : array{
+        return $this->findPvByMember($memberId, PointValue::FOOT_LEFT);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\PointValueDAOManager::findRightByMember()
+     */
+    public function findRightByMember (int $memberId) : array{
+        return $this->findPvByMember($memberId, PointValue::FOOT_RIGTH);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\PointValueDAOManager::findMiddleByMember()
+     */
+    public function findMiddleByMember (int $memberId) : array{
+        return $this->findPvByMember($memberId, PointValue::FOOT_MIDDEL);
     }
 
 }

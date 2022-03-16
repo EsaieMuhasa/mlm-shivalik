@@ -2,76 +2,37 @@
 namespace Core\Shivalik\Managers;
 
 use PHPBackend\Dao\DAOException;
-use PHPBackend\Dao\DefaultDAOInterface;
-use PHPBackend\Dao\UtilitaireSQL;
-use Core\Shivalik\Entities\Grade;
+use PHPBackend\Dao\DAOInterface;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-abstract class GradeDAOManager extends DefaultDAOInterface
+interface GradeDAOManager extends DAOInterface
 {
-    
-    /**
-     * @var GenerationDAOManager
-     */
-    protected $generationDAOManager;
-    
-    /**
-     * {@inheritDoc}
-     * @see \PHPBackend\Dao\DefaultDAOInterface::findAll()
-     * @return Grade[]
-     */
-    public function findAll(?int $limit = null, int $offset = 0) : array
-    {
-        $grades = parent::findAll($limit, $offset);
-        foreach ($grades as $grade) {
-            $grade->setMaxGeneration($this->generationDAOManager->findById($grade->getMaxGeneration()->getId()));
-        }
-        return $grades;
-    }
-
-
-    /**
-     * {@inheritDoc}
-     * @see \PHPBackend\Dao\DefaultDAOInterface::findById()
-     * @return Grade
-     */
-    public function findById($id, bool $forward = true)
-    {
-        $grade = parent::findById($id, $forward);
-        $grade->setMaxGeneration($this->generationDAOManager->findById($grade->getMaxGeneration()->getId(), false));
-        return $grade;
-    }
-
     /**
      * To update the pack icon
      * @param int $id
      * @param string $icon
      */
-    public function updateIcon (int $id, string $icon) : void {
-        UtilitaireSQL::update($this->getConnection(), $this->getTableName(), array('icon' => $icon), $id);
-    }
+    public function updateIcon (int $id, string $icon) : void;
     
     /**
+     * verif pack name in DB
      * @param string $name
      * @param int $id
      * @return bool
      */
-    public function checkByName (string $name, ?int $id = null) : bool {
-        return $this->columnValueExist('name', $name, $id);
-    }
+    public function checkByName (string $name, ?int $id = null) : bool;
     
     /**
+     * check packet by percent in DB
      * @param float $percentage
      * @param int $id
      * @return bool
      */
-    public function checkByPercentage (float $percentage, ?int $id = null) : bool {
-        return $this->columnValueExist('percentage', $percentage, $id);
-    }
+    public function checkByPercentage (float $percentage, ?int $id = null) : bool;
     
     
     /**
@@ -79,18 +40,7 @@ abstract class GradeDAOManager extends DefaultDAOInterface
      * @param int $id
      * @return bool
      */
-    public function checkUpTo (int $id) : bool{
-        $all = $this->findAll();
-        $current = $this->findById($id);
-        
-        foreach ($all as $grade) {
-            if ($current->getAmount() < $grade->getAmount()) {
-                return true;
-            }
-        }
-        
-        return false;
-    }
+    public function checkUpTo (int $id) : bool;
     
     /**
      * 
@@ -98,23 +48,6 @@ abstract class GradeDAOManager extends DefaultDAOInterface
      * @throws DAOException
      * @return \Core\Shivalik\Entities\Grade[]
      */
-    public function findUpTo (int $id) : array {        
-        $current = $this->findById($id);
-        
-        if (!$this->checkUpTo($id)) {
-            throw new DAOException("no packet greater than '{$current->getName()}' paket");
-        }
-        
-        $up = array();
-        $all = $this->findAll();
-        
-        foreach ($all as $grade) {
-            if ($current->getAmount() < $grade->getAmount()) {
-                $up[] = $grade;
-            }
-        }
-        
-        return $up;
-    }
+    public function findUpTo (int $id) : array;
 }
 

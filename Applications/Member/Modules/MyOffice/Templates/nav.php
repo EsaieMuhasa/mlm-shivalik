@@ -1,11 +1,11 @@
 <?php
 use Applications\Admin\Modules\Offices\OfficesController;
-use Applications\Member\MemberApplication;
+use Core\Shivalik\Filters\SessionMemberFilter;
 
 /**
  * @var \Core\Shivalik\Entities\Office $dashboard
  */
-$office = MemberApplication::getConnectedMember()->getOfficeAccount();
+$office = $_SESSION[SessionMemberFilter::MEMBER_CONNECTED_SESSION]->getOfficeAccount();
 
 ?>
 

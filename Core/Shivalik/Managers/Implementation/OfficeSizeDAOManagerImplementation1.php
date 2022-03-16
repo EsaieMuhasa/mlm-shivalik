@@ -8,12 +8,13 @@ use Core\Shivalik\Managers\SizeDAOManager;
 use PHPBackend\Dao\DAOEvent;
 use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
+use PHPBackend\Dao\DefaultDAOInterface;
 /**
  *
  * @author Esaie MHS
  *        
  */
-class OfficeSizeDAOManagerImplementation1 extends OfficeSizeDAOManager
+class OfficeSizeDAOManagerImplementation1 extends DefaultDAOInterface implements OfficeSizeDAOManager
 {
     /**
      * @var OfficeDAOManager
@@ -66,7 +67,7 @@ class OfficeSizeDAOManagerImplementation1 extends OfficeSizeDAOManager
 
     /**
      * {@inheritDoc}
-     * @see \PHPBackend\Dao\DAOInterface::createInTransaction()
+     * @see \PHPBackend\Dao\DefaultDAOInterface::createInTransaction()
      * @param OfficeSize $entity
      */
     public function createInTransaction($entity, \PDO $pdo): void
@@ -89,7 +90,6 @@ class OfficeSizeDAOManagerImplementation1 extends OfficeSizeDAOManager
      */
     public function findCurrentByOffice(int $officeId): OfficeSize
     {
-        
         $current = null;
         try {
             $statement = $this->getConnection()->prepare("SELECT * FROM {$this->getTableName()} WHERE office=:office AND (initDate IS NOT NULL AND closeDate IS NULL)");
@@ -120,7 +120,22 @@ class OfficeSizeDAOManagerImplementation1 extends OfficeSizeDAOManager
     {
         throw new DAOException("impossible to perform this operation");        
     }
-
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\OfficeSizeDAOManager::checkByOffice()
+     */
+    public function checkByOffice (int $officeId) : bool{
+        return $this->columnValueExist("office", $officeId);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\OfficeSizeDAOManager::findByOffice()
+     */
+    public function findByOffice (int $officeId) : array {
+        return UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, array('office' => $officeId));
+    }
 
 }
 

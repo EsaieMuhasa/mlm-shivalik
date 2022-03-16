@@ -8,7 +8,7 @@ use PHPBackend\Dao\DAOInterface;
  * @author Esaie MUHASA
  *        
  */
-interface NotificationDAOManager extends DAOInterface
+interface CategorieDAOManager extends DAOInterface
 {
 }
 

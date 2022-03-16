@@ -1,6 +1,7 @@
 <?php
 namespace PHPBackend\Dao;
 
+use PHPBackend\DBEntity;
 use PHPBackend\Config\EntityMetadata;
 
 /**
@@ -71,6 +72,47 @@ abstract class DefaultDAOInterface implements DAOInterface
         $this->hydrateInterfaces($factory);
     }
     
+    
+    /**
+     * creation d'une occurence dans une trasaction
+     * @param DBEntity $entity
+     * @param \PDO $pdo
+     */
+    public abstract function createInTransaction ($entity, \PDO $pdo) : void;
+    
+    /**
+     * supression d'une collection d'occurence dans une transaction
+     * @param \PDO $pdo
+     * @param array $ids
+     * @return array
+     */
+    public function deleteAllInTransaction(\PDO $pdo, array $ids = array()): array
+    {
+        UtilitaireSQL::deleteAll($pdo, $this->getTableName(), $ids);
+    }
+    
+    /**
+     * depacement de tout les occurences dont leurs IDs sont en parametre dans la corbeille.
+     * l'operation s'effectue dans une transaction
+     * @param array $ids
+     * @param \PDO $pdo
+     * @return array
+     */
+    public function moveAllToTrashInTransaction(array $ids = array(), \PDO $pdo): array
+    {
+        throw new DAOException("La mis en corbeil transactionnel n'est pas prise en charge");
+    }
+    
+    /**
+     * mise en jour d'une occurerence dans une transaction
+     * @param DBEntity $entity
+     * @param int|string $entity
+     * @param \PDO $pdo
+     */
+    public function updateInTransaction($entity, $id, \PDO $pdo): void
+    {
+        throw new DAOException("les mise en jours transactionnel ne sont pas pris en charge");
+    }
     /**
      * revoie la connection dont le nom est en parametre
      * @param string $name
@@ -357,32 +399,6 @@ abstract class DefaultDAOInterface implements DAOInterface
         return UtilitaireSQL::count($this->getConnection(), $this->getTableName(), array($columName => $value));
     }
 
-    /**
-     * {@inheritDoc}
-     * @see \PHPBackend\Dao\DAOInterface::deleteAllInTransaction()
-     */
-    public function deleteAllInTransaction(\PDO $pdo, array $ids = array()): array
-    {
-        UtilitaireSQL::deleteAll($pdo, $this->getTableName(), $ids);
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \PHPBackend\Dao\DAOInterface::moveAllToTrashInTransaction()
-     */
-    public function moveAllToTrashInTransaction(array $ids = array(), \PDO $pdo): array
-    {
-        throw new DAOException("La mis en corbeil transactionnel n'est pas prise en charge");
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \PHPBackend\Dao\DAOInterface::updateInTransaction()
-     */
-    public function updateInTransaction($entity, $id, \PDO $pdo): void
-    {
-        throw new DAOException("les mise en jours transactionnel ne sont pas pris en charge");
-    }
 
     /**
      * {@inheritDoc}

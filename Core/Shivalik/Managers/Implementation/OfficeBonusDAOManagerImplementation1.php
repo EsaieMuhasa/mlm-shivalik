@@ -11,7 +11,7 @@ use PHPBackend\Dao\UtilitaireSQL;
  * @author Esaie MUHASA
  *        
  */
-class OfficeBonusDAOManagerImplementation1 extends OfficeBonusDAOManager
+class OfficeBonusDAOManagerImplementation1 extends AbstractOperationDAOManager implements  OfficeBonusDAOManager
 {
     
     /**
@@ -33,11 +33,27 @@ class OfficeBonusDAOManagerImplementation1 extends OfficeBonusDAOManager
 
     /**
      * {@inheritDoc}
-     * @see \Core\Shivalik\Managers\AbstractOperationDAOManager::update()
+     * @see \Core\Shivalik\Managers\Implementation\AbstractOperationDAOManager::update()
      */
     public function update($entity, $id) : void
     {
         throw new DAOException("no subsequent update of the office bonus is authorized");
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\OfficeBonusDAOManager::checkByVirtual()
+     */
+    public function checkByVirtual (int $virtualId) : bool {
+        return $this->columnValueExist("virtualMoney", $virtualId);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\OfficeBonusDAOManager::findByVirtual()
+     */
+    public function findByVirtual (int $virtualId) : OfficeBonus {
+        return UtilitaireSQL::findUnique($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), "virtualMoney", $virtualId);
     }
 
 }

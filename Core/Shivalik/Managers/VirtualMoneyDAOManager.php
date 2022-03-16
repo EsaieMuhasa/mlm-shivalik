@@ -3,52 +3,41 @@
 namespace Core\Shivalik\Managers;
 
 use Core\Shivalik\Entities\VirtualMoney;
-use PHPBackend\Dao\DefaultDAOInterface;
-use PHPBackend\Dao\UtilitaireSQL;
+use PHPBackend\Dao\DAOInterface;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-abstract class VirtualMoneyDAOManager extends DefaultDAOInterface {
+interface VirtualMoneyDAOManager extends DAOInterface {
 	
 	/**
 	 * revoie tout le monais virtuel d'un office
 	 * @param int $officeId
 	 * @return VirtualMoney[]
 	 */
-	public function findByOffice (int $officeId) {
-	    return UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, ['office' => $officeId]);
-	}
+	public function findByOffice (int $officeId);
 	
 	/**
 	 * @param int $officeId
 	 * @return bool
 	 */
-	public function checkByOffice (int $officeId) : bool {
-		return $this->columnValueExist('office', $officeId);
-	}
+	public function checkByOffice (int $officeId) : bool;
 	
 	/**
 	 * @param int $requestId
 	 * @return VirtualMoney
 	 */
-	public function findByRequest (int $requestId) : VirtualMoney {
-		return UtilitaireSQL::findUnique($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), "request", $requestId);
-	}
-	
+	public function findByRequest (int $requestId) : VirtualMoney;	
 	
 	/**
 	 * La requette a-t-l aumoin une reponse
 	 * @param int $requestId
 	 * @return bool
 	 */
-	public function checkByRequest (int $requestId) : bool {
-		return $this->columnValueExist('request', $requestId);
-	}
-	
-	
+	public function checkByRequest (int $requestId) : bool;
+
 	/**
 	 * verification de l'historique des operations effectuer pas un office
 	 * @param int $officeId
@@ -58,9 +47,7 @@ abstract class VirtualMoneyDAOManager extends DefaultDAOInterface {
 	 * @param int $offset
 	 * @return bool
 	 */
-	public function checkCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : bool {
-	    return UtilitaireSQL::hasCreationHistory($this->getConnection(), $this->getTableName(), self::FIELD_DATE_AJOUT, true, $dateMin, $dateMax, ['office' => $officeId], $limit, $offset);
-	}
+	public function checkCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : bool ;
 	
 	/**
 	 * recuperation des l'historique des operations effectuer par un office
@@ -71,11 +58,7 @@ abstract class VirtualMoneyDAOManager extends DefaultDAOInterface {
 	 * @param int $offset
 	 * @return VirtualMoney[]
 	 */
-	public function findCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : array {
-	    return UtilitaireSQL::findCreationHistory($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, $dateMin, $dateMax, ['office' => $officeId], $limit, $offset);
-	}
-	
-	
-	
+	public function findCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : array ;
+
 }
 

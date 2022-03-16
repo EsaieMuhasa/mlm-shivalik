@@ -2,8 +2,12 @@
 namespace Core\Shivalik\Managers\Implementation;
 
 
+use Core\Shivalik\Entities\Account;
+use Core\Shivalik\Entities\BonusGeneration;
 use Core\Shivalik\Entities\Localisation;
 use Core\Shivalik\Entities\Member;
+use Core\Shivalik\Entities\PointValue;
+use Core\Shivalik\Entities\Withdrawal;
 use Core\Shivalik\Managers\MemberDAOManager;
 use PHPBackend\Dao\DAOEvent;
 use PHPBackend\Dao\DAOException;
@@ -14,9 +18,535 @@ use PHPBackend\Dao\UtilitaireSQL;
  * @author Esaie MHS
  *        
  */
-class MemberDAOManagerImplementation1 extends MemberDAOManager
+class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements MemberDAOManager
 {
-   
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::loadAccount()
+     */
+    public function loadAccount ($member, bool $calcul = true) : Account {
+        $account = new Account(($member instanceof Member)? $member : $this->findById($member));
+        
+        $daos = [PointValue::class, BonusGeneration::class, Withdrawal::class];
+        
+        foreach ($daos as $dao) {
+            /**
+             * @var AbstractOperationDAOManager $interface
+             */
+            $interface = $this->getManagerFactory()->getManagerOf($dao);
+            
+            if ($interface->checkByMember($account->getMember()->getId())) {
+                $operations = $interface->findByMember($account->getMember()->getId());
+                $account->addOperations($operations, false);
+            }
+            
+        }
+        
+        if ($calcul) {
+            $account->calcul();
+        }
+        
+        return $account;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::countByOffice()
+     */
+    public function countByOffice(int $officeId) : int{
+        if ($this->checkByOffice($officeId)) {
+            return UtilitaireSQL::count($this->getConnection(), $this->getTableName(), array('office' => $officeId));
+        }
+        return 0;
+    }
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::findByOffice()
+     */
+    public function findByOffice (int $officeId, ?int $limit = null, int $offset = 0) : array{
+        return UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, array('office' => $officeId), $limit, $offset);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::checkByOffice()
+     */
+    public function checkByOffice (int $officeId) : bool {
+        return $this->columnValueExist('office', $officeId);
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::checkLeftChild()
+     */
+    public function checkLeftChild (int $memberId) : bool{
+        return $this->checkChild($memberId, Member::LEFT_FOOT);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::checkRightChild()
+     */
+    public function checkRightChild (int $memberId) : bool{
+        return $this->checkChild($memberId, Member::RIGHT_FOOT);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::checkMiddelChild()
+     */
+    public function checkMiddelChild (int $memberId) : bool{
+        return $this->checkChild($memberId, Member::MIDDEL_FOOT);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::countChilds()
+     */
+    public function countChilds (int $memberId, ?int $foot = null) : int{
+        switch ($foot){
+            case Member::LEFT_FOOT : {//left
+                return $this->countLeftChild($memberId);
+            }break;
+            
+            case Member::MIDDEL_FOOT : {//middle
+                return $this->countMiddleChild($memberId);
+            }break;
+            
+            case Member::RIGHT_FOOT : {//right
+                return $this->countRightChild($memberId);
+            }break;
+            
+            default : {//to count all member
+                $number = $this->countLeftChild($memberId);
+                $number += $this->countMiddleChild($memberId);
+                $number += $this->countRightChild($memberId);
+                
+                return $number;
+            }
+            
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::countLeftChild()
+     */
+    public function countLeftChild (int $memberId) : int{
+        $number = 0;
+        
+        if ($this->checkLeftChild($memberId)) {//s'il a un neud a gauche
+            $leftChild = $this->findLeftChild($memberId);
+            $number = 1;
+            
+            if ($this->checkChilds($leftChild->getId())) {//si le neud gauche a des afants
+                $childs = $this->findChilds($leftChild->getId());
+                
+                foreach ($childs as $child) {//comptage des afents
+                    $number++;
+                    
+                    if ($this->checkChilds($child->getId())) {//comptage des affant/afent
+                        $number += $this->countChilds($child->getId());
+                    }
+                }
+            }
+            
+        }
+        
+        return $number;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::countMiddleChild()
+     */
+    public function countMiddleChild (int $memberId) : int{
+        $number = 0;
+        
+        if ($this->checkMiddelChild($memberId)) {//s'il a un neud au centre
+            $middleChild = $this->findMiddelChild($memberId);
+            $number = 1;
+            
+            if ($this->checkChilds($middleChild->getId())) {//si le neud au centre a des afants
+                $childs = $this->findChilds($middleChild->getId());
+                
+                foreach ($childs as $child) {//comptage des afents
+                    $number++;
+                    
+                    if ($this->checkChilds($child->getId())) {//comptage des affant/afent
+                        $number += $this->countChilds($child->getId());
+                    }
+                }
+            }
+            
+        }
+        return $number;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::countRightChild()
+     */
+    public function countRightChild (int $memberId) : int{
+        $number = 0;
+        
+        if ($this->checkRightChild($memberId)) {//s'il a un neud a droite
+            $ringhtChild = $this->findRightChild($memberId);
+            $number = 1;
+            
+            if ($this->checkChilds($ringhtChild->getId())) {//si le neud au centre a des afants
+                $childs = $this->findChilds($ringhtChild->getId());
+                
+                foreach ($childs as $child) {//comptage des afents
+                    $number++;
+                    
+                    if ($this->checkChilds($child->getId())) {//comptage des affant/afent
+                        $number += $this->countChilds($child->getId());
+                    }
+                }
+            }
+            
+        }
+        
+        return $number;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::findDownlinesChilds()
+     */
+    public function findDownlinesChilds (int $memberId, ?int $foot = null) : array{
+        
+        switch ($foot){
+            case Member::LEFT_FOOT : {//left
+                return $this->findLeftDownlinesChilds($memberId);
+            }break;
+            
+            case Member::MIDDEL_FOOT : {//middle
+                return $this->findMiddleDownlinesChilds($memberId);
+            }break;
+            
+            case Member::RIGHT_FOOT : {//right
+                return $this->findRightDownlinesChilds($memberId);
+            }break;
+            
+            default : {//all Member
+                $members = $this->findLeftDownlinesChilds($memberId);
+                $members = array_merge($members, $this->findMiddleDownlinesChilds($memberId));
+                $members = array_merge($members, $this->findRightDownlinesChilds($memberId));
+                return $members;
+            }
+            
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::findLeftDownlinesChilds()
+     */
+    public function findLeftDownlinesChilds (int $memberId) : array{
+        $members = array();
+        
+        if ($this->checkLeftChild($memberId)) {//s'il a un neud a gauche
+            $leftChild = $this->findLeftChild($memberId);
+            $members[] = $leftChild;
+            
+            if ($this->checkChilds($leftChild->getId())) {//si le neud gauche a des afants
+                $childs = $this->findChilds($leftChild->getId());
+                
+                foreach ($childs as $child) {//comptage des afents
+                    $members[] = $child;
+                    if ($this->checkChilds($child->getId())) {
+                        $members = array_merge($members, $this->findDownlinesChilds($child->getId()));
+                    }
+                }
+            }
+        }
+        return $members;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::findMiddleDownlinesChilds()
+     */
+    public function findMiddleDownlinesChilds (int $memberId) : array{
+        $members = array();
+        
+        if ($this->checkMiddelChild($memberId)) {//s'il a un neud au centre
+            $middleChild = $this->findMiddelChild($memberId);
+            $members[] = $middleChild;
+            
+            if ($this->checkChilds($middleChild->getId())) {//si le neud au centre a des afants
+                $childs = $this->findChilds($middleChild->getId());
+                
+                foreach ($childs as $child) {//comptage des afents
+                    $members[] = $child;
+                    
+                    if ($this->checkChilds($child->getId())) {
+                        $members = array_merge($members, $this->findDownlinesChilds($child->getId()));
+                    }
+                }
+            }
+            
+        }
+        
+        return $members;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::findRightDownlinesChilds()
+     */
+    public function findRightDownlinesChilds (int $memberId) : array{
+        $members = array();
+        
+        if ($this->checkRightChild($memberId)) {//s'il a un neud a droite
+            $ringhtChild = $this->findRightChild($memberId);
+            $members[] = $ringhtChild;
+            
+            if ($this->checkChilds($ringhtChild->getId())) {//si le neud as des neuds afant
+                $childs = $this->findChilds($ringhtChild->getId());
+                
+                foreach ($childs as $child) {//comptage pout tout les afant
+                    $members[] = $child;
+                    if ($this->checkChilds($child->getId())) {
+                        $members = array_merge($members, $this->findDownlinesChilds($child->getId()));
+                    }
+                }
+            }
+        }
+        
+        return $members;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::findDownlinesStacks()
+     */
+    public function findDownlinesStacks (int $memberId, ?int $foot = null) : array{
+        
+        $data = array();
+        switch ($foot){
+            case Member::LEFT_FOOT : {//left
+                if ($this->checkLeftChild($memberId)) {
+                    $data[] = $this->findLeftDownlineStack($memberId);
+                }
+            }break;
+            
+            case Member::MIDDEL_FOOT : {//middle
+                if ($this->checkMiddelChild($memberId)) {
+                    $data[] = $this->findMiddleDownlineStack($memberId);
+                }
+            }break;
+            
+            case Member::RIGHT_FOOT : {//right
+                if ($this->checkRightChild($memberId)) {
+                    $data[] = $this->getRightDownlineStack($memberId);
+                }
+            }break;
+            
+            default : {//all Member
+                if ($this->checkLeftChild($memberId)) {
+                    $data[] = $this->findLeftDownlineStack($memberId);
+                }
+                if ($this->checkMiddelChild($memberId)) {
+                    $data[] = $this->findMiddleDownlineStack($memberId);
+                }
+                if ($this->checkRightChild($memberId)) {
+                    $data[] = $this->findRightDownlineStack($memberId);
+                }
+            }
+        }
+        return $data;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::findLeftDownlineStack()
+     */
+    public function findLeftDownlineStack (int $memberId) : Member{
+        
+        $leftChild = $this->findLeftChild($memberId);
+        
+        if ($this->checkChilds($leftChild->getId())) {//si le neud gauche a des afants
+            $childs = $this->findChilds($leftChild->getId());
+            
+            foreach ($childs as $child) {//pour chaque noeud afant
+                if ($this->checkChilds($child->getId())) {
+                    $child->setChilds($this->findDownlinesStacks($child->getId()));//empilage de la methode parente
+                }
+            }
+            
+            $leftChild->setChilds($childs);
+        }
+        
+        return $leftChild;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::findMiddleDownlineStack()
+     */
+    public function findMiddleDownlineStack (int $memberId) : Member{
+        
+        $middleChild = $this->findMiddelChild($memberId);
+        
+        if ($this->checkChilds($middleChild->getId())) {//si le neud au centre a des afants
+            $childs = $this->findChilds($middleChild->getId());
+            
+            foreach ($childs as $child) {//empilage des enfants -> des anfants
+                if ($this->checkChilds($child->getId())) {
+                    $child->setChilds($this->findDownlinesStacks($child->getId()));
+                }
+            }
+            
+            $middleChild->setChilds($childs);
+        }
+        
+        return $middleChild;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::findRightDownlineStack()
+     */
+    public function findRightDownlineStack (int $memberId) : Member{
+        
+        $ringhtChild = $this->findRightChild($memberId);
+        
+        if ($this->checkChilds($ringhtChild->getId())) {//si le neud as des neuds afant
+            $childs = $this->findChilds($ringhtChild->getId());
+            
+            foreach ($childs as $child) {
+                if ($this->checkChilds($child->getId())) {
+                    $child->setChilds($this->findDownlinesStacks($child->getId()));
+                }
+            }
+            
+            $ringhtChild->setChilds($childs);
+        }
+        
+        return $ringhtChild;
+    }
+    
+    
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::findParent()
+     */
+    public function findParent (int $memberId) : Member{
+        if ($this->checkParent($memberId)) {
+            /**
+             * @var Member $member
+             */
+            $member = $this->findById($memberId, false);
+            return $this->findById($member->getParent()->getId());
+        }
+        
+        throw new DAOException("this node does not have a parent node");
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::findSponsor()
+     */
+    public function findSponsor (int $memberId) : Member{
+        if ($this->checkSponsor($memberId)) {
+            /**
+             * @var Member $member
+             */
+            $member = $this->findById($memberId, false);
+            return $this->findById($member->getSponsor()->getId());
+        }
+        
+        throw new DAOException("this node does not have a sponsor node");
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::findChilds()
+     */
+    public function findChilds (int $memberId) : array{
+        return UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), "foot", true, ['parent' => $memberId]);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::findLeftChild()
+     */
+    public function findLeftChild (int $memberId) : Member{
+        return $this->findChild($memberId, Member::LEFT_FOOT);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::findRightChild()
+     */
+    public function findRightChild (int $memberId) : Member{
+        return $this->findChild($memberId, Member::RIGHT_FOOT);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::findMiddelChild()
+     */
+    public function findMiddelChild (int $memberId) : Member{
+        return $this->findChild($memberId, Member::MIDDEL_FOOT);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::updateMatricule()
+     */
+    public function updateMatricule (string $matricule, int $memberId) : void {
+        UtilitaireSQL::update($this->getConnection(), $this->getTableName(), array('matricule' => $matricule), $memberId);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::checkByMatricule()
+     */
+    public function checkByMatricule (string $matricule, ?int $id = null) : bool {
+        return $this->columnValueExist('matricule', $matricule, $id);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::findByMatricule()
+     */
+    public function findByMatricule (string $matricule) : Member {
+        return UtilitaireSQL::findUnique($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), "matricule", $matricule);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::checkCreationHistoryByOffice()
+     */
+    public function checkCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : bool {
+        return UtilitaireSQL::hasCreationHistory($this->getConnection(), $this->getTableName(), self::FIELD_DATE_AJOUT, true, $dateMin, $dateMax, ['office' => $officeId], $limit, $offset);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::findCreationHistoryByOffice()
+     */
+    public function findCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : array {
+        return UtilitaireSQL::findCreationHistory($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, $dateMin, $dateMax, ['office' => $officeId], $limit, $offset);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::countCreationHistoryByOffice()
+     */
+    public function countCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null) : int{
+        return 0;
+    }
+
     /**
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\MemberDAOManager::findChild()
@@ -306,7 +836,6 @@ class MemberDAOManagerImplementation1 extends MemberDAOManager
         return false;
     }
     
-
     
     
 

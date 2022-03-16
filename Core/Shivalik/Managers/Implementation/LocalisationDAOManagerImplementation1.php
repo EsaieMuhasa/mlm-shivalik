@@ -1,9 +1,11 @@
 <?php
 namespace Core\Shivalik\Managers\Implementation;
 
-use Core\Shivalik\Managers\LocalisationDAOManager;
+use Core\Shivalik\Entities\Localisation;
 use PHPBackend\Dao\DAOEvent;
 use PHPBackend\Dao\DAOException;
+use PHPBackend\Dao\DAOInterface;
+use PHPBackend\Dao\DefaultDAOInterface;
 use PHPBackend\Dao\UtilitaireSQL;
 
 /**
@@ -11,8 +13,22 @@ use PHPBackend\Dao\UtilitaireSQL;
  * @author Esaie MHS
  *        
  */
-class LocalisationDAOManagerImplementation1 extends LocalisationDAOManager
+class LocalisationDAOManagerImplementation1 extends DefaultDAOInterface implements DAOInterface
 {
+    /**
+     * {@inheritDoc}
+     * @see \PHPBackend\Dao\DefaultDAOInterface::findById()
+     * @return Localisation
+     */
+    public function findById($id, bool $forward = true)
+    {
+        /**
+         * @var Localisation $localisation
+         */
+        $localisation = parent::findById($id, $forward);
+        $localisation->setCountry($this->getDaoManager()->getManagerOf('Country')->findById($localisation->getCountry()->getId()));
+        return $localisation;
+    }
 
     /**
      * {@inheritDoc}

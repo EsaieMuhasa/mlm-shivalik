@@ -4,6 +4,7 @@ namespace Core\Shivalik\Managers\Implementation;
 use Core\Shivalik\Entities\NotifiableComponent;
 use Core\Shivalik\Managers\NotifiableComponentDAOManager;
 use PHPBackend\Dao\DAOException;
+use PHPBackend\Dao\DefaultDAOInterface;
 use PHPBackend\Dao\UtilitaireSQL;
 
 /**
@@ -11,7 +12,7 @@ use PHPBackend\Dao\UtilitaireSQL;
  * @author Esaie MUHASA
  *        
  */
-class NotifiableComponentDAOManagerImplementation1 extends NotifiableComponentDAOManager
+class NotifiableComponentDAOManagerImplementation1 extends DefaultDAOInterface implements NotifiableComponentDAOManager
 {
     /**
      * {@inheritDoc}
@@ -39,7 +40,7 @@ class NotifiableComponentDAOManagerImplementation1 extends NotifiableComponentDA
 
     /**
      * {@inheritDoc}
-     * @see \PHPBackend\Dao\DAOInterface::createInTransaction()
+     * @see \PHPBackend\Dao\DefaultDAOInterface::createInTransaction()
      * @param NotifiableComponent $entity
      */
     public function createInTransaction($entity, $pdo): void
@@ -59,6 +60,26 @@ class NotifiableComponentDAOManagerImplementation1 extends NotifiableComponentDA
     public function update($entity, $id)
     {
         throw new DAOException("update operation is not supported");
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\NotifiableComponentDAOManager::checkByNotifiable()
+     */
+    public function checkByNotifiable ($dataKey, string $entity) : bool {
+        return UtilitaireSQL::checkAll($this->getConnection(), $this->getTableName(), ['dataKey' => $dataKey, 'entity' => $entity]);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\NotifiableComponentDAOManager::loadNotifiable()
+     */
+    public function loadNotifiable (NotifiableComponent $notifiable) : void {
+        if ($this->getDaoManager()->getManagerOf($notifiable->getEntity())->checkById($notifiable->getDataKey())) {
+            $notifiable->setNotifiable($this->getDaoManager()->getManagerOf($notifiable->getEntity())->findById($notifiable->getDataKey()));
+        } else {
+            throw new DAOException("An error occurred while loading data. Data integrity is not correct.");
+        }
     }
  
 }

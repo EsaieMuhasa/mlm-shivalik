@@ -7,14 +7,20 @@ use Core\Shivalik\Managers\OfficeAdminDAOManager;
 use PHPBackend\Dao\DAOEvent;
 use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
+use Core\Shivalik\Managers\OfficeDAOManager;
 
 /**
  * 
  * @author Esaie MUHASA
  *
  */
-class OfficeAdminDAOManagerImplementation1 extends OfficeAdminDAOManager
+class OfficeAdminDAOManagerImplementation1 extends AbstractUserDAOManager implements OfficeAdminDAOManager
 {
+    /**
+     * @var OfficeDAOManager
+     */
+    protected $officeDAOManager;
+    
     /**
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\OfficeAdminDAOManager::findActiveByOffice()
@@ -35,6 +41,19 @@ class OfficeAdminDAOManagerImplementation1 extends OfficeAdminDAOManager
 			throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
 		}
 		return  $return;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \Core\Shivalik\Managers\Implementation\AbstractUserDAOManager::findByColumnName()
+	 */
+	public function findByColumnName(string $columnName, $value, bool $forward = true)
+	{
+	    $admin = parent::findByColumnName($columnName, $value, $forward);
+	    if($forward) {
+	        $admin->setOffice($this->officeDAOManager->findById($admin->getOffice()->getId()));
+	    }
+	    return $admin;
 	}
 
 	/**
@@ -118,6 +137,20 @@ class OfficeAdminDAOManagerImplementation1 extends OfficeAdminDAOManager
 		    "office" => $officeId,
 		    "enable" => $active ? 1 : '0'
 		]);
+	}
+	
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \PHPBackend\Dao\DefaultDAOInterface::findAll()
+	 */
+	public function findAll(?int $limit = null, int $offset = 0) : array
+	{
+	    $users = parent::findAll($limit, $offset);
+	    foreach ($users as $user){
+	        $user->setOffice($this->officeDAOManager->findById($user->getOffice()->getId()));
+	    }
+	    return $users;
 	}
 	
 	

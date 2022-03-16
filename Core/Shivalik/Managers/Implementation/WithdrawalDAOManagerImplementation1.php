@@ -6,14 +6,26 @@ use Core\Shivalik\Managers\WithdrawalDAOManager;
 use PHPBackend\Dao\DAOEvent;
 use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
+use Core\Shivalik\Managers\MemberDAOManager;
+use Core\Shivalik\Managers\OfficeDAOManager;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-class WithdrawalDAOManagerImplementation1 extends WithdrawalDAOManager
+class WithdrawalDAOManagerImplementation1 extends AbstractOperationDAOManager implements WithdrawalDAOManager
 {
+    
+    /**
+     * @var OfficeDAOManager
+     */
+    protected $officeDAOManager;
+    
+    /**
+     * @var MemberDAOManager
+     */
+    protected $memberDAOManager;
     
     /**
      * {@inheritDoc}
@@ -48,7 +60,7 @@ class WithdrawalDAOManagerImplementation1 extends WithdrawalDAOManager
     
     /**
      * {@inheritDoc}
-     * @see \Core\Shivalik\Managers\AbstractOperationDAOManager::update()
+     * @see \Core\Shivalik\Managers\Implementation\AbstractOperationDAOManager::update()
      * @param Withdrawal $entity
      */
     public function update($entity, $id) : void
@@ -109,6 +121,86 @@ class WithdrawalDAOManagerImplementation1 extends WithdrawalDAOManager
             throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
         }
         return $return;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\WithdrawalDAOManager::validate()
+     */
+    public function validate (int $id, int $adminId) : void {
+        UtilitaireSQL::update($this->getConnection(), $this->getTableName(), array('admin' => $adminId), $id);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\Implementation\AbstractOperationDAOManager::findByMember()
+     * @return Withdrawal[]
+     */
+    public function findByMember(int $memberId, ?int $limit = null, int $offset = 0): array
+    {
+        $operations = parent::findByMember($memberId, $limit, $offset);
+        foreach ($operations as $operation) {
+            $operation->setOffice($this->officeDAOManager->findById($operation->office->id, false));
+        }
+        return $operations;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\WithdrawalDAOManager::findByRapport()
+     */
+    public function findByRapport(int $raportId, ?int $limit = null, int $offset = 0): array{
+        /**
+         * @var Withdrawal[] $raports
+         */
+        $raports = UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, array('raport' => $raportId), $limit, $offset);
+        foreach ($raports as $raport) {
+            $raport->setMember($this->memberDAOManager->findById($raport->getMember()->getId(), false));
+        }
+        return $raports;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\WithdrawalDAOManager::countByRapport()
+     */
+    public function countByRapport (int $rapportId) : int  {
+        return UtilitaireSQL::count($this->getConnection(), $this->getTableName(), array('rapport' => $rapportId));
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \PHPBackend\Dao\DefaultDAOInterface::findByCreationHistory()
+     */
+    public function findByCreationHistory(\DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset = 0) : array
+    {
+        /**
+         * @var Withdrawal[] $withs
+         */
+        $withs = parent::findByCreationHistory($dateMin, $dateMax, $limit, $offset);
+        foreach ($withs as $withdrawel) {
+            $withdrawel->setOffice($this->officeDAOManager->findById($withdrawel->office->id, false));
+            $withdrawel->setMember($this->memberDAOManager->findById($withdrawel->member->id, false));
+        }
+        return $withs;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\WithdrawalDAOManager::checkCreationHistoryByOffice()
+     */
+    public function checkCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : bool {
+        return UtilitaireSQL::hasCreationHistory($this->getConnection(), $this->getTableName(), self::FIELD_DATE_AJOUT, true, $dateMin, $dateMax, ['office' => $officeId], $limit, $offset);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\WithdrawalDAOManager::findCreationHistoryByOffice()
+     */
+    public function findCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : array {
+        return UtilitaireSQL::findCreationHistory($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, $dateMin, $dateMax, ['office' => $officeId], $limit, $offset);
     }
 
 }

@@ -4,13 +4,14 @@ namespace Core\Shivalik\Managers\Implementation;
 use Core\Shivalik\Managers\ProductDAOManager;
 use Core\Shivalik\Entities\Product;
 use PHPBackend\Dao\UtilitaireSQL;
+use PHPBackend\Dao\DefaultDAOInterface;
 
 /**
  *
  * @author Esaie MUHASA
  *        
  */
-class ProductDAOManagerImplementation1 extends ProductDAOManager
+class ProductDAOManagerImplementation1 extends DefaultDAOInterface implements ProductDAOManager
 {
     /**
      * {@inheritDoc}
@@ -26,6 +27,22 @@ class ProductDAOManagerImplementation1 extends ProductDAOManager
             'description' => $entity->getDescription()
         ]);
         $entity->setId($id);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\ProductDAOManager::findByName()
+     */
+    public function findByName (string $name) : Product {
+        return  $this->findByColumnName('name', $name);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\ProductDAOManager::checkByName()
+     */
+    public function checkByName (string $name,  ?int $id = null) : bool {
+        return  $this->checkByColumnName('name', $name, $id);
     }
 
     /**

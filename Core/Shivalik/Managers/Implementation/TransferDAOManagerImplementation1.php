@@ -11,7 +11,7 @@ use PHPBackend\Dao\UtilitaireSQL;
  * @author Esaie MHS
  *        
  */
-class TransferDAOManagerImplementation1 extends TransferDAOManager
+class TransferDAOManagerImplementation1 extends AbstractOperationDAOManager implements TransferDAOManager
 {
 
     /**
@@ -32,7 +32,7 @@ class TransferDAOManagerImplementation1 extends TransferDAOManager
 
     /**
      * {@inheritDoc}
-     * @see \Core\Shivalik\Managers\AbstractOperationDAOManager::update()
+     * @see \Core\Shivalik\Managers\Implementation\AbstractOperationDAOManager::update()
      */
     public function update($entity, $id) : void
     {

@@ -5,20 +5,46 @@ use Core\Shivalik\Entities\BonusGeneration;
 use Core\Shivalik\Entities\Generation;
 use Core\Shivalik\Entities\GradeMember;
 use Core\Shivalik\Entities\Member;
-use Core\Shivalik\Entities\PointValue;
-use Core\Shivalik\Managers\GradeMemberDAOManager;
-use PHPBackend\Dao\DAOException;
-use PHPBackend\Dao\UtilitaireSQL;
 use Core\Shivalik\Entities\NotificationReceiver;
+use Core\Shivalik\Entities\PointValue;
+use Core\Shivalik\Managers\GenerationDAOManager;
+use Core\Shivalik\Managers\GradeDAOManager;
+use Core\Shivalik\Managers\GradeMemberDAOManager;
+use Core\Shivalik\Managers\MemberDAOManager;
+use Core\Shivalik\Managers\OfficeDAOManager;
 use PHPBackend\Dao\DAOEvent;
+use PHPBackend\Dao\DAOException;
+use PHPBackend\Dao\DefaultDAOInterface;
+use PHPBackend\Dao\UtilitaireSQL;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-class GradeMemberDAOManagerImplementation1 extends GradeMemberDAOManager
+class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implements  GradeMemberDAOManager
 {
+    
+    /**
+     * @var MemberDAOManager
+     */
+    protected $memberDAOManager;
+    
+    /**
+     * @var GradeDAOManager
+     */
+    protected $gradeDAOManager;
+    
+    /**
+     * @var GenerationDAOManager
+     */
+    protected $generationDAOManager;
+    
+    /**
+     * @var OfficeDAOManager
+     */
+    protected $officeDAOManager;
+    
     
     /**
      * {@inheritDoc}
@@ -747,6 +773,54 @@ class GradeMemberDAOManagerImplementation1 extends GradeMemberDAOManager
             throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
         }
         return $return;
+    }
+    
+
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\GradeMemberDAOManager::hasUnpaid()
+     */
+    public function hasUnpaid (?int $officeId) : bool {
+        return $this->hasOperation($officeId, null, false);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\GradeMemberDAOManager::findUnpaid()
+     */
+    public function findUnpaid (?int $officeId) : array {
+        return $this->findOperations($officeId, null, false);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\GradeMemberDAOManager::checkCreationHistoryByOffice()
+     */
+    public function checkCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : bool {
+        return UtilitaireSQL::hasCreationHistory($this->getConnection(), $this->getTableName(), self::FIELD_DATE_AJOUT, true, $dateMin, $dateMax, ['office' => $officeId], $limit, $offset);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\GradeMemberDAOManager::findCreationHistoryByOffice()
+     */
+    public function findCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : bool {
+        return UtilitaireSQL::findCreationHistory($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, $dateMin, $dateMax, ['office' => $officeId], $limit, $offset);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\GradeMemberDAOManager::load()
+     */
+    public function load ($gradeMember) : GradeMember {
+        $gm = ($gradeMember instanceof GradeMember)? $gradeMember : $this->findById($gradeMember);
+        $gm->setOffice($this->officeDAOManager->findById($gm->getOffice()->getId(), false));
+        $gm->setMember($this->memberDAOManager->findById($gm->getMember()->getId(), false));
+        $gm->setGrade($this->gradeDAOManager->findById($gm->getGrade()->getId(), false));
+        if ($gm->getOld() != null) {
+            $gm->setOld($this->findById($gm->getOld()->getId(), false));
+        }
+        return $gm;
     }
 
   

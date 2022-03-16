@@ -1,33 +1,29 @@
 <?php
 namespace Core\Shivalik\Managers;
 
-use PHPBackend\Dao\DefaultDAOInterface;
+use PHPBackend\Dao\DAOInterface;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-abstract class CountryDAOManager extends DefaultDAOInterface
+interface CountryDAOManager extends DAOInterface
 {
     /**
      * @param string $name
      * @param int $id
      * @return bool
      */
-    public function checkByName (string $name, ?int $id = null) : bool {
-        return $this->columnValueExist('name', $name, $id);
-    }
+    public function checkByName (string $name, ?int $id = null) : bool;
     
     /**
-     *
+     *verification de l'existance de l'abreviation dans la bse de donnee
      * @param string $abbreviation
      * @param int $id
      * @return bool
      */
-    public function checkByAbreviation (string $abbreviation, ?int $id = null) : bool {
-        return $this->columnValueExist('abbreviation', $abbreviation, $id);
-    }
+    public function checkByAbreviation (string $abbreviation, ?int $id = null) : bool;
     
 }
 

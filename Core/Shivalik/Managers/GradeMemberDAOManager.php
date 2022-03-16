@@ -3,38 +3,16 @@ namespace Core\Shivalik\Managers;
 
 use Core\Shivalik\Entities\GradeMember;
 use PHPBackend\Dao\DAOException;
-use PHPBackend\Dao\DefaultDAOInterface;
-use PHPBackend\Dao\UtilitaireSQL;
+use PHPBackend\Dao\DAOInterface;
 
 /**
  *
  * @author Esaie MHS
  *        
  */
-abstract class GradeMemberDAOManager extends DefaultDAOInterface
+interface GradeMemberDAOManager extends DAOInterface
 {
-	
-	/**
-	 * @var MemberDAOManager
-	 */
-	protected $memberDAOManager;
-	
-	/**
-	 * @var GradeDAOManager
-	 */
-	protected $gradeDAOManager;
-	
-	/**
-	 * @var GenerationDAOManager
-	 */
-	protected $generationDAOManager;
-	
-	/**
-	 * @var OfficeDAOManager
-	 */
-	protected $officeDAOManager;
-	
-	
+
     /**
      * revoie l'actuel packet du membre dont l'id est en paramtres
      * (le packet envoyer est celui qui est actuelement activer)
@@ -42,14 +20,14 @@ abstract class GradeMemberDAOManager extends DefaultDAOInterface
      * @return GradeMember
      * @throws DAOException
      */
-    public abstract function findCurrentByMember (int $memberId) : GradeMember ;
+    public function findCurrentByMember (int $memberId) : GradeMember ;
     
     /**
      * renveoie la demande de mise en jour du packet d'un utilisateur
      * @param int $memberId
      * @return GradeMember
      */
-    public abstract function findRequestedByMember (int $memberId) : GradeMember;
+    public function findRequestedByMember (int $memberId) : GradeMember;
     
     /**
      * L'office en parametre a-t-elle deja effectuee aumoin une operation???
@@ -64,7 +42,7 @@ abstract class GradeMemberDAOManager extends DefaultDAOInterface
      * @param bool $virtual 
      * @return bool
      */
-    public abstract function checkByOffice (?int $officeId, ?bool $upgrade = null, ?bool $virtual = null) : bool;
+    public function checkByOffice (?int $officeId, ?bool $upgrade = null, ?bool $virtual = null) : bool;
     
     /**
      * revoie une collection d'operation effectuer par un bureau
@@ -79,16 +57,14 @@ abstract class GradeMemberDAOManager extends DefaultDAOInterface
      * @param bool $virtual
      * @return GradeMember[]
      */
-    public abstract function findByOffice (?int $officeId, ?bool $upgrade = null, ?bool $virtual = null);
+    public function findByOffice (?int $officeId, ?bool $upgrade = null, ?bool $virtual = null);
     
     /**
      * Verifie s'il a des operation dont la rertrocession n'a pas encore eu lieux
      * @param int $officeId
      * @return bool
      */
-    public function hasUnpaid (?int $officeId) : bool {
-        return $this->hasOperation($officeId, null, false);
-    }
+    public function hasUnpaid (?int $officeId) : bool;
     
     /**
      * renvoie une collection des operations dont la retrocession n'as pas encore eu lieux
@@ -97,16 +73,14 @@ abstract class GradeMemberDAOManager extends DefaultDAOInterface
      * @return GradeMember[]
      * @throws DAOException s'il y a erreur lors de la communication avec la BDD ou aucune operations
      */
-    public function findUnpaid (?int $officeId) : array {
-        return $this->findOperations($officeId, null, false);
-    }
+    public function findUnpaid (?int $officeId) : array;
     
     /**
      * y-a-il aumoin une operation pour le virtual en parametre??
      * @param int $virtualId
      * @return bool
      */
-    public abstract function hasDebts (?int $virtualId = null) : bool ;
+    public function hasDebts (?int $virtualId = null) : bool ;
     
     /**
      * Revoie une collection d'operation en dettes 
@@ -114,7 +88,7 @@ abstract class GradeMemberDAOManager extends DefaultDAOInterface
      * @param int $virtualId
      * @return GradeMember[]
      */
-    public abstract function findDebts (?int $virtualId = null);
+    public function findDebts (?int $virtualId = null);
     
     
     /**
@@ -122,39 +96,39 @@ abstract class GradeMemberDAOManager extends DefaultDAOInterface
      * @return GradeMember[]
      * @throws DAOException
      */
-    public abstract function findAllRequest ();
+    public function findAllRequest ();
     
     /**
      * Verifie s'il y a des packets en attente d'activation.
      * lorsque les packet sont en attente d'activation, les PV et l'argent n'est pas encore dispatcher
      * @return bool
      */
-    public abstract function checkRequest () : bool;
+    public function checkRequest () : bool;
     
     /**
      * @param int $memberId
      * @return bool
      */
-    public abstract function checkCurrentByMember (int $memberId) : bool;
+    public function checkCurrentByMember (int $memberId) : bool;
     
     /**
      * @param int $memberId
      * @return bool
      */
-    public abstract function checkRequestedByMember (int $memberId) : bool;
+    public function checkRequestedByMember (int $memberId) : bool;
     
     /**
      * @param GradeMember $gm
      * @throws DAOException
      */
-    public abstract function upgrade (GradeMember $gm) : void ;
+    public function upgrade (GradeMember $gm) : void ;
     
     /**
      * comptage des operations d'apgrade de compte??
      * @param int $officeId
      * @return int
      */
-    public abstract function countUpgrades (?int $officeId = null) : int ;
+    public function countUpgrades (?int $officeId = null) : int ;
     
     /**
      * Activation de packet d'un utilisateur
@@ -162,7 +136,7 @@ abstract class GradeMemberDAOManager extends DefaultDAOInterface
      * @param GradeMember $gm
      * @throws DAOException s'il y a erreur lors du partage des bonus
      */
-    public abstract function enable (GradeMember $gm) : void ;
+    public function enable (GradeMember $gm) : void ;
     
     
     /**
@@ -174,7 +148,7 @@ abstract class GradeMemberDAOManager extends DefaultDAOInterface
      * @return bool
      * @throws DAOException
      */
-    public abstract function checkUpgradeHistory(\DateTime $dateMin, \DateTime $dateMax = null, ?int $officeId=null, ?int $limit = null, int $offset = 0) : bool;
+    public function checkUpgradeHistory(\DateTime $dateMin, \DateTime $dateMax = null, ?int $officeId=null, ?int $limit = null, int $offset = 0) : bool;
     
     /**
      * comptage de upgrade de comptes
@@ -184,7 +158,7 @@ abstract class GradeMemberDAOManager extends DefaultDAOInterface
      * @return int
      * @throws DAOException
      */
-    public abstract function countUpgradeHistory (\DateTime $dateMin, \DateTime $dateMax = null, ?int $officeId=null) : int;
+    public function countUpgradeHistory (\DateTime $dateMin, \DateTime $dateMax = null, ?int $officeId=null) : int;
     
     /**
      * reguperation de l'historique pour Upgrade
@@ -195,7 +169,7 @@ abstract class GradeMemberDAOManager extends DefaultDAOInterface
      * @param int $offset
      * @return GradeMember[]
      */
-    public abstract function findUpgradeHistory(\DateTime $dateMin, \DateTime $dateMax = null, ?int $officeId=null, ?int $limit = null, int $offset = 0);
+    public function findUpgradeHistory(\DateTime $dateMin, \DateTime $dateMax = null, ?int $officeId=null, ?int $limit = null, int $offset = 0);
     
     
     /**
@@ -207,9 +181,7 @@ abstract class GradeMemberDAOManager extends DefaultDAOInterface
      * @param int $offset
      * @return bool
      */
-    public function checkCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : bool {
-        return UtilitaireSQL::hasCreationHistory($this->getConnection(), $this->getTableName(), self::FIELD_DATE_AJOUT, true, $dateMin, $dateMax, ['office' => $officeId], $limit, $offset);
-    }
+    public function checkCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : bool ;
     
     /**
      * recuperation des l'historique des operations effectuer par un office
@@ -220,25 +192,15 @@ abstract class GradeMemberDAOManager extends DefaultDAOInterface
      * @param int $offset
      * @return bool
      */
-    public function findCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : bool {
-        return UtilitaireSQL::findCreationHistory($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, $dateMin, $dateMax, ['office' => $officeId], $limit, $offset);
-    }
+    public function findCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : bool ;
     
     
     /**
+     * chargement des donnees du grade d'un membre
      * @param GradeMember|int $gradeMember
      * @return GradeMember
      */
-    public function load ($gradeMember) : GradeMember {
-        $gm = ($gradeMember instanceof GradeMember)? $gradeMember : $this->findById($gradeMember);
-        $gm->setOffice($this->officeDAOManager->findById($gm->getOffice()->getId(), false));
-        $gm->setMember($this->memberDAOManager->findById($gm->getMember()->getId(), false));
-        $gm->setGrade($this->gradeDAOManager->findById($gm->getGrade()->getId(), false));
-        if ($gm->getOld() != null) {
-            $gm->setOld($this->findById($gm->getOld()->getId(), false));
-        }
-        return $gm;
-    }
+    public function load ($gradeMember) : GradeMember;
     
 }
 

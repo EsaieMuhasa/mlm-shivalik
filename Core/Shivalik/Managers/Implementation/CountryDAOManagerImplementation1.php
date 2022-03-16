@@ -4,15 +4,16 @@ namespace Core\Shivalik\Managers\Implementation;
 
 use Core\Shivalik\Entities\Country;
 use Core\Shivalik\Managers\CountryDAOManager;
-use PHPBackend\Dao\UtilitaireSQL;
 use PHPBackend\Dao\DAOEvent;
+use PHPBackend\Dao\DefaultDAOInterface;
+use PHPBackend\Dao\UtilitaireSQL;
 
 /**
  * 
  * @author Esaie MUHASA
  *
  */
-class CountryDAOManagerImplementation1 extends CountryDAOManager
+class CountryDAOManagerImplementation1 extends DefaultDAOInterface implements CountryDAOManager
 {
 
     /**
@@ -33,8 +34,7 @@ class CountryDAOManagerImplementation1 extends CountryDAOManager
     
     /**
      * {@inheritDoc}
-     * @see \PHPBackend\Dao\DAOInterface::createInTransaction()
-     * @param Country $entity
+     * @see \PHPBackend\Dao\DefaultDAOInterface::createInTransaction()
      */
     public function createInTransaction($entity, \PDO $pdo): void
     {
@@ -44,6 +44,25 @@ class CountryDAOManagerImplementation1 extends CountryDAOManager
             self::FIELD_DATE_AJOUT => $entity->getFormatedDateAjout()
         ]);
         $entity->setId($id);
+    }
+    
+    /**
+     * @param string $name
+     * @param int $id
+     * @return bool
+     */
+    public function checkByName (string $name, ?int $id = null) : bool {
+        return $this->columnValueExist('name', $name, $id);
+    }
+    
+    /**
+     *
+     * @param string $abbreviation
+     * @param int $id
+     * @return bool
+     */
+    public function checkByAbreviation (string $abbreviation, ?int $id = null) : bool {
+        return $this->columnValueExist('abbreviation', $abbreviation, $id);
     }
 
 
