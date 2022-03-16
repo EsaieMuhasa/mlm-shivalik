@@ -1,17 +1,14 @@
-
 @import 'bootstrap';
 @import 'customs/variables';
 @import 'customs/mixins';
 @import 'customs/icons-awesome';
 @import 'customs/icons-elegant';
-
 @import 'customs/grid';
 @import 'templates/layout-index';
+@import 'templates/about';
 @import 'templates/login';
 @import 'templates/button';
 @import 'customs/default-carousel';
-
-
 * {
     @include box-sizing('border-box');
 }

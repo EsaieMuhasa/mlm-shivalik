@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Libre+Franklin:ital,wght@0,300;1,300&display=swap');
+.about {
+    padding-top: $goutier-bootstrap;
+    p,
+    li,
+    a {
+        font-family: 'Libre Franklin', sans-serif;
+        font-size: 1.8rem;
+    }
+    p {
+        line-height: 2.5rem;
+        text-align: justify;
+    }
+    .about-title {
+        border-bottom: 1px solid $custom-secodary-color;
+        padding-bottom: $goutier;
+        color: $custom-secodary-color;
+    }
+}

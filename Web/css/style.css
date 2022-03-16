@@ -5,6 +5,7 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
 /*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */
+@import url("https://fonts.googleapis.com/css2?family=Libre+Franklin:ital,wght@0,300;1,300&display=swap");
 html {
   font-family: sans-serif;
   -ms-text-size-adjust: 100%;
@@ -4500,7 +4501,7 @@ button.close {
 .default-navbar .default-nav, .banner, .default-carousel, .home-carousel, .default-carousel-items, .home-carousel-items {
   zoom: 1; }
 
-.default-navbar, .banner, .why-section, .default-products, .default-footer {
+.default-navbar, .banner, .why-section, .default-products, .certified-section, .default-footer {
   margin-left: -15px;
   margin-right: -15px; }
 
@@ -9316,6 +9317,8 @@ you can use the generic selector below, but it's slower:
     float: left; }
     .default-navbar .default-navbar-header * {
       vertical-align: middle; }
+    .default-navbar .default-navbar-header a {
+      text-decoration: none; }
     @media screen and (max-width: 768px) {
       .default-navbar .default-navbar-header a {
         display: flex; } }
@@ -9579,11 +9582,29 @@ you can use the generic selector below, but it's slower:
       -webkit-transition: transform 600ms;
       -o-transition: transform 600ms; }
 
+.certified-section {
+  border-top: 5px solid #3b3b97; }
+
 .default-footer {
   background: #ffffff;
   padding-top: 30px;
   padding-bottom: 30px;
   border-top: 5px solid #cf4d33; }
+
+.about {
+  padding-top: 30px; }
+  .about p,
+  .about li,
+  .about a {
+    font-family: 'Libre Franklin', sans-serif;
+    font-size: 1.8rem; }
+  .about p {
+    line-height: 2.5rem;
+    text-align: justify; }
+  .about .about-title {
+    border-bottom: 1px solid #3b3b97;
+    padding-bottom: 10px;
+    color: #3b3b97; }
 
 .login-page {
   background: #e6e6e6; }

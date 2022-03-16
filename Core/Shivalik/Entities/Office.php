@@ -22,6 +22,12 @@ class Office extends DBEntity
     private $photo;
     
     /**
+     * visibilite du bureau
+     * @var boolean
+     */
+    private $visible;
+    
+    /**
      * @var boolean
      */
     private $central;
@@ -415,7 +421,22 @@ class Office extends DBEntity
             throw new PHPBackendException("invalid param value in setOfficeSize() method");
         }
     }
+    /**
+     * @return boolean
+     */
+    public function isVisible() : ?bool
+    {
+        return $this->visible;
+    }
 
+    /**
+     * @param boolean $visible
+     * modification de la visiblite d'un office
+     */
+    public function setVisible ($visible) : void
+    {
+        $this->visible = is_bool($visible)? $visible : $visible == 1;
+    }
 
 }
 

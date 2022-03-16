@@ -1,14 +1,14 @@
 <?php
-use Applications\Member\MemberApplication;
 use Applications\Member\Modules\Account\AccountController;
 use Core\Shivalik\Entities\Account;
 use Core\Shivalik\Entities\Member;
-use PHPBackend\Request;
+use Core\Shivalik\Filters\SessionMemberFilter;
 use PHPBackend\AppConfig;
+use PHPBackend\Request;
 /**
  * @var Member $member
  */
-$member = MemberApplication::getConnectedMember();
+$member = $_SESSION[SessionMemberFilter::MEMBER_CONNECTED_SESSION];
 
 /**
  * @var Account $compte

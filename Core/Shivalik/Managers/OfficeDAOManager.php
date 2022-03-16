@@ -38,6 +38,42 @@ abstract class OfficeDAOManager extends DefaultDAOInterface
     }
     
     /**
+     * mis en jour de la visibilite d'un office
+     * @param int $id
+     * @param bool $visible
+     */
+    public function updateVisibility (int $id, bool $visible) : void {
+        UtilitaireSQL::update(
+            $this->getConnection(), $this->getTableName(), ['visible' => $visible? '1':'0'], $id);
+    }
+    
+    /**
+     * Selection des offices ayant pour visibilitee, le boolean en parametre
+     * @param bool $visible
+     * @param int $limit
+     * @param int $offset
+     * @return object[]
+     */
+    public function findByVisibility (bool $visible = true, ?int $limit = null, int $offset = 0) {
+        return UtilitaireSQL::findAll(
+            $this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), 
+            "dateAjout", true, ['visible' => $visible? '1':'0'], $limit, $offset);
+    }
+    
+    /**
+     * verification de l'existance d'un office ayant pour visibilite la valeur en parametre
+     * @param bool $visible
+     * @param int $limit
+     * @param int $offset
+     * @return boolean
+     */
+    public function checkByVisibility (bool $visible = true, ?int $limit = null, int $offset = 0) {
+        return UtilitaireSQL::checkAll(
+            $this->getConnection(), $this->getTableName(), ['visible' => $visible? '1':'0'], 
+            $limit, $offset);
+    }
+    
+    /**
      * @param int $id
      * @param string $photo
      */

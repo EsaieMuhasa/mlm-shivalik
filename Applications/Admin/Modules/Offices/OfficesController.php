@@ -202,6 +202,19 @@ class OfficesController extends AdminController {
 	}
 	
 	/**
+	 * Modification de la visibilite d'un office
+	 * cette action n'ast pas de vue,
+	 * apre execution d'operation, une demande de redirection est renvoyer en repose
+	 * @param Request $request
+	 * @param Response $response
+	 */
+	public function executeOfficeVisibility (Request $request, Response $response) : void {
+	    $visible = $request->getDataGET('option') == 'visible';
+	    $this->officeDAOManager->updateVisibility($this->office->getId(), $visible);
+	    $response->sendRedirect("/admin/offices/table.{$request->getExtensionURI()}");
+	}
+	
+	/**
 	 * modification des information d'un office
 	 * @param Request $request
 	 * @param Response $response

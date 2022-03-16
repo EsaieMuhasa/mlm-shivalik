@@ -92,8 +92,13 @@ use Applications\Admin\Modules\Offices\OfficesController;
     							<a class="btn btn-primary" href="/admin/offices/<?php echo  $office->id; ?>/">
     								<span class="glyphicon glyphicon-folder-open"></span> Open
     							</a>
+    							
     							<a class="btn btn-success" href="/admin/offices/<?php echo  "{$office->id}/update.html"; ?>">
-    								<span class="glyphicon glyphicon-edit"></span> update
+    								<span class="glyphicon glyphicon-edit"></span> Update
+    							</a>
+    							
+    							<a class="btn btn-<?php echo ($office->visible? 'danger':'info'); ?>" href="/admin/offices/<?php echo  "{$office->id}/".($office->visible? 'in':'')."visible.html"; ?>">
+    								<span class="glyphicon glyphicon-remove"></span> <?php echo ($office->visible? 'Disable':'Enable'); ?>
     							</a>
     						</td>
     					</tr>

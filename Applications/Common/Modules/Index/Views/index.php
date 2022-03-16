@@ -25,7 +25,7 @@ $member = isset($_SESSION[SessionMemberFilter::MEMBER_CONNECTED_SESSION])? $_SES
 
             <h1>We Are Shivalik Herbals</h1>
             <p>
-                At Shivalik Herbals we are manufacturing Herbal <?php echo htmlspecialchars('&'); ?> Ayurvedic Products Since 2004 and we are working in this field for the last 25 years. Shivalik Herbals is a GMP <?php echo htmlspecialchars('&'); ?> ISO 9001:2015 certified company. We are manufacturing Herbal <?php echo htmlspecialchars('&'); ?> Ayurvedic Capsules, Powders,Tea, Prash, Oils <?php echo htmlspecialchars('&'); ?> cosmetics. Shivalik Herbals is the place where you can find the perfect balance between science of ancient Ayurveda and the modern manufacturing and testing techniques.
+                Shivalik Herbals is one of the best Ayurvedic &amp; Natural Health Care Company in India. It is GMP (Good manufacturing practices as per the norms of WHO) &amp; ISO 9001:2008 certified company with a portfolio of over 200 Herbal/Ayurvedic products. We have a unique range of world class ayurvedic products and have expertise in Herbal &amp; Ayurvedic Capsules, Tablets, Powders, Tea, Prash, Oils &amp; creams. Your search ends here as here you can find the perfect balance between science of ancient Ayurveda and the modern manufacturing and testing techniques of all the times. We are pioneer in this field for the last 25 years. With its perfect solutions Shivalik Herbals has touched lives of millions of people across globe.
             </p>
 
             <div class="text-center">
@@ -78,7 +78,7 @@ $member = isset($_SESSION[SessionMemberFilter::MEMBER_CONNECTED_SESSION])? $_SES
                         </div>
                         <div class="card-caption">
                             <p>
-                                Product can be supplied to any part of the world according to buyer requirement.
+                                Product can be customised according to buyer requirement.
                             </p>
                         </div>
                     </div>
@@ -116,7 +116,7 @@ $member = isset($_SESSION[SessionMemberFilter::MEMBER_CONNECTED_SESSION])? $_SES
                         </div>
                         <div class="card-caption">
                             <p>
-                                Best quality at right price.
+                                Experienced &amp; well qualified team.
                             </p>
                         </div>
                     </div>
@@ -128,7 +128,7 @@ $member = isset($_SESSION[SessionMemberFilter::MEMBER_CONNECTED_SESSION])? $_SES
                         </div>
                         <div class="card-caption">
                             <p>
-                                Product can be supplied to any part of the world according to buyer requirement.
+                                Advanced machinery.
                             </p>
                         </div>
                     </div>
@@ -140,7 +140,7 @@ $member = isset($_SESSION[SessionMemberFilter::MEMBER_CONNECTED_SESSION])? $_SES
                         </div>
                         <div class="card-caption">
                             <p>
-                                We manufacture the complete range of Herbal <?php echo htmlspecialchars('&'); ?> Ayurvedic Products.
+                                Timely delivery.
                             </p>
                         </div>
                     </div>
@@ -186,4 +186,36 @@ $member = isset($_SESSION[SessionMemberFilter::MEMBER_CONNECTED_SESSION])? $_SES
             <?php endforeach; ?>
         </div>
     </div>
+    
 </section>
+<div class="certified-section">
+	<div class="container">
+		<h1>A GMP &amp; ISO 9001: 2015 Certified Company</h1>
+    	
+    	<div class="row">
+    		<div class="col-xs-12 col-sm-4 col-md-2 col-lg-2">
+    			<img src="/img/haccp.png" class="thumbnail"/>
+    		</div>
+    		
+    		<div class="col-xs-12 col-sm-4 col-md-2 col-lg-2">
+    			<img src="/img/iso-9001.png" class="thumbnail"/>
+    		</div>
+    		
+    		<div class="col-xs-12 col-sm-4 col-md-2 col-lg-2">
+    			<img src="/img/halal.png" class="thumbnail"/>
+    		</div>
+    		
+    		<div class="col-xs-12 col-sm-4 col-md-2 col-lg-2">
+    			<img src="/img/iso-22000.png" class="thumbnail"/>
+    		</div>
+    		
+    		<div class="col-xs-12 col-sm-4 col-md-2 col-lg-2">
+    			<img src="/img/gmp.png" class="thumbnail"/>
+    		</div>
+    		
+    		<div class="col-xs-12 col-sm-4 col-md-2 col-lg-2">
+    			<img src="/img/natural.png" class="thumbnail"/>
+    		</div>
+    	</div>
+	</div>
+</div>

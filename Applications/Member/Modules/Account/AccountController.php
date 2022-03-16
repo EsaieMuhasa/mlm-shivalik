@@ -226,7 +226,9 @@ class AccountController extends HTTPController
             $request->addAttribute(self::ATT_WITHDRAWEL, $withdrawel);
         }
         
-        $request->addAttribute(self::ATT_OFFICES, $this->officeDAOManager->findAll());
+        $offices = $this->officeDAOManager->findByVisibility();
+
+        $request->addAttribute(self::ATT_OFFICES, $offices);
         $request->addAttribute(self::ATT_MEMBER, $account->getMember());
     }
     

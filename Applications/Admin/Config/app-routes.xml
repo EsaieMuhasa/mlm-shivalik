@@ -56,6 +56,8 @@
 		<route action="resetPassword" urlPattern="/admin/offices/([0-9]+)/reset-([0-9]+)\.html" paramsNames="id,adminId"/>
 		<route action="redirectWithdrawal" urlPattern="/admin/offices/([0-9]+)/withdrawals/([0-9]+)/redirect\.html" paramsNames="id,withdrawalId"/>
 		
+		<route action="officeVisibility" urlPattern="/admin/offices/([0-9]+)/(invisible|visible)\.html" paramsNames="id,option"/>
+		
 		<route action="virtualmoney" urlPattern="/admin/offices/([0-9]+)/virtualmoney/" paramsNames="id"/>
 		<route action="sendVirtualmoney" urlPattern="/admin/offices/([0-9]+)/virtualmoney/send\.html" paramsNames="id"/>
 		<route action="sendVirtualmoney" urlPattern="/admin/offices/([0-9]+)/virtualmoney/([0-9]+)/send\.html" paramsNames="id,request"/>
