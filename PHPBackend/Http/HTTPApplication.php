@@ -64,8 +64,8 @@ class HTTPApplication implements Application
     public function __construct(string $name, string $container, ?Application $source = null)
     {
         if ($source == null) {
-            $hadler = new HTTPSessionHandler();
-            session_set_save_handler($hadler, true);
+//             $hadler = new HTTPSessionHandler();
+//             session_set_save_handler($hadler, true);
             session_start();
         }
         

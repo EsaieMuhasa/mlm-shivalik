@@ -1,5 +1,7 @@
 #pour les fichiers statiques 
 RewriteEngine On
+#RewriteCond %{HTTPS} !=on
+#RewriteRule .* https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 RewriteCond %{REQUEST_URI} ^/(js|css|img|fonts)/.* 
 RewriteRule ^(js|css|img|fonts)/(.*)$ Web/$1/$2 [L]
 
