@@ -18,6 +18,7 @@ use Core\Shivalik\Validators\LocalisationFormValidator;
 use Core\Shivalik\Validators\MemberFormValidator;
 use PHPBackend\Application;
 use PHPBackend\Request;
+use PHPBackend\Response;
 use PHPBackend\ToastMessage;
 use PHPBackend\Http\HTTPController;
 
@@ -99,7 +100,7 @@ class MembersController extends HTTPController {
 		
 		if ($application->getHttpRequest()->existGET('id')) {//
 			$id = intval($application->getRequest()->getDataGET('id'), 10);
-			$member = $this->memberDAOManager->getForId($id);
+			$member = $this->memberDAOManager->findById($id);
 			$account = $this->getAccount($member);
 			
 			$application->getRequest()->addAttribute(self::ATT_COMPTE, $account);
@@ -112,7 +113,7 @@ class MembersController extends HTTPController {
 	 * @return Account
 	 */
 	public function getAccount (Member $member) : Account {
-		return $this->memberDAOManager->getAccount($member);
+		return $this->memberDAOManager->loadAccount($member);
 	}
 	
 	/**
@@ -122,8 +123,8 @@ class MembersController extends HTTPController {
 	public function executeIndex (Request $request, Request $response) : void{
 		$withdrawal = 0;
 
-		if ($this->withdrawalDAOManager->hasRequest($request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice()->getId())) {
-			$all = $this->withdrawalDAOManager->getOfficeRequests($request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice()->getId());
+		if ($this->withdrawalDAOManager->checkByOffice($request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice()->getId())) {
+			$all = $this->withdrawalDAOManager->findByOffice($request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice()->getId());
 			foreach ($all as $one) {
 				$withdrawal += $one->getAmount();
 			}
@@ -139,7 +140,7 @@ class MembersController extends HTTPController {
 	 * @param Request $request
 	 * @param Request $response
 	 */
-	public function executeMembers (Request $request, Request $response) : void {
+	public function executeMembers (Request $request, Response $response) : void {
 		
 		$office = $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice();
 		
@@ -148,8 +149,8 @@ class MembersController extends HTTPController {
 		    $matricule = $request->getDataPOST('id');
 		    if ($matricule == null ) {
 		        $message = new ToastMessage('Error', "Enter user ID to perform shearch operation...", ToastMessage::MESSAGE_ERROR);
-		    } else if ($this->memberDAOManager->matriculeExist($matricule)) {
-				$member = $this->memberDAOManager->getForMatricule($request->getDataPOST('id'));
+		    } else if ($this->memberDAOManager->checkByMatricule($matricule)) {
+				$member = $this->memberDAOManager->findByMatricule($request->getDataPOST('id'));
 				$response->sendRedirect("/office/members/{$member->getId()}/");
 			}else {
     			$message = new ToastMessage('Error', "Know user ID in system. ID: {$request->getDataPOST('id')}", ToastMessage::MESSAGE_ERROR);
@@ -160,15 +161,15 @@ class MembersController extends HTTPController {
 		}
 		
 
-		$nombre = $this->memberDAOManager->countCreatedBy($office->getId());
+		$nombre = $this->memberDAOManager->countByOffice($office->getId());
 		if ($nombre>0) {
 			if ($request->existGET('limit')) {
 				$offset = intval($request->getDataGET('offset'), 10);
 				$limit = intval($request->getDataGET('limit'), 10);
-				$members = $this->memberDAOManager->getCreatedBy($office->getId(), $limit, $offset);
+				$members = $this->memberDAOManager->findByOffice($office->getId(), $limit, $offset);
 			} else {
 				$limit = intval($request->getApplication()->getConfig()->get(self::CONFIG_MAX_MEMBER_VIEW_STEP)!=null? $request->getApplication()->getConfig()->get(self::CONFIG_MAX_MEMBER_VIEW_STEP)->getValue() : 50);
-				$members = $this->memberDAOManager->getCreatedBy($office->getId(), $limit, 0);
+				$members = $this->memberDAOManager->findByOffice($office->getId(), $limit, 0);
 			}
 		}else {
 			$members = array();
@@ -178,7 +179,7 @@ class MembersController extends HTTPController {
 		* @var Member $member
 		*/
 		foreach ($members as $member) {
-		    $member->setPacket($this->gradeMemberDAOManager->getCurrent($member->getId()));
+		    $member->setPacket($this->gradeMemberDAOManager->findCurrentByMember($member->getId()));
 		}
 		$request->addAttribute(self::ATT_MEMBERS, $members);
 		$request->addAttribute(self::PARAM_MEMBER_COUNT, $nombre);
@@ -190,16 +191,16 @@ class MembersController extends HTTPController {
 	 * @param Request $request
 	 * @param Request $response
 	 */
-	public function executeAddMember (Request $request, Request $response) : void {
+	public function executeAddMember (Request $request, Response $response) : void {
 		
 		$office = $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice();
 		
-		if ($this->gradeMemberDAOManager->hasOperation($office->getId())) {
-			$office->setOperations($this->gradeMemberDAOManager->getOperations($office->getId()));
+		if ($this->gradeMemberDAOManager->checkByOffice($office->getId())) {
+			$office->setOperations($this->gradeMemberDAOManager->findByOffice($office->getId()));
 		}
 		
-		if ($this->virtualMoneyDAOManager->hasVirtualMoney($office->getId())) {
-			$office->setVirtualMoneys($this->virtualMoneyDAOManager->forOffice($office->getId()));
+		if ($this->virtualMoneyDAOManager->checkByOffice($office->getId())) {
+			$office->setVirtualMoneys($this->virtualMoneyDAOManager->findByOffice($office->getId()));
 		}
 		
 		if ($request->getMethod() == Request::HTTP_POST) {
@@ -221,8 +222,8 @@ class MembersController extends HTTPController {
 		}
 		
 		//
-		$request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->getAll());
-		$grades = $this->gradeDAOManager->getAll();
+		$request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->findAll());
+		$grades = $this->gradeDAOManager->findAll();
 		$request->addAttribute(self::ATT_GRADES, $grades);
 	}
 	
@@ -231,25 +232,25 @@ class MembersController extends HTTPController {
 	 * @param Request $request
 	 * @param Request $response
 	 */
-	public function executeMember (Request $request, Request $response) : void {
+	public function executeMember (Request $request, Response $response) : void {
 		$id = intval($request->getDataGET('id'), 10);
-		if (!$this->memberDAOManager->idExist($id)) {
+		if (!$this->memberDAOManager->checkById($id)) {
 			$response->sendError();
 		}
 		
 		/**
 		 * @var Member $member
 		 */
-		$member = $this->memberDAOManager->getForId($id);
+		$member = $this->memberDAOManager->findById($id);
 		
-		if ($this->gradeMemberDAOManager->hasCurrent($member->getId())) {
-			$gradeMember = $this->gradeMemberDAOManager->getCurrent($id);
+		if ($this->gradeMemberDAOManager->checkCurrentByMember($member->getId())) {
+			$gradeMember = $this->gradeMemberDAOManager->findCurrentByMember($id);
 			$gradeMember->setMember($member);
 			$request->addAttribute(self::ATT_GRADE_MEMBER, $gradeMember);
 		} 
 		
-		if ($this->gradeMemberDAOManager->hasRequested($member->getId())) {
-			$requestedGradeMember = $this->gradeMemberDAOManager->getRequested($member->getId());
+		if ($this->gradeMemberDAOManager->checkRequestedByMember($member->getId())) {
+			$requestedGradeMember = $this->gradeMemberDAOManager->findRequestedByMember($member->getId());
 			$requestedGradeMember->setMember($member);
 			$request->addAttribute(self::ATT_REQUESTED_GRADE_MEMBER, $requestedGradeMember);
 		}
@@ -265,36 +266,36 @@ class MembersController extends HTTPController {
 	 * @param Request $request
 	 * @param Request $response
 	 */
-	public function executeDownlines (Request $request, Request $response) : void {
+	public function executeDownlines (Request $request, Response $response) : void {
 		
 		$id = intval($request->getDataGET('id'), 10);
-		if (!$this->memberDAOManager->idExist($id)) {
+		if (!$this->memberDAOManager->checkById($id)) {
 			$response->sendError();
 		}
 		
 		/**
 		 * @var Member $member
 		 */
-		$member = $this->memberDAOManager->getForId($id);
+		$member = $this->memberDAOManager->findById($id);
 		
 		
 		if ($request->existGET('foot')) {
 			//chargement des downlines
 			switch ($request->getDataGET('foot')){
 				case 'left' : {//left
-					$members = $this->memberDAOManager->getLeftDownlinesChilds($member->getId());
+					$members = $this->memberDAOManager->findLeftDownlinesChilds($member->getId());
 				}break;
 				
 				case 'middle' : {//middle
-					$members = $this->memberDAOManager->getMiddleDownlinesChilds($member->getId());
+					$members = $this->memberDAOManager->findMiddleDownlinesChilds($member->getId());
 				}break;
 				
 				case 'right' : {//right
-					$members = $this->memberDAOManager->getRightDownlinesChilds($member->getId());
+					$members = $this->memberDAOManager->findRightDownlinesChilds($member->getId());
 				}break;
 				
 				default : {//all Member
-					$members = $this->memberDAOManager->getDownlinesChilds($member->getId());
+					$members = $this->memberDAOManager->findDownlinesChilds($member->getId());
 				}
 			}
 			
@@ -323,30 +324,30 @@ class MembersController extends HTTPController {
 	 * @param Request $request
 	 * @param Request $response
 	 */
-	public function executeWithdrawalsMember (Request $request, Request $response) : void {
+	public function executeWithdrawalsMember (Request $request, Response $response) : void {
 		$id = intval($request->getDataGET('id'), 10);
-		if (!$this->memberDAOManager->idExist($id)) {
+		if (!$this->memberDAOManager->checkById($id)) {
 			$response->sendError();
 		}
 		
 		/**
 		 * @var Member $member
 		 */
-		$member = $this->memberDAOManager->getForId($id);
+		$member = $this->memberDAOManager->findById($id);
 		
 		if ($request->existGET('requestId')) {
 			$this->withdrawalDAOManager->validate(intval($request->getDataGET('requestId')), $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getId());
 		}
 		
 		
-		if ($this->gradeMemberDAOManager->hasCurrent($member->getId())) {
-			$gradeMember = $this->gradeMemberDAOManager->getCurrent($id);
+		if ($this->gradeMemberDAOManager->checkCurrentByMember($member->getId())) {
+			$gradeMember = $this->gradeMemberDAOManager->findCurrentByMember($id);
 			$gradeMember->setMember($member);
 			$request->addAttribute(self::ATT_GRADE_MEMBER, $gradeMember);
 		}
 		
-		if ($this->gradeMemberDAOManager->hasRequested($member->getId())) {
-			$requestedGradeMember = $this->gradeMemberDAOManager->getRequested($member->getId());
+		if ($this->gradeMemberDAOManager->checkRequestedByMember($member->getId())) {
+			$requestedGradeMember = $this->gradeMemberDAOManager->findRequestedByMember($member->getId());
 			$requestedGradeMember->setMember($member);
 			$request->addAttribute(self::ATT_REQUESTED_GRADE_MEMBER, $requestedGradeMember);
 		}
@@ -354,8 +355,8 @@ class MembersController extends HTTPController {
 		//Chargement des PV;
 		$compte = $this->getAccount($member);
 		
-		if ($this->withdrawalDAOManager->hasOperation($member->getId())) {
-			$withdrawals = $this->withdrawalDAOManager->forMember($member->getId());
+		if ($this->withdrawalDAOManager->checkByMember($member->getId())) {
+			$withdrawals = $this->withdrawalDAOManager->findByMember($member->getId());
 		}else {
 			$withdrawals = array();
 		}
@@ -375,7 +376,7 @@ class MembersController extends HTTPController {
 	public function executeStateMember (Request $request, Request $response) : void {
 		$request->addAttribute(self::ATT_VIEW_TITLE, "Union members");
 		$id = intval($request->getDataGET('id'), 10);
-		if (!$this->memberDAOManager->idExist($id)) {
+		if (!$this->memberDAOManager->checkById($id)) {
 			$response->sendError();
 		}
 		
@@ -384,7 +385,7 @@ class MembersController extends HTTPController {
 		/**
 		 * @var Member $member
 		 */
-		$member = $this->memberDAOManager->getForId($id);
+		$member = $this->memberDAOManager->findById($id);
 		
 		if ($state != $member->isEnable()) {
 			$this->memberDAOManager->updateState($id, $state);
@@ -399,31 +400,31 @@ class MembersController extends HTTPController {
 	 * @param Request $request
 	 * @param Request $response
 	 */
-	public function executeUpgradeMember (Request $request, Request $response) : void {
+	public function executeUpgradeMember (Request $request, Response $response) : void {
 		$id = intval($request->getDataGET('id'), 10);
-		if (!$this->memberDAOManager->idExist($id)) {
+		if (!$this->memberDAOManager->checkById($id)) {
 			$response->sendError();
 		}
 		
-		if ($this->gradeMemberDAOManager->hasRequested($id)) {
+		if ($this->gradeMemberDAOManager->checkRequestedByMember($id)) {
 			$response->sendRedirect("/office/members/{$id}/");
 		}
 		
 		$office = $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice();
 		
-		if ($this->gradeMemberDAOManager->hasOperation($office->getId())) {
-			$office->setOperations($this->gradeMemberDAOManager->getOperations($office->getId()));
+		if ($this->gradeMemberDAOManager->checkByOffice($office->getId())) {
+			$office->setOperations($this->gradeMemberDAOManager->findByOffice($office->getId()));
 		}
 		
-		if ($this->virtualMoneyDAOManager->hasVirtualMoney($office->getId())) {
-			$office->setVirtualMoneys($this->virtualMoneyDAOManager->forOffice($office->getId()));
+		if ($this->virtualMoneyDAOManager->checkByOffice($office->getId())) {
+			$office->setVirtualMoneys($this->virtualMoneyDAOManager->findByOffice($office->getId()));
 		}
 		
 		/**
 		 * @var Member $member
 		 */
-		$member = $this->memberDAOManager->getForId($id);
-		$gradeMember = $this->gradeMemberDAOManager->getCurrent($id);
+		$member = $this->memberDAOManager->findById($id);
+		$gradeMember = $this->gradeMemberDAOManager->findCurrentByMember($id);
 		$gradeMember->setMember($member);
 		
 		if ($request->getMethod() == Request::HTTP_POST) {
@@ -442,7 +443,7 @@ class MembersController extends HTTPController {
 		
 		$request->addAttribute(self::ATT_MEMBER, $member);
 		$request->addAttribute(self::ATT_GRADE_MEMBER, $gradeMember);
-		$grades = $this->gradeDAOManager->getAll();
+		$grades = $this->gradeDAOManager->findAll();
 		$request->addAttribute(self::ATT_GRADES, $grades);
 	}
 	

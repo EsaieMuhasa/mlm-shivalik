@@ -1,8 +1,8 @@
 <?php
 use Applications\Root\Modules\Settings\SettingsController;
-use Applications\Office\OfficeApplication;
+use Core\Shivalik\Filters\SessionOfficeFilter;
 
-$office = OfficeApplication::getConnectedUser()->getOffice();
+$office = $_SESSION[SessionOfficeFilter::OFFICE_CONNECTED_SESSION]->getOffice();
 ?>
 <div class="row">
     <div class="col-lg-12">

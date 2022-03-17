@@ -11,6 +11,7 @@ use PHPBackend\Application;
 use PHPBackend\Request;
 use PHPBackend\Http\HTTPController;
 use Core\Shivalik\Filters\SessionOfficeFilter;
+use PHPBackend\Response;
 
 
 /**
@@ -64,35 +65,35 @@ class DashboardController extends HTTPController {
      * @param Request $request
      * @param Request $response
      */
-    public function executeIndex (Request $request, Request $response) : void{
+    public function executeIndex (Request $request, Response $response) : void{
         //$response->sendRedirect("/admin/members/");
         $office = $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice();
         
-        if ($this->withdrawalDAOManager->hasRequest($office->getId(), null)) {
-            $withdrawals = $this->withdrawalDAOManager->getOfficeRequests($office->getId(), null);
+        if ($this->withdrawalDAOManager->checkByOffice($office->getId())) {
+            $withdrawals = $this->withdrawalDAOManager->findByOffice($office->getId());
         }else {
             $withdrawals = array();
         }
         
         $office->setWithdrawals($withdrawals);
         
-        if ($this->gradeMemberDAOManager->hasOperation($office->getId())) {
-        	$office->setOperations($this->gradeMemberDAOManager->getOperations($office->getId()));
+        if ($this->gradeMemberDAOManager->checkByOffice($office->getId())) {
+        	$office->setOperations($this->gradeMemberDAOManager->findByOffice($office->getId()));
         }
         
-        if ($this->virtualMoneyDAOManager->hasVirtualMoney($office->getId())) {
-        	$office->setVirtualMoneys($this->virtualMoneyDAOManager->forOffice($office->getId()));
+        if ($this->virtualMoneyDAOManager->checkByOffice($office->getId())) {
+        	$office->setVirtualMoneys($this->virtualMoneyDAOManager->findByOffice($office->getId()));
         }
         
         
-        if ($this->withdrawalDAOManager->hasRequest($office->getId())) {
-            $all = $this->withdrawalDAOManager->getOfficeRequests($office->getId());
+        if ($this->withdrawalDAOManager->checkByOffice($office->getId())) {
+            $all = $this->withdrawalDAOManager->findByOffice($office->getId());
         }else {
             $all = array();
         }        
         
         $request->addAttribute(self::ATT_WITHDRAWALS, $all);
-        $request->addAttribute(self::PARAM_MEMBER_COUNT, $this->memberDAOManager->countCreatedBy($office->getId()));
+        $request->addAttribute(self::PARAM_MEMBER_COUNT, $this->memberDAOManager->countByOffice($office->getId()));
     }
     
     /**
@@ -103,40 +104,36 @@ class DashboardController extends HTTPController {
      * @param Request $request
      * @param Request $response
      */
-    public function executeVirtualMoney (Request $request, Request $response) : void {
+    public function executeVirtualMoney (Request $request, Response $response) : void {
     	$request->addAttribute(self::ATT_VIEW_TITLE, "Dashboard virtual money");
     	
     	$office = $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice();
     	
-    	if ($this->withdrawalDAOManager->hasRequest($office->getId(), null)) {
-    		$withdrawals = $this->withdrawalDAOManager->getOfficeRequests($office->getId(), null);
+    	if ($this->withdrawalDAOManager->checkByOffice($office->getId(), null)) {
+    		$withdrawals = $this->withdrawalDAOManager->findByOffice($office->getId(), null);
     	}else {
     		$withdrawals = array();
     	}
     	
     	$office->setWithdrawals($withdrawals);
     	
-    	if ($this->gradeMemberDAOManager->hasOperation($office->getId())) {
-    		$office->setOperations($this->gradeMemberDAOManager->getOperations($office->getId()));
+    	if ($this->gradeMemberDAOManager->checkByOffice($office->getId())) {
+    		$office->setOperations($this->gradeMemberDAOManager->findByOffice($office->getId()));
     	}
     	
-    	if ($this->virtualMoneyDAOManager->hasVirtualMoney($office->getId())) {
-    		$office->setVirtualMoneys($this->virtualMoneyDAOManager->forOffice($office->getId()));
+    	if ($this->virtualMoneyDAOManager->checkByOffice($office->getId())) {
+    		$office->setVirtualMoneys($this->virtualMoneyDAOManager->findByOffice($office->getId()));
     	}
     	
     	
-    	if ($this->withdrawalDAOManager->hasRequest($office->getId())) {
-    		$all = $this->withdrawalDAOManager->getOfficeRequests($office->getId());
-    	}else {
+    	if ($this->withdrawalDAOManager->checkByOffice($office->getId())) {
+    		$all = $this->withdrawalDAOManager->findByOffice($office->getId());
+    	} else {
     		$all = array();
     	}
     	
-    	if ($this->requestVirtualMoneyDAOManager->hasRequest($office->getId())) {
-    		
-    	}
-    	
     	$request->addAttribute(self::ATT_WITHDRAWALS, $all);
-    	$request->addAttribute(self::PARAM_MEMBER_COUNT, $this->memberDAOManager->countCreatedBy($office->getId()));
+    	$request->addAttribute(self::PARAM_MEMBER_COUNT, $this->memberDAOManager->countByOffice($office->getId()));
     }
     
     

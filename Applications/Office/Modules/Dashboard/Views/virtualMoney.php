@@ -1,15 +1,15 @@
 <?php
-use Applications\Office\OfficeApplication;
 use Applications\Office\Modules\Dashboard\DashboardController;
 use PHPBackend\AppConfig;
 use PHPBackend\Request;
+use Core\Shivalik\Filters\SessionOfficeFilter;
 
 /**
  * @var AppConfig $config
  */
 $config = $_REQUEST[Request::ATT_APP_CONFIG];
 
-$office = OfficeApplication::getConnectedUser()->getOffice();
+$office = $_SESSION[SessionOfficeFilter::OFFICE_CONNECTED_SESSION]->getOffice();
 ?>
 
 <div class="row">
