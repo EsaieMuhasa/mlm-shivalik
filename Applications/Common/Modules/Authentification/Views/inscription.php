@@ -5,6 +5,11 @@
                 <span class="fa fa-user-plus"></span>
             </span>
         </div>
+        <div class="alert alert-danger">
+        	<p>
+        		<span class="fa fa-info-circled"></span>This form is not functional for administrative reasons. Please contact for more information.
+        	</p>
+        </div>
         <?php if (isset($_REQUEST['result'])) : ?>
     	<div class="alert alert-danger">
     		<strong class="text-danger text-center"><?php echo ($_REQUEST['result']);?></strong>

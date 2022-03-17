@@ -8,8 +8,35 @@
     <p>
     	We strive for quality products and to maintain quality of our products we ensure to use best quality raw material and we source our raw material 'only’ from trusted suppliers and moreover we are rigorous in our approach to check each and every ingredient before we use it in any of our formulation. Every product we manufacture has to pass through stringent laboratory tests before it gets launched in the market.
     </p>
+    <h2 class="about-title">A GMP &amp; ISO 9001: 2015 Certified Company</h2>
+    	
+	<div class="row">
+		<div class="col-xs-6 col-sm-4 col-md-2 col-lg-2">
+			<img src="/img/haccp.png" class="thumbnail"/>
+		</div>
+		
+		<div class="col-xs-6 col-sm-4 col-md-2 col-lg-2">
+			<img src="/img/iso-9001.png" class="thumbnail"/>
+		</div>
+		
+		<div class="col-xs-6 col-sm-4 col-md-2 col-lg-2">
+			<img src="/img/halal.png" class="thumbnail"/>
+		</div>
+		
+		<div class="col-xs-6 col-sm-4 col-md-2 col-lg-2">
+			<img src="/img/iso-22000.png" class="thumbnail"/>
+		</div>
+		
+		<div class="col-xs-6 col-sm-4 col-md-2 col-lg-2">
+			<img src="/img/gmp.png" class="thumbnail"/>
+		</div>
+		
+		<div class="col-xs-6 col-sm-4 col-md-2 col-lg-2">
+			<img src="/img/natural.png" class="thumbnail"/>
+		</div>
+	</div>
     
-    <h2>Steps taken to maintain quality</h2>
+    <h2 class="about-title">Steps taken to maintain quality</h2>
     
     <ol>
     	<li>Sourcing of Quality raw material only from trusted suppliers</li>
@@ -30,7 +57,7 @@
     	<strong>Client’s Satisfaction:</strong> We very well understand that it’s a client who runs a business. So apart from manufacturing quality products we also ensure timely delivery with right pricing. We go to every possible extent to keep our customers happy
     </p>
     
-    <h2>Why Us?</h2>
+    <h2 class="about-title">Why Us?</h2>
     
     <p>
     	Rich industry experience, great exposure, highly qualified professionals, fully dedicated teams, in depth knowledge of Herbal &amp; Ayurvedic products; vast portfolio of products makes us the best in the industry. Moreover we just don’t cover problems, we cure it.

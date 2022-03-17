@@ -161,6 +161,7 @@ $member = isset($_SESSION[SessionMemberFilter::MEMBER_CONNECTED_SESSION])? $_SES
         </div>
     </div>
 
+	<?php if (!empty($_REQUEST[IndexController::ATT_PRODUCTS])) : ?>
     <div class="default-products">
 
         <div class="container">
@@ -186,6 +187,7 @@ $member = isset($_SESSION[SessionMemberFilter::MEMBER_CONNECTED_SESSION])? $_SES
             <?php endforeach; ?>
         </div>
     </div>
+    <?php endif; ?>
     
 </section>
 <div class="certified-section">
@@ -193,27 +195,27 @@ $member = isset($_SESSION[SessionMemberFilter::MEMBER_CONNECTED_SESSION])? $_SES
 		<h1>A GMP &amp; ISO 9001: 2015 Certified Company</h1>
     	
     	<div class="row">
-    		<div class="col-xs-12 col-sm-4 col-md-2 col-lg-2">
+    		<div class="col-xs-6 col-sm-4 col-md-2 col-lg-2">
     			<img src="/img/haccp.png" class="thumbnail"/>
     		</div>
     		
-    		<div class="col-xs-12 col-sm-4 col-md-2 col-lg-2">
+    		<div class="col-xs-6 col-sm-4 col-md-2 col-lg-2">
     			<img src="/img/iso-9001.png" class="thumbnail"/>
     		</div>
     		
-    		<div class="col-xs-12 col-sm-4 col-md-2 col-lg-2">
+    		<div class="col-xs-6 col-sm-4 col-md-2 col-lg-2">
     			<img src="/img/halal.png" class="thumbnail"/>
     		</div>
     		
-    		<div class="col-xs-12 col-sm-4 col-md-2 col-lg-2">
+    		<div class="col-xs-6 col-sm-4 col-md-2 col-lg-2">
     			<img src="/img/iso-22000.png" class="thumbnail"/>
     		</div>
     		
-    		<div class="col-xs-12 col-sm-4 col-md-2 col-lg-2">
+    		<div class="col-xs-6 col-sm-4 col-md-2 col-lg-2">
     			<img src="/img/gmp.png" class="thumbnail"/>
     		</div>
     		
-    		<div class="col-xs-12 col-sm-4 col-md-2 col-lg-2">
+    		<div class="col-xs-6 col-sm-4 col-md-2 col-lg-2">
     			<img src="/img/natural.png" class="thumbnail"/>
     		</div>
     	</div>
