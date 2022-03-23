@@ -427,9 +427,9 @@ class OfficesController extends AdminController {
 			$form->includeFeedback($request);
 		}
 		
-		if ($this->gradeMemberDAOManager->hasOperation($this->office->getId(), null, false)) {//Recuperation de toutes les operations 
+		if ($this->gradeMemberDAOManager->checkByOffice($this->office->getId(), null, false)) {//Recuperation de toutes les operations 
 		    //qui ne sont pas encore payer
-		    $virtual->setDebts($this->gradeMemberDAOManager->getOperations($this->office->getId(), null, false));
+		    $virtual->setDebts($this->gradeMemberDAOManager->findByOffice($this->office->getId(), null, false));
 		}
 		
 		$request->addAttribute(self::ATT_VIRTUAL_MONEY, $virtual);

@@ -245,7 +245,7 @@ class GradeMemberFormValidator extends DefaultFormValidator
             }
         }
         
-        $this->result = $this->hasError()? "failure to register member" : "successful registration of member";
+        $this->result = $this->hasError()? "Failure to register member" : "successful registration of member";
         
         return $gm;
         

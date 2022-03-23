@@ -260,10 +260,10 @@ abstract class UserFormValidator extends DefaultFormValidator
         
         if ($write && $photo->isImage()) {
             $time = time();
-            $reelName = self::getAbsolutDataDirName($config, $user->getId()).DIRECTORY_SEPARATOR.$user->getId().'-'.$time.'-reel.'.$photo->getExtension();
-            $reelFullName = self::getDataDirName($$config, $user->getId()).DIRECTORY_SEPARATOR.$user->getId().'-'.$time.'-reel.'.$photo->getExtension();
+            //$reelName = self::getAbsolutDataDirName($config, $user->getId()).DIRECTORY_SEPARATOR.$user->getId().'-'.$time.'-reel.'.$photo->getExtension();
+            $reelName = "data".DIRECTORY_SEPARATOR.self::getDataDirName($config, $user->getId()).DIRECTORY_SEPARATOR.$user->getId().'-'.$time.'-reel.'.$photo->getExtension();
             $photoName = self::getDataDirName($config, $user->getId()).DIRECTORY_SEPARATOR.$user->getId().'-'.$time.'.'.$photo->getExtension();
-            FileManager::writeUploadedFile($photo, $reelFullName);
+            FileManager::writeUploadedFile($photo, $reelName);
             ImageResizing::profiling(new Image($reelName));
             $user->setPhoto($photoName);
         }
@@ -339,11 +339,10 @@ abstract class UserFormValidator extends DefaultFormValidator
      */
     public final static function getDataDirName (AppConfig $config, int $id) : string{
         $fold = 'users';
-        $dirPath = dirname(__DIR__).DIRECTORY_SEPARATOR.($config->get('webData')!=null? $config->get('webData') : 'Web').DIRECTORY_SEPARATOR.$fold;
+        $dirPath = dirname(dirname(dirname(__DIR__))).DIRECTORY_SEPARATOR.($config->get('webData')!=null? $config->get('webData') : 'Web').DIRECTORY_SEPARATOR.$fold;
         if (!is_dir($fold)) {
             @mkdir($dirPath, 0777, true);
         }
-        
         return $fold;
     }
     

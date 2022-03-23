@@ -14,12 +14,11 @@ use PHPBackend\Dao\DefaultDAOInterface;
  */
 class NotificationDAOManagerImplementation1 extends DefaultDAOInterface implements NotificationDAOManager
 {
-    
     /**
      * {@inheritDoc}
-     * @see \PHPBackend\Dao\DAOInterface::create()
+     * @see \PHPBackend\Dao\DefaultDAOInterface::create()
      */
-    public function create($entity)
+    public function create($entity) : void
     {
         throw new DAOException("Operation not supported");
     }
@@ -28,7 +27,7 @@ class NotificationDAOManagerImplementation1 extends DefaultDAOInterface implemen
      * {@inheritDoc}
      * @see \PHPBackend\Dao\DAOInterface::update()
      */
-    public function update($entity, $id)
+    public function update($entity, $id) : void
     {
         throw new DAOException("Operation not supported");
     }
@@ -43,7 +42,7 @@ class NotificationDAOManagerImplementation1 extends DefaultDAOInterface implemen
         if (!$api->inTransaction()) {
             throw new DAOException("A transaction must be started in advance");
         }
-        $id = UtilitaireSQL::insert($this->getTableName(), $this->getTableName(), [            
+        $id = UtilitaireSQL::insert($api, $this->getTableName(), [            
             "title" => $entity->getTitle(),
             "description" => $entity->getDescription(),
             self::FIELD_DATE_AJOUT => $entity->getFormatedDateAjout()

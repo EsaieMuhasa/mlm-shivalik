@@ -96,7 +96,7 @@ class ProfilController extends HTTPController
             $localisation = $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getLocalisation();
         }
         
-        $request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->getAll());
+        $request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->findAll());
         $request->addAttribute(self::ATT_LOCALISATION, $localisation);
     }
 

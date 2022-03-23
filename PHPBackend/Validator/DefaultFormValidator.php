@@ -95,6 +95,7 @@ abstract class DefaultFormValidator implements FormValidator
      * Le champs des formulaire
      *****************************************/
     const FIELD_ID = 'id';
+    const CHAMP_ID = 'id';
     const FIELD_DELETED = 'deleted';
     
     /**

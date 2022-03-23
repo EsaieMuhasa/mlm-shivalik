@@ -171,9 +171,13 @@ $offset = isset($_GET['offset'])? $_GET['offset'] : 0;
 	    						<td><?php echo htmlspecialchars($user->names);?></td>
 	    						<td><?php echo ($user->matricule);?></td>
 	    						<td><?php echo ($user->pseudo);?></td>
+	    						<?php if ($user->packet != null) { ?>
 	    						<td title="<?php echo htmlspecialchars($user->packet->grade->name);?>">
 	    							<img style="width: 30px;" alt="<?php echo htmlspecialchars($user->packet->grade->name);?>" src="/<?php echo htmlspecialchars($user->packet->grade->icons->getXs());?>"/>
 	    						</td>
+	    						<?php } else { ?>
+	    						<td></td>
+	    						<?php }?>
 	    						<td>
 	    							<a class="btn btn-primary" href="/admin/members/<?php echo  $user->id; ?>/">
 	    								<span class="glyphicon glyphicon-user"></span> Show acount

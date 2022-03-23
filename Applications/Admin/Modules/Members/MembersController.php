@@ -144,7 +144,8 @@ class MembersController extends AdminController
          * @var Member $member
          */
         foreach ($members as $member) {
-            $member->setPacket($this->gradeMemberDAOManager->findCurrentByMember($member->getId()));
+            if($this->gradeMemberDAOManager->checkCurrentByMember($member->getId()))
+                $member->setPacket($this->gradeMemberDAOManager->findCurrentByMember($member->getId()));
         }
         
         $request->addAttribute(self::ATT_MEMBERS, $members);
@@ -614,7 +615,7 @@ class MembersController extends AdminController
         $request->addAttribute($form::CHAMP_ID, $gmId);
         $form->enableAfterValidation($request);
         
-        $request->addToast($form->buildAppMessage());
+        $request->addToast($form->buildToastMessage());
         $response->sendRedirect("/admin/members/");
     }
 }

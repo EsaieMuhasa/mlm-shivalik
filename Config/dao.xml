@@ -93,6 +93,21 @@
 			implementation="\Core\Shivalik\Managers\Implementation\ProductDAOManagerImplementation1"/>
 			
 		<entity 
+			name="\Core\Shivalik\Entities\Notification" 
+			specification="\Core\Shivalik\Managers\NotificationDAOManager" 
+			implementation="\Core\Shivalik\Managers\Implementation\NotificationDAOManagerImplementation1"/>
+			
+		<entity 
+			name="\Core\Shivalik\Entities\NotificationReceiver" 
+			specification="\Core\Shivalik\Managers\NotificationReceiverDAOManager" 
+			implementation="\Core\Shivalik\Managers\Implementation\NotificationReceiverDAOManagerImplementation1"/>
+			
+		<entity 
+			name="\Core\Shivalik\Entities\NotifiableComponent" 
+			specification="\Core\Shivalik\Managers\NotifiableComponentDAOManager" 
+			implementation="\Core\Shivalik\Managers\Implementation\NotifiableComponentDAOManagerImplementation1"/>
+			
+		<entity 
 			name="\Core\Shivalik\Entities\Withdrawal" 
 			specification="\Core\Shivalik\Managers\WithdrawalDAOManager" 
 			implementation="\Core\Shivalik\Managers\Implementation\WithdrawalDAOManagerImplementation1"/>

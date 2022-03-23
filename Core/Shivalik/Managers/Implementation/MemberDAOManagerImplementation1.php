@@ -609,7 +609,7 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
     {
         $return = false;
         try {
-            $statement = $this->pdo->prepare("SELECT id FROM {$this->getTableName()} WHERE id=:id AND parent IS NOT NULL");
+            $statement = $this->getConnection()->prepare("SELECT id FROM {$this->getTableName()} WHERE id=:id AND parent IS NOT NULL");
             if($statement->execute(array('id' => $memberId))){
                 if($statement->fetch()){
                     $return = true;
@@ -654,11 +654,10 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
         
         return $return;
     }
-
     
     /**
      * {@inheritDoc}
-     * @see \PHPBackend\Dao\DAOInterface::createInTransaction()
+     * @see \PHPBackend\Dao\DefaultDAOInterface::createInTransaction()
      * @param Member $entity
      */
     public function createInTransaction($entity, \PDO $pdo): void

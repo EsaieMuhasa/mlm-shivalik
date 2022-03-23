@@ -17,7 +17,10 @@ use PHPBackend\Text\HtmlFormater;
 			</div>
 			<div class="modal-body" style="max-height: 350px; overflow: auto;">
         		<?php foreach ($_SESSION[Request::ATT_TOAST_MESSAGES] as $key => $message) {?>
-				<p class="text-<?php echo $message->getClassType(); ?>"><strong><?php echo htmlspecialchars($message->getTitle()); ?></strong> <?php echo (HtmlFormater::toHTML($message->getDescription())); ?></p>
+				<p class="text-<?php echo $message->getClassType(); ?>">
+					<strong><?php echo htmlspecialchars($message->getTitle()); ?></strong>
+					<br/><?php echo (HtmlFormater::toHTML($message->getDescription())); ?>
+				</p>
         		<?php unset($_SESSION[Request::ATT_TOAST_MESSAGES][$key]); // on suprimer le message dans la session ?>
         		<?php }?>
 			</div>

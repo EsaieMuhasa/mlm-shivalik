@@ -90,6 +90,38 @@ class MemberFormValidator extends UserFormValidator
     }
     
     /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Validators\UserFormValidator::validationTelephone()
+     */
+    protected function validationTelephone($telephone, $id = null): void
+    {
+        parent::validationTelephone($telephone, $id);
+        try {
+            if($this->memberDAOManager->checkByTelephone($telephone, $id)){
+                throw new IllegalFormValueException("This telephone number are used");
+            }
+        } catch (DAOException $e) {
+            throw new IllegalFormValueException($e->getMessage());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Validators\UserFormValidator::validationEmail()
+     */
+    protected function validationEmail($email, $id = - 1): void
+    {
+        parent::validationEmail($email, $id);
+        try {
+            if($email != null && $this->memberDAOManager->checkByEmail($email, $id)){
+                throw new IllegalFormValueException("This mail are used");
+            }
+        } catch (DAOException $e) {
+            throw new IllegalFormValueException($e->getMessage());
+        }
+    }
+
+    /**
      * validation du peid sur le quel le membre doit doit etre affecter
      * @param int $foot
      * @param VarList $foots
@@ -122,16 +154,16 @@ class MemberFormValidator extends UserFormValidator
                 $member->setParent($this->memberDAOManager->findByMatricule($parent));
             }
             
-            if ($member->getSponsor() == null) {
+            if ($member->getSponsor() === null) {
                 return;
             }
             
             /**
              * @var Member $parentNode
              */
-            $parentNode = $member->getParent()!=null? $member->getParent() : $member->getSponsor();
+            $parentNode = $member->getParent() !== null? $member->getParent() : $member->getSponsor();
             $foot = null;
-            
+
             foreach ($foots->getItems() as $item) {//verification des pieds du parent
                 if (!$this->memberDAOManager->checkChild($parentNode->getId(), intval($item->getValue()))) {
                     $foot = intval($item->getValue(), 10);
@@ -188,7 +220,6 @@ class MemberFormValidator extends UserFormValidator
             }
         } catch (IllegalFormValueException $e) {
             $this->addError(self::FIELD_SPONSOR, $e->getMessage());
-            $member->setSponsor(new Member(array('matricule' => $sponsor)));
         }
     }
     

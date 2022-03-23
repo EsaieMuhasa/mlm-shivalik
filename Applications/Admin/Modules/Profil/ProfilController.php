@@ -44,7 +44,7 @@ class ProfilController extends HTTPController
         
         if ($request->getMethod() == Request::HTTP_POST) {
             $form = new OfficeAdminFormValidator($this->getDaoManager());
-            $request->addAttribute($form::CHAMP_ID, $this->getConnectedAdmin()->getId());
+            $request->addAttribute($form::CHAMP_ID, $request->getSession()->getAttribute(SessionAdminFilter::ADMIN_CONNECTED_SESSION)->getId());
             $form->updatePasswordAfterValidation($request);
             
             if (!$form->hasError()) {

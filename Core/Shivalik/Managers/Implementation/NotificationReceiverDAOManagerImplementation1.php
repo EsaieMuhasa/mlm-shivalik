@@ -16,7 +16,7 @@ use PHPBackend\Dao\DefaultDAOInterface;
  * @author Esaie MUHASA
  *        
  */
-class NotificationReceiverDAOmanagerImplementation1 extends DefaultDAOInterface implements NotificationReceiverDAOmanager
+class NotificationReceiverDAOManagerImplementation1 extends DefaultDAOInterface implements NotificationReceiverDAOmanager
 {
     
     /**
@@ -102,7 +102,12 @@ class NotificationReceiverDAOmanagerImplementation1 extends DefaultDAOInterface 
      */
     public function createInTransaction($entity, \PDO $pdo): void
     {
-        $this->getDaoManager()->getManagerOf(Notification::class)->createInTransaction($entity->getNotification(), $pdo);
+        if ($entity->getNotification()->getId() == null || $entity->getNotification()->getId() <= 0) {
+            $this->getDaoManager()->getManagerOf(Notification::class)->createInTransaction($entity->getNotification(), $pdo);
+        }
+        if ($entity->getReceiver()->getId() == null || $entity->getReceiver()->getId() <= 0) {
+            $this->getDaoManager()->getManagerOf(NotifiableComponent::class)->createInTransaction($entity->getReceiver(), $pdo);
+        }
         $id = UtilitaireSQL::insert($pdo, $this->getTableName(), [            
             "notification" => $entity->getNotification()->getId(),
             "receiver" => $entity->getReceiver()->getId(),
@@ -115,7 +120,7 @@ class NotificationReceiverDAOmanagerImplementation1 extends DefaultDAOInterface 
      * {@inheritDoc}
      * @see \PHPBackend\Dao\DAOInterface::update()
      */
-    public function update($entity, $id)
+    public function update($entity, $id) : void
     {
         throw new DAOException("Updating operation is not support in this data access object manager");
     }

@@ -57,7 +57,7 @@ class PointValueDAOManagerImplementation1 extends AbstractBonusDAOManager implem
      */
     public function createInTransaction($pv, \PDO $pdo): void
     {
-        $id = UtilitaireSQL::update($pdo, $this->getTableName(), [
+        $id = UtilitaireSQL::insert($pdo, $this->getTableName(), [
             'member' => $pv->getMember()->getId(),
             'generator' => $pv->getGenerator()->getId(),
             'value' => $pv->getValue(),

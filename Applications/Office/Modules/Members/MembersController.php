@@ -179,7 +179,9 @@ class MembersController extends HTTPController {
 		* @var Member $member
 		*/
 		foreach ($members as $member) {
-		    $member->setPacket($this->gradeMemberDAOManager->findCurrentByMember($member->getId()));
+		    if ($this->gradeMemberDAOManager->checkCurrentByMember($member->getId())) {
+    		    $member->setPacket($this->gradeMemberDAOManager->findCurrentByMember($member->getId()));
+		    }
 		}
 		$request->addAttribute(self::ATT_MEMBERS, $members);
 		$request->addAttribute(self::PARAM_MEMBER_COUNT, $nombre);

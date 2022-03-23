@@ -113,7 +113,7 @@ class EntitiesConfig
      */
     public function forImplementation (string $implementation) : EntityMetadata{
         foreach ($this->metadatas as $metadata) {
-            if ($metadata->getImplementation() == $implementation) {
+            if ($metadata->getImplementation() == $implementation || "\\{$metadata->getImplementation()}" == $implementation) {
                 return $metadata;
             }
         }

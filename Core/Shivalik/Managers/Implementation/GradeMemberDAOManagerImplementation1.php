@@ -538,7 +538,7 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
                     
                     $parent = $this->memberDAOManager->findParent($parent->getId());
                     
-                    $generation = $this->generationDAOManager->forNumber($generationNumber);
+                    $generation = $this->generationDAOManager->findByNumber($generationNumber);
                     $gradeParent = $this->findCurrentByMember($parent->getId());
                     
                     if ($gradeParent->getGrade()->getMaxGeneration()->getNumber() >= $generation->getNumber()) {
@@ -576,7 +576,6 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
              */
             if ($entity->getMember()->getParent() != null) {
                 $child = $entity->getMember();
-                
                 while ($this->memberDAOManager->checkParent($child->getId())) {
                     $foot = $child->getFoot();
                     $child = $this->memberDAOManager->findParent($child->getId());
@@ -659,6 +658,29 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
         }
         
     }
+    
+    /**
+     * {@inheritDoc}
+     * @see \PHPBackend\Dao\DefaultDAOInterface::create()
+     */
+    public function create($entity): void
+    {
+        try {
+            $pdo = $this->getConnection();
+            if (!$pdo->beginTransaction()) {
+                throw new DAOException("An errot occurred in creating transaction process");
+            }
+            
+            $this->createInTransaction($entity, $pdo);
+            if(!$pdo->commit()){
+                throw new DAOException("An errors occurend in commit transaction process");
+            }
+        } catch (\PDOException $e) {
+            throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
+        }
+
+        $this->enable($entity);
+    }
 
     /**
      * {@inheritDoc}
@@ -682,7 +704,6 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
             self::FIELD_DATE_AJOUT => $entity->getFormatedDateAjout()
         ]);
         $entity->setId($id);
-        $this->enable($entity);
 
     }
 

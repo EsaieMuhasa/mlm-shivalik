@@ -22,7 +22,7 @@ class NotifiableComponentDAOManagerImplementation1 extends DefaultDAOInterface i
     {
         $return = null;
         try {
-            $statement = $this->pdo->prepare("SELECT * {$this->getTableName()} WHERE dataKey =:dataKey AND entity=:entity AND deleted != 0");
+            $statement = $this->getConnection()->prepare("SELECT * FROM {$this->getTableName()} WHERE dataKey =:dataKey AND entity=:entity AND deleted != 0");
             $statement->execute(array("dataKey" => $key , "entity" => $entity));
             if ($row = $statement->fetch()) {
                 $statement->closeCursor();
@@ -33,7 +33,7 @@ class NotifiableComponentDAOManagerImplementation1 extends DefaultDAOInterface i
                 throw new DAOException("no noticeable component for the desired element");
             }
         } catch (\PDOException $e) {
-            throw new DAOException("an error occurred while selecting data", DAOException::ERROR_CODE, $e);
+            throw new DAOException("an error occurred while selecting data {$e->getMessage()}", DAOException::ERROR_CODE, $e);
         }
         return $return;
     }
@@ -45,19 +45,30 @@ class NotifiableComponentDAOManagerImplementation1 extends DefaultDAOInterface i
      */
     public function createInTransaction($entity, $pdo): void
     {
-        $id = UtilitaireSQL::insert($pdo, $this->getTableName(), [            
+        if ( UtilitaireSQL::checkAll($pdo, $this->getTableName(), [
             "entity" => $entity->getEntity(),
             "dataKey" => $entity->getNotifiable()->getKey(),
-            self::FIELD_DATE_AJOUT => $entity->getFormatedDateAjout()
-        ]);
-        $entity->setId($id);
+        ])) {
+            $data = UtilitaireSQL::findAll($pdo, $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, [
+                "entity" => $entity->getEntity(),
+                "dataKey" => $entity->getNotifiable()->getKey(),
+            ], 1)[0];
+            $entity->setId($data->getId());
+        } else {
+            $id = UtilitaireSQL::insert($pdo, $this->getTableName(), [            
+                "entity" => $entity->getEntity(),
+                "dataKey" => $entity->getNotifiable()->getKey(),
+                self::FIELD_DATE_AJOUT => $entity->getFormatedDateAjout()
+            ]);
+            $entity->setId($id);
+        }
     }
 
     /**
      * {@inheritDoc}
      * @see \PHPBackend\Dao\DAOInterface::update()
      */
-    public function update($entity, $id)
+    public function update($entity, $id) : void
     {
         throw new DAOException("update operation is not supported");
     }

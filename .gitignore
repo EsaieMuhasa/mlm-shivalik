@@ -1,0 +1,13 @@
+Web/.sass-cache
+Web/logger
+Web/*.xml
+Web/*.json
+Web/*txt
+Web/node_modules
+Web/data/
+index.html
+.buildpath
+.dbeaver
+.settings
+.buildpath
+.project

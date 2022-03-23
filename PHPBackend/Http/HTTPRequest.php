@@ -41,10 +41,13 @@ final class HTTPRequest implements Request
     public function addToast(\PHPBackend\ToastMessage $toast): void
     {
        if ($this->getSession()->hasAttribute(self::ATT_TOAST_MESSAGES)) {
-           $this->getAttribute(self::ATT_TOAST_MESSAGES)[] = $toast;
+           $toasts = $this->getSession()->getAttribute(self::ATT_TOAST_MESSAGES);
+           array_push($toasts, $toast);
+           $this->getSession()->addAttribute(self::ATT_TOAST_MESSAGES, $toasts);
        } else {
            $this->getSession()->addAttribute(self::ATT_TOAST_MESSAGES, [$toast]);
        }
+       
     }
 
     /**

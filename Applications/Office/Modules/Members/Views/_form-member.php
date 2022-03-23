@@ -18,7 +18,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
     	<form role="form" action="" method="POST" enctype="multipart/form-data">
     		
     		<?php if (isset($_REQUEST['result'])){?>
-    		<div class="alert alert-<?php echo (isset($_REQUEST['errors']) && empty($_REQUEST['errors'])? 'success':'danger')?>">
+    		<div class="alert alert-danger">
     			<?php echo ($_REQUEST['result']);?>
     			<?php if (isset($_REQUEST['errors']['message'])){?>
     			<hr/><p><?php echo ($_REQUEST['errors']['message']);?></p>
