@@ -1,19 +1,18 @@
 <?php 
-use Applications\Member\MemberApplication;
 use Applications\Member\Modules\MyOffice\MyOfficeController;
+use Core\Shivalik\Filters\SessionMemberFilter;
 use PHPBackend\AppConfig;
 use PHPBackend\Request;
 
 /**
  * @var \Core\Shivalik\Entities\Office $office
  */
-$office = MemberApplication::getConnectedMember()->getOfficeAccount();
+$office = $_SESSION[SessionMemberFilter::MEMBER_CONNECTED_SESSION]->getOfficeAccount();
 
 /**
  * @var AppConfig $config
  */
 $config = $_REQUEST[Request::ATT_APP_CONFIG];
-
 $requests = $_REQUEST[MyOfficeController::ATT_VIRTUAL_MONEYS];
 ?>
 

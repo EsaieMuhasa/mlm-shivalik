@@ -1,10 +1,9 @@
 <?php
 use Applications\Member\Modules\MyOffice\MyOfficeController;
+use Core\Shivalik\Entities\Office;
+use Core\Shivalik\Filters\SessionMemberFilter;
 use PHPBackend\AppConfig;
 use PHPBackend\Request;
-use Core\Shivalik\Entities\Office;
-use Core\Shivalik\Entities\Withdrawal;
-use Core\Shivalik\Filters\SessionMemberFilter;
 
 /**
  * @var AppConfig $config
@@ -15,10 +14,6 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
  */
 $office = $_SESSION[SessionMemberFilter::MEMBER_CONNECTED_SESSION]->officeAccount;
 
-/**
- * @var Withdrawal[] $withdrawals
- */
-$withdrawals = $_REQUEST[MyOfficeController::ATT_WITHDRAWALS];
 ?>
 
 
@@ -92,44 +87,4 @@ $withdrawals = $_REQUEST[MyOfficeController::ATT_WITHDRAWALS];
     	</div>
     </div>
     <?php endif; ?>
-    
-    <div class="col-xs-12">
-    	<?php if (!empty($withdrawals)) : ?>
-        <div class="panel panel-default">
-	        <header class="panel-heading">
-	        	<h2 class="panel-title">withdrawals</h2>
-	        </header>
-	        <section class="table-responsive">
-	        	<table class="table">
-	        		<caption></caption>
-	        		<thead>
-	        			<tr>
-	        				<th>N°</th>
-	        				<th>Names</th>
-	        				<th>ID</th>
-	        				<th>Amount</th>
-	        				<th>Served</th>
-	        				<th>date and time</th>
-	        			</tr>
-	        		</thead>
-	        		<tbody>
-	        			<?php $num = 0; ?>
-						<?php foreach ($withdrawals as $withdrawal): ?>
-	    					<tr>
-	    						<td><?php  $num++; echo ($num);?> </td>
-	    						<td><?php echo htmlspecialchars($withdrawal->getMember()->getNames());?></td>
-	    						<td><?php echo ($withdrawal->getMember()->getMatricule());?></td>
-	    						<td><?php echo ("{$withdrawal->getAmount()} {$config->get('devise')}");?></td>
-	    						<td class="<?php echo ($withdrawal->getAdmin()!=null? "text-success":"text-danger"); ?>">
-	    							<span class="glyphicon glyphicon-<?php echo ($withdrawal->getAdmin()!=null? "ok":"remove"); ?>"></span>
-	    						</td>
-	    						<td><?php echo ($withdrawal->dateAjout->format('d/m/Y \a\t H\h:i'));?></td>
-	    					</tr>
-						<?php endforeach; ?>
-	        		</tbody>
-	        	</table>
-	        </section>
-        </div>
-        <?php endif;?>
-    </div>
 </div>

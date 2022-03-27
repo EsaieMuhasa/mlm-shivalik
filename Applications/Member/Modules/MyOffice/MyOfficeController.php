@@ -26,6 +26,7 @@ class MyOfficeController extends HTTPController
     const ATT_ITEM_MENU_HISTORY = 'OFFICE_ACTIVE_ITEM_MENU_HISTORY';
     const ATT_ITEM_MENU_OFFICE_ADMIN = 'OFFICE_ACTIVE_ITEM_MENU_OFFICE_ADMIN';
     const ATT_ITEM_MENU_VIRTUAL_MONEY = 'OFFICE_ACTIVE_ITEM_MENU_VIRTUAL_MONEY';
+    const ATT_ITEM_MENU_WITHDRAWALS = 'OFFICE_ACTIVE_ITEM_MENU_CASH_OUTS';
     
     
     const ATT_OFFICE = 'office';
@@ -37,6 +38,7 @@ class MyOfficeController extends HTTPController
     
     const ATT_OFFICE_SIZE = 'officeSize';
     const ATT_COUNT_MEMEBERS = 'COUNT_MEMBERS_IN_OFFICE';
+    const ATT_COUNT_WITHDRAWALS = 'COUNT_WITHDRAWALS_BY_OFFICE';
     const ATT_WITHDRAWALS = 'WITHDRAWALS';
     const ATT_WITHDRAWALS_AMOUNT = 'WITHDRAWALS_AMOUNT';
     
@@ -98,7 +100,7 @@ class MyOfficeController extends HTTPController
     }
     
     /**
-     * 
+     * tableau de board d'un office
      * @param Request $request
      * @param Response $response
      */
@@ -122,14 +124,30 @@ class MyOfficeController extends HTTPController
         
         $this->office->setWithdrawals($withdrawals);
         
-        if ($this->withdrawalDAOManager->checkByOffice($this->office->getId(), null, false)) {
-            $serveds = $this->withdrawalDAOManager->findByOffice($this->office->getId(), null, false);
-            $request->addAttribute(self::ATT_WITHDRAWALS, $serveds);
+        $request->addAttribute(self::ATT_CAN_SEND_RAPORT, $this->raportWithdrawalDAOManager->canSendRaport($this->office->getId()));
+        $request->addAttribute(self::ATT_COUNT_MEMEBERS, $nombreMembre);
+    }
+    
+    /**
+     * Visualisation de cash outs deja effectuer dans l'office du proprietaire du compte
+     * @param Request $request
+     * @param Response $response
+     */
+    public function executeWithdrawals (Request $request, Response $response) : void {
+        $request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_WITHDRAWALS);
+        
+        $limit = $request->existInGET("limit")? intval($request->getDataGET("limit"), 10) : intval($request->getApplication()->getConfig()->get('limitCashout')->getValue(), 10);
+        $offset = $request->existInGET('offset')? intval($request->getDataGET('offset'), 10) : 0;
+        $count = $this->withdrawalDAOManager->countByOffice($this->office->getId(), null, false);
+        
+        if ($this->withdrawalDAOManager->checkByOffice($this->office->getId(), null, false, $limit, $offset)) {
+            $cashouts = $this->withdrawalDAOManager->findByOffice($this->office->getId(), null, false, $limit, $offset);
+            $request->addAttribute(self::ATT_WITHDRAWALS, $cashouts);
         }else {
             $request->addAttribute(self::ATT_WITHDRAWALS, array());
         }
-        $request->addAttribute(self::ATT_CAN_SEND_RAPORT, $this->raportWithdrawalDAOManager->canSendRaport($this->office->getId()));
-        $request->addAttribute(self::ATT_COUNT_MEMEBERS, $nombreMembre);
+        
+        $request->addAttribute(self::ATT_COUNT_WITHDRAWALS, $count);
     }
     
     /**
@@ -205,19 +223,17 @@ class MyOfficeController extends HTTPController
     public function executeMembers (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_MEMBERS);
         
-        $nombre = $this->memberDAOManager->countByOffice($this->office->getId());
+        $limit = $request->existInGET("limit")? intval($request->getDataGET("limit"), 10) : intval($request->getApplication()->getConfig()->get(self::CONFIG_MAX_MEMBER_VIEW_STEP)->getValue(), 10);
+        $offset = $request->existInGET('offset')? intval($request->getDataGET('offset'), 10) : 0;
+        $count = $this->memberDAOManager->countByOffice($this->office->getId());
         
-        if ($nombre>0) {
-            if ($request->existGET('limit')) {
-                $offset = intval($request->getDataGET('offset'), 10);
-                $limit = intval($request->getDataGET('limit'), 10);
+        $members = [];
+        if ($count > 0) {
+            if($this->memberDAOManager->checkByOffice($this->office->getId(), $limit, $offset)) {                
+                $members = $this->memberDAOManager->findByOffice($this->office->getId(), $limit, $offset);
             } else {
-                $limit = intval($request->getApplication()->getConfig()->get(self::CONFIG_MAX_MEMBER_VIEW_STEP)!=null? $request->getApplication()->getConfig()->get(self::CONFIG_MAX_MEMBER_VIEW_STEP)->getValue() : 50);
-                $offset = 0;
+                $response->sendError();
             }
-            $members = $this->memberDAOManager->findByOffice($this->office->getId(), $limit, $offset);
-        }else {
-            $members = array();
         }
         
         /**
@@ -229,7 +245,7 @@ class MyOfficeController extends HTTPController
             }
         }
         
-        $request->addAttribute(self::PARAM_MEMBER_COUNT, $nombre);
+        $request->addAttribute(self::PARAM_MEMBER_COUNT, $count);
         $request->addAttribute(self::ATT_MEMBERS, $members);
     }
     

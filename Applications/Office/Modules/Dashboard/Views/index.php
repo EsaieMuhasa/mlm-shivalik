@@ -4,12 +4,16 @@ use Applications\Office\Modules\Dashboard\DashboardController;
 use PHPBackend\AppConfig;
 use PHPBackend\Request;
 use Core\Shivalik\Filters\SessionOfficeFilter;
+use Core\Shivalik\Entities\Office;
 
 /**
  * @var AppConfig $config
  */
 $config = $_REQUEST[Request::ATT_APP_CONFIG];
 
+/**
+ * @var Office $office
+ */
 $office = $_SESSION[SessionOfficeFilter::OFFICE_CONNECTED_SESSION]->getOffice();
 ?>
 
@@ -139,9 +143,11 @@ $office = $_SESSION[SessionOfficeFilter::OFFICE_CONNECTED_SESSION]->getOffice();
     						<td><?php echo ($withdrowal->telephone);?></td>
     						<td><?php echo ($withdrowal->amount);?> $</td>
     						<td>
+    							<?php if ($withdrowal->admin == null) : ?>
     							<a class="btn btn-danger" href="<?php echo "/office/members/{$withdrowal->member->getId()}/withdrawals/{$withdrowal->id}.html"; ?>">
     								<span class="glyphicon glyphicon-ok"></span> Accept
     							</a>
+    							<?php endif; ?>
     						</td>
     					</tr>
 					<?php endforeach; ?>

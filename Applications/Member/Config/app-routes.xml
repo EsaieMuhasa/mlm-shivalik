@@ -31,10 +31,12 @@
 	
 	<module name="MyOffice"><!-- monitoring de l'office -->
 	 	<route action="index" urlPattern="/member/office/"/>
+	 	<route action="withdrawals" urlPattern="/member/office/withdrawals/"/>
+	 	<route action="withdrawals" urlPattern="/member/office/withdrawals/([0-9]+)-([0-9]+)\.html" paramsNames="limit,offset"/>
 	 	<route action="members" urlPattern="/member/office/members/"/>
 	 	<route action="upgrades" urlPattern="/member/office/upgrades\.html"/>
 	 	<route action="members" urlPattern="/member/office/members/(table|grid)/" paramsNames="affichage"/>
-	 	<route action="members" urlPattern="/member/office/members/(table|grid)/([0-9]+)-([0-9]+)\.html" paramsNames="affichage,limit,offiset"/>
+	 	<route action="members" urlPattern="/member/office/members/(table|grid)/([0-9]+)-([0-9]+)\.html" paramsNames="affichage,limit,offset"/>
 	 	<route action="virtualmoney" urlPattern="/member/office/virtualmoney/"/>
 	 	<route action="sendRaportWithdrawals" urlPattern="/member/office/send-matched-money.html"/>
 	 	<route action="requestVirtualmoney" urlPattern="/member/office/virtualmoney/request\.html"/>

@@ -12,6 +12,7 @@ use Core\Shivalik\Managers\MemberDAOManager;
 use PHPBackend\Dao\DAOEvent;
 use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
+use Core\Shivalik\Entities\OfficeBonus;
 
 /**
  *
@@ -27,7 +28,7 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
     public function loadAccount ($member, bool $calcul = true) : Account {
         $account = new Account(($member instanceof Member)? $member : $this->findById($member));
         
-        $daos = [PointValue::class, BonusGeneration::class, Withdrawal::class];
+        $daos = [PointValue::class, BonusGeneration::class, OfficeBonus::class, Withdrawal::class];
         
         foreach ($daos as $dao) {
             /**
@@ -72,8 +73,8 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\MemberDAOManager::checkByOffice()
      */
-    public function checkByOffice (int $officeId) : bool {
-        return $this->columnValueExist('office', $officeId);
+    public function checkByOffice (int $officeId, ?int $limit = null, int $offset = 0) : bool {
+        return UtilitaireSQL::checkAll($this->getConnection(), $this->getTableName(), ['office' => $officeId], $limit, $offset);
     }
     
     

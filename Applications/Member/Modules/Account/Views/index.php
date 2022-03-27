@@ -61,19 +61,22 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
         </div>
         <!--/.info-box-->
     </div>
+</div>
     
+<?php $hasOffice = $compte->getMember()->getOfficeAccount() != null; ?>
+<div class="row">
     <!-- montant disponible -->
-    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+    <div class="<?php echo ($hasOffice? 'col-lg-4 col-md-4':'col-lg-6 col-md-6'); ?> col-lg-4 col-md-4 col-sm-6 col-xs-12">
         <div class="info-box green-bg">
             <i class="fa fa-money"></i>
-            <div class="count"><?php echo ("{$compte->getSolde()} {$config->get("devise")}"); ?></div>
+            <div class="count"><?php echo ("{$compte->getSoldeGenration()} {$config->get("devise")}"); ?></div>
             <div class="title">Reg <?php echo htmlspecialchars("&"); ?>  Upg Wallet</div>
         </div>
         <!--/.info-box-->
     </div>
     
     <!-- bonus reachat -->
-    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+    <div class="<?php echo ($hasOffice? 'col-lg-4 col-md-4':'col-lg-6 col-md-6'); ?> col-sm-6 col-xs-12">
         <div class="info-box green-bg">
             <i class="fa fa-link"></i>
             <div class="count">0<?php echo ("{$config->get("devise")}"); ?></div>
@@ -82,21 +85,23 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
         <!--/.info-box-->
     </div>
     
+    <?php if ($hasOffice) : ?>
     <!-- bonus reachat -->
     <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
         <div class="info-box green-bg">
-            <i class="fa fa-users"></i>
-            <div class="count">0<?php echo ("{$config->get("devise")}"); ?></div>
-            <div class="title">PVW</div>
+            <i class="fa fa-laptop"></i>
+            <div class="count"><?php echo ("{$compte->getSoldeOfficeBonus()} {$config->get("devise")}"); ?></div>
+            <div class="title">Office</div>
         </div>
         <!--/.info-box-->
     </div>
+    <?php endif; ?>
 </div>
     
 <div class="row">
 
     <!-- bonus reachat -->
-    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
         <div class="info-box brown-bg">
             <i class="fa fa-inbox"></i>
             <div class="count"><?php echo ("{$compte->getSolde()} {$config->get("devise")}"); ?></div>
@@ -106,7 +111,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
     </div>
     
     <!-- bonus reachat -->
-    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
         <div class="info-box brown-bg">
             <i class="fa fa-trash-o"></i>
             <div class="count"><?php echo ("{$compte->getWithdrawals()}  {$config->get("devise")}"); ?></div>

@@ -79,7 +79,7 @@ $offset = isset($_GET['offset'])? $_GET['offset'] : 0;
 	        			</tr>
 	        		</thead>
 	        		<tbody>
-	        			<?php $num = 0; ?>
+	        			<?php $num = $offset; ?>
 						<?php foreach ($_REQUEST[MyOfficeController::ATT_MEMBERS] as $user): ?>
 	    					<tr>
 	    						<td><?php 

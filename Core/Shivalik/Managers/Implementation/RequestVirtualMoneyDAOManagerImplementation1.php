@@ -64,11 +64,11 @@ class RequestVirtualMoneyDAOManagerImplementation1 extends DefaultDAOInterface i
             if ($statementt->execute()) {
                 if ($row = $statementt->fetch()) {
                     $request = new RequestVirtualMoney($row, true);
-                    $request->setOffice($this->officeDAOManager->getForId($request->getOffice()->getId(), false));
+                    $request->setOffice($this->officeDAOManager->findById($request->getOffice()->getId(), false));
                     $return[] = $request;
                     while ($row = $statementt->fetch()) {
                         $request = new RequestVirtualMoney($row, true);
-                        $request->setOffice($this->officeDAOManager->getForId($request->getOffice()->getId(), false));
+                        $request->setOffice($this->officeDAOManager->findById($request->getOffice()->getId(), false));
                         $return[] = $request;
                     }
                 }else {

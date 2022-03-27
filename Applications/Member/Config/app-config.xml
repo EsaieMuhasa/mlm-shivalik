@@ -1,3 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE app-config SYSTEM "../../../PHPBackend/config.dtd" >
-<app-config></app-config>
+<app-config>
+	<definitions>
+		<define name="limitCashout" value="15"/>
+	</definitions>
+</app-config>

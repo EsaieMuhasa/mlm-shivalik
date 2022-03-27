@@ -13,7 +13,7 @@ interface UserDAOManager extends DAOInterface
 {
 
     /**
-     * mis sen jour du statut d'un telephone
+     * mis sen jour du statut d'un membre
      * @param int $id
      * @param bool $enable
      */

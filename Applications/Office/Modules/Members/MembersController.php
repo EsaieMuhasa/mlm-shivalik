@@ -4,6 +4,7 @@ namespace Applications\Office\Modules\Members;
 
 use Core\Shivalik\Entities\Account;
 use Core\Shivalik\Entities\Member;
+use Core\Shivalik\Entities\Withdrawal;
 use Core\Shivalik\Filters\SessionOfficeFilter;
 use Core\Shivalik\Managers\BonusGenerationDAOManager;
 use Core\Shivalik\Managers\CountryDAOManager;
@@ -117,32 +118,16 @@ class MembersController extends HTTPController {
 	}
 	
 	/**
+	 * acces aux membres, dont leurs compte ont ete creer par l'office dans la session encours.
 	 * @param Request $request
 	 * @param Request $response
 	 */
-	public function executeIndex (Request $request, Request $response) : void{
-		$withdrawal = 0;
-
-		if ($this->withdrawalDAOManager->checkByOffice($request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice()->getId())) {
-			$all = $this->withdrawalDAOManager->findByOffice($request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice()->getId());
-			foreach ($all as $one) {
-				$withdrawal += $one->getAmount();
-			}
-		}else {
-			$all = array();
-		}
-		
-		$request->addAttribute(self::ATT_SOLDE_WITHDRAWALS, $withdrawal);
-		$request->addAttribute(self::ATT_WITHDRAWALS, $all);
-	}
-	
-	/**
-	 * @param Request $request
-	 * @param Request $response
-	 */
-	public function executeMembers (Request $request, Response $response) : void {
+	public function executeIndex (Request $request, Response $response) : void {
 		
 		$office = $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice();
+		
+		$limit = intval($request->getApplication()->getConfig()->get(self::CONFIG_MAX_MEMBER_VIEW_STEP)->getValue(), 10);
+		$offset = $request->existInGET('offset')? intval($request->getDataGET('offset'), 10) : 0;
 		
 		if ($request->getMethod() == Request::HTTP_POST) {
 		    
@@ -156,23 +141,18 @@ class MembersController extends HTTPController {
     			$message = new ToastMessage('Error', "Know user ID in system. ID: {$request->getDataPOST('id')}", ToastMessage::MESSAGE_ERROR);
 			}
 			
-			$request->addAppMessage($message);
+			$request->addToast($message);
 			$response->sendRedirect('/office/members/');
 		}
 		
-
-		$nombre = $this->memberDAOManager->countByOffice($office->getId());
-		if ($nombre>0) {
-			if ($request->existGET('limit')) {
-				$offset = intval($request->getDataGET('offset'), 10);
-				$limit = intval($request->getDataGET('limit'), 10);
+		$count = $this->memberDAOManager->countByOffice($office->getId());
+		$members = [];
+		if ($count > 0) {
+			if ($this->memberDAOManager->checkByOffice($office->getId(), $limit, $offset)) {
 				$members = $this->memberDAOManager->findByOffice($office->getId(), $limit, $offset);
 			} else {
-				$limit = intval($request->getApplication()->getConfig()->get(self::CONFIG_MAX_MEMBER_VIEW_STEP)!=null? $request->getApplication()->getConfig()->get(self::CONFIG_MAX_MEMBER_VIEW_STEP)->getValue() : 50);
-				$members = $this->memberDAOManager->findByOffice($office->getId(), $limit, 0);
+			    $response->sendError();
 			}
-		}else {
-			$members = array();
 		}
 		
 		/**
@@ -184,12 +164,13 @@ class MembersController extends HTTPController {
 		    }
 		}
 		$request->addAttribute(self::ATT_MEMBERS, $members);
-		$request->addAttribute(self::PARAM_MEMBER_COUNT, $nombre);
+		$request->addAttribute(self::PARAM_MEMBER_COUNT, $count);
 	}
 	
 	
 	
 	/**
+	 * Adhesion d'un nouveau membre
 	 * @param Request $request
 	 * @param Request $response
 	 */
@@ -206,6 +187,11 @@ class MembersController extends HTTPController {
 		}
 		
 		if ($request->getMethod() == Request::HTTP_POST) {
+		    /**
+		     * on prefere passer pas L'inscription au pack, qui utilise dans le colices 
+		     * le validateur d'un membre et tout les validateurs qui y sont lier
+		     * @var \Core\Shivalik\Validators\GradeMemberFormValidator $form
+		     */
 			$form = new GradeMemberFormValidator($this->getDaoManager());
 			$request->addAttribute(GradeMemberFormValidator::FIELD_OFFICE_ADMIN, $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION));
 			$gm = $form->createAfterValidation($request);
@@ -223,7 +209,6 @@ class MembersController extends HTTPController {
 			$request->addAttribute(self::ATT_LOCALISATION, $gm->getMember()->getLocalisation());
 		}
 		
-		//
 		$request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->findAll());
 		$grades = $this->gradeDAOManager->findAll();
 		$request->addAttribute(self::ATT_GRADES, $grades);
@@ -231,6 +216,7 @@ class MembersController extends HTTPController {
 	
 	
 	/**
+	 * Dashboard du compte d'un membre
 	 * @param Request $request
 	 * @param Request $response
 	 */
@@ -265,6 +251,7 @@ class MembersController extends HTTPController {
 	}
 	
 	/**
+	 * visiualisation des membres du reseau d'un membre
 	 * @param Request $request
 	 * @param Request $response
 	 */
@@ -323,11 +310,13 @@ class MembersController extends HTTPController {
 	}
 	
 	/**
+	 * - visualisation des operations de cashout deja effectuer par le compte d'un utilisateur
+	 * - validation d'une operation pour le compte d'un utilisateur
 	 * @param Request $request
 	 * @param Request $response
 	 */
 	public function executeWithdrawalsMember (Request $request, Response $response) : void {
-		$id = intval($request->getDataGET('id'), 10);
+		$id = intval($request->getDataGET('id'), 10);//identifiant du membre
 		if (!$this->memberDAOManager->checkById($id)) {
 			$response->sendError();
 		}
@@ -337,10 +326,19 @@ class MembersController extends HTTPController {
 		 */
 		$member = $this->memberDAOManager->findById($id);
 		
-		if ($request->existGET('requestId')) {
-			$this->withdrawalDAOManager->validate(intval($request->getDataGET('requestId')), $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getId());
+		if ($request->existGET('requestId')) {//dans le cas où on doit accepte le cashout
+		    
+		    /**
+		     * @var Withdrawal $cashout
+		     */
+		    $cashout = $this->withdrawalDAOManager->findById(intval($request->getDataGET('requestId'), 10));
+		    if($cashout->getOffice()->getId() != $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->office->getId() || 
+		        $cashout->getAdmin() != null) { //Dans le cas où, le cash out est deja valider ou que celui-ci a été envoyer à un office different de celui qui est dans la session encours
+		        $response->sendError();
+		    }
+			$this->withdrawalDAOManager->validate($cashout->getId(), $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getId());
+			$response->sendRedirect("/office/");
 		}
-		
 		
 		if ($this->gradeMemberDAOManager->checkCurrentByMember($member->getId())) {
 			$gradeMember = $this->gradeMemberDAOManager->findCurrentByMember($id);
@@ -369,36 +367,8 @@ class MembersController extends HTTPController {
 		$request->addAttribute(self::ATT_MEMBER, $member);
 	}
 	
-	
 	/**
-	 *
-	 * @param Request $request
-	 * @param Request $response
-	 */
-	public function executeStateMember (Request $request, Request $response) : void {
-		$request->addAttribute(self::ATT_VIEW_TITLE, "Union members");
-		$id = intval($request->getDataGET('id'), 10);
-		if (!$this->memberDAOManager->checkById($id)) {
-			$response->sendError();
-		}
-		
-		$state = ($request->getDataGET('state') == 'enable');
-		
-		/**
-		 * @var Member $member
-		 */
-		$member = $this->memberDAOManager->findById($id);
-		
-		if ($state != $member->isEnable()) {
-			$this->memberDAOManager->updateState($id, $state);
-		}
-		
-		$response->sendRedirect("/office/members/{$id}/");
-		
-	}
-	
-	/**
-	 *
+	 * Mise en jours du packet d'un membre
 	 * @param Request $request
 	 * @param Request $response
 	 */

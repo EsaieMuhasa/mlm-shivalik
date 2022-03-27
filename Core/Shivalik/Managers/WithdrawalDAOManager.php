@@ -36,7 +36,17 @@ interface WithdrawalDAOManager extends OperationDAOManager
      * @param int $rapportId
      * @return int
      */
-    public function countByRapport (int $rapportId) : int ;
+    public function countByRapport (int $rapportId) : int;
+    
+    /** 
+     * Comptage des operations deja effectuers dans un bureau (operations de cashouts)
+     * @param int $officeId, identifiant de l'office
+     * @param bool $state, status du cashout
+     * @param bool $sended, est-il deja transmis a la hierarchie??
+     * @return int
+     * @throws DAOException s'il ya erreur lors de la communication avec la BDD
+     */
+    public function countByOffice (int $officeId, ?bool $state = false, ?bool $sended=null) : int;
     
     /**
      * verifie si l'office as des operations qui y ont transiter

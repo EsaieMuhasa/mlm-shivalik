@@ -97,7 +97,7 @@ class MemberFormValidator extends UserFormValidator
     {
         parent::validationTelephone($telephone, $id);
         try {
-            if($this->memberDAOManager->checkByTelephone($telephone, $id)){
+            if($telephone!= null && $this->memberDAOManager->checkByTelephone($telephone, $id)){
                 throw new IllegalFormValueException("This telephone number are used");
             }
         } catch (DAOException $e) {
@@ -340,7 +340,7 @@ class MemberFormValidator extends UserFormValidator
         $member = new Member();
         $photo = $request->getUploadedFile(self::FIELD_PHOTO);
         
-        if (!$photo->isUploadedFile()) {
+        if (!$photo->isImage()) {
             $this->addError(self::FIELD_PHOTO, "make sure you have selected a photo on your terminal");
         }
         /**

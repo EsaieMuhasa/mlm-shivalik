@@ -16,14 +16,13 @@
 	</module>
 
 	<module name="Members">
-	 	<route action="members" urlPattern="/office/members/"/>
-	 	<route action="members" urlPattern="/office/members/(table|grid)/" paramsNames="affichage"/>
-	 	<route action="members" urlPattern="/office/members/([0-9]+)-([0-9]+)\.html" paramsNames="limit,offset"/>
-	 	<route action="members" urlPattern="/office/members/(table|grid)/([0-9]+)-([0-9]+)\.html" paramsNames="affichage,limit,offset"/>
+	 	<route action="index" urlPattern="/office/members/"/>
+	 	<route action="index" urlPattern="/office/members/(table|grid)/" paramsNames="affichage"/>
+	 	<route action="index" urlPattern="/office/members/([0-9]+)-([0-9]+)\.html" paramsNames="limit,offset"/>
+	 	<route action="index" urlPattern="/office/members/(table|grid)/([0-9]+)-([0-9]+)\.html" paramsNames="affichage,limit,offset"/>
 	 	<route action="addMember" urlPattern="/office/members/add\.html"/>
 	 	
 	 	<route action="member" urlPattern="/office/members/([0-9]+)/" paramsNames="id"/>
-	 	<route action="stateMember" urlPattern="/office/members/([0-9]+)/(enable|disable)\.html" paramsNames="id,state"/>
 	 	<route action="upgradeMember" urlPattern="/office/members/([0-9]+)/(upgrade)\.html" paramsNames="id,option"/>
 	 	<route action="downlines" urlPattern="/office/members/([0-9]+)/(downlines)/" paramsNames="id,option"/>
 	 	<route action="downlines" urlPattern="/office/members/([0-9]+)/(downlines)/(left|middle|right|all)\.html" paramsNames="id,option,foot"/>

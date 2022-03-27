@@ -73,13 +73,33 @@ class WithdrawalDAOManagerImplementation1 extends AbstractOperationDAOManager im
     
     /**
      * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\WithdrawalDAOManager::countByOffice()
+     */
+    public function countByOffice(int $officeId, ?bool $state = false, ?bool $sended = null): int
+    {
+        $return = 0;
+        try {
+            $statement = $this->getConnection()->prepare("SELECT COUNT(*) AS nombre FROM {$this->getTableName()} WHERE office=:office ".(($state !== null)? ("AND admin IS ".($state? 'NOT':'')." NULL") : ("")).(($sended !== null)? (" AND raport IS ".($sended? 'NOT':'')." NULL") : ("")).' ORDER BY dateAjout DESC');
+            $statement->execute(array('office' => $officeId));
+            if ($row = $statement->fetch()) {
+                $return = $row['nombre'];
+            }
+            $statement->closeCursor();
+        } catch (\PDOException $e) {
+            throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
+        }
+        return $return;
+    }
+
+    /**
+     * {@inheritDoc}
      * @see \Core\Shivalik\Managers\WithdrawalDAOManager::checkByOffice()
      */
     public function checkByOffice(int $officeId, ?bool $state = false, ?bool $sended=null, ?int $limit = null, int $offset = 0): bool
     {
         $return = false;
         try {
-            $statement = $this->getConnection()->prepare("SELECT * FROM {$this->getTableName()} WHERE office=:office ".(($state !== null)? ("AND admin IS ".($state? 'NOT':'')." NULL") : ("")).(($sended !== null)? (" AND raport IS ".($sended? 'NOT':'')." NULL") : ("")));
+            $statement = $this->getConnection()->prepare("SELECT * FROM {$this->getTableName()} WHERE office=:office ".(($state !== null)? ("AND admin IS ".($state? 'NOT':'')." NULL") : ("")).(($sended !== null)? (" AND raport IS ".($sended? 'NOT':'')." NULL") : ("")).' ORDER BY dateAjout DESC'.($limit !== null? " LIMIT {$limit} OFFSET {$offset}":''));
             $statement->execute(array('office' => $officeId));
             if ($statement->fetch()) {
                 $return = true;
@@ -99,7 +119,7 @@ class WithdrawalDAOManagerImplementation1 extends AbstractOperationDAOManager im
     {
         $return = array();
         try {
-            $statement = $this->getConnection()->prepare("SELECT * FROM {$this->getTableName()} WHERE office={$officeId} ".(($state !== null)? ("AND admin IS ".($state? 'NOT':'')." NULL") : ("")).(($sended !== null)? (" AND raport IS ".($sended? 'NOT':'')." NULL") : ("")));
+            $statement = $this->getConnection()->prepare("SELECT * FROM {$this->getTableName()} WHERE office={$officeId} ".(($state !== null)? ("AND admin IS ".($state? 'NOT':'')." NULL") : ("")).(($sended !== null)? (" AND raport IS ".($sended? 'NOT':'')." NULL") : ("")).' ORDER BY dateAjout DESC'.($limit !== null? " LIMIT {$limit} OFFSET {$offset}":''));
             $statement->execute();
             if ($row = $statement->fetch()) {
                 $w = new Withdrawal($row);

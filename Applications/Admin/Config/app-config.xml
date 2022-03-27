@@ -2,7 +2,7 @@
 <!DOCTYPE app-config SYSTEM "../../../PHPBackend/config.dtd" >
 <app-config>
 	<definitions>
-		<define name="maxMembers" value="50"/>
+		<define name="maxMembers" value="24"/>
 		<define name="productsSteep" value="12"/>
 	</definitions>
 	<users>

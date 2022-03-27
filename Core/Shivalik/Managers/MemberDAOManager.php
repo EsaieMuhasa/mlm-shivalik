@@ -40,9 +40,11 @@ interface MemberDAOManager extends UserDAOManager
 	/**
 	 * l'office en parametre at-il deja creer aumoin un membre
 	 * @param int $officeId
+	 * @param int $limit
+	 * @param int $offset
 	 * @return bool
 	 */
-	public function checkByOffice (int $officeId) : bool ;
+	public function checkByOffice (int $officeId, ?int $limit = null, int $offset = 0) : bool ;
 
     /**
      * 

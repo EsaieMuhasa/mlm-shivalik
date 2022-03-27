@@ -31,6 +31,18 @@ class Account
     private $solde;
     
     /**
+     * Le solde bonus office pour ceux qui en ont
+     * @var float
+     */
+    private $soldeOfficeBonus;
+    
+    /**
+     * Solde du compte principale (parainage)
+     * @var float
+     */
+    private $soldeGenration;
+    
+    /**
      * somme total des pv
      * @var double
      */
@@ -163,6 +175,22 @@ class Account
     /**
      * @return number
      */
+    public function getSoldeOfficeBonus()
+    {
+        return $this->soldeOfficeBonus;
+    }
+
+    /**
+     * @return number
+     */
+    public function getSoldeGenration()
+    {
+        return $this->soldeGenration;
+    }
+
+    /**
+     * @return number
+     */
     public function getPv()
     {
         return $this->pv;
@@ -234,7 +262,6 @@ class Account
      * @throws PHPBackendException
      */
     private function calculSolde () : void {
-        $solde = 0.0;
         $this->leftPv = 0;
         $this->rightPv = 0;
         $this->middlePv = 0;
@@ -242,6 +269,8 @@ class Account
         $this->pv = 0;
         $this->withdrawals = 0;
         $this->withdrawalsRequest = 0;
+        $this->soldeOfficeBonus = 0;
+        $this->soldeGenration = 0.0;
         
         foreach ($this->getOperations() as $operation) {
             if ($operation instanceof Withdrawal) {
@@ -252,12 +281,11 @@ class Account
                     $this->withdrawalsRequest += $operation->getAmount();
                 }
                 
-                $solde -= $operation->getAmount();
-            }else if ($operation instanceof BonusGeneration || $operation instanceof OfficeBonus) {
-                $solde += $operation->getAmount();
-                
+            }else if ($operation instanceof BonusGeneration) {
+                $this->soldeGenration += $operation->getAmount();
+            } else if ($operation instanceof OfficeBonus) {
+                $this->soldeOfficeBonus += $operation->getAmount();
             }else if ($operation instanceof PointValue) {
-                
                 if ($operation->getFoot() == PointValue::FOOT_LEFT) {
                     $this->leftPv += $operation->getValue();
                 }else if ($operation->getFoot() == PointValue::FOOT_MIDDEL) {
@@ -265,22 +293,19 @@ class Account
                 }else if ($operation->getFoot() == PointValue::FOOT_RIGTH) {
                     $this->rightPv += $operation->getValue();
                 }
-                
                 $this->pv += $operation->getAmount();
             }else if ($operation instanceof Transfer) {
                 if ($this->member->getId() == $operation->getReceiver()->getId()) {
                     //reception de l'argement
-                    $solde += $operation->getAmount();
                 } else {
                     //transfert de l'argent
-                    $solde -= $operation->getAmount();
                 }
             }else {
                 throw new PHPBackendException("unable to calculate account balance for {$this->getMember()->getNames()}");
             }
         }
         
-        $this->solde = $solde;
+        $this->solde = $this->soldeGenration + $this->soldeOfficeBonus + $this->withdrawalsRequest - $this->withdrawals;
     }
 
 }

@@ -84,7 +84,7 @@ abstract class UserFormValidator extends DefaultFormValidator
      */
     protected function validationTelephone ($telephone, $id = null) : void {
         if ($telephone == null) {
-            //throw new IllegalFormValueException("the user's phone number is required");
+            throw new IllegalFormValueException("the user's phone number is required");
         } else if (!preg_match(self::RGX_TELEPHONE, $telephone) && !preg_match(self::RGX_TELEPHONE_RDC, $telephone)) {
             throw new IllegalFormValueException("invalid phone number format");
         }

@@ -2,7 +2,6 @@
 
 namespace Core\Shivalik\Validators;
 
-use Applications\Member\MemberApplication;
 use Core\Shivalik\Entities\RequestVirtualMoney;
 use Core\Shivalik\Managers\RequestVirtualMoneyDAOManager;
 use Core\Shivalik\Managers\VirtualMoneyDAOManager;
@@ -10,6 +9,8 @@ use PHPBackend\Request;
 use PHPBackend\Dao\DAOException;
 use PHPBackend\Validator\DefaultFormValidator;
 use PHPBackend\Validator\IllegalFormValueException;
+use Core\Shivalik\Filters\SessionMemberFilter;
+use PHPBackend\PHPBackendException;
 
 /**
  *
@@ -66,7 +67,7 @@ class RequestVirtualMoneyFormValidator extends DefaultFormValidator {
 		
 		$this->processingAmount($rv, $amount);
 		
-	    if (sha1($password) != MemberApplication::getConnectedMember()->getPassword()) {
+	    if (sha1($password) != $request->getSession()->getAttribute(SessionMemberFilter::MEMBER_CONNECTED_SESSION)->getPassword()) {
 	        $this->addError('password', 'invalid password');
 	    }
 		if (!$this->hasError()) {
@@ -87,8 +88,7 @@ class RequestVirtualMoneyFormValidator extends DefaultFormValidator {
 	 * @see \PHPBackend\Validator\FormValidator::updateAfterValidation()
 	 */
 	public function updateAfterValidation(Request $request) {
-		// TODO Auto-generated method stub
-		
+		throw new PHPBackendException("unsuported operation");
 	}
 
 

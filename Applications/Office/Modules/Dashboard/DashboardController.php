@@ -69,13 +69,11 @@ class DashboardController extends HTTPController {
         //$response->sendRedirect("/admin/members/");
         $office = $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice();
         
-        if ($this->withdrawalDAOManager->checkByOffice($office->getId())) {
-            $withdrawals = $this->withdrawalDAOManager->findByOffice($office->getId());
+        if ($this->withdrawalDAOManager->checkByOffice($office->getId(), false, false)) {
+            $withdrawals = $this->withdrawalDAOManager->findByOffice($office->getId(), false, false);
         }else {
             $withdrawals = array();
         }
-        
-        $office->setWithdrawals($withdrawals);
         
         if ($this->gradeMemberDAOManager->checkByOffice($office->getId())) {
         	$office->setOperations($this->gradeMemberDAOManager->findByOffice($office->getId()));
@@ -86,13 +84,15 @@ class DashboardController extends HTTPController {
         }
         
         
-        if ($this->withdrawalDAOManager->checkByOffice($office->getId())) {
-            $all = $this->withdrawalDAOManager->findByOffice($office->getId());
+        if ($this->withdrawalDAOManager->checkByOffice($office->getId(), null, false)) {
+            $all = $this->withdrawalDAOManager->findByOffice($office->getId(), null, false);
         }else {
             $all = array();
-        }        
+        }
         
-        $request->addAttribute(self::ATT_WITHDRAWALS, $all);
+        $office->setWithdrawals($all);
+        
+        $request->addAttribute(self::ATT_WITHDRAWALS, $withdrawals);
         $request->addAttribute(self::PARAM_MEMBER_COUNT, $this->memberDAOManager->countByOffice($office->getId()));
     }
     

@@ -41,7 +41,7 @@
 		<define name="designerEmail" value="webmaster@shivalikherbals.org"/>
 		<define name="devise" value="$"/>
 		<define name="minWithdrawal" value="10"/><!-- La plus petite valeur retirable en dolar -->
-		<define name="maxMembers" value="20"/>
+		<define name="maxMembers" value="12"/>
 		
 		<list name="footsMember">
 			<item name="LEFT" value="1"/>

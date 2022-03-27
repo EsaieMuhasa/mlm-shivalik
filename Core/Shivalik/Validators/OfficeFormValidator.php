@@ -7,6 +7,7 @@ use Core\Shivalik\Managers\OfficeDAOManager;
 use PHPBackend\AppConfig;
 use PHPBackend\Request;
 use PHPBackend\Dao\DAOException;
+use PHPBackend\File\FileManager;
 use PHPBackend\File\UploadedFile;
 use PHPBackend\Http\HTTPRequest;
 use PHPBackend\Image2D\Image;
@@ -151,11 +152,10 @@ class OfficeFormValidator extends DefaultFormValidator
         
         if ($write && $photo->isImage()) {
             $time = time();
-            $reelName = self::getAbsolutDataDirName($config, $office->getId()).DIRECTORY_SEPARATOR.$office->getId().'-'.$time.'-reel.'.$photo->getExtension();
-            $reelFullName = self::getDataDirName($config, $office->getId()).DIRECTORY_SEPARATOR.$office->getId().'-'.$time.'-reel.'.$photo->getExtension();
+            $reelFullName = "data".DIRECTORY_SEPARATOR.self::getDataDirName($config, $office->getId()).DIRECTORY_SEPARATOR.$office->getId().'-'.$time.'-reel.'.$photo->getExtension();
             $photoName = self::getDataDirName($config, $office->getId()).DIRECTORY_SEPARATOR.$office->getId().'-'.$time.'.'.$photo->getExtension();
-            $photo->getApplication()->writeUploadedFile($photo, $reelFullName);
-            ImageResizing::profiling(new Image($reelName));
+            $real = FileManager::writeUploadedFile($photo, $reelFullName);
+            ImageResizing::profiling(new Image($real));
             $office->setPhoto($photoName);
         }
     }
@@ -262,7 +262,7 @@ class OfficeFormValidator extends DefaultFormValidator
      */
     public final static function getDataDirName (AppConfig $config, int $id) : string{
         $fold = 'offices'.DIRECTORY_SEPARATOR.($id!=0? $id : '0');
-        $dirPath = dirname(__DIR__).DIRECTORY_SEPARATOR.($config->get('webData')!=null? $config->get('webData') : 'Web').DIRECTORY_SEPARATOR.$fold;
+        $dirPath = dirname(dirname(dirname(__DIR__))).DIRECTORY_SEPARATOR.($config->get('webData')!=null? $config->get('webData') : 'Web').DIRECTORY_SEPARATOR.$fold;
         if (!is_dir($fold)) {
             @mkdir($dirPath, 0777, true);
         }

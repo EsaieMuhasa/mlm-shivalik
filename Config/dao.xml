@@ -93,6 +93,11 @@
 			implementation="\Core\Shivalik\Managers\Implementation\ProductDAOManagerImplementation1"/>
 			
 		<entity 
+			name="\Core\Shivalik\Entities\Stock" 
+			specification="\Core\Shivalik\Managers\StockDAOManager" 
+			implementation="\Core\Shivalik\Managers\Implementation\StockDAOManagerImplementation1"/>
+			
+		<entity 
 			name="\Core\Shivalik\Entities\Notification" 
 			specification="\Core\Shivalik\Managers\NotificationDAOManager" 
 			implementation="\Core\Shivalik\Managers\Implementation\NotificationDAOManagerImplementation1"/>
