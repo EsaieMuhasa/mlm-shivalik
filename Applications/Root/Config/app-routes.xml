@@ -28,6 +28,6 @@
 	 	<route action="addSize" urlPattern="/root/sizes/add\.html"/>
 	 	<route action="updateSize" urlPattern="/root/sizes/([0-9]{1,2})/update\.html" paramsNames="id"/>
 	 	
-	 	<route action="server" urlPattern="/root/server\.htm"/>
+	 	<route action="insertMember" urlPattern="/root/members/insert\.html"/>
 	</module>
 </app-routes>

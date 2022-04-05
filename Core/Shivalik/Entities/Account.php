@@ -43,25 +43,40 @@ class Account
     private $soldeGenration;
     
     /**
-     * somme total des pv
-     * @var double
+     * @var number
      */
-    private $pv;
+    private $leftMembershipPv;
     
     /**
-     * @var double
+     * @var number
      */
-    private $leftPv;
+    private $rightMembershipPv;
     
     /**
-     * @var double
+     * @var number
      */
-    private $rightPv;
+    private $middleMembershipPv;
     
     /**
-     * @var double
+     * @var number
      */
-    private $middlePv;
+    private $leftProductPv;
+    
+    /**
+     * @var number
+     */
+    private $rightProductPv;
+    
+    /**
+     * @var number
+     */
+    private $middleProductPv;
+    
+    /**
+     * effort personnel lors d'achat des produits
+     * @var number
+     */
+    private $personalProductPv;
     
     /**
      * (bonus generationnnel et parainage)
@@ -191,25 +206,52 @@ class Account
     /**
      * @return number
      */
-    public function getPv()
+    public function getPv() 
     {
-        return $this->pv;
+        return ($this->getMembershipPv() + $this->getProductPv());
+    }
+    
+    /**
+     * Return the somme of all membership points values
+     * @return number
+     */
+    public function getMembershipPv () {
+        return ($this->getLeftMembershipPv() + $this->getMiddleMembershipPv() + $this->getRightMembershipPv());
+    }
+    
+    /**
+     * return the somme of all product points values
+     * @return number
+     */
+    public function getProductPv () {
+        return ($this->getLeftProductPv() + $this->getMiddleProductPv() + $this->getRightProductPv() + $this->getPersonalProductPv());
     }
 
     /**
+     * return personal point value
+     * @return number
+     */
+    public function getPersonalProductPv()
+    {
+        return $this->personalProductPv;
+    }
+
+    /**
+     * Return sold of point value at left foot of this account
      * @return number
      */
     public function getLeftPv()
     {
-        return $this->leftPv;
+        return ($this->getLeftMembershipPv() + $this->getLeftProductPv());
     }
 
     /**
+     * return sold of point value at right foot of account
      * @return number
      */
     public function getRightPv()
     {
-        return $this->rightPv;
+        return ($this->getRightMembershipPv() + $this->getRightProductPv());
     }
 
     /**
@@ -217,7 +259,68 @@ class Account
      */
     public function getMiddlePv()
     {
-        return $this->middlePv;
+        return ($this->getMiddleMembershipPv() + $this->getMiddleProductPv());
+    }
+
+    /**
+     * @return number
+     */
+    public function getLeftMembershipPv()
+    {
+        return $this->leftMembershipPv;
+    }
+
+    /**
+     * @return number
+     */
+    public function getRightMembershipPv()
+    {
+        return $this->rightMembershipPv;
+    }
+
+    /**
+     * @return number
+     */
+    public function getMiddleMembershipPv()
+    {
+        return $this->middleMembershipPv;
+    }
+
+    /**
+     * @return number
+     */
+    public function getLeftProductPv()
+    {
+        return $this->leftProductPv;
+    }
+
+    /**
+     * @return number
+     */
+    public function getRightProductPv()
+    {
+        return $this->rightProductPv;
+    }
+
+    /**
+     * @return number
+     */
+    public function getMiddleProductPv()
+    {
+        return $this->middleProductPv;
+    }
+    
+    /**
+     * Renvoie la collection des points, pour tout les operations du compte
+     * @return PointValue[]
+     */
+    public function getPointValues () {
+        $pvs = [];
+        foreach ($this->operations as $opt) {
+            if($opt instanceof PointValue)
+                $pvs[] = $opt;
+        }
+        return $pvs;
     }
 
     /**
@@ -248,10 +351,8 @@ class Account
      */
     public function hasWithdrawRequest () : bool {
         foreach ($this->operations as $operation) {
-            if ($operation instanceof Withdrawal) {
-                if ($operation->getAdmin() == null ) {
-                    return true;
-                }
+            if ($operation instanceof Withdrawal && $operation->getAdmin() == null ) {
+                return true;
             }
         }
         
@@ -262,11 +363,14 @@ class Account
      * @throws PHPBackendException
      */
     private function calculSolde () : void {
-        $this->leftPv = 0;
-        $this->rightPv = 0;
-        $this->middlePv = 0;
+        $this->leftMembershipPv = 0;
+        $this->rightMembershipPv = 0;
+        $this->middleMembershipPv = 0;
+        $this->leftProductPv = 0;
+        $this->rightProductPv = 0;
+        $this->middleProductPv = 0;
+        $this->personalProductPv = 0;
         $this->wallet = 0;
-        $this->pv = 0;
         $this->withdrawals = 0;
         $this->withdrawalsRequest = 0;
         $this->soldeOfficeBonus = 0;
@@ -287,13 +391,28 @@ class Account
                 $this->soldeOfficeBonus += $operation->getAmount();
             }else if ($operation instanceof PointValue) {
                 if ($operation->getFoot() == PointValue::FOOT_LEFT) {
-                    $this->leftPv += $operation->getValue();
+                    if ($operation->getCommande() == null) {
+                        $this->leftMembershipPv += $operation->getValue();
+                    } else {
+                        $this->leftProductPv += $operation->getValue();
+                    }
                 }else if ($operation->getFoot() == PointValue::FOOT_MIDDEL) {
-                    $this->middlePv += $operation->getValue();
+                    if ($operation->getCommande() == null) {
+                        $this->middleMembershipPv += $operation->getValue();
+                    } else {
+                        $this->middleProductPv += $operation->getValue();
+                    }
                 }else if ($operation->getFoot() == PointValue::FOOT_RIGTH) {
-                    $this->rightPv += $operation->getValue();
+                    if ($operation->getCommande() == null) {
+                        $this->rightMembershipPv += $operation->getValue();
+                    } else {
+                        $this->rightProductPv += $operation->getValue();
+                    }
+                } else if ($operation->getCommande() != null) {//effort personnel
+                    $this->personalProductPv += $operation->getValue();
+                } else {
+                    throw new PHPBackendException("Invalid data integrity. Unable to classify point value");
                 }
-                $this->pv += $operation->getAmount();
             }else if ($operation instanceof Transfer) {
                 if ($this->member->getId() == $operation->getReceiver()->getId()) {
                     //reception de l'argement

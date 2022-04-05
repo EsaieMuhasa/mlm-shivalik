@@ -19,6 +19,16 @@ interface MemberDAOManager extends UserDAOManager
 	 */
 	public function loadAccount ($member, bool $calcul = true) : Account;
 	
+	/**
+	 * Insersion d'un nouveau compte au dessu d'un autre compte dans la hierarchie
+	 * Cette methode, recalcule tout les PVs de upline.
+	 * Losque de l'insersion du compte, aucun bonus n'est recue, 
+	 * aucune notification n'est generer
+	 * @param Account $newAccount, nouveau compte
+	 * @param Account $existAcount, ce compte doit exister n'avance dans l'arbre
+	 * @throws DAOException si une erreur surviens dans la transaction
+	 */
+	public function insertBelow (Account $newAccount, Account $existAcount) : void;
     
 	/**
 	 * revoie le nombre de compte deja creer par un office

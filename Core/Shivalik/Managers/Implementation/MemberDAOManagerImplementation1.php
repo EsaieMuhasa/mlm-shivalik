@@ -13,6 +13,7 @@ use PHPBackend\Dao\DAOEvent;
 use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
 use Core\Shivalik\Entities\OfficeBonus;
+use Core\Shivalik\Entities\GradeMember;
 
 /**
  *
@@ -51,6 +52,92 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
     }
     
     
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::insertBelow()
+     */
+    public function insertBelow(Account $newAccount, Account $existAcount): void {
+        try {
+            $pdo = $this->getConnection();
+            if ($pdo->beginTransaction()) {
+                
+                //creation du membre
+                $newAccount->getMember()->setParent($existAcount->getMember()->getParent());
+                $newAccount->getMember()->setSponsor($existAcount->getMember()->getSponsor());
+                $newAccount->getMember()->setFoot(4);//pour eviter de violer la contrainte d'unicite
+                
+                $this->createInTransaction($newAccount->getMember(), $pdo);
+
+                UtilitaireSQL::update($pdo, $this->getTableName(), [
+                    'parent' => $newAccount->getMember()->getId()
+                ], $existAcount->getMember()->getId());
+                
+                $newAccount->getMember()->setFoot($existAcount->getMember()->getFoot());
+                UtilitaireSQL::update($pdo, $this->getTableName(), [
+                    'foot' => $newAccount->getMember()->getFoot()
+                ], $newAccount->getMember()->getId());//correction du foot du nouveau membre
+                //==
+                
+                //packet
+                $this->getDaoManager()->getManagerOf(GradeMember::class)->createInTransaction($newAccount->getMember()->getPacket(), $pdo);
+                UtilitaireSQL::update($pdo, "GradeMember", [
+                    'enable' => 1,
+                    'initDate' => $newAccount->getMember()->getPacket()->getFormatedDateAjout()
+                ], $newAccount->getMember()->getPacket()->getId());
+                //==
+                
+                //pv du membre
+                $points = $existAcount->getPointValues();
+                $pointsValues = [];
+                $now = new \DateTime();
+                for ($i = 0, $count = count($points); $i < $count; $i++) {
+                    $pv = clone $points[$i];
+                    $pv->setDateAjout($now);
+                    $pv->setMember($newAccount->getMember());
+                    $pv->setFoot($newAccount->getMember()->getFoot());
+                    $pointsValues[] = $pv;
+                }
+                
+                $point = new PointValue();
+                $point->setDateAjout($now);
+                $point->setMember($newAccount->getMember());
+                $point->setGenerator($existAcount->getMember()->getPacket()->getId());
+                $point->setValue($existAcount->getMember()->getPacket()->getProduct()/2);
+                $point->setFoot($existAcount->getMember()->getFoot());
+                
+                $pointsValues[] = $point;
+                $newAccount->setOperations($pointsValues);
+                
+                $this->getDaoManager()->getManagerOf(PointValue::class)->createAllInTransaction($pointsValues, $pdo);
+                //==
+                
+                //pv pour les upline
+                $node = $newAccount->getMember();
+                while ($this->checkParent($node->getId())) {
+                    $point = new PointValue();
+                    $point->setDateAjout($now);
+                    $point->setGenerator($newAccount->getMember()->getPacket());
+                    $point->setValue($newAccount->getMember()->getPacket()->getProduct()/2);
+                    $point->setFoot($node->getFoot());
+                    
+                    $node = $this->findParent($node->getId());
+                    $point->setMember($node);
+                    $this->getDaoManager()->getManagerOf(PointValue::class)->createInTransaction($point, $pdo);
+                }
+                //==
+                
+            } else {
+                throw new DAOException("An error occurred while creating the transaction");
+            }
+            
+            if (!$pdo->commit()) {
+                throw new DAOException("An error occurred while closing the transaction");
+            }
+        } catch (\PDOException $e) {
+            throw  new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
+        }
+    }
+
     /**
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\MemberDAOManager::countByOffice()

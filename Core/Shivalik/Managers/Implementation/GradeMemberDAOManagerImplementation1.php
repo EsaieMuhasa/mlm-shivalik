@@ -689,11 +689,10 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
      */
     public function createInTransaction($entity, \PDO $pdo): void
     {
-        //on commence par creer le generateur
-        
         $generator = $entity->getMember();
-        
-        $this->memberDAOManager->createInTransaction($generator, $pdo);
+        if($generator->getId() == null || $generator->getId() <= 0){//on commence par creer le generateur
+            $this->memberDAOManager->createInTransaction($generator, $pdo);
+        }
         $id = UtilitaireSQL::insert($pdo, $this->getTableName(), [
             'member' => $entity->getMember()->getId(),
             'grade' => $entity->getGrade()->getId(),

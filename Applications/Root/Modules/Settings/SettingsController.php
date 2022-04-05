@@ -19,6 +19,7 @@ use PHPBackend\Application;
 use PHPBackend\Request;
 use PHPBackend\Response;
 use PHPBackend\Http\HTTPController;
+use Core\Shivalik\Validators\MemberFormValidator;
 
 /**
  *
@@ -47,6 +48,8 @@ class SettingsController extends HTTPController
     const ATT_COUNTRY = 'country';
     
     const ATT_LOCALISATION = 'localisation';
+    const ATT_GRADE_MEMBER = 'gradeMember';
+    const ATT_MEMBER = 'member';
     
     
     /**
@@ -129,11 +132,32 @@ class SettingsController extends HTTPController
     }
     
     /**
+     * insersion d'un membre dans l'arbre
      * @param Request $request
      * @param Response $response
      */
-    public function executeServer (Request $request, Response $response) : void {
-    	
+    public function executeInsertMember (Request $request, Response $response) : void {
+        if ($request->getMethod() == Request::HTTP_POST) {
+
+            $form = new MemberFormValidator($this->getDaoManager());
+            $gm = $form->insertBelowAferValidation($request);
+            
+            if (!$form->hasError()) {
+                $response->sendRedirect("/root/");
+            }
+            
+            $request->addAttribute(LocalisationFormValidator::LOCALISATION_FEEDBACK, $form->getFeedback(LocalisationFormValidator::LOCALISATION_FEEDBACK));
+            $request->addAttribute(MemberFormValidator::MEMBER_FEEDBACK, $form->getFeedback(MemberFormValidator::MEMBER_FEEDBACK));
+            $form->includeFeedback($request);
+            
+            $request->addAttribute(self::ATT_GRADE_MEMBER, $gm);
+            $request->addAttribute(self::ATT_MEMBER, $gm->getMember());
+            $request->addAttribute(self::ATT_LOCALISATION, $gm->getMember()->getLocalisation());
+        }
+        
+        $request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->findAll());
+        $grades = $this->gradeDAOManager->findAll();
+        $request->addAttribute(self::ATT_GRADES, $grades);
     }
     
     /**

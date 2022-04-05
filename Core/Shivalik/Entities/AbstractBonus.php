@@ -37,7 +37,7 @@ abstract class AbstractBonus extends Operation
         if ($generator == null || $generator instanceof GradeMember) {
             $this->generator = $generator;
         }elseif ($this->isInt($generator)){
-            $this->old = new GradeMember(array('id' => $generator));
+            $this->generator = new GradeMember(array('id' => $generator));
         }else {
             throw new PHPBackendException("Invalid value in param of method setGenerator()");
         }

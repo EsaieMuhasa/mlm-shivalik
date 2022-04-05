@@ -81,6 +81,18 @@ abstract class DefaultDAOInterface implements DAOInterface
     public abstract function createInTransaction ($entity, \PDO $pdo) : void;
     
     /**
+     * Creation d'une collection d'entite dans une transaction
+     * @param DBEntity[] $entities
+     * @param \PDO $pdo
+     * @throws DAOException
+     */
+    public function createAllInTransaction (array $entities, \PDO $pdo) : void {
+        foreach ($entities as $entity) {
+            $this->createInTransaction($entity, $pdo);
+        }
+    }
+    
+    /**
      * supression d'une collection d'occurence dans une transaction
      * @param \PDO $pdo
      * @param array $ids

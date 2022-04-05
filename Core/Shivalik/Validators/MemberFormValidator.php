@@ -1,14 +1,20 @@
 <?php
 namespace Core\Shivalik\Validators;
 
+use Core\Shivalik\Entities\Account;
+use Core\Shivalik\Entities\GradeMember;
 use Core\Shivalik\Entities\Member;
+use Core\Shivalik\Entities\Office;
 use Core\Shivalik\Entities\User;
 use Core\Shivalik\Filters\SessionMemberFilter;
+use Core\Shivalik\Managers\GradeDAOManager;
+use Core\Shivalik\Managers\OfficeDAOManager;
 use PHPBackend\Request;
 use PHPBackend\Config\VarList;
 use PHPBackend\Dao\DAOException;
 use PHPBackend\File\UploadedFile;
 use PHPBackend\Validator\IllegalFormValueException;
+use Core\Shivalik\Managers\GradeMemberDAOManager;
 
 /**
  *
@@ -22,12 +28,29 @@ class MemberFormValidator extends UserFormValidator
     const FIELD_FOOT = 'foot';
     const DEFINE_CONFIG_FOOTS = 'footsMember';
     const MEMBER_FEEDBACK = 'memberFeedback';
+    const FIELD_CHILD = 'child';
+    const FIELD_GRADE =  'grade';
     
     /**
      * la photo encours de traitement
      * @var UploadedFile
      */
     private $processPhoto;
+    
+    /**
+     * @var GradeDAOManager
+     */
+    private $gradeDAOManager;
+    
+    /**
+     * @var GradeMemberDAOManager
+     */
+    private $gradeMemberDAOManager;
+    
+    /**
+     * @var OfficeDAOManager
+     */
+    private $officeDAOManager;
     
     /**
      * validation du parent d'un du membre adhereant
@@ -140,6 +163,77 @@ class MemberFormValidator extends UserFormValidator
         }
         
         throw new IllegalFormValueException("the chosen allocation foot is unknown in the system configuration");
+    }
+    
+    /**
+     * Validation d'un user.
+     * cette methode prend son sens lors de l'insertion d'un membre comme parent
+     * du $child.
+     * @param string $child
+     */
+    private function validationChild ($child) : void {
+        if ($child == null) {
+            throw new IllegalFormValueException("Child ID cannot be empty");
+        } elseif (!is_string($child)) {
+            throw new IllegalFormValueException("Member ID must be string type");
+        }
+        
+        try {
+            if (!$this->memberDAOManager->checkByMatricule($child)) {
+                throw new IllegalFormValueException("Child ID unknown in system");
+            }
+        } catch (DAOException $e) {
+            throw new IllegalFormValueException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+    
+    /**
+     * Validation du packet d'un membre.
+     * cette methode est utiliser dans le processuce de validation, lors de l'insersion
+     * d'un membre dans l'arbre genealogique
+     * @param string|int $grade
+     * @throws IllegalFormValueException
+     */
+    private function validationGrade ($grade) : void {
+        if ($grade == null) {
+            throw new IllegalFormValueException("packet ID cannot null or empty");
+        } else if (!preg_match(self::RGX_INT_POSITIF, $grade)) {
+            throw new IllegalFormValueException("Packet reference must be integer");
+        } 
+        
+        try {
+            if (!$this->gradeDAOManager->checkById($grade)) {
+                throw new IllegalFormValueException("the package indexed by {$grade} does not exist in database");
+            }
+        } catch (DAOException $e) {
+            throw new IllegalFormValueException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+    
+    /**
+     * Processuce de traitement du compte enfant,
+     * pour lequel on veut changer de parent
+     * @param Account $account
+     * @param string $child
+     */
+    private function processingChild (Account $account, $child) : void {
+        try {
+            $this->validationChild($child);
+        } catch (IllegalFormValueException $e) {
+            $this->addError(self::FIELD_CHILD, $e->getMessage());
+        }
+    }
+    
+    private function processingGrad (Account $account, $grade) : void {
+        try {
+            $this->validationGrade($grade);
+            if ($account->getMember()->getPacket() == null) {
+                $account->getMember()->setPacket(new GradeMember());
+            }
+            $account->getMember()->getPacket()->setGrade($this->gradeDAOManager->findById(intval($grade, 10)));
+        } catch (IllegalFormValueException $e) {
+            $this->addError(self::FIELD_GRADE, $e->getMessage());
+        }
     }
     
     /**
@@ -386,9 +480,104 @@ class MemberFormValidator extends UserFormValidator
         
         return $user; 
     }
+    
+    /**
+     * Insersion d'un nouveau membre dans l'arbre genealogique.
+     * Le compte du membre est directement considere comme compte parent
+     * du compte où on prefere l'inserer
+     * @param Request $request
+     * @return Account
+     */
+    public function insertBelowAferValidation (Request $request) : Account {
+        $user = new Member();
+        $account = new Account($user);
+        
+        $name = $request->getDataPOST(self::FIELD_NAME);
+        $postName = $request->getDataPOST(self::FIELD_POST_NAME);
+        $lastName = $request->getDataPOST(self::FIELD_LAST_NAME);
+        $email = $request->getDataPOST(self::FIELD_EMAIL);
+        $telephone = $request->getDataPOST(self::FIELD_TELEPHONE);
+        $pseudo = $request->getDataPOST(self::FIELD_PSEUDO);
+        $password = $request->getDataPOST(self::FIELD_PASSWORD);
+        $confirmation = $request->getDataPOST(self::FIELD_CONFIRMATION);
+        $grade = $request->getDataPOST(self::FIELD_GRADE);
+        
+        $child = $request->getDataPOST(self::FIELD_CHILD);
+        
+        $photo = $request->getUploadedFile(self::FIELD_PHOTO);
+        $user->setKind($request->getDataPOST(self::FIELD_KIND));
+        
+        $this->processingName($user, $name);
+        $this->processingPostName($user, $postName);
+        $this->processingLastName($user, $lastName);
+        $this->processingEmail($user, $email);
+        $this->processingTelephone($user, $telephone);
+        $this->processingPassword($user, $password, $confirmation);
+        $this->processingPseudo($user, $pseudo);
+        $this->processingChild($account, $child);
+        $this->processingGrad($account, $grade);
+        
+        if ($photo->isFile()) {
+            $this->processingPhoto($user, $photo);
+        }
+        
+        //validation de l'adresse du membre
+        $formLocalisation = new LocalisationFormValidator($this->getDaoManager());
+        $localisation = $formLocalisation->processingLocalisation($request);
+        $user->setLocalisation($localisation);
+        $this->addFeedback(LocalisationFormValidator::LOCALISATION_FEEDBACK, $formLocalisation->toFeedback());
+        
+        if (!$this->hasError()) {
+            try {
+                $node = $this->memberDAOManager->findByMatricule($child);
+                $node->setPacket($this->gradeMemberDAOManager->findCurrentByMember($node->getId()));
+                $childAccount = $this->memberDAOManager->loadAccount($node, false);
+                
+                /**
+                 * @var Office[] $offices
+                 * @var Office $office
+                 */
+                $offices =  $this->officeDAOManager->findAll();
+                
+                $now = new \DateTime();
+                
+                $g = $account->getMember()->getPacket()->getGrade();
+                $gm = $account->getMember()->getPacket();
+                
+                $gm->setMembership(20);
+                $gm->setOfficePart(10);
+                $gm->setProduct($g->getAmount() - ($gm->getMembership() + $gm->getOfficePart()));
+                $gm->setInitDate($now);
+                $gm->setDateAjout($now);
+                
+                foreach ($offices as $office) {//recherche d'un bureau centrale
+                    if ($office->isCentral()) {
+                        $admin = $this->officeAdminDAOManager->findActiveByOffice($office->getId());
+                        $user->setOffice($office);
+                        $user->setAdmin($admin);
+                        $gm->setOffice($office);
+                        break;
+                    }
+                }
+                
+                $this->memberDAOManager->insertBelow($account, $childAccount);
+                
+                if ($photo->isFile()) {
+                    $this->processingPhoto($user, $photo, true, $request->getApplication()->getConfig());
+                } else {
+                    $user->setPhoto('img/user.png');
+                }
+                $this->memberDAOManager->updatePhoto($user->getId(), $user->getPhoto());
+            } catch (DAOException $e) {
+                $this->setMessage($e->getMessage());
+            }
+        }
+        
+        $this->setResult("account insertion success below {$child}", "failed to insert account below {$child}");
+        return $account;
+    }
 
     /**
-     * 
      * {@inheritDoc}
      * @see \PHPBackend\Validator\FormValidator::updateAfterValidation()
      * @return Member
