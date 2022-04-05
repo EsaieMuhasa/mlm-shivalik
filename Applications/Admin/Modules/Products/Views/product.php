@@ -23,7 +23,7 @@ $count = intval($_REQUEST[ProductsController::ATT_COUNT_PRODUCT], 10);
     		<div class="row">
     			<div class="col-xs-12 col-sm-8 col-md-8">
             		<div class="alert alert-info">
-            			<strong class="">Defualt unit price: <?php echo $product->defaultUnitPrice; ?> $</strong>, record date <?php echo $product->dateAjout->format('D, d M Y \a\t H:i:s')?>
+            			<span class="label label-info">Defualt unit price: <?php echo $product->defaultUnitPrice; ?> $</span>, <span class="badge"><?php echo $product->packagingSize; ?></span>, record date <?php echo $product->dateAjout->format('D, d M Y \a\t H:i:s')?>
             		</div>
             		<div class="text-justify">
             			<p><?php echo htmlspecialchars($product->description); ?></p>
@@ -41,7 +41,7 @@ $count = intval($_REQUEST[ProductsController::ATT_COUNT_PRODUCT], 10);
 	</div>
 	
 	<div class="col-xs-12">
-		<h2>Other products</h2>
+		<h2><?php echo  htmlspecialchars($product->getCategory()->getTitle()); ?></h2>
 		<div class="row">
 			<?php foreach ($products as $p) : ?>
 			<div class="col-sm-4 col-md-3 col-lg-3">
@@ -49,11 +49,15 @@ $count = intval($_REQUEST[ProductsController::ATT_COUNT_PRODUCT], 10);
         			<img src="/<?php echo $p->picture;?>" alt="<?php echo htmlspecialchars($p->name); ?>"/>
                     <div class="caption">
                         <h3 class="h3 <?php echo ($p->id == $product->id? 'text-info' : ''); ?>"><?php echo htmlspecialchars($p->name); ?></h3>
-                        <p class="text-justify"><?php echo htmlspecialchars($p->getDescription(100)); ?></p>
-                        <p>
-                        	<a href="/admin/products/<?php echo "{$p->id}/{$limit}-more-skips-{$offset}.html"; ?>" class="btn btn-primary" role="button">See more</a>
-                        	<a href="/admin/products/<?php echo $p->id; ?>/update.html" class="btn btn-default" role="button">Update</a>
+                        <p class="text-right">
+                        	<small class="label label-danger"> <?php echo $p->defaultUnitPrice; ?> $</small>
+                            <small class="label label-info"> <?php echo $p->packagingSize; ?> </small>
                         </p>
+                        <p class="text-justify"><?php echo htmlspecialchars($p->getDescription(100)); ?></p>
+                        <div class="btn-group">
+                        	<a href="/admin/products/<?php echo "{$p->id}/{$limit}-more-skips-{$offset}.html"; ?>" class="btn btn-xs btn-primary" role="button">See more</a>
+                        	<a href="/admin/products/<?php echo $p->id; ?>/update.html" class="btn btn-xs btn-default" role="button">Update</a>
+                        </div>
                     </div>
                 </div>
 			</div>

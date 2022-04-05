@@ -15,28 +15,40 @@ class Stock extends DBEntity
      * quantitie initinitial du stock
      * @var int
      */
-    private $quantity;
+    protected $quantity;
     
     /**
      * @var number
      */
-    private $unitPrice;
+    protected $unitPrice;
     
     /**
      * @var string
      */
-    private $comment;
+    protected $comment;
     
     /**
      * date d'epiration du stock
      * @var \DateTime
      */
-    private $expiryDate;
+    protected $expiryDate;
     
     /**
      * @var Product
      */
-    private $product;
+    protected $product;
+    
+    /**
+     * Collection des stocks auxiliaires
+     * @var AuxiliaryStock[]
+     */
+    private $auxiliaries = [];
+    
+    /**
+     * Solde disponible dans un stock
+     * @var int
+     */
+    private $sold = 0;
     
     /**
      * @return number
@@ -76,6 +88,7 @@ class Stock extends DBEntity
     public function setQuantity($quantity) : void
     {
         $this->quantity = $quantity;
+        $this->updateSold();
     }
 
     /**
@@ -122,8 +135,73 @@ class Stock extends DBEntity
             throw new PHPBackendException("invalide argument in setProduct param method");
         }
     }
-
-
     
+    /**
+     * @return \Core\Shivalik\Entities\AuxiliaryStock[] 
+     */
+    public function getAuxiliaries()
+    {
+        return $this->auxiliaries;
+    }
+
+    /**
+     * @param multitype:\Core\Shivalik\Entities\AuxiliaryStock  $auxiliaries
+     */
+    public function setAuxiliaries (array $auxiliaries) : void
+    {
+        $this->auxiliaries = $auxiliaries;
+        $this->updateSold();
+    }
+    
+    /**
+     * adding an auxiliary stock
+     * @param AuxiliaryStock $stock
+     * @throws PHPBackendException
+     */
+    public function addAuxiliary (AuxiliaryStock $stock) : void {
+        if ($stock->getParent() != null && $stock->getParent()->getId() != $this->getId()) {
+            throw new PHPBackendException("Auxiliary stock not support => {$stock->getParent()->getId()} != {$this->getId()}");
+        }
+        
+        if ($stock->getParent() == null){
+            $stock->setParent($this);
+        }
+        
+        $this->auxiliaries[] = $stock;
+        $this->sold -= $stock->getQuantity();
+    }
+    
+    /**
+     * ajout d'une collection des stocks
+     * @param AuxiliaryStock ...$stocks
+     * @return Stock
+     */
+    public function addAuxiliaries (AuxiliaryStock ...$stocks) : Stock {
+        foreach ($stocks as $stock) {
+            $this->addAuxiliary($stock);
+        }
+        return $this;
+    }
+    
+    /**
+     * renvoie la quantite disponible pour le stock
+     * @return int
+     */
+    public function getSold () : int
+    {
+        return $this->sold;
+    }
+    
+    /**
+     * Mis en jour du sold, apres une operation X
+     * @return void
+     */
+    private function updateSold () : void {
+        $this->sold = $this->quantity;
+        foreach ($this->auxiliaries as $stock) {
+            $this->sold -= $stock->getQuantity();
+        }
+    }
+
 }
 

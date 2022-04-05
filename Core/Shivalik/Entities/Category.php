@@ -6,9 +6,9 @@ use PHPBackend\DBEntity;
 /**
  *
  * @author Esaie MUHASA
- *        
+ * Categorisation des produit       
  */
-class Categorie extends DBEntity
+class Category extends DBEntity
 {
     /**
      * @var string
@@ -39,7 +39,7 @@ class Categorie extends DBEntity
     /**
      * @param string $title
      */
-    public function setTitle ($title) : void
+    public function setTitle (?string $title) : void
     {
         $this->title = $title;
     }
@@ -47,7 +47,7 @@ class Categorie extends DBEntity
     /**
      * @param string $description
      */
-    public function setDescription ($description) : void
+    public function setDescription (?string $description) : void
     {
         $this->description = $description;
     }

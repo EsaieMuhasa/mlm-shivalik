@@ -8,6 +8,9 @@ use PHPBackend\Application;
 use PHPBackend\Request;
 use PHPBackend\Response;
 use Core\Shivalik\Managers\StockDAOManager;
+use Core\Shivalik\Validators\CategoryValidator;
+use Core\Shivalik\Managers\CategoryDAOManager;
+use Core\Shivalik\Entities\Product;
 
 /**
  *
@@ -16,6 +19,9 @@ use Core\Shivalik\Managers\StockDAOManager;
  */
 class ProductsController extends AdminController
 {
+    const ATT_CATEGORY = 'category';
+    const ATT_CATEGORIES = 'categories';
+    
     const ATT_PRODUCT ='product';
     const ATT_PRODUCTS ='products';
     const ATT_COUNT_PRODUCT = 'count_products';
@@ -36,6 +42,11 @@ class ProductsController extends AdminController
      * @var ProductDAOManager
      */
     private $productDAOManager;
+    
+    /**
+     * @var CategoryDAOManager
+     */
+    private $categoryDAOManager;
     
     /**
      * @var StockDAOManager
@@ -71,7 +82,7 @@ class ProductsController extends AdminController
      * @param Request $request
      * @param Response $response
      */
-    public function executeIndex (Request $request, Response $response) : void {
+    public function executeShowProducts (Request $request, Response $response) : void {
         $limit = $request->existInGET('limit')? intval($request->getDataGET('limit'), 10) : 12;
         $offset = $request->existInGET('offset')? intval($request->getDataGET('offset'), 10) : 0;
         $affichage = $request->existInGET('affichage')? $request->getDataGET('affichage') : 'table';
@@ -97,12 +108,13 @@ class ProductsController extends AdminController
      * dashboad de gestion des produits
      * @param Request $request
      */
-    public function executeDashboard (Request $request ) : void {
+    public function executeIndex (Request $request ) : void {
         $request->addAttribute(self::ATT_ACTIVE_MENU, self::ITEM_MENU_DASHBOARD);
     }
     
     /**
      * Visualisation de la description d'un produit
+     * on en profite pour directement afficher les autres produits de la meme categorie
      * @param Request $request
      * @param Response $response
      * @return void
@@ -112,13 +124,21 @@ class ProductsController extends AdminController
         $limit = $request->existInGET('limit')? intval($request->getDataGET('limit'), 10) : 4;
         $offset = $request->existInGET('offset')? intval($request->getDataGET('offset'), 10) : 0;
         
-        if (!$this->productDAOManager->checkById($id) || !$this->productDAOManager->checkAll($limit, $offset)) {
+        if (!$this->productDAOManager->checkById($id)) {
             $response->sendError();
         }
         
-        $request->addAttribute(self::ATT_PRODUCT, $this->productDAOManager->findById($id));
-        $request->addAttribute(self::ATT_PRODUCTS, $this->productDAOManager->findAll($limit, $offset));
-        $request->addAttribute(self::ATT_COUNT_PRODUCT, $this->productDAOManager->countAll());
+        /**
+         * @var Product $product
+         */
+        $product = $this->productDAOManager->findById($id);
+        if (!$this->productDAOManager->checkByCategory($product->getCategory()->getId(), $limit, $offset)) {
+            $response->sendError();
+        }
+        
+        $request->addAttribute(self::ATT_PRODUCT, $product);
+        $request->addAttribute(self::ATT_PRODUCTS, $this->productDAOManager->findByCategory($product->getCategory()->getId(), $limit, $offset));
+        $request->addAttribute(self::ATT_COUNT_PRODUCT, $this->productDAOManager->countByCategory($product->getCategory()->getId()));
         $this->itemMenuProduct($request);
     }
     
@@ -140,6 +160,11 @@ class ProductsController extends AdminController
             $form->includeFeedback($request);
         }
         
+        if (!$this->categoryDAOManager->hasData()) {//categories
+            $response->sendRedirect("/admin/products/categories/add.html");
+        }
+        
+        $request->addAttribute(self::ATT_CATEGORIES, $this->categoryDAOManager->findAll());
         $this->itemMenuOtherOperations($request);
         $request->addAttribute(self::ITEM_MENU_OTHER_OPTERATIONS, self::ITEM_MENU_ADD_PRODUCT);
     }
@@ -168,9 +193,71 @@ class ProductsController extends AdminController
             $form->includeFeedback($request);
         }
         
+        $request->addAttribute(self::ATT_CATEGORIES, $this->categoryDAOManager->findAll());
         $request->addAttribute(self::ATT_PRODUCT, $product);
         $this->itemMenuProduct($request);
     }
+    
+    /**
+     * Visalisation de la liste des categories des produits
+     * @param Request $request
+     * @param Response $response
+     */
+    public function executeCategories (Request $request, Response $response) : void {
+        
+        if (!$this->categoryDAOManager->hasData()){
+            $response->sendRedirect("{$request->getURI()}/add.html");
+        }
+        
+        $categories = $this->categoryDAOManager->findAll();
+        $request->addAttribute(self::ATT_CATEGORIES, $categories);
+    }
+    
+    /**
+     * enregistrement d'une nouvelle category
+     * @param Request $request
+     * @param Response $response
+     */
+    public function executeAddCategory (Request $request, Response $response) : void {
+        if ($request->getMethod() == Request::HTTP_POST) {
+            $form = new CategoryValidator($this->getDaoManager());
+            $category = $form->createAfterValidation($request);
+            
+            if (!$form->hasError()) {
+                $response->sendRedirect("/admin/products/categories/");
+            }
+            
+            $request->addAttribute(self::ATT_CATEGORY, $category);
+            $form->includeFeedback($request);
+        }
+    }
+    
+    /**
+     * Edition des informations d'une categirie
+     * @param Request $request
+     * @param Response $response
+     */
+    public function executeUpdateCategory (Request $request, Response $response) : void {
+        $id = intval($request->getDataGET('id'), 10);
+        if ($request->getMethod() == Request::HTTP_GET) {
+            if (!$this->categoryDAOManager->checkById($id)) {
+                $response->sendError();
+            }
+            
+            $category = $this->categoryDAOManager->findById($id);
+        } else {
+            $form = new CategoryValidator($this->getDaoManager());
+            $category = $form->createAfterValidation($request);
+            
+            if (!$form->hasError()) {
+                $response->sendRedirect("/admin/products/categories/{$id}/");
+            }
+            $form->includeFeedback($request);
+        } 
+        
+        $request->addAttribute(self::ATT_CATEGORY, $category);
+    }
+    
     
     /**
      * visualisation des stocks
@@ -179,7 +266,7 @@ class ProductsController extends AdminController
      */
     public function executeStocks (Request $request, Response $response) : void {
         
-        if (!$this->stockDAOManager->hasData()) {
+        if (!$this->productDAOManager->hasData()) {
             $response->sendRedirect("/admin/products/");
         }
         

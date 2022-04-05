@@ -3,6 +3,7 @@ namespace Core\Shivalik\Managers;
 
 use PHPBackend\Dao\DAOInterface;
 use Core\Shivalik\Entities\Stock;
+use PHPBackend\Dao\DAOException;
 
 /**
  *
@@ -16,20 +17,26 @@ interface StockDAOManager extends DAOInterface
      * @param int $productId
      * @param bool $empty: true si verification des stock vide, false si verification des stock non vide
      * null si verification du stock sans tenir compte de son etat
+     * @param int $limit
+     * @param int $offset
      * @return bool
+     * @throws DAOException s'il ya erreur lors de la communication avec le SGBD
      */
-    public function checkByProduct (int $productId, ?bool $empty = null) : bool;
+    public function checkByProduct (int $productId, ?bool $empty = null, ?int $limit = null, int $offset = 0) : bool;
     
     /**
      * recuperation des stocks du'un produit
      * @param int $productId
      * @param bool $empty : confert le parametre $empty de la method checkByProduct() : bool
-     * @return array
+     * @param int $limit
+     * @param int $offset
+     * @return Stock[]
+     * @throws DAOException s'il n'y a aucun resultat, ou s'il y a erreur lors de la communication avec le SGBD
      */
-    public function findByProduct (int $productId, ?bool $empty = null) : array;
+    public function findByProduct (int $productId, ?bool $empty = null, ?int $limit = null, int $offset = 0) : array;
     
     /**
-     * verification des stock, en fonction de leurs etat
+     * verification des stock, en fonction de leurs etat (vide, ou pas)
      * @param bool $empty
      * @param int $limit
      * @param int $offset

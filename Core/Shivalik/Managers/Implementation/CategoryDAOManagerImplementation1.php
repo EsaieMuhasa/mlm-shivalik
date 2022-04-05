@@ -1,36 +1,65 @@
 <?php
 namespace Core\Shivalik\Managers\Implementation;
 
-use Core\Shivalik\Managers\CategorieDAOManager;
+use Core\Shivalik\Managers\CategoryDAOManager;
 use PHPBackend\Dao\DefaultDAOInterface;
+use Core\Shivalik\Entities\Category;
+use PHPBackend\Dao\UtilitaireSQL;
 
 /**
  *
  * @author Esaie MUHASA
  *        
  */
-class CategorieDAOManagerImplementation1 extends DefaultDAOInterface implements CategorieDAOManager
+class CategoryDAOManagerImplementation1 extends DefaultDAOInterface implements CategoryDAOManager
 {
-    /**
-     * {@inheritDoc}
-     * @see \PHPBackend\Dao\DAOInterface::createInTransaction()
-     */
-    public function createInTransaction($entity, \PDO $pdo): void
-    {
-        // TODO Auto-generated method stub
-        
-    }
 
     /**
      * {@inheritDoc}
      * @see \PHPBackend\Dao\DAOInterface::update()
+     * @param Category $entity
      */
     public function update($entity, $id): void
     {
-        // TODO Auto-generated method stub
-        
+        UtilitaireSQL::update($this->getConnection(), $this->getTableName(), [
+            'title' => $entity->getTitle(),
+            'description' => $entity->getDescription(),
+            self::FIELD_DATE_MODIF => $entity->getFormatedDateModif()
+        ], $id);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \PHPBackend\Dao\DefaultDAOInterface::createInTransaction()
+     * @param Category $entity
+     */
+    public function createInTransaction($entity, \PDO $pdo): void
+    {
+        $id = UtilitaireSQL::insert($pdo, $this->getTableName(), [
+            'title' => $entity->getTitle(),
+            'description' => $entity->getDescription(),
+            self::FIELD_DATE_AJOUT => $entity->getFormatedDateAjout()
+        ]);
+        $entity->setId($id);
     }
 
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\CategoryDAOManager::checkByTitle()
+     */
+    public function checkByTitle(string $title, ?int $id = null): bool
+    {
+        return $this->checkByColumnName("title", $title, $id);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\CategoryDAOManager::findByTitle()
+     */
+    public function findByTitle(string $title): Category
+    {
+        return $this->findByColumnName("title", $title);
+    }
 
 }
 

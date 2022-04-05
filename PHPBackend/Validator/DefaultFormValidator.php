@@ -366,11 +366,15 @@ abstract class DefaultFormValidator implements FormValidator
     }
 
     /**
-     * @param string $result
+     * Modification du message, resultat de la desscision final, apres execution de l'operation
+     * @param string $success
+     * @param string $error
+     * <br/> l'affectation du message est conditionnel. dans le cas où il n'y a eu aucune erreur, alors 
+     * $this->result = $success, sinon $this->result = $error
      */
-    public function setResult($result) : void
+    public function setResult (?string $success, ?string $error =  null) : void
     {
-        $this->result = $result;
+        $this->result = $this->hasError()? $error : $success;
     }
 
     /**

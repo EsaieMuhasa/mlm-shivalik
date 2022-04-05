@@ -1,6 +1,8 @@
 <?php
 namespace Core\Shivalik\Entities;
 
+use PHPBackend\PHPBackendException;
+
 /**
  *
  * @author Esaie MHS
@@ -17,6 +19,12 @@ class PointValue extends AbstractBonus
      * @var int
      */
     private $foot;
+    
+    /**
+     * Pour le reachat.
+     * @var Commande
+     */
+    private $commande;
 
     /**
      * @return int
@@ -74,6 +82,29 @@ class PointValue extends AbstractBonus
      */
     public function setValue ($value) : void {
         $this->setAmount($value);
+    }
+    
+    /**
+     * @return \Core\Shivalik\Entities\Commande
+     * Different de null dans le cas où le PV ont été générer par l'achat des produits
+     */
+    public function getCommande () : ?Commande
+    {
+        return $this->commande;
+    }
+
+    /**
+     * @param \Core\Shivalik\Entities\Commande | int $commande
+     */
+    public function setCommande ($commande) : void
+    {
+        if ($commande instanceof Commande || $commande == null) {
+            $this->commande = $commande;
+        } else if (self::isInt($commande)) {
+            $this->commande = new Commande(['id' => $commande]);
+        } else {
+            throw new PHPBackendException("illegal argument valeur in setCommande () method param");
+        }
     }
     
 }

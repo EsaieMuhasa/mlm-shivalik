@@ -5,6 +5,7 @@ use Core\Shivalik\Managers\ProductDAOManager;
 use Core\Shivalik\Entities\Product;
 use PHPBackend\Dao\UtilitaireSQL;
 use PHPBackend\Dao\DefaultDAOInterface;
+use Core\Shivalik\Entities\Category;
 
 /**
  *
@@ -21,10 +22,12 @@ class ProductDAOManagerImplementation1 extends DefaultDAOInterface implements Pr
     public function createInTransaction($entity, \PDO $pdo): void
     {
         $id = UtilitaireSQL::insert($pdo, $this->getTableName(), [
+            self::FIELD_DATE_AJOUT => $entity->getFormatedDateAjout(),
             'name' => $entity->getName(),
-            'dateAjout' => $entity->getFormatedDateAjout(),
             'defaultUnitPrice' => $entity->getDefaultUnitPrice(),
-            'description' => $entity->getDescription()
+            'description' => $entity->getDescription(),
+            'packagingSize' => $entity->getPackagingSize(),
+            'category' => $entity->getCategory()->getId()
         ]);
         $entity->setId($id);
     }
@@ -47,16 +50,29 @@ class ProductDAOManagerImplementation1 extends DefaultDAOInterface implements Pr
 
     /**
      * {@inheritDoc}
+     * @see \PHPBackend\Dao\DefaultDAOInterface::findByColumnName()
+     */
+    public function findByColumnName(string $columnName, $value, bool $forward = true)
+    {
+        $data = parent::findByColumnName($columnName, $value, $forward);
+        $data->setCategory($this->getDaoManager()->getManagerOf(Category::class)->findById($data->getCategory()->getId()));
+        return $data;
+    }
+
+    /**
+     * {@inheritDoc}
      * @see \PHPBackend\Dao\DAOInterface::update()
      * @param Product $entity
      */
     public function update($entity, $id): void
     {
         UtilitaireSQL::update($this->getConnection(), $this->getTableName(), [
-            'dateModif' => $entity->getFormatedDateModif(),
+            self::FIELD_DATE_MODIF => $entity->getFormatedDateModif(),
             'name' => $entity->getName(),
             'defaultUnitPrice' => $entity->getDefaultUnitPrice(),
-            'description' => $entity->getDescription()
+            'description' => $entity->getDescription(),
+            'packagingSize' => $entity->getPackagingSize(),
+            'category' => $entity->getCategory()->getId()
         ], $id);
     }
     
@@ -64,12 +80,40 @@ class ProductDAOManagerImplementation1 extends DefaultDAOInterface implements Pr
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\ProductDAOManager::updatePicture()
      */
-    public function updatePicture(string $path, int $id): void
+    public function updatePicture(int $id, string $path): void
     {
         UtilitaireSQL::update($this->getConnection(), $this->getTableName(), [
             'picture' => $path
         ], $id);
     }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\ProductDAOManager::checkByCategory()
+     */
+    public function checkByCategory(int $categoryId, ?int $limit = null, int $offset = 0): bool
+    {
+        return UtilitaireSQL::checkAll($this->getConnection(), $this->getTableName(), ['category' => $categoryId], $limit, $offset);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\ProductDAOManager::countByCategory()
+     */
+    public function countByCategory(int $categoryId): int
+    {
+        return UtilitaireSQL::count($this->getConnection(), $this->getTableName(), ['category' => $categoryId]);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\ProductDAOManager::findByCategory()
+     */
+    public function findByCategory(int $categoryId, ?int $limit = null, int $offset = 0): array
+    {
+        return UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, ['category' => $categoryId], $limit, $offset);
+    }
+
  
 }
 

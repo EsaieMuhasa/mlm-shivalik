@@ -18,6 +18,15 @@
 	</li>
 	
 	<li>
+		<a href="/root/members/insert.html">
+    		<span class="nav-item-icon">
+        		<span class="fa fa-user"></span>
+    		</span>
+    		<span class="nav-item-caption">Insert member</span>
+		</a>
+	</li>
+	
+	<li>
 		<a href="/root/offices/">
     		<span class="nav-item-icon">
         		<span class="fa fa-building"></span>

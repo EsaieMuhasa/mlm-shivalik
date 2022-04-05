@@ -5,6 +5,8 @@ use Core\Shivalik\Entities\Stock;
 use Core\Shivalik\Managers\StockDAOManager;
 use PHPBackend\Dao\UtilitaireSQL;
 use PHPBackend\Dao\DefaultDAOInterface;
+use PHPBackend\Dao\DAOException;
+use Core\Shivalik\Entities\AuxiliaryStock;
 
 /**
  *
@@ -17,9 +19,39 @@ class StockDAOManagerImplementation1 extends DefaultDAOInterface implements Stoc
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\StockDAOManager::checkByProduct()
      */
-    public function checkByProduct(int $productId, ?bool $empty = null): bool
+    public function checkByProduct(int $productId, ?bool $empty = null, ?int $limit = null, int $offset = 0): bool
     {
-        return UtilitaireSQL::checkAll($this->getConnection(), $this->getTableName(), ['product' => $productId], 1);
+        $return = false;
+        try {
+            $sql = "SELECT * FROM {$this->getTableName()} WHERE product = :product ".($limit !== null? "LIMIT {$limit} OFFSET {$offset}":'');
+            $statement = UtilitaireSQL::prepareStatement($this->getConnection(), $sql, ['product' => $productId]);
+            while ($row = $statement->fetch()){
+                if ($empty !== null) {
+                    $stock = new Stock($row);
+                    if ($this->getDaoManager()->getManagerOf(AuxiliaryStock::class)->checkByParent($stock->getId())){
+                        $stock->setAuxiliaries($this->getDaoManager()->getManagerOf(AuxiliaryStock::class)->findByParent($stock->getId()));
+                    }
+                    
+                    if ($empty) {
+                        if ($stock->getSold() == 0 ) {
+                            $return = true;
+                            break;
+                        }
+                    } else {
+                        if ($stock->getSold() != 0 ) {
+                            $return = false;
+                            break;
+                        }
+                    }
+                } else {                    
+                    $return = true;
+                    break;
+                }
+            }
+        } catch (\PDOException $e) {
+            throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
+        }
+        return $return;
     }
 
     /**
@@ -35,9 +67,36 @@ class StockDAOManagerImplementation1 extends DefaultDAOInterface implements Stoc
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\StockDAOManager::findByProduct()
      */
-    public function findByProduct(int $productId, ?bool $empty = null): array
+    public function findByProduct(int $productId, ?bool $empty = null, ?int $limit =  null, int $offset = 0): array
     {
-        return [];
+        $data = [];
+        try {
+            $sql = "SELECT * FROM {$this->getTableName()} WHERE product = :product ".($limit !== null? "LIMIT {$limit} OFFSET {$offset}":'');
+            $statement = UtilitaireSQL::prepareStatement($this->getConnection(), $sql, ['product' => $productId]);
+            while ($row = $statement->fetch()){
+                if ($empty !== null) {
+                    $stock = new Stock($row);
+                    if ($this->getDaoManager()->getManagerOf(AuxiliaryStock::class)->checkByParent($stock->getId())){
+                        $stock->setAuxiliaries($this->getDaoManager()->getManagerOf(AuxiliaryStock::class)->findByParent($stock->getId()));
+                    }
+                    
+                    if ($empty) {
+                        if ($stock->getSold() == 0 ) {
+                            $data[] = $stock;
+                        }
+                    } else {
+                        if ($stock->getSold() != 0 ) {
+                            $data[] = $stock;
+                        }
+                    }
+                } else {
+                    $data[] = $stock;
+                }
+            }
+        } catch (\PDOException $e) {
+            throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
+        }
+        return $data;
     }
 
     /**

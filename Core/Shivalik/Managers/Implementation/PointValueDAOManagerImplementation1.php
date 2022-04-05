@@ -30,15 +30,29 @@ class PointValueDAOManagerImplementation1 extends AbstractBonusDAOManager implem
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\PointValueDAOManager::checkPv()
      */
-    public function checkPv(int $memberId, ?int $foot = null): bool
+    public function checkPv(int $memberId, ?int $foot = null, ?bool $product = null): bool
     {
-        if ($foot === null) {
+        if ($foot === null && $product === null) {
             return $this->checkByMember($memberId);
         }
-        return UtilitaireSQL::checkAll($this->getConnection(), $this->getTableName(), [
-            'member' => $memberId,
-            'foot' => $foot
-        ]);
+        
+        $QUERY = "SELECT * FROM {$this->getTableName()} WHERE member = ?";
+        $QUERY .= $foot !== null? " AND foot = {$foot}" : "";
+        $QUERY .= $product !== null? (" AND commande IS ".($product? 'NOT':''))." NULL" : "";
+        $QUERY .= 'LIMIT 1';
+        
+        $return = false;
+        try {
+            $statement = UtilitaireSQL::prepareStatement($this->getConnection(), $QUERY, [$memberId]);
+            if ($statement->fetch()) {
+                $return = true;
+            }
+            $statement->closeCursor();
+        } catch (\PDOException $e) {
+            throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
+        }
+        
+        return $return;
     }
 
     /**
@@ -62,6 +76,7 @@ class PointValueDAOManagerImplementation1 extends AbstractBonusDAOManager implem
             'generator' => $pv->getGenerator()->getId(),
             'value' => $pv->getValue(),
             'foot' => $pv->getFoot(),
+            'commande' => $pv->getCommande() != null? $pv->getCommande()->getId() : null,
             self::FIELD_DATE_AJOUT => $pv->getFormatedDateAjout()            
         ]);
         $pv->setId($id);
@@ -71,65 +86,129 @@ class PointValueDAOManagerImplementation1 extends AbstractBonusDAOManager implem
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\PointValueDAOManager::findPvByMember()
      */
-    public function findPvByMember(int $memberId, ?int $memberFoot = null): array
+    public function findPvByMember(int $memberId, ?int $foot = null, ?bool $product = null): array
     {
-        if($memberFoot == null ){
+        if($foot == null &&  $product === null){
             return $this->findByMember($memberId);
         }
         
-        return UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, [
-            'member' => $memberId,
-            'foot' => $memberFoot
-        ]);        
+        $QUERY = "SELECT * FROM {$this->getTableName()} WHERE member = ?";
+        $QUERY .= $foot !== null? " AND foot = {$foot}" : "";
+        $QUERY .= $product !== null? (" AND commande IS ".($product? 'NOT':''))." NULL" : "";
+        
+        $return = [];
+        try {
+            $statement = UtilitaireSQL::prepareStatement($this->getConnection(), $QUERY, [$memberId]);
+            while ($row = $statement->fetch()) {
+                $return[] = new PointValue($row);
+            }
+            $statement->closeCursor();
+        } catch (\PDOException $e) {
+            throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
+        }
+        
+        if (empty($return)) {
+            throw new DAOException("No point value in database indexed to {$memberId} ID member account");
+        }
+        
+        return $return;
     }
     
     /**
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\PointValueDAOManager::checkLeftPv()
      */
-    public function checkLeftPv (int $memberId) : bool{
-        return $this->checkPv($memberId, PointValue::FOOT_LEFT);
+    public function checkLeftPv (int $memberId, ?bool $product = null) : bool{
+        return $this->checkPv($memberId, PointValue::FOOT_LEFT, $product);
     }
     
     /**
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\PointValueDAOManager::checkRightPv()
      */
-    public function checkRightPv (int $memberId) : bool{
-        return $this->checkPv($memberId, PointValue::FOOT_RIGTH);
+    public function checkRightPv (int $memberId, ?bool $product = null) : bool{
+        return $this->checkPv($memberId, PointValue::FOOT_RIGTH, $product);
     }
     
     /**
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\PointValueDAOManager::checkMiddlePv()
      */
-    public function checkMiddlePv (int $memberId) : bool{
-        return $this->checkPv($memberId, PointValue::FOOT_MIDDEL);
+    public function checkMiddlePv (int $memberId, ?bool $product = null) : bool{
+        return $this->checkPv($memberId, PointValue::FOOT_MIDDEL, $product);
     }
     
     /**
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\PointValueDAOManager::findLeftByMember()
      */
-    public function findLeftByMember (int $memberId) : array{
-        return $this->findPvByMember($memberId, PointValue::FOOT_LEFT);
+    public function findLeftByMember (int $memberId, ?bool $product = null) : array{
+        return $this->findPvByMember($memberId, PointValue::FOOT_LEFT, $product);
     }
     
     /**
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\PointValueDAOManager::findRightByMember()
      */
-    public function findRightByMember (int $memberId) : array{
-        return $this->findPvByMember($memberId, PointValue::FOOT_RIGTH);
+    public function findRightByMember (int $memberId, ?bool $product = null) : array{
+        return $this->findPvByMember($memberId, PointValue::FOOT_RIGTH, $product);
     }
     
     /**
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\PointValueDAOManager::findMiddleByMember()
      */
-    public function findMiddleByMember (int $memberId) : array{
-        return $this->findPvByMember($memberId, PointValue::FOOT_MIDDEL);
+    public function findMiddleByMember (int $memberId, ?bool $product = null) : array{
+        return $this->findPvByMember($memberId, PointValue::FOOT_MIDDEL, $product);
     }
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\PointValueDAOManager::checkProductPvByMember()
+     */
+    public function checkProductPvByMember(int $memberId): bool
+    {
+        $QUERY = "SELECT * FROM {$this->getTableName()} WHERE member = ? AND foot IS NULL AND commande IS NOT NULL LIMIT 1";
+        
+        $return = false;
+        try {
+            $statement = UtilitaireSQL::prepareStatement($this->getConnection(), $QUERY, [$memberId]);
+            if ($statement->fetch()) {
+                $return = true;
+            }
+            $statement->closeCursor();
+        } catch (\PDOException $e) {
+            throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
+        }
+        
+        return $return;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\PointValueDAOManager::findProductPvByMember()
+     */
+    public function findProductPvByMember(int $memberId): array
+    {
+        $QUERY = "SELECT * FROM {$this->getTableName()} WHERE member = ? AND foot IS NULL AND commande IS NOT NULL";
+        
+        $data = false;
+        try {
+            $statement = UtilitaireSQL::prepareStatement($this->getConnection(), $QUERY, [$memberId]);
+            while ($row = $statement->fetch()) {
+                $data[] = new PointValue($row);
+            }
+            $statement->closeCursor();
+        } catch (\PDOException $e) {
+            throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
+        }
+        
+        if (empty($data)) {
+            throw new DAOException("No point value in database indexed to {$memberId} ID member account");
+        }
+        
+        return $data;
+    }
+
 
 }
 

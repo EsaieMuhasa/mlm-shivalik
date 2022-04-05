@@ -1,4 +1,6 @@
 <?php
+use Applications\Admin\Modules\Products\ProductsController;
+
 ?>
 <section class="panel">
     <header class="panel-heading">Product <?php echo (isset($_GET['id'])? 'edition':'creation') ?> form</header>
@@ -14,13 +16,40 @@
     		<?php endif;?>
     		<fieldset>
     			<legend>Product profile</legend>
-        		<div class="form-group <?php echo (isset($_REQUEST['errors']['name'])? 'has-error':'');?>">
-        			<label class="form-label" for="product-name">Name <span class="text-danger">*</span></label>
-        			<input type="text" name="name" value="<?php echo htmlspecialchars(isset($_REQUEST['product'])? $_REQUEST['product']->name:'');?>" id="product-name" class="form-control" placeholder="put here product name" autocomplete="off"/>
-        			<?php if (isset($_REQUEST['errors']['name'])){?>
-        			<p class="help-block"><?php echo htmlspecialchars($_REQUEST['errors']['name']);?></p>
+    			
+    			<div class="row">
+    				<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                		<div class="form-group <?php echo (isset($_REQUEST['errors']['name'])? 'has-error':'');?>">
+                			<label class="form-label" for="product-name">Name <span class="text-danger">*</span></label>
+                			<input type="text" name="name" value="<?php echo htmlspecialchars(isset($_REQUEST['product'])? $_REQUEST['product']->name:'');?>" id="product-name" class="form-control" placeholder="put here product name" autocomplete="off"/>
+                			<?php if (isset($_REQUEST['errors']['name'])){?>
+                			<p class="help-block"><?php echo htmlspecialchars($_REQUEST['errors']['name']);?></p>
+                			<?php }?>
+                		</div>
+    				</div>
+    				<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+        				<div class="form-group <?php echo (isset($_REQUEST['errors']['packagingSize'])? 'has-error':'');?>">
+                			<label class="form-label" for="product-packaging-size">Packaging size <span class="text-danger">*</span></label>
+                			<input type="text" name="packagingSize" value="<?php echo htmlspecialchars(isset($_REQUEST['product'])? $_REQUEST['product']->packagingSize:'');?>" id="product-packagingSize" class="form-control" placeholder="put here product packaging size" autocomplete="off"/>
+                			<?php if (isset($_REQUEST['errors']['packagingSize'])){?>
+                			<p class="help-block"><?php echo htmlspecialchars($_REQUEST['errors']['packagingSize']);?></p>
+                			<?php }?>
+                		</div>
+    				</div>
+    			</div>
+    			<div class="form-group <?php echo (isset($_REQUEST['errors']['categorie'])? 'has-error':'');?>">
+					<label>Categorie <span class="text-danger">*</span></label>
+					<select name="categorie" id="product-categorie" class="form-control">
+						<?php foreach ($_REQUEST[ProductsController::ATT_CATEGORIES] as $c) : ?>
+						<option value="<?php echo $c->id; ?>" <?php echo (isset($_REQUEST['product']) && $_REQUEST['product']->category != null && $_REQUEST['product']->category->id == $c->id)? 'selected="selected"':''; ?>>
+							<?php echo  htmlspecialchars($c->title); ?>
+						</option>
+						<?php endforeach; ?>
+					</select>
+					<?php if (isset($_REQUEST['errors']['categorie'])){?>
+        			<p class="help-block"><?php echo htmlspecialchars($_REQUEST['errors']['categorie']);?></p>
         			<?php }?>
-        		</div>
+    			</div>
         		<div class="row">
         			<div class="col-md-6">
                 		<div class="form-group <?php echo (isset($_REQUEST['errors']['picture'])? 'has-error':'');?>">

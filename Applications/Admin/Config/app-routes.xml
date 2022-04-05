@@ -68,10 +68,22 @@
 	</module>
 	
 	<module name="Products">
-		<route action="dashboard" urlPattern="/admin/products/dashboard\.html"/>
+		<!-- categorisation des produits -->
+		<route action="categories" urlPattern="/admin/products/categories/"/>
+		<route action="addCategory" urlPattern="/admin/products/categories/add\.html"/>
+		<route action="updateCategory" urlPattern="/admin/products/categories/([0-9]+)/update\.html" paramsNames="id"/>
+		<route action="deleteCategory" urlPattern="/admin/products/categories/([0-9]+)/delete\.html" paramsNames="id"/>
+		<route action="classement" urlPattern="/admin/products/categories/([0-9]+)/" paramsNames="id"/>
+		<route action="classement" urlPattern="/admin/products/categories/([0-9]+)/([0-9]+)-([0-9]+)\.html" paramsNames="id,limit,offset"/>
+		<!-- // -->
+		
 		<route action="index" urlPattern="/admin/products/"/>
-		<route action="index" urlPattern="/admin/products/(grid|table)/" paramsNames="affichage"/>
-		<route action="index" urlPattern="/admin/products/(grid|table)/([0-9]+)-([0-9]+)\.html" paramsNames="affichage,limit,offset"/>
+		
+		<!-- visualisation des produits -->
+		<route action="showProducts" urlPattern="/admin/products/(grid|table)/" paramsNames="affichage"/>
+		<route action="showProducts" urlPattern="/admin/products/(grid|table)/([0-9]+)-([0-9]+)\.html" paramsNames="affichage,limit,offset"/>
+		<!-- // -->
+		
 		<route action="addProduct" urlPattern="/admin/products/add\.html"/>
 		<route action="product" urlPattern="/admin/products/([0-9]+)/" paramsNames="id"/>
 		<route action="product" urlPattern="/admin/products/([0-9]+)/([0-9]+)-more-skips-([0-9]+)\.html" paramsNames="id,limit,offset"/>

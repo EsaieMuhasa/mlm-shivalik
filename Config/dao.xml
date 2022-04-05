@@ -86,7 +86,12 @@
 			name="\Core\Shivalik\Entities\PointValue" 
 			specification="\Core\Shivalik\Managers\PointValueDAOManager" 
 			implementation="\Core\Shivalik\Managers\Implementation\PointValueDAOManagerImplementation1"/>
-			
+		
+		<entity 
+			name="\Core\Shivalik\Entities\Category" 
+			specification="\Core\Shivalik\Managers\CategoryDAOManager" 
+			implementation="\Core\Shivalik\Managers\Implementation\CategoryDAOManagerImplementation1"/>
+				
 		<entity 
 			name="\Core\Shivalik\Entities\Product" 
 			specification="\Core\Shivalik\Managers\ProductDAOManager" 
@@ -96,6 +101,11 @@
 			name="\Core\Shivalik\Entities\Stock" 
 			specification="\Core\Shivalik\Managers\StockDAOManager" 
 			implementation="\Core\Shivalik\Managers\Implementation\StockDAOManagerImplementation1"/>
+			
+		<entity 
+			name="\Core\Shivalik\Entities\AuxiliaryStock" 
+			specification="\Core\Shivalik\Managers\AuxiliaryStockDAOManager" 
+			implementation="\Core\Shivalik\Managers\Implementation\AuxiliaryStockDAOManagerImplementation1"/>
 			
 		<entity 
 			name="\Core\Shivalik\Entities\Notification" 

@@ -30,49 +30,54 @@ use Applications\Admin\Modules\Products\ProductsController;
 	    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
 	        	<li class="<?php echo (isset($_REQUEST[ProductsController::ATT_ACTIVE_MENU]) && $_REQUEST[ProductsController::ATT_ACTIVE_MENU] == ProductsController::ITEM_MENU_DASHBOARD)? "active" : ""; ?>">
-	        		<a href="/admin/products/dashboard.html">
+	        		<a href="/admin/products/">
 	        			<span class="glyphicon glyphicon-dashboard"></span> Dashboard
 	        		</a>
 	        	</li>
 	        	
 	        	<li class="<?php echo (isset($_REQUEST[ProductsController::ATT_ACTIVE_MENU]) && $_REQUEST[ProductsController::ATT_ACTIVE_MENU] == ProductsController::ITEM_MENU_PRODUCTS)? "active" : ""; ?>">
-	        		<a href="/admin/products/">
+	        		<a href="/admin/products/table/"   class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
             			<span class="fa fa-leaf"></span> Products
             		</a>
+            		<ul class="dropdown-menu">
+                		<li class="<?php echo (isset($_REQUEST[ProductsController::ATT_ACTIVE_MENU]) && $_REQUEST[ProductsController::ATT_ACTIVE_MENU] == ProductsController::ITEM_MENU_ADD_PRODUCT)? "active" : ""; ?>">
+        	        		<a href="/admin/products/add.html">New products</a>
+        	        	</li>
+        	        	<li class="<?php echo (isset($_REQUEST[ProductsController::ATT_ACTIVE_MENU]) && $_REQUEST[ProductsController::ATT_ACTIVE_MENU] == ProductsController::ITEM_MENU_ADD_PRODUCT)? "active" : ""; ?>">
+        	        		<a href="/admin/products/table/">Show all products</a>
+        	        	</li>	        	
+        	        	<li role="separator" class="divider"></li>
+                		<li class="<?php echo ""; ?>">
+        	        		<a href="/admin/products/categories/add.html">New category</a>
+        	        	</li>
+        	        	<li class="<?php echo ""; ?>">
+        	        		<a href="/admin/products/categories/">Show all categories</a>
+        	        	</li>
+                	</ul>
 	        	</li>	        	
 	        	
 	        	<li class="<?php echo (isset($_REQUEST[ProductsController::ATT_ACTIVE_MENU]) && $_REQUEST[ProductsController::ATT_ACTIVE_MENU] == ProductsController::ITEM_MENU_STOCKS)? "active" : ""; ?>">
-	        		<a href="/admin/stocks/">
+	        		<a href="/admin/stocks/" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
             			<span class="fa fa-database"></span> Stocks
             		</a>
-	        	</li>
-			</ul>
-			
-			<ul class="nav navbar-nav pull-right">
-	        	<li class="<?php echo (isset($_REQUEST[ProductsController::ATT_ACTIVE_MENU]) && $_REQUEST[ProductsController::ATT_ACTIVE_MENU] == ProductsController::ITEM_MENU_OTHER_OPTERATIONS)? "active" : ""; ?>" >
-					<a href="/admin/products/add.html"  class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                		<span class="fa fa-plus"></span> other operations
-                	</a>
-                	<ul class="dropdown-menu">
+            		<ul class="dropdown-menu">
                 		<li class="<?php echo (isset($_REQUEST[ProductsController::ATT_ACTIVE_MENU]) && $_REQUEST[ProductsController::ATT_ACTIVE_MENU] == ProductsController::ITEM_MENU_ADD_PRODUCT)? "active" : ""; ?>">
-        	        		<a href="/admin/products/add.html">
-                    			<span class="fa fa-plus"></span> add new products
-                    		</a>
-        	        	</li>	        	
-        	        	
-        	        	<li class="<?php echo ""; ?>">
-        	        		<a href="/admin/stocks/add.html">
-                    			<span class="fa fa-plus"></span> add new stocks
-                    		</a>
+        	        		<a href="/admin/products/stocks/add.html">New stock</a>
         	        	</li>
+                		<li class="<?php echo ""; ?>">
+        	        		<a href="/admin/products/stocks/">Show vailable stocks</a>
+        	        	</li>
+        	        	<li class="<?php echo (isset($_REQUEST[ProductsController::ATT_ACTIVE_MENU]) && $_REQUEST[ProductsController::ATT_ACTIVE_MENU] == ProductsController::ITEM_MENU_ADD_PRODUCT)? "active" : ""; ?>">
+        	        		<a href="/admin/products/stocks/all/">Show all Stocks</a>
+        	        	</li>	        	
         	        	<li role="separator" class="divider"></li>
         	        	<li class="">
-        	        		<a href="/admin/stocks/add.html">
-                    			<span class="fa fa-time"></span> Time line
+        	        		<a href="/admin/stocks/charts/">
+                    			<span class="fa fa-task"></span> Evolutions
                     		</a>
         	        	</li>
                 	</ul>
-				</li>
+	        	</li>
 			</ul>
 		</div><!-- /.navbar-collapse -->
 	</div><!-- /.container-fluid -->

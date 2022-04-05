@@ -10,6 +10,7 @@ use Core\Shivalik\Entities\Product;
 use PHPBackend\File\FileManager;
 use PHPBackend\Image2D\ImageResizing;
 use PHPBackend\Image2D\Image;
+use Core\Shivalik\Managers\CategoryDAOManager;
 
 /**
  *
@@ -28,12 +29,19 @@ class ProductValidator extends DefaultFormValidator
     const FIELD_NAME = 'name';
     const FIELD_PICTURE = 'picture';
     const FIELD_DESCRIPTION = 'description';
+    const FIELD_CATEGORY = 'categorie';
+    const FIELD_PACKAGING_SIZE = 'packagingSize';
     const FIELD_DEFAULT_UNIT_PRICE = 'defaultUnitPrice';
     
     /**
      * @var ProductDAOManager
      */
     private $productDAOManager;
+    
+    /**
+     * @var CategoryDAOManager
+     */
+    private $categoryDAOManager;
     
     /**
      * validation du nom d'un produit
@@ -54,6 +62,37 @@ class ProductValidator extends DefaultFormValidator
             }
         } catch (DAOException $e) {
             throw new IllegalFormValueException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+    
+    /**
+     * Validation du packaging d'un produit
+     * @param string $packagingSize
+     */
+    private function validationPackagingSize ($packagingSize) : void {
+        if ($packagingSize == null) {
+            throw new IllegalFormValueException("packaging size cannot be empty");
+        }
+    }
+    
+    /**
+     * validation de la categorie d'un produt
+     * @param string|int $category
+     * @throws IllegalFormValueException
+     */
+    private function validationCategory($category) : void {
+        if ($category == null) {
+            throw new IllegalFormValueException("select product category");
+        } else if (!preg_match(self::RGX_INT_POSITIF, $category)) {
+            throw new IllegalFormValueException("the reference must be a positive integer");
+        } else {
+            try {
+                if (!$this->categoryDAOManager->checkById(intval($category), 10)) {
+                    throw new IllegalFormValueException("the category reference does not exist in the database");
+                }
+            } catch (DAOException $e) {
+                throw new IllegalFormValueException($e->getMessage());
+            }
         }
     }
     
@@ -111,6 +150,35 @@ class ProductValidator extends DefaultFormValidator
     }
     
     /**
+     * Processuce de traitement/validation du packaging size d'un produit
+     * @param string $packagingSize
+     * @param Product $product
+     */
+    private function processPackagingSize ($packagingSize, Product $product) : void {
+        try {
+            $this->validationPackagingSize($packagingSize);
+        } catch (IllegalFormValueException $e) {
+            $this->addError(self::FIELD_PACKAGING_SIZE, $e->getMessage());
+        }
+        
+        $product->setPackagingSize($packagingSize);
+    }
+    
+    /**
+     * processuce de traitement de la categorie d'unproduit
+     * @param string|int $category
+     * @param Product $product
+     */
+    private function processCategory ($category, Product $product) : void {
+        try {
+            $this->validationCategory($category);
+        } catch (IllegalFormValueException $e) {
+            $this->addError(self::FIELD_CATEGORY, $e->getMessage());
+        }
+        $product->setCategory($category);
+    }
+    
+    /**
      * traitement/validation de l'image d'un produit
      * @param Product $product
      * @param UploadedFile $file
@@ -120,7 +188,7 @@ class ProductValidator extends DefaultFormValidator
         try {
             if ($write && $file->isImage()) {
                 $time = time();
-                $base = "img/products/{$product->getId()}/{$time}";
+                $base = "img".DIRECTORY_SEPARATOR."products".DIRECTORY_SEPARATOR.$product->getId().DIRECTORY_SEPARATOR.$time;
                 $fileName = "{$base}-reel.{$file->getExtension()}";
                 $picture = "{$base}.{$file->getExtension()}";
                 $reelName = FileManager::writeUploadedFile($file, $fileName);
@@ -174,17 +242,21 @@ class ProductValidator extends DefaultFormValidator
         $description = $request->getDataPOST(self::FIELD_DESCRIPTION);
         $defaultUnitPrice = $request->getDataPOST(self::FIELD_DEFAULT_UNIT_PRICE);
         $file = $request->getUploadedFile(self::FIELD_PICTURE);
+        $category = $request->getDataPOST(self::FIELD_CATEGORY);
+        $packagingSize = $request->getDataPOST(self::FIELD_PACKAGING_SIZE);
         
         $this->processName($product, $name);
         $this->processDefaultUnitPrice($product, $defaultUnitPrice);
         $this->processDescription($product, $description);
         $this->processPicture($product, $file);
+        $this->processCategory($category, $product);
+        $this->processPackagingSize($packagingSize, $product);
         
         if (!$this->hasError()) {
             try {
                 $this->productDAOManager->create($product);
                 $this->processPicture($product, $file, true);
-                $this->productDAOManager->updatePicture($product->getPicture(), $product->getId());
+                $this->productDAOManager->updatePicture($product->getId(), $product->getPicture());
             } catch (DAOException $e) {
                 $this->setMessage($e->getMessage());
             }
@@ -207,6 +279,8 @@ class ProductValidator extends DefaultFormValidator
         $description = $request->getDataPOST(self::FIELD_DESCRIPTION);
         $defaultUnitPrice = $request->getDataPOST(self::FIELD_DEFAULT_UNIT_PRICE);
         $file = $request->getUploadedFile(self::FIELD_PICTURE);
+        $category = $request->getDataPOST(self::FIELD_CATEGORY);
+        $packagingSize = $request->getDataPOST(self::FIELD_PACKAGING_SIZE);
         
         $product->setId($request->getDataGET(self::FIELD_ID));
         
@@ -214,13 +288,15 @@ class ProductValidator extends DefaultFormValidator
         $this->processDefaultUnitPrice($product, $defaultUnitPrice);
         $this->processDescription($product, $description);
         $this->processPicture($product, $file);
+        $this->processCategory($category, $product);
+        $this->processPackagingSize($packagingSize, $product);
         
         if (!$this->hasError()) {
             try {
                 $this->productDAOManager->update($product, $product->getId());
                 if ($file->isImage()) {
                     $this->processPicture($product, $file, true);
-                    $this->productDAOManager->updatePicture($product->getPicture(), $product->getId());
+                    $this->productDAOManager->updatePicture($product->getId(), $product->getPicture());
                 }
             } catch (DAOException $e) {
                 $this->setMessage($e->getMessage());
