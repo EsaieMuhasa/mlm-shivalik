@@ -1,7 +1,7 @@
 <?php
 namespace Core\Shivalik\Managers;
 
-use Core\Shivalik\Entities\Commande;
+use Core\Shivalik\Entities\Command;
 use PHPBackend\Dao\DAOInterface;
 
 /**
@@ -9,11 +9,11 @@ use PHPBackend\Dao\DAOInterface;
  * @author Esaie MUHASA
  *        
  */
-interface CommandeDAOManager extends DAOInterface
+interface CommandDAOManager extends DAOInterface
 {
     
     /**
-     * verification des commandes deja effectuer par un membre
+     * verification des commands deja effectuer par un membre
      * @param int $memberId
      * @param bool $delivered
      * @return bool
@@ -21,7 +21,7 @@ interface CommandeDAOManager extends DAOInterface
     public function checkByMember (int $memberId, ?bool $delivered=null) : bool;
     
     /**
-     * comptage de commandes deja effectuer par un membre
+     * comptage de commands deja effectuer par un membre
      * @param int $memberId
      * @param bool $delivered
      * @return int
@@ -29,10 +29,10 @@ interface CommandeDAOManager extends DAOInterface
     public function countByMember (int $memberId, ?bool $delivered=null) : int;
     
     /**
-     * Recuperation des commandes d'un membre
+     * Recuperation des commands d'un membre
      * @param int $memberId
      * @param bool $delivered, filtrage du colone deliveryDate
-     * @return Commande
+     * @return Command
      */
     public function findByMember (int $memberId, ?bool $delivered=null) : array;
     
@@ -46,16 +46,16 @@ interface CommandeDAOManager extends DAOInterface
     public function checkByStatus (bool $delivered=false, ?int $limit = null, int $offset=0) : bool;
     
     /**
-     * recuperation des commandes ayant le status en parametre
+     * recuperation des commands ayant le status en parametre
      * @param bool $delivered
      * @param int $limit
      * @param int $offset
-     * @return Commande[]
+     * @return Command[]
      */
     public function findByStatus (bool $delivered=false, ?int $limit = null, int $offset=0) : array;
     
     /**
-     * comptage des commandes ayants le status en parametre
+     * comptage des commands ayants le status en parametre
      * @param bool $delivered
      * @return int
      */

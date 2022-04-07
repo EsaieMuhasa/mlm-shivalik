@@ -11,6 +11,7 @@ use Core\Shivalik\Managers\StockDAOManager;
 use Core\Shivalik\Validators\CategoryValidator;
 use Core\Shivalik\Managers\CategoryDAOManager;
 use Core\Shivalik\Entities\Product;
+use Core\Shivalik\Validators\StockFormValidator;
 
 /**
  *
@@ -196,6 +197,31 @@ class ProductsController extends AdminController
         $request->addAttribute(self::ATT_CATEGORIES, $this->categoryDAOManager->findAll());
         $request->addAttribute(self::ATT_PRODUCT, $product);
         $this->itemMenuProduct($request);
+    }
+    
+    /**
+     * ajout d'un noveau stock pour un produit specifique
+     * @param Request $request
+     * @param Response $response
+     */
+    public function executeAddStock (Request $request, Response $response) : void {
+        $id = intval($request->getDataGET("productId"), 10);//id du produit
+        if (!$this->productDAOManager->checkById($id)) {
+            $response->sendError();
+        }
+        
+        $product = $this->productDAOManager->findById($id);
+        $request->addAttribute(self::ATT_PRODUCT, $product);
+        
+        if ($request->getMethod() == Request::HTTP_POST) {
+            $form = new StockFormValidator($this->getDaoManager());
+            $stock = $form->createAfterValidation($request);
+            if(!$form->hasError()) {
+                $response->sendRedirect("/admin/products/{$id}/stocks/");
+            }
+            $request->addAttribute(self::ATT_STOCK, $stock);
+            $form->includeFeedback($request);
+        }
     }
     
     /**

@@ -13,6 +13,14 @@ use PHPBackend\Dao\DAOException;
 interface StockDAOManager extends DAOInterface
 {
     /**
+     * Chargement complet d'un stock
+     * @param Stock|int $stock
+     * @return Stock
+     * @throws DAOException s'il y a une erreur lors du chargement des donnees depuis la BDD
+     */
+    public function load ($stock) : Stock;
+    
+    /**
      * verifie si le produit a un stock
      * @param int $productId
      * @param bool $empty: true si verification des stock vide, false si verification des stock non vide

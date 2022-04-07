@@ -31,6 +31,7 @@ $count = intval($_REQUEST[ProductsController::ATT_COUNT_PRODUCT], 10);
             		
             		<div>
             			<a href="update.html" class="btn btn-primary">Update</a>
+            			<a href="stocks/add.html" class="btn btn-info">new stocks</a>
             		</div>
     			</div>
     			<div class="col-md-4 col-sm-4 col-xs-12">

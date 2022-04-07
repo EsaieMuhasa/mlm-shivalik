@@ -57,7 +57,7 @@ class OfficeBonus extends Operation
     /**
      * @param VirtualMoney $virtualMoney
      */
-    public function setVirtualMoney($virtualMoney)
+    public function setVirtualMoney($virtualMoney) : void
     {
         if ($virtualMoney instanceof VirtualMoney || $virtualMoney == null) {
             $this->virtualMoney = $virtualMoney;

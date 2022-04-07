@@ -15,6 +15,15 @@ use Core\Shivalik\Entities\AuxiliaryStock;
  */
 class StockDAOManagerImplementation1 extends DefaultDAOInterface implements StockDAOManager
 {
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\StockDAOManager::load()
+     */
+    public function load($stock): Stock
+    {
+    }
+    
     /**
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\StockDAOManager::checkByProduct()
@@ -120,7 +129,9 @@ class StockDAOManagerImplementation1 extends DefaultDAOInterface implements Stoc
             'comment' => $entity->getComment(),
             'quantity'=> $entity->getQuantity(),
             'unitPrice' => $entity->getUnitPrice() ,
-            'dateAjout' => $entity->getFormatedDateAjout()
+            self::FIELD_DATE_AJOUT => $entity->getFormatedDateAjout(),
+            'expiryDate' => $entity->getExpiryDate()->format('Y-m-d'),
+            'manufacturingDate' => $entity->getManufacturingDate()->format('Y-m-d')
         ]);
         $entity->setId($id);
     }
@@ -136,8 +147,10 @@ class StockDAOManagerImplementation1 extends DefaultDAOInterface implements Stoc
             "product" => $entity->getProduct()->getId(),
             'comment' => $entity->getComment(),
             'quantity'=> $entity->getQuantity(),
-            'unitPrice' => $entity->getUnitPrice() ,
-            'dateModif' => $entity->getFormatedDateModif()
+            'unitPrice' => $entity->getUnitPrice(),
+            self::FIELD_DATE_MODIF => $entity->getFormatedDateModif(),
+            'expiryDate' => $entity->getExpiryDate()->format('Y-m-d'),
+            'manufacturingDate' => $entity->getManufacturingDate()->format('Y-m-d')
         ], $id);
     }
 

@@ -391,24 +391,24 @@ class Account
                 $this->soldeOfficeBonus += $operation->getAmount();
             }else if ($operation instanceof PointValue) {
                 if ($operation->getFoot() == PointValue::FOOT_LEFT) {
-                    if ($operation->getCommande() == null) {
+                    if ($operation->getCommand() == null) {
                         $this->leftMembershipPv += $operation->getValue();
                     } else {
                         $this->leftProductPv += $operation->getValue();
                     }
                 }else if ($operation->getFoot() == PointValue::FOOT_MIDDEL) {
-                    if ($operation->getCommande() == null) {
+                    if ($operation->getCommand() == null) {
                         $this->middleMembershipPv += $operation->getValue();
                     } else {
                         $this->middleProductPv += $operation->getValue();
                     }
                 }else if ($operation->getFoot() == PointValue::FOOT_RIGTH) {
-                    if ($operation->getCommande() == null) {
+                    if ($operation->getCommand() == null) {
                         $this->rightMembershipPv += $operation->getValue();
                     } else {
                         $this->rightProductPv += $operation->getValue();
                     }
-                } else if ($operation->getCommande() != null) {//effort personnel
+                } else if ($operation->getCommand() != null) {//effort personnel
                     $this->personalProductPv += $operation->getValue();
                 } else {
                     throw new PHPBackendException("Invalid data integrity. Unable to classify point value");

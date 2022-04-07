@@ -34,6 +34,12 @@ class Stock extends DBEntity
     protected $expiryDate;
     
     /**
+     * La date de fabrication des produts du stock
+     * @var \DateTime
+     */
+    protected $manufacturingDate;
+    
+    /**
      * @var Product
      */
     protected $product;
@@ -53,7 +59,7 @@ class Stock extends DBEntity
     /**
      * @return number
      */
-    public function getQuantity() : int
+    public function getQuantity() : ?int
     {
         return $this->quantity;
     }
@@ -112,8 +118,24 @@ class Stock extends DBEntity
      */
     public function setExpiryDate($expiryDate) : void
     {
-        $this->expiryDate = $expiryDate;
+        $this->expiryDate = $this->hydrateDate($expiryDate);
     }
+    /**
+     * @return \DateTime
+     */
+    public function getManufacturingDate() : ?\DateTime
+    {
+        return $this->manufacturingDate;
+    }
+
+    /**
+     * @param \DateTime|string|int $manufacturingDate
+     */
+    public function setManufacturingDate($manufacturingDate) : void
+    {
+        $this->manufacturingDate = $this->hydrateDate($manufacturingDate);
+    }
+
     /**
      * @return \Core\Shivalik\Entities\Product
      */

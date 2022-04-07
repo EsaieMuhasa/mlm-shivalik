@@ -9,7 +9,7 @@ use PHPBackend\PHPBackendException;
  * @author Esaie MUHASA
  *        
  */
-class Commande extends DBEntity
+class Command extends DBEntity
 {
     /**
      * date de livraison de la commande
@@ -18,14 +18,28 @@ class Commande extends DBEntity
     private $deliveryDate;
     
     /**
-     * @var int
-     */
-    private $pointValue;
-    
-    /**
+     * dans le cas ou c'est un membre adherant qui ait effectuer la commande, on garde une reference
      * @var Member
      */
     private $member;
+    
+    /**
+     * l'office dans la quel la commande a ete faite
+     * @var Office
+     */
+    private $office;
+    
+    /**
+     * l'admin qui aurait valider la livraison/l'enregistrement de la commande 
+     * @var OfficeAdmin
+     */
+    private $officeAdmin;
+    
+    /**
+     * une note, si necessaire
+     * @var string
+     */
+    private $note;
     
     /**
      * @return \DateTime
@@ -33,14 +47,6 @@ class Commande extends DBEntity
     public function getDeliveryDate() :?\DateTime
     {
         return $this->deliveryDate;
-    }
-
-    /**
-     * @return number
-     */
-    public function getPointValue() : ?int
-    {
-        return $this->pointValue;
     }
 
     /**
@@ -60,14 +66,6 @@ class Commande extends DBEntity
     }
 
     /**
-     * @param number $pointValue
-     */
-    public function setPointValue($pointValue) : void
-    {
-        $this->pointValue = $pointValue;
-    }
-
-    /**
      * @param \Core\Shivalik\Entities\Member|int $member
      */
     public function setMember($member) : void
@@ -80,6 +78,68 @@ class Commande extends DBEntity
             throw new PHPBackendException("invalide argument value");
         }
     }
+    
+    /**
+     * @return \Core\Shivalik\Entities\Office
+     */
+    public function getOffice() : ?Office
+    {
+        return $this->office;
+    }
+
+    /**
+     * @return \Core\Shivalik\Entities\OfficeAdmin
+     */
+    public function getOfficeAdmin() : ?OfficeAdmin
+    {
+        return $this->officeAdmin;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNote() : ?string
+    {
+        return $this->note;
+    }
+
+    /**
+     * @param \Core\Shivalik\Entities\Office $office
+     */
+    public function setOffice($office) : void
+    {
+        if($office == null || $office instanceof Office) {
+            $this->office = $office;
+        } else if (self::isInt($office)) {
+            $this->office = new Office(['id' => $office]);
+        } else {
+            throw new PHPBackendException("Invalid argument in setOffice(): void method");
+        }
+    }
+
+    /**
+     * @param \Core\Shivalik\Entities\OfficeAdmin $officeAdmin
+     */
+    public function setOfficeAdmin($officeAdmin) : void
+    {
+        if($officeAdmin == null || $officeAdmin instanceof OfficeAdmin) {
+            $this->officeAdmin = $officeAdmin;
+        } else if (self::isInt($officeAdmin)) {
+            $this->officeAdmin = new OfficeAdmin(['id' => $officeAdmin]);
+        } else {
+            throw new PHPBackendException("invalide argument value in setOfficeAdmin() : void method");
+        }
+            
+    }
+
+    /**
+     * @param string $note
+     */
+    public function setNote($note) : void
+    {
+        $this->note = $note;
+    }
+
     
 }
 

@@ -21,7 +21,7 @@ class CategoryValidator extends DefaultFormValidator
     /**
      * @var CategoryDAOManager
      */
-    private $categorieDAOManager;
+    private $categoryDAOManager;
     
     /**
      * {@inheritDoc}
@@ -30,7 +30,7 @@ class CategoryValidator extends DefaultFormValidator
     protected function validationId($id) : void {
         parent::validationId($id);
         try {
-            if(!$this->categorieDAOManager->checkById($id))
+            if(!$this->categoryDAOManager->checkById($id))
                 throw new IllegalFormValueException("Know ID in database");
         } catch (DAOException $e) {
             throw new IllegalFormValueException($e->getMessage(), intval($e->getCode(), 10), $e);
@@ -38,7 +38,7 @@ class CategoryValidator extends DefaultFormValidator
     }
     
     /**
-     * Validation du title d'un categorie
+     * Validation du title d'un category
      * @param string $title
      * @throws IllegalFormValueException
      */
@@ -49,18 +49,18 @@ class CategoryValidator extends DefaultFormValidator
     }
     
     /**
-     * Processuce de traitement du title d'une categorie
+     * Processuce de traitement du title d'une category
      * @param string $title
-     * @param Category $categorie
+     * @param Category $category
      */
-    private function processTitle ($title, Category $categorie) : void {
+    private function processTitle ($title, Category $category) : void {
         try {
             $this->validationTitle($title);
         } catch (IllegalFormValueException $e) {
             $this->addError(self::FIELD_TITLE, $e->getMessage());
         }
         
-        $categorie->setTitle($title);
+        $category->setTitle($title);
     }
     
     /**
@@ -72,21 +72,21 @@ class CategoryValidator extends DefaultFormValidator
     {
         $title = $request->getDataPOST(self::FIELD_TITLE);
         $description = $request->getDataPOST(self::FIELD_DESCRIPTION);
-        $categorie = new Category();
+        $category = new Category();
         
-        $this->processTitle($title, $categorie);
-        $categorie->setDescription($description);
+        $this->processTitle($title, $category);
+        $category->setDescription($description);
         
         if(!$this->hasError()) {
             try {
-                $this->categorieDAOManager->create($categorie);
+                $this->categoryDAOManager->create($category);
             } catch (DAOException $e) {
                 $this->setMessage($e->getMessage());
             }
         }
         
-        $this->setResult("Success registration categorie", "Failure registration categirie");
-        return $categorie;
+        $this->setResult("Success registration category", "Failure registration categirie");
+        return $category;
         
     }
 
@@ -100,22 +100,22 @@ class CategoryValidator extends DefaultFormValidator
         $id = intval($request->getDataGET(self::FIELD_ID), 10);
         $title = $request->getDataPOST(self::FIELD_TITLE);
         $description = $request->getDataPOST(self::FIELD_DESCRIPTION);
-        $categorie = new Category();
+        $category = new Category();
         
-        $this->traitementId($categorie, $id);
-        $this->processTitle($title, $categorie);
-        $categorie->setDescription($description);
+        $this->traitementId($category, $id);
+        $this->processTitle($title, $category);
+        $category->setDescription($description);
         
         if(!$this->hasError()) {
             try {
-                $this->categorieDAOManager->update($categorie, $id);
+                $this->categoryDAOManager->update($category, $id);
             } catch (DAOException $e) {
                 $this->setMessage($e->getMessage());
             }
         }
         
-        $this->setResult("Success registration categorie", "Failure registration categirie");
-        return $categorie;
+        $this->setResult("Success registration category", "Failure registration categirie");
+        return $category;
     }
 
 }

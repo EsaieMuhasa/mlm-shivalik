@@ -38,7 +38,7 @@ class PointValueDAOManagerImplementation1 extends AbstractBonusDAOManager implem
         
         $QUERY = "SELECT * FROM {$this->getTableName()} WHERE member = ?";
         $QUERY .= $foot !== null? " AND foot = {$foot}" : "";
-        $QUERY .= $product !== null? (" AND commande IS ".($product? 'NOT':''))." NULL" : "";
+        $QUERY .= $product !== null? (" AND command IS ".($product? 'NOT':''))." NULL" : "";
         $QUERY .= 'LIMIT 1';
         
         $return = false;
@@ -76,7 +76,7 @@ class PointValueDAOManagerImplementation1 extends AbstractBonusDAOManager implem
             'generator' => $pv->getGenerator()->getId(),
             'value' => $pv->getValue(),
             'foot' => $pv->getFoot(),
-            'commande' => $pv->getCommande() != null? $pv->getCommande()->getId() : null,
+            'command' => $pv->getCommand() != null? $pv->getCommand()->getId() : null,
             self::FIELD_DATE_AJOUT => $pv->getFormatedDateAjout()            
         ]);
         $pv->setId($id);
@@ -94,7 +94,7 @@ class PointValueDAOManagerImplementation1 extends AbstractBonusDAOManager implem
         
         $QUERY = "SELECT * FROM {$this->getTableName()} WHERE member = ?";
         $QUERY .= $foot !== null? " AND foot = {$foot}" : "";
-        $QUERY .= $product !== null? (" AND commande IS ".($product? 'NOT':''))." NULL" : "";
+        $QUERY .= $product !== null? (" AND command IS ".($product? 'NOT':''))." NULL" : "";
         
         $return = [];
         try {
@@ -167,7 +167,7 @@ class PointValueDAOManagerImplementation1 extends AbstractBonusDAOManager implem
      */
     public function checkProductPvByMember(int $memberId): bool
     {
-        $QUERY = "SELECT * FROM {$this->getTableName()} WHERE member = ? AND foot IS NULL AND commande IS NOT NULL LIMIT 1";
+        $QUERY = "SELECT * FROM {$this->getTableName()} WHERE member = ? AND foot IS NULL AND command IS NOT NULL LIMIT 1";
         
         $return = false;
         try {
@@ -189,7 +189,7 @@ class PointValueDAOManagerImplementation1 extends AbstractBonusDAOManager implem
      */
     public function findProductPvByMember(int $memberId): array
     {
-        $QUERY = "SELECT * FROM {$this->getTableName()} WHERE member = ? AND foot IS NULL AND commande IS NOT NULL";
+        $QUERY = "SELECT * FROM {$this->getTableName()} WHERE member = ? AND foot IS NULL AND command IS NOT NULL";
         
         $data = false;
         try {

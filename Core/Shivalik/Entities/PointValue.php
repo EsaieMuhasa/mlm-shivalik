@@ -22,9 +22,9 @@ class PointValue extends AbstractBonus
     
     /**
      * Pour le reachat.
-     * @var Commande
+     * @var Command
      */
-    private $commande;
+    private $command;
 
     /**
      * @return int
@@ -85,25 +85,25 @@ class PointValue extends AbstractBonus
     }
     
     /**
-     * @return \Core\Shivalik\Entities\Commande
+     * @return \Core\Shivalik\Entities\Command
      * Different de null dans le cas où le PV ont été générer par l'achat des produits
      */
-    public function getCommande () : ?Commande
+    public function getCommand () : ?Command
     {
-        return $this->commande;
+        return $this->command;
     }
 
     /**
-     * @param \Core\Shivalik\Entities\Commande | int $commande
+     * @param \Core\Shivalik\Entities\Command | int $command
      */
-    public function setCommande ($commande) : void
+    public function setCommand ($command) : void
     {
-        if ($commande instanceof Commande || $commande == null) {
-            $this->commande = $commande;
-        } else if (self::isInt($commande)) {
-            $this->commande = new Commande(['id' => $commande]);
+        if ($command instanceof Command || $command == null) {
+            $this->command = $command;
+        } else if (self::isInt($command)) {
+            $this->command = new Command(['id' => $command]);
         } else {
-            throw new PHPBackendException("illegal argument valeur in setCommande () method param");
+            throw new PHPBackendException("illegal argument valeur in setCommand () method param");
         }
     }
     
