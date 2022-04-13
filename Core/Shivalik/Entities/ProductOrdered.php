@@ -22,14 +22,21 @@ class ProductOrdered extends DBEntity
     private $reduction;
     
     /**
-     * @var Commande
+     * @var Command
      */
-    private $commande;
+    private $command;
     
     /**
      * @var Stock
      */
     private $stock;
+    
+    /**
+     * La quantitee, pour la commande
+     * @var int
+     */
+    private $quantity;
+    
     /**
      * @return \Core\Shivalik\Entities\Product
      */
@@ -47,11 +54,11 @@ class ProductOrdered extends DBEntity
     }
 
     /**
-     * @return \Core\Shivalik\Entities\Commande
+     * @return \Core\Shivalik\Entities\Command
      */
-    public function getCommande() : ?Commande
+    public function getCommand() : ?Command
     {
-        return $this->commande;
+        return $this->command;
     }
 
     /**
@@ -85,16 +92,16 @@ class ProductOrdered extends DBEntity
     }
 
     /**
-     * @param \Core\Shivalik\Entities\Commande $commande
+     * @param \Core\Shivalik\Entities\Command $command
      */
-    public function setCommande($commande) : void
+    public function setCommand($command) : void
     {
-        if ($commande === null || $commande instanceof Commande) {
-            $this->commande = $commande;
+        if ($command === null || $command instanceof Command) {
+            $this->command = $command;
         } elseif (condition) {
-            $this->commande = new Commande(['id' => $commande]);
+            $this->command = new Command(['id' => $command]);
         } else {
-            throw new PHPBackendException("invalide value in setCommande () : void method parameter");
+            throw new PHPBackendException("invalide value in setCommand () : void method parameter");
         } 
     }
 
@@ -111,6 +118,23 @@ class ProductOrdered extends DBEntity
             throw new PHPBackendException("invalide value in setStock () : void method parameter");
         }
     }
+    
+    /**
+     * @return number
+     */
+    public function getQuantity()
+    {
+        return $this->quantity;
+    }
+
+    /**
+     * @param number $quantity
+     */
+    public function setQuantity ($quantity) : void
+    {
+        $this->quantity = $quantity;
+    }
+
 
 }
 

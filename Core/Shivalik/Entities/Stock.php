@@ -51,48 +51,44 @@ class Stock extends DBEntity
     private $auxiliaries = [];
     
     /**
-     * Solde disponible dans un stock
+     * quantite deja servie
      * @var int
      */
-    private $sold = 0;
+    protected $served = 0;
+    
     
     /**
      * @return number
      */
-    public function getQuantity() : ?int
-    {
+    public function getQuantity() : ?int {
         return $this->quantity;
     }
 
     /**
      * @return number
      */
-    public function getUnitPrice()
-    {
+    public function getUnitPrice() {
         return $this->unitPrice;
     }
 
     /**
      * @return string
      */
-    public function getComment() : ?string
-    {
+    public function getComment() : ?string {
         return $this->comment;
     }
 
     /**
      * @return \DateTime
      */
-    public function getExpiryDate() : ?\DateTime
-    {
+    public function getExpiryDate() : ?\DateTime {
         return $this->expiryDate;
     }
 
     /**
      * @param number $quantity
      */
-    public function setQuantity($quantity) : void
-    {
+    public function setQuantity($quantity) : void {
         $this->quantity = $quantity;
         $this->updateSold();
     }
@@ -100,55 +96,49 @@ class Stock extends DBEntity
     /**
      * @param number $unitPrice
      */
-    public function setUnitPrice($unitPrice) : void
-    {
+    public function setUnitPrice($unitPrice) : void {
         $this->unitPrice = $unitPrice;
     }
 
     /**
      * @param string $comment
      */
-    public function setComment($comment) : void
-    {
+    public function setComment($comment) : void {
         $this->comment = $comment;
     }
 
     /**
      * @param \DateTime $expiryDate
      */
-    public function setExpiryDate($expiryDate) : void
-    {
+    public function setExpiryDate($expiryDate) : void {
         $this->expiryDate = $this->hydrateDate($expiryDate);
     }
     /**
      * @return \DateTime
      */
-    public function getManufacturingDate() : ?\DateTime
-    {
+    public function getManufacturingDate() : ?\DateTime {
         return $this->manufacturingDate;
     }
 
     /**
      * @param \DateTime|string|int $manufacturingDate
      */
-    public function setManufacturingDate($manufacturingDate) : void
-    {
+    public function setManufacturingDate($manufacturingDate) : void {
         $this->manufacturingDate = $this->hydrateDate($manufacturingDate);
     }
 
     /**
      * @return \Core\Shivalik\Entities\Product
      */
-    public function getProduct() :?Product
-    {
+    public function getProduct() :?Product {
         return $this->product;
     }
 
     /**
      * @param \Core\Shivalik\Entities\Product | int $product
+     * @throws PHPBackendException
      */
-    public function setProduct($product)
-    {
+    public function setProduct($product) : void {
         if ($product == null || $product instanceof Product) {
             $this->product = $product;
         } else if (self::isInt($product)) {
@@ -161,16 +151,14 @@ class Stock extends DBEntity
     /**
      * @return \Core\Shivalik\Entities\AuxiliaryStock[] 
      */
-    public function getAuxiliaries()
-    {
+    public function getAuxiliaries() {
         return $this->auxiliaries;
     }
 
     /**
      * @param multitype:\Core\Shivalik\Entities\AuxiliaryStock  $auxiliaries
      */
-    public function setAuxiliaries (array $auxiliaries) : void
-    {
+    public function setAuxiliaries (array $auxiliaries) : void {
         $this->auxiliaries = $auxiliaries;
         $this->updateSold();
     }
@@ -190,7 +178,7 @@ class Stock extends DBEntity
         }
         
         $this->auxiliaries[] = $stock;
-        $this->sold -= $stock->getQuantity();
+        $this->served += $stock->getQuantity();
     }
     
     /**
@@ -206,12 +194,35 @@ class Stock extends DBEntity
     }
     
     /**
+     * Renvoie la quantite deja servie par le stock
+     * @return int
+     */
+    public function getServed() : int {
+        return $this->served;
+    }
+
+    /**
+     * @param number $served
+     */
+    protected function setServed ($served)
+    {
+        $this->served = $served;
+    }
+
+    /**
      * renvoie la quantite disponible pour le stock
      * @return int
      */
-    public function getSold () : int
-    {
-        return $this->sold;
+    public function getSold () : int {
+        return $this->quantity - $this->served;//quantite initial - quantite deja servies
+    }
+    
+    /**
+     * Renvoie la quaantite disponible en pourcentage
+     * @return float
+     */
+    public function getSoldToPercent () : float {
+        return $this->getSold() * 100 / $this->getQuantity();
     }
     
     /**
@@ -219,9 +230,9 @@ class Stock extends DBEntity
      * @return void
      */
     private function updateSold () : void {
-        $this->sold = $this->quantity;
+        $this->served = 0;
         foreach ($this->auxiliaries as $stock) {
-            $this->sold -= $stock->getQuantity();
+            $this->served += $stock->getQuantity();
         }
     }
 

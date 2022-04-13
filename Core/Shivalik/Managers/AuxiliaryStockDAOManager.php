@@ -37,6 +37,17 @@ interface AuxiliaryStockDAOManager extends StockDAOManager
     public function findByOffice (int $officeId, ?bool $empty = null, ?int $limit = null, int $offset = 0) : array;
     
     /**
+     * Chargement des tout les stocks auxiliaire d'un office
+     * @param int $officeId
+     * @param bool $empty
+     * @param int $limit
+     * @param int $offset
+     * @return AuxiliaryStock[]
+     * @throws DAOException s'ily a erreur lors de la communication avec le SGBD au aucun resultat n'est retourner par la requette de selection
+     */
+    public function loadByOffice (int $officeId, ?bool $empty = null, ?int $limit = null, int $offset = 0) : array;
+    
+    /**
      * comptage de stock de l'office en premier parametre
      * @tutorial Pour plus d'explication sur le parametre $empty => consulter la doc de la methode checkByProduct() de l'interface StockDAOManager
      * @param int $officeId
@@ -74,6 +85,18 @@ interface AuxiliaryStockDAOManager extends StockDAOManager
     public function findByProductInOffice (int $productId, int $officeId, ?bool $empty = null, ?int $limit = null, int $offset = 0) : array;
     
     /**
+     * Chargement des stocks auxiliaires pour un produit, dans un office
+     * @param int $productId, l'identifiant du produit
+     * @param int $officeId, l'identifiant de l'office
+     * @param bool $empty, le stock doit-elle etre vide??
+     * @param int $limit, nombre des stocks a selectionner
+     * @param int $offset, nombre d'occurence au sauter
+     * @return AuxiliaryStock[]
+     * @throws DAOException s'il y a erreur lors de la selection, ou aucun resultat n'est returner par la requette de selection
+     */
+    public function loadByProductInOffice (int $productId, int $officeId, ?bool $empty = null, ?int $limit = null, int $offset = 0) : array;
+    
+    /**
      * Comptage des stock d'un produit,dans le l'office en deuxieme parametre
      * @tutorial Pour plus d'explication sur le parametre $empty => consulter la doc de la methode checkByProduct() de l'interface StockDAOManager
      * @param int $productId
@@ -98,25 +121,38 @@ interface AuxiliaryStockDAOManager extends StockDAOManager
     public function checkByParent (int $parentId, ?int $officeId = null, ?bool $empty = null, ?int $limit = null, int $offset = 0) : bool;
     
     /**
-     * selection des stock auxiliaire lier au stock pricipale en premier parametre
+     * Selection des stock auxiliaire lier au stock pricipale en premier parametre
      * @param int $parentId
      * @param int $officeId
      * @param bool $empty
      * @param int $limit
      * @param int $offset
      * @return AuxiliaryStock[]
+     * @throws DAOException s'il ya erreur lors de la communication avec le SGBD, ou aucun resultat n'est retourner par la requette de selection
      */
     public function findByParent (int $parentId, ?int $officeId = null, ?bool $empty = null, ?int $limit = null, int $offset = 0) : array;
+    
+    /**
+     * Chargement des stocks auxiliaire pour le stock parent en premier parametre 
+     * @param int $parentId
+     * @param int $officeId
+     * @param bool $empty
+     * @param int $limit
+     * @param int $offset
+     * @return AuxiliaryStock[]
+     * @throws DAOException s'il y a erreur lors de la communication avec le SGBD, ou aucun resultat n'est retourner par la requette de selection
+     */
+    public function loadByParent (int $parentId, ?int $officeId = null, ?bool $empty = null, ?int $limit = null, int $offset = 0) : array;
     
     /**
      * comptage des stocks auxiliaire du stock principale en premier parametre
      * @param int $parentId
      * @param int $officeId
      * @param bool $empty
-     * @return bool
+     * @return int
      * @throws DAOException s'il y a erreur lose de la communication avec le SGBD
      */
-    public function countByParent (int $parentId, ?int $officeId = null, ?bool $empty = null) : bool;
+    public function countByParent (int $parentId, ?int $officeId = null, ?bool $empty = null) : int;
     
 }
 

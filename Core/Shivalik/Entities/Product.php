@@ -164,6 +164,14 @@ class Product extends DBEntity
     {
         return $this->stocks;
     }
+    
+    /**
+     * Ce produit a-t-il de(s) stock(s)??
+     * @return bool
+     */
+    public function hasStock () : bool {
+        return !empty($this->stocks);
+    }
 
     /**
      * @param \Core\Shivalik\Entities\Stock[]  $stocks

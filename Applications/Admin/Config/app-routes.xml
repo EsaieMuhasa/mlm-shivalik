@@ -65,6 +65,13 @@
 		<route action="history" urlPattern="/admin/offices/([0-9]+)/history/" paramsNames="id"/>
 		<route action="history" urlPattern="/admin/offices/([0-9]+)/history/([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})\.html" paramsNames="id,date"/>
 		<route action="history" urlPattern="/admin/offices/([0-9]+)/history/([0-9]{1,2})-([0-9]{4})\.html" paramsNames="id,month,year"/>
+		
+		<!-- stock -->
+		<route action="stocks" urlPattern="/admin/offices/([0-9]+)/stocks/" paramsNames="id"/>
+		<route action="addStock" urlPattern="/admin/offices/([0-9]+)/stocks/add\.html" paramsNames="id"/>
+		<route action="updateStock" urlPattern="/admin/offices/([0-9]+)/stocks/([0-9]+)/update\.html" paramsNames="id,stockId"/>
+		<route action="removeStock" urlPattern="/admin/offices/([0-9]+)/stocks/([0-9]+)/remove\.html" paramsNames="id,stockId"/>
+		<!-- //stock -->
 	</module>
 	
 	<module name="Products">

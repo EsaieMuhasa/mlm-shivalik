@@ -2,16 +2,16 @@
 namespace Applications\Admin\Modules\Products;
 
 use Applications\Admin\AdminController;
+use Core\Shivalik\Entities\Product;
+use Core\Shivalik\Managers\CategoryDAOManager;
 use Core\Shivalik\Managers\ProductDAOManager;
+use Core\Shivalik\Managers\StockDAOManager;
+use Core\Shivalik\Validators\CategoryValidator;
 use Core\Shivalik\Validators\ProductValidator;
+use Core\Shivalik\Validators\StockFormValidator;
 use PHPBackend\Application;
 use PHPBackend\Request;
 use PHPBackend\Response;
-use Core\Shivalik\Managers\StockDAOManager;
-use Core\Shivalik\Validators\CategoryValidator;
-use Core\Shivalik\Managers\CategoryDAOManager;
-use Core\Shivalik\Entities\Product;
-use Core\Shivalik\Validators\StockFormValidator;
 
 /**
  *
@@ -121,10 +121,7 @@ class ProductsController extends AdminController
      * @return void
      */
     public function executeProduct (Request $request, Response $response) : void {
-        $id = intval($request->getDataGET('id'), 10);
-        $limit = $request->existInGET('limit')? intval($request->getDataGET('limit'), 10) : 4;
-        $offset = $request->existInGET('offset')? intval($request->getDataGET('offset'), 10) : 0;
-        
+        $id = intval($request->getDataGET('id'), 10);        
         if (!$this->productDAOManager->checkById($id)) {
             $response->sendError();
         }
@@ -133,13 +130,11 @@ class ProductsController extends AdminController
          * @var Product $product
          */
         $product = $this->productDAOManager->findById($id);
-        if (!$this->productDAOManager->checkByCategory($product->getCategory()->getId(), $limit, $offset)) {
-            $response->sendError();
+        if($this->stockDAOManager->checkByProduct($id)) {
+            $product->setStocks($this->stockDAOManager->findByProduct($id));
         }
         
         $request->addAttribute(self::ATT_PRODUCT, $product);
-        $request->addAttribute(self::ATT_PRODUCTS, $this->productDAOManager->findByCategory($product->getCategory()->getId(), $limit, $offset));
-        $request->addAttribute(self::ATT_COUNT_PRODUCT, $this->productDAOManager->countByCategory($product->getCategory()->getId()));
         $this->itemMenuProduct($request);
     }
     

@@ -1,11 +1,11 @@
 <?php 
 use Applications\Admin\Modules\Products\ProductsController;
-use Core\Shivalik\Entities\Categorie;
 use PHPBackend\Text\HtmlFormater;
+use Core\Shivalik\Entities\Category;
 
 
 /**
- * @var Categorie[] $categotries
+ * @var Category[] $categotries
  */
 $categotries = $_REQUEST[ProductsController::ATT_CATEGORIES];
 ?>

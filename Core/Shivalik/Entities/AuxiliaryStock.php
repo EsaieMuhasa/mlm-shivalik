@@ -25,6 +25,12 @@ class AuxiliaryStock extends Stock
     private $office;
     
     /**
+     * le produit aux commandes, qui ont ete satisfaits par le stock
+     * @var ProductOrdered[]
+     */
+    private $ordereds;
+    
+    /**
      * @return \Core\Shivalik\Entities\Stock
      */
     public function getParent () : ?Stock
@@ -44,8 +50,7 @@ class AuxiliaryStock extends Stock
      * tho set $parent stock in this auxiliary stock
      * @param \Core\Shivalik\Entities\Stock | int $parent
      */
-    public function setParent ($parent) : void
-    {
+    public function setParent ($parent) : void {
         if ($parent instanceof Stock || $parent == null) {
             $this->parent = $parent;
         } else if (self::isInt($parent)) {
@@ -57,8 +62,7 @@ class AuxiliaryStock extends Stock
      * to set $office was control this auxiliary stock
      * @param \Core\Shivalik\Entities\Office | int $office
      */
-    public function setOffice($office) : void
-    {
+    public function setOffice($office) : void {
         if ($office == null || $office instanceof Office) {
             $this->office = $office;
         } else if (self::isInt($office)) {
@@ -67,11 +71,50 @@ class AuxiliaryStock extends Stock
     }
 
     /**
+     * @return \Core\Shivalik\Entities\ProductOrdered[]
+     */
+    public function getOrdereds() {
+        return $this->ordereds;
+    }
+
+    /**
+     * @param \Core\Shivalik\Entities\ProductOrdered[]  $ordereds
+     */
+    public function setOrdereds(array $ordereds) : void {
+        $this->ordereds = $ordereds;
+        $this->served = 0;
+        foreach ($this->ordereds as $order) {
+            $this->served += $order->getQuantity();
+        }
+    }
+    
+    /**
+     * Ajout d'une collection des produits
+     * @param ProductOrdered ...$ordereds
+     */
+    public function addOrdereds (ProductOrdered ...$ordereds) : void {
+        foreach ($ordereds as $ordered) {
+            $this->ordereds[] = $ordered;
+            $this->served += $ordered->getQuantity();
+        }
+    }
+    
+    /**
+     * Ajout d'un satisfaction de la commande par le stock
+     * @param ProductOrdered $ordered
+     * @return AuxiliaryStock
+     */
+    public function addOrdered (ProductOrdered $ordered) : AuxiliaryStock {
+        $this->ordereds [] = $ordered;
+        $this->served += $ordered->getQuantity();
+        return $this;
+    }
+
+    /**
      * {@inheritDoc}
      * @see \Core\Shivalik\Entities\Stock::getComment()
      */
-    public function getComment(): ?string
-    {
+    public function getComment(): ?string {
         return $this->parent->getComment();
     }
 
@@ -80,8 +123,7 @@ class AuxiliaryStock extends Stock
      * @see \Core\Shivalik\Entities\Stock::getExpiryDate()
      * returned expiry date of this stock is the same of parent stock
      */
-    public function getExpiryDate(): ?\DateTime
-    {
+    public function getExpiryDate(): ?\DateTime {
         return $this->parent->getExpiryDate();
     }
 
@@ -90,8 +132,7 @@ class AuxiliaryStock extends Stock
      * @see \Core\Shivalik\Entities\Stock::getProduct()
      * the product returned by this getter, is the same of parent stock 
      */
-    public function getProduct(): ?Product
-    {
+    public function getProduct(): ?Product {
         return $this->parent->getProduct();
     }
 
@@ -101,16 +142,45 @@ class AuxiliaryStock extends Stock
      * the unit price returned by this getter method, is the same of parent stock of this instance.
      * parent Stock cannot by null, as far as possible
      */
-    public function getUnitPrice()
-    {
+    public function getUnitPrice() {
         return $this->parent->getUnitPrice();
     }
     
     /**
      * {@inheritDoc}
-     * @see \Core\Shivalik\Entities\Stock::setComment()
+     * @see \Core\Shivalik\Entities\Stock::addAuxiliaries()
      */
-    public function setComment($comment): void
+    public function addAuxiliaries(AuxiliaryStock ...$stocks): Stock
+    {
+        throw new PHPBackendException("Operation not supported");
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Entities\Stock::addAuxiliary()
+     * @throws PHPBackendException
+     */
+    public function addAuxiliary(AuxiliaryStock $stock): void
+    {
+        throw new PHPBackendException("Operation not supported");
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Entities\Stock::getAuxiliaries()
+     * @throws PHPBackendException
+     */
+    public function getAuxiliaries()
+    {
+        throw new PHPBackendException("Operation not supported");
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Entities\Stock::setComment()
+     * @throws PHPBackendException
+     */
+    public function setComment ($comment): void
     {
         throw new PHPBackendException("setComment() => operation not supported");
     }
@@ -118,6 +188,7 @@ class AuxiliaryStock extends Stock
     /**
      * {@inheritDoc}
      * @see \Core\Shivalik\Entities\Stock::setExpiryDate()
+     * @throws PHPBackendException
      */
     public function setExpiryDate($expiryDate): void
     {
@@ -128,14 +199,12 @@ class AuxiliaryStock extends Stock
      * {@inheritDoc}
      * @see \Core\Shivalik\Entities\Stock::setProduct()
      */
-    public function setProduct($product)
-    {
-        throw new PHPBackendException("setProduct() => operation not supported");
-    }
+    public function setProduct($product) : void {}
 
     /**
      * {@inheritDoc}
      * @see \Core\Shivalik\Entities\Stock::setUnitPrice()
+     * @throws PHPBackendException
      */
     public function setUnitPrice($unitPrice): void
     {

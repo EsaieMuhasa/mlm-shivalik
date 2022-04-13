@@ -26,7 +26,7 @@ class StockFormValidator extends DefaultFormValidator
     /**
      * @var StockDAOManager
      */
-    private $stockDAOManager;
+    protected $stockDAOManager;
     
     /**
      * Validation du commentaire pour un stock
@@ -44,7 +44,7 @@ class StockFormValidator extends DefaultFormValidator
      * @param string|int $quantity
      * @throws IllegalFormValueException
      */
-    private function validationQuantity ($quantity, ?int $id) : void {
+    protected function validationQuantity ($quantity, ?int $id = null) : void {
         if ($quantity == null || $quantity === 0) {
             throw new IllegalFormValueException("the initial stock quantity cannot be empty");
         } else if (!preg_match(self::RGX_INT_POSITIF, $quantity)) {
@@ -131,7 +131,7 @@ class StockFormValidator extends DefaultFormValidator
      * @param Stock $stock
      * @param int $id dans le cas d'edition du stock
      */
-    private function processingQuantity ($quantity, Stock $stock, ?int $id = null) : void {
+    protected function processingQuantity ($quantity, Stock $stock, ?int $id = null) : void {
         try {
             $this->validationQuantity($quantity, $id);
         } catch (IllegalFormValueException $e) {
