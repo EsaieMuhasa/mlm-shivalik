@@ -30,4 +30,8 @@
 		<route action="withdrawalsMember" urlPattern="/office/members/([0-9]+)/(withdrawals)\.html" paramsNames="id,option"/>
 		<route action="withdrawalsMember" urlPattern="/office/members/([0-9]+)/(withdrawals)/([0-9]+)\.html" paramsNames="id,option,requestId"/>
 	</module>
+	
+	<module name="Products">
+		<route action="index" urlPattern="/office/products/"/>
+	</module>
 </app-routes>

@@ -69,5 +69,34 @@ interface ProductDAOManager extends DAOInterface
      * @throws DAOException s'il ya erreur lors de la communication avec le SGBD
      */
     public function countByCategory (int $categoryId) : int;
+    
+    /**
+     * Comptage du nombre des produits dont leurs stocks ne sont pas vide pour l'office en parametre
+     * @param int $officeId
+     * @return int
+     * @return DAOException s'il y a erreur lors de la communication avec le SGBD
+     */
+    public function countVailableByOffice (int $officeId) : int;
+    
+    /**
+     * verifie l'existance de produit ayant des stocks non vide pour l'office en premier parametre
+     * @param int $officeId
+     * @param int $limit
+     * @param int $offset
+     * @return bool
+     * @throws DAOException s'il y a erreur losrs de la communication avec le SGBD
+     */
+    public function checkVailableByOffice (int $officeId, ?int $limit = null, int $offset = 0) : bool;
+    
+    /**
+     * renvoie la collection des produits disponible dans l'office en premier parametre.
+     * (sock auxiliaire non vide)
+     * @param int $officeId
+     * @param int $limit
+     * @param int $offset
+     * @return Product[]
+     * @throws DAOException s'il y a erreur lors de la communication avec le SGBD, ou aucun resultat
+     */
+    public function findVailableByOffice (int $officeId, ?int $limit = null, int $offset = 0) : array;
 }
 

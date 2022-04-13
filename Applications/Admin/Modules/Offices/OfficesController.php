@@ -165,12 +165,10 @@ class OfficesController extends AdminController {
 	}
 	
 	/**
-	 * chargement des donnes obligatorie
-	 * lors de la consultation d'un office, on chage les donnees qui le concerne 
-	 * @param Request $request
-	 * @param Response $response
+	 * {@inheritDoc}
+	 * @see \PHPBackend\Http\HTTPController::init()
 	 */
-	private function init (Request $request, Response $response) : void {
+	protected function init (Request $request, Response $response) : void {
 		if ($request->existInGET('id')) {
 			$id = intval($request->getDataGET('id'), 10);//l'identifiant de l'office
 			
