@@ -61,7 +61,8 @@ class AuxiliaryStockDAOManagerImplementation1 extends StockDAOManagerImplementat
     public function checkByOffice(int $officeId, ?bool $empty = null, ?int $limit = null, int $offset = 0): bool {
         $return = false;
         try {
-            $SQL = "SELECT * FROM {$this->getViewName()} WHERE office =:office".($empty !== null? ' AND served'.($empty? " = " : ' <> ').'quantity' : (''));
+            $SQL = "SELECT * FROM {$this->getViewName()} WHERE office =:office";
+            $SQL .= ($empty !== null? ' AND (served'.($empty? " = quantity" : " = quantity OR served IS NULL ").')' : (''));
             $SQL_LIMIT = $limit !== null? "LIMIT {$limit} OFFSET {$offset}":'';
             
             $statement = UtilitaireSQL::prepareStatement($this->getConnection(), "{$SQL} {$SQL_LIMIT}", ['office' => $officeId]);
@@ -82,7 +83,8 @@ class AuxiliaryStockDAOManagerImplementation1 extends StockDAOManagerImplementat
     public function checkByProductInOffice(int $productId, int $officeId, ?bool $empty = null, ?int $limit = null, int $offset = 0): bool {
         $return = false;
         try {
-            $SQL = "SELECT * FROM {$this->getViewName()} WHERE office =:office AND product =:product ".($empty !== null? ' AND served'.($empty? " = " : ' <> ').'quantity' : (''));
+            $SQL = "SELECT * FROM {$this->getViewName()} WHERE office =:office AND product =:product ";
+            $SQL .= ($empty !== null? ' AND (served'.($empty? " = quantity" : " = quantity OR served IS NULL ").')' : (''));
             $SQL_LIMIT = $limit !== null? "LIMIT {$limit} OFFSET {$offset}":'';
             
             $statement = UtilitaireSQL::prepareStatement($this->getConnection(), "{$SQL} {$SQL_LIMIT}", ['office' => $officeId, 'product' => $productId]);
@@ -103,8 +105,8 @@ class AuxiliaryStockDAOManagerImplementation1 extends StockDAOManagerImplementat
     public function countByOffice(int $officeId, ?bool $empty = null): int {
         $count = 0;
         try {
-            $SQL = "SELECT COUNT(*) AS nombre FROM {$this->getViewName()} WHERE office =:office".($empty !== null? ' AND served'.($empty? " = " : ' <> ').'quantity' : (''));
-            
+            $SQL = "SELECT COUNT(*) AS nombre FROM {$this->getViewName()} WHERE office =:office";
+            $SQL .= ($empty !== null? ' AND (served'.($empty? " = quantity" : " = quantity OR served IS NULL ").')' : (''));
             $statement = UtilitaireSQL::prepareStatement($this->getConnection(), $SQL, ['office' => $officeId]);
             if ($row = $statement->fetch()) {
                 $count =$row['nombre'];
@@ -123,8 +125,8 @@ class AuxiliaryStockDAOManagerImplementation1 extends StockDAOManagerImplementat
     public function countByProductInOffice(int $productId, int $officeId, ?bool $empty = null): int {
         $count = 0;
         try {
-            $SQL = "SELECT COUNT(*) AS nombre FROM {$this->getViewName()} WHERE office =:office AND product =:product ".($empty !== null? ' AND served'.($empty? " = " : ' <> ').'quantity' : (''));
-            
+            $SQL = "SELECT COUNT(*) AS nombre FROM {$this->getViewName()} WHERE office =:office AND product =:product ";
+            $SQL .= ($empty !== null? ' AND (served'.($empty? " = quantity" : " = quantity OR served IS NULL ").')' : (''));
             $statement = UtilitaireSQL::prepareStatement($this->getConnection(), $SQL, ['office' => $officeId, 'product' => $productId]);
             if ($row = $statement->fetch()) {
                 $count = $row['nombre'];
@@ -143,7 +145,8 @@ class AuxiliaryStockDAOManagerImplementation1 extends StockDAOManagerImplementat
     public function findByOffice(int $officeId, ?bool $empty = null, ?int $limit = null, int $offset = 0): array {
         $data = [];
         try {
-            $SQL = "SELECT * FROM {$this->getViewName()} WHERE office =:office".($empty !== null? ' AND served'.($empty? " = " : ' <> ').'quantity' : (''))." ORDER BY product, dateAjout DESC";
+            $SQL = "SELECT * FROM {$this->getViewName()} WHERE office =:office";
+            $SQL .= ($empty !== null? ' AND (served'.($empty? " = quantity" : " = quantity OR served IS NULL ").')' : (''))." ORDER BY product, dateAjout DESC";
             $SQL_LIMIT = $limit !== null? "LIMIT {$limit} OFFSET {$offset}":'';
             
             $statement = UtilitaireSQL::prepareStatement($this->getConnection(), "{$SQL} {$SQL_LIMIT}", ['office' => $officeId]);
@@ -168,7 +171,8 @@ class AuxiliaryStockDAOManagerImplementation1 extends StockDAOManagerImplementat
     public function findByProductInOffice(int $productId, int $officeId, ?bool $empty = null, ?int $limit = null, int $offset = 0): array {
         $data = [];
         try {
-            $SQL = "SELECT * FROM {$this->getViewName()} WHERE office =:office AND product =:product ".($empty !== null? ' AND served'.($empty? " = " : ' <> ').'quantity' : (''));
+            $SQL = "SELECT * FROM {$this->getViewName()} WHERE office =:office AND product =:product ";
+            $SQL .= ($empty !== null? ' AND (served'.($empty? " = quantity" : " = quantity OR served IS NULL ").')' : (''));
             $SQL_LIMIT = $limit !== null? "LIMIT {$limit} OFFSET {$offset}":'';
             
             $statement = UtilitaireSQL::prepareStatement($this->getConnection(), "{$SQL} {$SQL_LIMIT}", ['office' => $officeId, 'product' => $productId]);
@@ -192,7 +196,8 @@ class AuxiliaryStockDAOManagerImplementation1 extends StockDAOManagerImplementat
     public function checkByParent(int $parentId, ?int $officeId = null, ?bool $empty = null, int $limit = null, int $offset = 0): bool {
         $return = false;
         try {
-            $SQL = "SELECT * FROM {$this->getViewName()} WHERE parent =:parent".($officeId!=null? " AND office = {$officeId}":'').($empty !== null? ' AND served'.($empty? " = " : ' <> ').'quantity' : (''));
+            $SQL = "SELECT * FROM {$this->getViewName()} WHERE parent =:parent".($officeId!=null? " AND office = {$officeId}":'');
+            $SQL .= ($empty !== null? ' AND (served'.($empty? " = quantity" : " = quantity OR served IS NULL ").')' : (''));
             $SQL_LIMIT = $limit !== null? "LIMIT {$limit} OFFSET {$offset}":'';
             
             $statement = UtilitaireSQL::prepareStatement($this->getConnection(), "{$SQL} {$SQL_LIMIT}", ['parent' => $parentId]);
@@ -213,7 +218,8 @@ class AuxiliaryStockDAOManagerImplementation1 extends StockDAOManagerImplementat
     public function countByParent(int $parentId, ?int $officeId = null, ?bool $empty = null): int {
         $count = 0;
         try {
-            $SQL = "SELECT COUNT(*) AS nombre FROM {$this->getViewName()} WHERE parent =:parent".($officeId!=null? " AND office = {$officeId}":'').($empty !== null? ' AND served'.($empty? " = " : ' <> ').'quantity' : (''));
+            $SQL = "SELECT COUNT(*) AS nombre FROM {$this->getViewName()} WHERE parent =:parent".($officeId!=null? " AND office = {$officeId}":'');
+            $SQL .= ($empty !== null? ' AND (served'.($empty? " = quantity" : " = quantity OR served IS NULL ").')' : (''));
             
             $statement = UtilitaireSQL::prepareStatement($this->getConnection(), $SQL, ['parent' => $parentId]);
             if ($row = $statement->fetch()){
@@ -233,7 +239,8 @@ class AuxiliaryStockDAOManagerImplementation1 extends StockDAOManagerImplementat
     public function findByParent(int $parentId, ?int $officeId = null, ?bool $empty = null, int $limit = null, int $offset = 0): array {
         $data = [];
         try {
-            $SQL = "SELECT * FROM {$this->getViewName()} WHERE parent =:parent".($officeId!=null? " AND office = {$officeId}":'').($empty !== null? ' AND served'.($empty? " = " : ' <> ').'quantity' : (''));
+            $SQL = "SELECT * FROM {$this->getViewName()} WHERE parent =:parent".($officeId!=null? " AND office = {$officeId}":'');
+            $SQL .= ($empty !== null? ' AND (served'.($empty? " = quantity" : " = quantity OR served IS NULL ").')' : (''));
             $SQL_LIMIT = $limit !== null? "LIMIT {$limit} OFFSET {$offset}":'';
             
             $statement = UtilitaireSQL::prepareStatement($this->getConnection(), "{$SQL} {$SQL_LIMIT}", ['parent' => $parentId]);

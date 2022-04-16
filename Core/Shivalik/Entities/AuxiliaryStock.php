@@ -54,7 +54,8 @@ class AuxiliaryStock extends Stock
         if ($parent instanceof Stock || $parent == null) {
             $this->parent = $parent;
         } else if (self::isInt($parent)) {
-            $this->parent = new Stock(['id' => $parent]);
+            $this->parent = $this->parent == null? new Stock() : $this->parent;
+            $this->parent->setId($parent);
         } else throw new PHPBackendException("Invalid value in setParent() param method");
     }
 
@@ -129,6 +130,14 @@ class AuxiliaryStock extends Stock
 
     /**
      * {@inheritDoc}
+     * @see \Core\Shivalik\Entities\Stock::getManufacturingDate()
+     */
+    public function getManufacturingDate(): \DateTime{
+        return $this->parent->getManufacturingDate();
+    }
+
+    /**
+     * {@inheritDoc}
      * @see \Core\Shivalik\Entities\Stock::getProduct()
      * the product returned by this getter, is the same of parent stock 
      */
@@ -150,8 +159,7 @@ class AuxiliaryStock extends Stock
      * {@inheritDoc}
      * @see \Core\Shivalik\Entities\Stock::addAuxiliaries()
      */
-    public function addAuxiliaries(AuxiliaryStock ...$stocks): Stock
-    {
+    public function addAuxiliaries(AuxiliaryStock ...$stocks): Stock {
         throw new PHPBackendException("Operation not supported");
     }
 
@@ -160,8 +168,7 @@ class AuxiliaryStock extends Stock
      * @see \Core\Shivalik\Entities\Stock::addAuxiliary()
      * @throws PHPBackendException
      */
-    public function addAuxiliary(AuxiliaryStock $stock): void
-    {
+    public function addAuxiliary(AuxiliaryStock $stock): void {
         throw new PHPBackendException("Operation not supported");
     }
 
@@ -170,8 +177,7 @@ class AuxiliaryStock extends Stock
      * @see \Core\Shivalik\Entities\Stock::getAuxiliaries()
      * @throws PHPBackendException
      */
-    public function getAuxiliaries()
-    {
+    public function getAuxiliaries() {
         throw new PHPBackendException("Operation not supported");
     }
 
@@ -180,34 +186,51 @@ class AuxiliaryStock extends Stock
      * @see \Core\Shivalik\Entities\Stock::setComment()
      * @throws PHPBackendException
      */
-    public function setComment ($comment): void
-    {
+    public function setComment ($comment): void {
         throw new PHPBackendException("setComment() => operation not supported");
     }
 
     /**
      * {@inheritDoc}
      * @see \Core\Shivalik\Entities\Stock::setExpiryDate()
-     * @throws PHPBackendException
      */
-    public function setExpiryDate($expiryDate): void
-    {
-        throw new PHPBackendException("setExpiredDate() => operation not supported");
+    public function setExpiryDate($expiryDate): void{
+        if ($this->parent == null) {
+            $this->parent = new Stock();
+        }
+        $this->parent->setExpiryDate($expiryDate);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Entities\Stock::setManufacturingDate()
+     */
+    public function setManufacturingDate($manufacturingDate): void{
+        if ($this->parent == null) {
+            $this->parent = new Stock();
+        }
+        
+        $this->parent->setManufacturingDate($manufacturingDate);
     }
 
     /**
      * {@inheritDoc}
      * @see \Core\Shivalik\Entities\Stock::setProduct()
      */
-    public function setProduct($product) : void {}
+    public function setProduct($product) : void {
+        if ($this->parent == null) {
+            $this->parent = new Stock();
+        }
+        
+        $this->parent->setProduct($product);
+    }
 
     /**
      * {@inheritDoc}
      * @see \Core\Shivalik\Entities\Stock::setUnitPrice()
      * @throws PHPBackendException
      */
-    public function setUnitPrice($unitPrice): void
-    {
+    public function setUnitPrice($unitPrice): void {
         throw new PHPBackendException("setUnitPrice() => operation not supported");
     }
 

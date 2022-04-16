@@ -9,6 +9,10 @@ use PHPBackend\Response;
 use Core\Shivalik\Managers\ProductDAOManager;
 use Core\Shivalik\Managers\CategoryDAOManager;
 use Core\Shivalik\Managers\CommandDAOManager;
+use PHPBackend\Calendar\Month;
+use PHPBackend\Calendar\Year;
+use Core\Shivalik\Entities\Product;
+use Core\Shivalik\Managers\AuxiliaryStockDAOManager;
 
 /**
  *
@@ -26,6 +30,9 @@ class ProductsController extends HTTPController
     
     const ATT_STOCK ='stock';
     const ATT_STOCKS ='stocks';
+    
+    const ATT_MONTH = 'SELECTED_MONTH';
+    const ATT_YEAR = 'SELECTED_YEAR';
     
     //activation/desactivation des menus
     const ATT_ACTIVE_MENU = 'PRODUCT_ACTIVE_ITEM_MENU';
@@ -50,7 +57,10 @@ class ProductsController extends HTTPController
      */
     private $commandDAOManager;
     
-    
+    /**
+     * @var AuxiliaryStockDAOManager
+     */
+    private $auxiliaryStockDAOManager;
     
     /**
      * @var Office
@@ -68,18 +78,49 @@ class ProductsController extends HTTPController
     }
     
     /**
-     * Visualisation des produits disponible dans le stock auxilitaire
+     * Visualisation des ventes, conformement au calendar
+     * Il est possible de visualiser le operations faites:
+     * + pour une date
+     * + pour un mois
+     * + pour une semaine
      * @param Request $request
      * @param Response $response
      */
     public function executeIndex (Request $request, Response $response) : void {
-        if ($this->productDAOManager->checkVailableByOffice($this->office->getId())) {
-            $products = $this->productDAOManager->findVailableByOffice($this->office->getId());
-        } else {
-            $products = [];
+        $request->addAttribute(self::ATT_ACTIVE_MENU, self::ITEM_MENU_DASHBOARD);
+        
+        $limit = $request->existInGET('limit')? intval($request->getDataGET('limit'), 10) : 5;
+        $offset = $request->existInGET('offset')? intval($request->getDataGET('offset'), 10) : 0;
+        $title = '';
+        
+        if ($request->existInGET('firstDay')) {//selection des operations faite dans une semaine
+            $firstDay = new \DateTime($request->getDataGET('firstDay'));
+            $lastDay = new \DateTime($request->getDataGET('lastDay'));
+            $week = intval($request->getDataGET('week'), 10);
+            $month = new Month(intval($firstDay->format('m'), 10), intval($firstDay->format('Y'), 10));
+            $month->addSelectedWeek($week);
+            $title = 'Commands of '.($week+1).'<sup>th</sup> week, of '.$month;
+        } else if($request->existInGET('month')){//selection des commandes faites dans un mois
+            $monthIndex = intval($request->getDataGET('month'), 10);
+            if($monthIndex > 12){
+                $response->sendError();
+            }
+            $yearIndex = intval($request->getDataGET('year'), 10);
+            $month = new Month($monthIndex, $yearIndex);
+            $title = 'Commands of '.$month;
+        } else  {//selection des operations faite en une date
+            $date = new \DateTime($request->getDataGET('date'));
+            $month = new Month(intval($date->format('m'), 10), intval($date->format('Y'), 10));
+            $month->addSelectedDate($date);
+            $title = 'Commands of '.$date->format('d').' '.$month;
         }
         
-        $request->addAttribute(self::ATT_PRODUCTS, $products);
+        $year = new Year($month->getYear());
+        $year->addSelectedMonth($month->getMonth());
+        
+        $request->addAttribute(self::ATT_YEAR, $year);
+        $request->addAttribute(self::ATT_MONTH, $month);
+        $request->addAttribute('title', $title);
     }
     
     /**
@@ -88,6 +129,28 @@ class ProductsController extends HTTPController
      * @param Response $response
      */
     public function executeProducts (Request $request, Response $response) : void{
+        $request->addAttribute(self::ATT_ACTIVE_MENU, self::ITEM_MENU_PRODUCTS);
+        if ($this->productDAOManager->checkVailableByOffice($this->office->getId())) {
+            /**
+             * @var Product[] $products
+             */
+            $products = $this->productDAOManager->findVailableByOffice($this->office->getId());
+        } else {
+            $products = [];
+        }
+        
+        foreach ($products as $product) {
+            $product->setStocks($this->auxiliaryStockDAOManager->findByProductInOffice($product->getId(), $this->office->getId(), false));
+        }
+        
+        $request->addAttribute(self::ATT_PRODUCTS, $products);
+    }
+    
+    /**
+     * @param Request $request
+     * @param Response $response
+     */
+    public function executeCommand (Request $request, Response $response) : void {
         
     }
 }

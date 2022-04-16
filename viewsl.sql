@@ -38,6 +38,8 @@ CREATE OR REPLACE VIEW V_AuxiliaryStock AS
         AuxiliaryStock.quantity AS quantity,
         AuxiliaryStock.parent AS parent,
         AuxiliaryStock.office AS office,
+        (SELECT Stock.expiryDate FROM Stock WHERE Stock.id = AuxiliaryStock.parent) AS expiryDate,
+        (SELECT Stock.manufacturingDate FROM Stock WHERE Stock.id = AuxiliaryStock.parent) AS manufacturingDate,
         (SELECT Stock.product FROM Stock WHERE Stock.id = AuxiliaryStock.parent) AS product, 
         (SELECT SUM(ProductOrdered.quantity) FROM ProductOrdered WHERE ProductOrdered.stock = AuxiliaryStock.id) AS served 
     FROM AuxiliaryStock;

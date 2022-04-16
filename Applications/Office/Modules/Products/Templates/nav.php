@@ -36,14 +36,14 @@ use Applications\Office\Modules\Products\ProductsController;
 	        	</li>
 	        	
 	        	<li class="<?php echo (isset($_REQUEST[ProductsController::ATT_ACTIVE_MENU]) && $_REQUEST[ProductsController::ATT_ACTIVE_MENU] == ProductsController::ITEM_MENU_PRODUCTS)? "active" : ""; ?>">
-	        		<a href="/office/products/table/">
+	        		<a href="/office/products/vailable/">
             			<span class="fa fa-leaf"></span> Products
             		</a>
 	        	</li>
 	        	
 	        	<li class="<?php echo (isset($_REQUEST[ProductsController::ATT_ACTIVE_MENU]) && $_REQUEST[ProductsController::ATT_ACTIVE_MENU] == ProductsController::ITEM_MENU_STOCKS)? "active" : ""; ?>">
-	        		<a href="/office/vente/">
-            			<span class="fa fa-database"></span> Vente
+	        		<a href="/office/product/command/">
+            			<span class="icon_folder-add_alt"></span> Command
             		</a>
 	        	</li>
 			</ul>
