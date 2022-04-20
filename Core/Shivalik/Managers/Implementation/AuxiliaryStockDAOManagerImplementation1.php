@@ -21,7 +21,7 @@ class AuxiliaryStockDAOManagerImplementation1 extends StockDAOManagerImplementat
      */
     public function load($stock): Stock {
         $data = ($stock instanceof AuxiliaryStock) ? $stock : $this->findById(intval($stock, 10), true);
-        $data->setParent($this->getDaoManager()->getManagerOf(Stock::class)->findById($data->getParent()->getId()));
+        $data->setParent($this->getDaoManager()->getManagerOf(Stock::class)->findById($data->getParent()->getId(), true));
         
         return $data;
     }

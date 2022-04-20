@@ -1,18 +1,21 @@
 <?php
 namespace Applications\Office\Modules\Products;
 
-use PHPBackend\Http\HTTPController;
+use Core\Shivalik\Entities\Command;
 use Core\Shivalik\Entities\Office;
 use Core\Shivalik\Filters\SessionOfficeFilter;
-use PHPBackend\Request;
-use PHPBackend\Response;
-use Core\Shivalik\Managers\ProductDAOManager;
+use Core\Shivalik\Managers\AuxiliaryStockDAOManager;
 use Core\Shivalik\Managers\CategoryDAOManager;
 use Core\Shivalik\Managers\CommandDAOManager;
+use Core\Shivalik\Managers\ProductDAOManager;
+use Core\Shivalik\Validators\MemberFormValidator;
+use Core\Shivalik\Validators\ProductOrderedFormValidator;
+use PHPBackend\Request;
+use PHPBackend\Response;
 use PHPBackend\Calendar\Month;
 use PHPBackend\Calendar\Year;
+use PHPBackend\Http\HTTPController;
 use Core\Shivalik\Entities\Product;
-use Core\Shivalik\Managers\AuxiliaryStockDAOManager;
 
 /**
  *
@@ -39,8 +42,11 @@ class ProductsController extends HTTPController
     const ITEM_MENU_DASHBOARD = 'ITEM_MENU_DASBOARD';
     const ITEM_MENU_PRODUCTS = 'ITEM_MENU_PRODUCT';
     const ITEM_MENU_STOCKS = 'ITEM_MENU_STOCK';
-    const ITEM_MENU_OTHER_OPTERATIONS = 'ITEM_MENU_OTHER_OPERATIONS';
+    const ITEM_MENU_COMMAND = 'ITEM_MENU_COMMAND';
     const ITEM_MENU_ADD_PRODUCT = 'ITEM_MENU_ADD_PRODUCT';
+    
+    const ATT_COMMAND = 'command';
+    const ATT_MEMBER = 'member';
     
     /**
      * @var ProductDAOManager
@@ -147,11 +153,103 @@ class ProductsController extends HTTPController
     }
     
     /**
+     * Pour effectuer une commande
      * @param Request $request
      * @param Response $response
      */
     public function executeCommand (Request $request, Response $response) : void {
+        if(!$request->getSession()->hasAttribute(self::ATT_COMMAND)) {
+            $response->sendRedirect("/office/products/command/member.html");
+        }
+        
+        $request->addAttribute(self::ATT_ACTIVE_MENU, self::ITEM_MENU_COMMAND);
+    }
+    
+    /**
+     * Pour annuler la commande encours
+     * @param Request $request
+     * @param Response $response
+     */
+    public function executeCancelCommand (Request $request, Response $response) : void {
+        $request->getSession()->removeAttribute(self::ATT_COMMAND);
+        $response->sendRedirect("/office/products/");
+    }
+    
+    
+    /**
+     * Validation definitive de la commande
+     * @param Request $request
+     * @param Response $response
+     */
+    public function executeValidateCommand (Request $request, Response $response) : void{
         
     }
+    
+    /**
+     * Selection du membre qui doit effectuer la commande
+     * @param Request $request
+     * @param Response $response
+     */
+    public function executeMemberCommand (Request $request, Response $response) : void {
+        if($request->getMethod() == Request::HTTP_POST) {
+            $form = new MemberFormValidator($this->getDaoManager());
+            $member = $form->searchByIdAfterValidation($request);
+            
+            if(!$form->hasError()) {
+                $command = $request->getSession()->getAttribute(self::ATT_COMMAND);
+                
+                if($command == null) {
+                    $command = new Command();
+                    $command->setOffice($this->office);
+                }
+                
+                $command->setMember($member);
+                if(!$request->getSession()->hasAttribute(self::ATT_COMMAND)) {
+                    $request->getSession()->addAttribute(self::ATT_COMMAND, $command);
+                }
+                
+                $response->sendRedirect("/office/products/command/product.html");
+            }
+            
+            $request->addAttribute(self::ATT_MEMBER, $member);
+        }
+        
+        $request->addAttribute(self::ATT_ACTIVE_MENU, self::ITEM_MENU_COMMAND);
+    }
+    
+    /**
+     * Selection de produits pour une commande
+     * @param Request $request
+     * @param Response $response
+     */
+    public function executeProductCommand (Request $request, Response $response) : void {
+        if (!$this->auxiliaryStockDAOManager->checkByOffice($this->office->getId(), false)) {
+            $response->sendRedirect("/office/products/");
+        }
+        
+        /**
+         * @var Command $command
+         */
+        $command = $request->getSession()->getAttribute(self::ATT_COMMAND);
+        
+        if($request->getMethod() == Request::HTTP_POST) {
+            $form = new ProductOrderedFormValidator($this->getDaoManager());
+            $products = $form->prepareCommand($request);
+            
+            if(!$form->hasError()) {
+                $command->setProducts($products);
+                $response->sendRedirect("/office/products/command/");
+            }
+            
+            $form->includeFeedback($request);
+        }
+        
+        $stocks = $this->auxiliaryStockDAOManager->loadByOffice($this->office->getId(), false);
+        $request->addAttribute(self::ATT_STOCKS, $stocks);
+        
+        
+        $request->addAttribute(self::ATT_ACTIVE_MENU, self::ITEM_MENU_COMMAND);
+    }
+    
 }
 

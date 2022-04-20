@@ -148,14 +148,12 @@ class HTTPPage implements Page
      */
     public function getGeneratedPDF () : string{
         $vue = $this->viewFile.'.pdf.php';
-        $layout = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.$this->getApplication()->getContainer().DIRECTORY_SEPARATOR.$this->getApplication()->getName().DIRECTORY_SEPARATOR.'Templates'.DIRECTORY_SEPARATOR.'layout.pdf.php';
+        $layout = dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR.$this->getApplication()->getContainer().DIRECTORY_SEPARATOR.$this->getApplication()->getName().DIRECTORY_SEPARATOR.'Templates'.DIRECTORY_SEPARATOR.'layout.pdf.php';
         $defaultLayout = dirname(__DIR__).DIRECTORY_SEPARATOR."DefaultLayouts".DIRECTORY_SEPARATOR."layout.pdf.php";
         
         if (!file_exists($vue)) {
             throw new PHPBackendException('La vue spécifique a la geration du PDF n\'existe pas. -> "'.$vue.'"', 500);
         }
-        
-        $_REQUEST = array_merge($_REQUEST, $this->attributes);
         
         ob_start();
         require_once $vue;

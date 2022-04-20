@@ -43,7 +43,7 @@ class StockDAOManagerImplementation1 extends DefaultDAOInterface implements Stoc
      */
     public function findById ($id, bool $forward = true) {
         $stock = parent::findById($id, $forward);
-        if ($forward && $stock instanceof Stock) {
+        if ($forward) {
             $stock->setProduct($this->getDaoManager()->getManagerOf(Product::class)->findById($stock->product->id, false));
         }
         return $stock;

@@ -27,7 +27,7 @@ class ProductOrdered extends DBEntity
     private $command;
     
     /**
-     * @var Stock
+     * @var AuxiliaryStock
      */
     private $stock;
     
@@ -64,7 +64,7 @@ class ProductOrdered extends DBEntity
     /**
      * @return \Core\Shivalik\Entities\Stock
      */
-    public function getStock() : ?Stock
+    public function getStock() : ?AuxiliaryStock
     {
         return $this->stock;
     }
@@ -106,14 +106,14 @@ class ProductOrdered extends DBEntity
     }
 
     /**
-     * @param \Core\Shivalik\Entities\Stock $stock
+     * @param \Core\Shivalik\Entities\AuxiliaryStock $stock
      */
     public function setStock($stock) : void
     {
-        if ($stock  === null || $stock instanceof Stock) {
+        if ($stock  === null || $stock instanceof AuxiliaryStock) {
             $this->stock = $stock;
         } elseif (self::isInt($stock)) {
-            $this->stock = new Stock(['id' => $stock]);
+            $this->stock = new AuxiliaryStock(['id' => $stock]);
         } else {
             throw new PHPBackendException("invalide value in setStock () : void method parameter");
         }
@@ -125,6 +125,17 @@ class ProductOrdered extends DBEntity
     public function getQuantity()
     {
         return $this->quantity;
+    }
+    
+    /**
+     * Renvoie le montant a payer pour cette commande
+     * @return float
+     */
+    public function getAmount () : float {
+        if ($this->quantity != null && $this->stock != null && $this->stock->getQuantity() != null) {
+            return $this->quantity *  $this->stock->getUnitPrice();
+        }
+        return 0;
     }
 
     /**

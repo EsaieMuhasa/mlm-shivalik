@@ -172,6 +172,13 @@ abstract class User extends DBEntity implements Notifiable
     {
         return $this->photo;
     }
+    
+    public function getAbsolutPhoto () : ?string {
+        if ($this->photo != null) {
+            return $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.'Web'.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.$this->photo;
+        }
+        return $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.'Web'.DIRECTORY_SEPARATOR.'img'.DIRECTORY_SEPARATOR.'user.png';
+    }
 
     /**
      * @param string $name

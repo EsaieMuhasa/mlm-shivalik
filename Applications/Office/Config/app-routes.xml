@@ -49,5 +49,11 @@
 		<!-- // -->
 		
 		<route action="products" urlPattern="/office/products/vailable/"/>
+		
+		<route action="command" urlPattern="/office/products/command/"/>
+		<route action="command" urlPattern="/office/products/command/pdf\.pdf"/>
+		<route action="cancelCommand" urlPattern="/office/products/command/cancel\.html"/>
+		<route action="memberCommand" urlPattern="/office/products/command/member\.html"/>
+		<route action="productCommand" urlPattern="/office/products/command/product\.html"/>
 	</module>
 </app-routes>

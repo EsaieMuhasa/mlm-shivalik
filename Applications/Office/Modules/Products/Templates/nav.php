@@ -41,8 +41,8 @@ use Applications\Office\Modules\Products\ProductsController;
             		</a>
 	        	</li>
 	        	
-	        	<li class="<?php echo (isset($_REQUEST[ProductsController::ATT_ACTIVE_MENU]) && $_REQUEST[ProductsController::ATT_ACTIVE_MENU] == ProductsController::ITEM_MENU_STOCKS)? "active" : ""; ?>">
-	        		<a href="/office/product/command/">
+	        	<li class="<?php echo (isset($_REQUEST[ProductsController::ATT_ACTIVE_MENU]) && $_REQUEST[ProductsController::ATT_ACTIVE_MENU] == ProductsController::ITEM_MENU_COMMAND)? "active" : ""; ?>">
+	        		<a href="/office/products/command/">
             			<span class="icon_folder-add_alt"></span> Command
             		</a>
 	        	</li>
