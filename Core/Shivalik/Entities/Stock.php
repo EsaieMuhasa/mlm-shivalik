@@ -222,7 +222,7 @@ class Stock extends DBEntity
      * @return float
      */
     public function getSoldToPercent () : float {
-        return $this->getSold() * 100 / $this->getQuantity();
+        return round($this->getSold() * 100 / $this->getQuantity(), 2, PHP_ROUND_HALF_DOWN);
     }
     
     /**

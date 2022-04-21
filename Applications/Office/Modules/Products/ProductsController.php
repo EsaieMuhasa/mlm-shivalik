@@ -16,6 +16,9 @@ use PHPBackend\Calendar\Month;
 use PHPBackend\Calendar\Year;
 use PHPBackend\Http\HTTPController;
 use Core\Shivalik\Entities\Product;
+use PHPBackend\Dao\DAOException;
+use PHPBackend\ToastMessage;
+use Core\Shivalik\Managers\ProductOrderedDAOManager;
 
 /**
  *
@@ -46,12 +49,18 @@ class ProductsController extends HTTPController
     const ITEM_MENU_ADD_PRODUCT = 'ITEM_MENU_ADD_PRODUCT';
     
     const ATT_COMMAND = 'command';
+    const ATT_COMMANDS = 'commands';
     const ATT_MEMBER = 'member';
     
     /**
      * @var ProductDAOManager
      */
     private $productDAOManager;
+    
+    /**
+     * @var ProductOrderedDAOManager
+     */
+    private $productOrderedDAOManager;
     
     /**
      * @var CategoryDAOManager
@@ -114,16 +123,33 @@ class ProductsController extends HTTPController
             $yearIndex = intval($request->getDataGET('year'), 10);
             $month = new Month($monthIndex, $yearIndex);
             $title = 'Commands of '.$month;
+            $firstDay = $month->getFirstDay();
+            $lastDay = $month->getLastDay();
         } else  {//selection des operations faite en une date
             $date = new \DateTime($request->getDataGET('date'));
             $month = new Month(intval($date->format('m'), 10), intval($date->format('Y'), 10));
             $month->addSelectedDate($date);
             $title = 'Commands of '.$date->format('d').' '.$month;
+            $firstDay = $date;
+            $lastDay = $date;
         }
         
         $year = new Year($month->getYear());
         $year->addSelectedMonth($month->getMonth());
         
+        if ($this->commandDAOManager->checkByOfficeAtDate($this->office->getId(), $firstDay, $lastDay, null, $limit, $offset)) {
+            /**
+             * @var Command[] $commands
+             */
+            $commands = $this->commandDAOManager->findByOfficeAtDate($this->office->getId(), $firstDay, $lastDay, null, $limit, $offset);
+            foreach ($commands as $command) {
+                $command->setProducts($this->productOrderedDAOManager->findByCommand($command->getId()));
+            }
+        } else {
+            $commands = [];
+        }
+        
+        $request->addAttribute(self::ATT_COMMANDS, $commands);
         $request->addAttribute(self::ATT_YEAR, $year);
         $request->addAttribute(self::ATT_MONTH, $month);
         $request->addAttribute('title', $title);
@@ -182,7 +208,24 @@ class ProductsController extends HTTPController
      * @param Response $response
      */
     public function executeValidateCommand (Request $request, Response $response) : void{
+        if ($request->getSession()->hasAttribute(self::ATT_COMMAND)) {
+            $title = "";
+            $command = $request->getSession()->getAttribute(self::ATT_COMMAND);
+            try {
+                $this->commandDAOManager->create($command);
+                $request->getSession()->removeAttribute(self::ATT_COMMAND);
+                $message = "command save successfully\nBy {$command->getMember()->getNames()}";
+                $title = 'Registration Success';
+                $request->addToast(new ToastMessage($title, $message, ToastMessage::MESSAGE_SUCCESS));
+                $response->sendRedirect("/office/products/");
+            } catch (DAOException $e) {
+                $title = 'An error occurred while executing the request';
+                $message = "{$e->getMessage()}";
+                $request->addToast(new ToastMessage($title, $message, ToastMessage::MESSAGE_ERROR));
+            }
+        } 
         
+        $response->sendRedirect("/office/products/command/");
     }
     
     /**

@@ -98,7 +98,7 @@ class ProductOrdered extends DBEntity
     {
         if ($command === null || $command instanceof Command) {
             $this->command = $command;
-        } elseif (condition) {
+        } elseif (self::isInt($command)) {
             $this->command = new Command(['id' => $command]);
         } else {
             throw new PHPBackendException("invalide value in setCommand () : void method parameter");

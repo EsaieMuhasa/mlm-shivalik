@@ -4,6 +4,7 @@ use Applications\Office\Modules\Products\ProductsController;
 use PHPBackend\Calendar\Month;
 use PHPBackend\Request;
 use PHPBackend\AppConfig;
+use Core\Shivalik\Entities\Command;
 
 /**
  * @var Month $month
@@ -18,6 +19,11 @@ $year = $_REQUEST[ProductsController::ATT_YEAR];
  * @var AppConfig $config
  */
 $config = $_REQUEST[Request::ATT_APP_CONFIG];
+
+/**
+ * @var Command[] $commands
+ */
+$commands = $_REQUEST[ProductsController::ATT_COMMANDS];
 ?>
 
 <h2><?php echo ($_REQUEST['title']); ?></h2>
@@ -120,11 +126,58 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
     		</div>
     		<div class="col-lg-12 col-md-12 col-sm-6 col-xs-12">
     			<div class="info-box blue-bg">
-		            <i class="fa fa-tags"></i>
-		            <div class="count"><?php echo "0 PV"; ?></div>
-		            <div class="title">Point value</div>
+		            <i class="fa fa-comment"></i>
+		            <div class="count"><?php echo count($commands); ?></div>
+		            <div class="title">command count</div>
 		        </div>
     		</div>
     	</div>
     </div>
+</div>
+
+<div class="">
+	<?php foreach ($commands as $command) : ?>
+    <div class="thumbnail">
+    	<div class="row">
+    		<div class="col-lg-1 col-md-1 col-sm-2 col-xs-3">
+    			<img class="thumbnail" alt="<?php echo htmlspecialchars($command->getMember()->getNames()); ?>" src="/<?php echo $command->getMember()->getPhoto(); ?>">
+    		</div>
+    		<div class="col-lg-6 col-md-6 col-sm-8 col-xs-7">
+    			<h4 class="text-primary"><?php echo htmlspecialchars($command->getMember()->getMatricule()); ?></h4>
+    			<p><?php echo htmlspecialchars($command->getMember()->getNames()); ?></p>
+    		</div>
+    	</div><div style="border-bottom: 1px solid #010101;"></div>
+    	
+    	<table class="table table-bordered">
+    		<thead>
+    			<tr>
+    				<th>N°</th>
+    				<th>Product</th>
+    				<th>Quantity</th>
+    				<th>Unit price</th>
+    				<th>Total</th>
+    			</tr>
+    		</thead>
+    		<tbody>
+    			<?php foreach ($command->getProducts() as $key => $product) : ?>
+    			<tr>
+    				<td><?php echo $key+1; ?></td>
+    				<td><?php echo htmlspecialchars($product->product->name); ?></td>
+    				<td><?php echo htmlspecialchars($product->quantity); ?></td>
+    				<td><?php echo htmlspecialchars("{$product->stock->unitPrice} {$config->get('devise')}"); ?></td>
+    				<td><?php echo htmlspecialchars("{$product->amount} {$config->get('devise')}"); ?></td>
+    			</tr>
+    			<?php endforeach; ?>
+    		</tbody>
+    		<tfoot>
+    			<tr>
+        			<th colspan="2">Total</th>
+        			<th><?php echo ($command->getTotalQuantity()); ?></th>
+        			<th><?php echo ("{$command->getTotalUnitPrice()} {$config->get('devise')}"); ?></th>
+        			<th class="info text-primary"><?php echo ("{$command->getAmount()} {$config->get('devise')}"); ?></th>
+    			</tr>
+    		</tfoot>
+    	</table>
+    </div>
+	<?php endforeach; ?>
 </div>

@@ -133,7 +133,6 @@ class ProductOrderedFormValidator extends DefaultFormValidator {
         } catch (IllegalFormValueException $e) {
             $this->addError(self::FIELD_QUANTITY.$stock, $e->getMessage());
         }
-        
         $order->setQuantity($quantity);
         return $order;
     }
@@ -166,9 +165,12 @@ class ProductOrderedFormValidator extends DefaultFormValidator {
         $command = $request->getSession()->getAttribute(ProductsController::ATT_COMMAND);
         
         if ($stocks != null && !empty($stocks)) {
+            $now = new \DateTime();
             foreach ($stocks as $stock) {
                 $quantity = intval($request->getDataPOST(self::FIELD_QUANTITY.$stock), 10);
-                $orders[] = $this->validationCommand($quantity, $stock, $command);
+                $order = $this->validationCommand($quantity, $stock, $command);
+                $order->setDateAjout($now);
+                $orders[] = $order;
             }
         } else {
             $this->setMessage("tick among the products offered to you");

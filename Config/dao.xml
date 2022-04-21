@@ -106,6 +106,21 @@
 			name="\Core\Shivalik\Entities\AuxiliaryStock" 
 			specification="\Core\Shivalik\Managers\AuxiliaryStockDAOManager" 
 			implementation="\Core\Shivalik\Managers\Implementation\AuxiliaryStockDAOManagerImplementation1"/>
+		
+		<entity 
+			name="\Core\Shivalik\Entities\Command" 
+			specification="\Core\Shivalik\Managers\CommandDAOManager" 
+			implementation="\Core\Shivalik\Managers\Implementation\CommandDAOManagerImplementation1"/>
+			
+		<entity 
+			name="\Core\Shivalik\Entities\ProductOrdered" 
+			specification="\Core\Shivalik\Managers\ProductOrderedDAOManager" 
+			implementation="\Core\Shivalik\Managers\Implementation\ProductOrderedDAOManagerImplementation1"/>
+			
+		<entity 
+			name="\Core\Shivalik\Entities\PurchaseBonus" 
+			specification="\Core\Shivalik\Managers\PurchaseBonusDAOManager" 
+			implementation="\Core\Shivalik\Managers\Implementation\PurchaseBonusDAOManagerImplementation1"/>
 			
 		<entity 
 			name="\Core\Shivalik\Entities\Notification" 

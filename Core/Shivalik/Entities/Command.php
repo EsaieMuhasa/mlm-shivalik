@@ -137,16 +137,19 @@ class Command extends DBEntity
     }
     
     /**
-     * @return multitype:\Core\Shivalik\Entities\ProductOrdered 
+     * @return \Core\Shivalik\Entities\ProductOrdered []
      */
     public function getProducts() {
         return $this->products;
     }
 
     /**
-     * @param multitype:\Core\Shivalik\Entities\ProductOrdered  $products
+     * @param \Core\Shivalik\Entities\ProductOrdered[]  $products
      */
-    public function setProducts($products) {
+    public function setProducts(array $products) : void {
+        foreach ($products as $product) {
+            $product->setCommand($this);
+        }
         $this->products = $products;
     }
     

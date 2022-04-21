@@ -62,7 +62,7 @@ class AuxiliaryStockDAOManagerImplementation1 extends StockDAOManagerImplementat
         $return = false;
         try {
             $SQL = "SELECT * FROM {$this->getViewName()} WHERE office =:office";
-            $SQL .= ($empty !== null? ' AND (served'.($empty? " = quantity" : " = quantity OR served IS NULL ").')' : (''));
+            $SQL .= ($empty !== null? ' AND (served'.($empty? " = quantity" : " != quantity OR served IS NULL ").')' : (''));
             $SQL_LIMIT = $limit !== null? "LIMIT {$limit} OFFSET {$offset}":'';
             
             $statement = UtilitaireSQL::prepareStatement($this->getConnection(), "{$SQL} {$SQL_LIMIT}", ['office' => $officeId]);
@@ -84,7 +84,7 @@ class AuxiliaryStockDAOManagerImplementation1 extends StockDAOManagerImplementat
         $return = false;
         try {
             $SQL = "SELECT * FROM {$this->getViewName()} WHERE office =:office AND product =:product ";
-            $SQL .= ($empty !== null? ' AND (served'.($empty? " = quantity" : " = quantity OR served IS NULL ").')' : (''));
+            $SQL .= ($empty !== null? ' AND (served'.($empty? " = quantity" : " != quantity OR served IS NULL ").')' : (''));
             $SQL_LIMIT = $limit !== null? "LIMIT {$limit} OFFSET {$offset}":'';
             
             $statement = UtilitaireSQL::prepareStatement($this->getConnection(), "{$SQL} {$SQL_LIMIT}", ['office' => $officeId, 'product' => $productId]);
@@ -106,7 +106,7 @@ class AuxiliaryStockDAOManagerImplementation1 extends StockDAOManagerImplementat
         $count = 0;
         try {
             $SQL = "SELECT COUNT(*) AS nombre FROM {$this->getViewName()} WHERE office =:office";
-            $SQL .= ($empty !== null? ' AND (served'.($empty? " = quantity" : " = quantity OR served IS NULL ").')' : (''));
+            $SQL .= ($empty !== null? ' AND (served'.($empty? " = quantity" : " != quantity OR served IS NULL ").')' : (''));
             $statement = UtilitaireSQL::prepareStatement($this->getConnection(), $SQL, ['office' => $officeId]);
             if ($row = $statement->fetch()) {
                 $count =$row['nombre'];
@@ -126,7 +126,7 @@ class AuxiliaryStockDAOManagerImplementation1 extends StockDAOManagerImplementat
         $count = 0;
         try {
             $SQL = "SELECT COUNT(*) AS nombre FROM {$this->getViewName()} WHERE office =:office AND product =:product ";
-            $SQL .= ($empty !== null? ' AND (served'.($empty? " = quantity" : " = quantity OR served IS NULL ").')' : (''));
+            $SQL .= ($empty !== null? ' AND (served'.($empty? " = quantity" : " != quantity OR served IS NULL ").')' : (''));
             $statement = UtilitaireSQL::prepareStatement($this->getConnection(), $SQL, ['office' => $officeId, 'product' => $productId]);
             if ($row = $statement->fetch()) {
                 $count = $row['nombre'];
@@ -146,7 +146,7 @@ class AuxiliaryStockDAOManagerImplementation1 extends StockDAOManagerImplementat
         $data = [];
         try {
             $SQL = "SELECT * FROM {$this->getViewName()} WHERE office =:office";
-            $SQL .= ($empty !== null? ' AND (served'.($empty? " = quantity" : " = quantity OR served IS NULL ").')' : (''))." ORDER BY product, dateAjout DESC";
+            $SQL .= ($empty !== null? ' AND (served'.($empty? " = quantity" : " != quantity OR served IS NULL ").')' : (''))." ORDER BY product, dateAjout DESC";
             $SQL_LIMIT = $limit !== null? "LIMIT {$limit} OFFSET {$offset}":'';
             
             $statement = UtilitaireSQL::prepareStatement($this->getConnection(), "{$SQL} {$SQL_LIMIT}", ['office' => $officeId]);
@@ -172,7 +172,7 @@ class AuxiliaryStockDAOManagerImplementation1 extends StockDAOManagerImplementat
         $data = [];
         try {
             $SQL = "SELECT * FROM {$this->getViewName()} WHERE office =:office AND product =:product ";
-            $SQL .= ($empty !== null? ' AND (served'.($empty? " = quantity" : " = quantity OR served IS NULL ").')' : (''));
+            $SQL .= ($empty !== null? ' AND (served'.($empty? " = quantity" : " != quantity OR served IS NULL ").')' : (''));
             $SQL_LIMIT = $limit !== null? "LIMIT {$limit} OFFSET {$offset}":'';
             
             $statement = UtilitaireSQL::prepareStatement($this->getConnection(), "{$SQL} {$SQL_LIMIT}", ['office' => $officeId, 'product' => $productId]);
@@ -255,8 +255,8 @@ class AuxiliaryStockDAOManagerImplementation1 extends StockDAOManagerImplementat
                     $stock->setParent($parent);
                     $data[] = $stock;
                 }
-                $statement->closeCursor();
             }
+            $statement->closeCursor();
             
             if (empty($data)) {
                 throw new DAOException("No data matched at this selection query");
