@@ -10,7 +10,6 @@ use Core\Shivalik\Managers\GradeMemberDAOManager;
 use Core\Shivalik\Validators\GradeMemberFormValidator;
 use Core\Shivalik\Validators\LocalisationFormValidator;
 use Core\Shivalik\Validators\MemberFormValidator;
-use PHPBackend\Application;
 use PHPBackend\Request;
 use PHPBackend\Response;
 use PHPBackend\ToastMessage;
@@ -69,19 +68,32 @@ class MembersController extends AdminController
      */
     private $gradeMemberDAOManager;
     
-    
+    /**
+     * @var Member
+     */
+    private $member;//le compte du membre encours de consultation
+
     /**
      * {@inheritDoc}
-     * @see \Applications\Admin\AdminController::__construct()
+     * @see \PHPBackend\Http\HTTPController::init()
      */
-    public function __construct(Application $application, string $module, string $action)
-    {
-        parent::__construct($application, $module, $action);
+    protected function init(Request $request, Response $response): void {
+        parent::init($request, $response);
+        
+        if ($request->existInGET('id')) {
+            $id = intval($request->getDataGET('id'), 10);
+            if(!$this->memberDAOManager->checkById($id)){
+                $response->sendError();
+            }
+            $this->member = $this->memberDAOManager->findById($id);
+            $request->addAttribute(self::ATT_MEMBER, $this->member);
+        }
+        
         $nombre = $this->memberDAOManager->countAll();
-        $application->getRequest()->addAttribute(self::PARAM_MEMBER_COUNT, $nombre);
-        $application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, "Union members");
+        $request->addAttribute(self::PARAM_MEMBER_COUNT, $nombre);
+        $request->addAttribute(self::ATT_VIEW_TITLE, "Union members");
     }
-    
+
     /**
      * Pour effectuer une recherche dans la liste des membres du syndicat
      * la recherche s'effectuer sur:
@@ -190,35 +202,24 @@ class MembersController extends AdminController
      * @param Response $response
      */
     public function executeMember (Request $request, Response $response) : void {
-        $id = intval($request->getDataGET('id'), 10);
-        if (!$this->memberDAOManager->checkById($id)) {
-            $response->sendError();
-        }
-        
         $request->addAttribute(self::ATT_SELECTED_ITEM_MENU, self::ATT_ITEM_MENU_DASHBORAD);
         
-        /**
-         * @var Member $member
-         */
-        $member = $this->memberDAOManager->findById($id);
-        $member->setPacket($this->gradeMemberDAOManager->findCurrentByMember($member->getId()));
+        $this->member->setPacket($this->gradeMemberDAOManager->findCurrentByMember($this->member->getId()));
         
-        if ($this->gradeMemberDAOManager->checkCurrentByMember($member->getId())) {
-            $gradeMember = $this->gradeMemberDAOManager->findCurrentByMember($id);
-            $gradeMember->setMember($member);
+        if ($this->gradeMemberDAOManager->checkCurrentByMember($this->member->getId())) {
+            $gradeMember = $this->gradeMemberDAOManager->findCurrentByMember($this->member->getId());
+            $gradeMember->setMember($this->member);
 	        $request->addAttribute(self::ATT_GRADE_MEMBER, $gradeMember);
         }
         
-        if ($this->gradeMemberDAOManager->checkRequestedByMember($member->getId())) {
-            $requestedGradeMember = $this->gradeMemberDAOManager->findRequestedByMember($member->getId());
-            $requestedGradeMember->setMember($member);
+        if ($this->gradeMemberDAOManager->checkRequestedByMember($this->member->getId())) {
+            $requestedGradeMember = $this->gradeMemberDAOManager->findRequestedByMember($this->member->getId());
+            $requestedGradeMember->setMember($this->member);
             $request->addAttribute(self::ATT_REQUESTED_GRADE_MEMBER, $requestedGradeMember);
         }
         
-        $compte = $this->memberDAOManager->loadAccount($member);
-
+        $compte = $this->memberDAOManager->loadAccount($this->member);
         $request->addAttribute(self::ATT_COMPTE, $compte);
-        $request->addAttribute(self::ATT_MEMBER, $member);
     }
     
     /**
@@ -227,22 +228,13 @@ class MembersController extends AdminController
      * @param Response $response
      */
     public function executeUpdateMember (Request $request, Response $response) : void {
-        $id = intval($request->getDataGET('id'), 10);
-        if (!$this->memberDAOManager->checkById($id)) {
-            $response->sendError();
-        }
-        
-        /**
-         * @var Member $member
-         */
-        $member = $this->memberDAOManager->findById($id);
         
         if ($request->getMethod() == Request::HTTP_POST) {
         	$form = new MemberFormValidator($this->getDaoManager());
-        	$request->addAttribute($form::CHAMP_ID, $id);
+        	$request->addAttribute($form::CHAMP_ID, $this->member->getId());
         	$member = $form->updateAfterValidation($request);
         	if (!$form->hasError()) {
-        		$response->sendRedirect("/admin/members/{$id}/");
+        		$response->sendRedirect("/admin/members/{$this->member->getId()}/");
         	}
         	$form->includeFeedback($request);
         	$request->addAttribute($form::MEMBER_FEEDBACK, $form->toFeedback());
@@ -259,36 +251,22 @@ class MembersController extends AdminController
      * @param Response $response
      */
     public function executeResetPassword (Request $request, Response $response) : void {
-    	$id = intval($request->getDataGET('id'), 10);
-    	if (!$this->memberDAOManager->checkById($id)) {
-    		$response->sendError();
-    	}
-    	
-    	/**
-    	 * @var Member $member
-    	 */
-    	$member = $this->memberDAOManager->findById($id);
     	
     	if ($request->getMethod() == Request::HTTP_POST) {
-    		$id = intval($request->getDataGET('id'), 10);
     		
     		$form = new MemberFormValidator($this->getDaoManager());
-    		$request->addAttribute($form::CHAMP_ID, $id);
+    		$request->addAttribute($form::CHAMP_ID, $this->member->getId());
     		$form->resetPasswordAfterValidation($request);
     		
     		if (!$form->hasError()) {
-    			$response->sendRedirect("/admin/members/{$id}/");
+    			$response->sendRedirect("/admin/members/{$this->member->getId()}/");
     		}
     		
     		$form->includeFeedback($request);
     	}
     	
-    	$compte = $this->memberDAOManager->loadAccount($member);
-    	
-    	
-    	
+    	$compte = $this->memberDAOManager->loadAccount($this->member);
     	$request->addAttribute(self::ATT_COMPTE, $compte);
-    	$request->addAttribute(self::ATT_MEMBER, $member);
     }
     
     /**
@@ -296,55 +274,39 @@ class MembersController extends AdminController
      * @param Response $response
      */
     public function executeDownlines (Request $request, Response $response) : void {
-        
-        $id = intval($request->getDataGET('id'), 10);
-        if (!$this->memberDAOManager->checkById($id)) {
-            $response->sendError();
-        }
-        
-        $request->addAttribute(self::ATT_SELECTED_ITEM_MENU, self::ATT_ITEM_MENU_DOWNLINES);
-        
-        /**
-         * @var Member $member
-         */
-        $member = $this->memberDAOManager->findById($id);
-        
+        $request->addAttribute(self::ATT_SELECTED_ITEM_MENU, self::ATT_ITEM_MENU_DOWNLINES);        
         
         if ($request->existInGET('foot')) {
             //chargement des downlines
             switch ($request->getDataGET('foot')){
                 case 'left' : {//left
-                    $members = $this->memberDAOManager->findLeftDownlinesChilds($member->getId());
+                    $members = $this->memberDAOManager->findLeftDownlinesChilds($this->member->getId());
                 }break;
                 
                 case 'middle' : {//middle
-                    $members = $this->memberDAOManager->findMiddleDownlinesChilds($member->getId());
+                    $members = $this->memberDAOManager->findMiddleDownlinesChilds($this->member->getId());
                 }break;
                 
                 case 'right' : {//right
-                    $members = $this->memberDAOManager->findRightDownlinesChilds($member->getId());
+                    $members = $this->memberDAOManager->findRightDownlinesChilds($this->member->getId());
                 }break;
                 
                 default : {//all Member
-                    $members = $this->memberDAOManager->findDownlinesChilds($member->getId());
+                    $members = $this->memberDAOManager->findDownlinesChilds($this->member->getId());
                 }
             }
             
             $request->addAttribute(self::ATT_MEMBERS, $members);
-            
         }else {
-            
             //comptage des downlines
-            $left = $this->memberDAOManager->countLeftChild($member->getId());
-            $middle = $this->memberDAOManager->countMiddleChild($member->getId());
-            $right = $this->memberDAOManager->countRightChild($member->getId());
+            $left = $this->memberDAOManager->countLeftChild($this->member->getId());
+            $middle = $this->memberDAOManager->countMiddleChild($this->member->getId());
+            $right = $this->memberDAOManager->countRightChild($this->member->getId());
             
             $request->addAttribute(self::LEFT_CHILDS, $left);
             $request->addAttribute(self::MIDDLE_CHILDS, $middle);
             $request->addAttribute(self::RIGHT_CHILDS, $right);
         }
-        
-        $request->addAttribute(self::ATT_MEMBER, $member);
         
         $account = $this->memberDAOManager->loadAccount($member);
         $request->addAttribute(self::ATT_COMPTE, $account);
@@ -355,19 +317,9 @@ class MembersController extends AdminController
      * @param Response $response
      */
     public function executeDownlinesHierarchy (Request $request, Response $response) : void {
-        
-        $id = intval($request->getDataGET('id'), 10);
-        if (!$this->memberDAOManager->checkById($id)) {
-            $response->sendError();
-        }
-        
         $request->addAttribute(self::ATT_SELECTED_ITEM_MENU, self::ATT_ITEM_MENU_DOWNLINES);
         
-        /**
-         * @var Member $member
-         */
-        $member = $this->memberDAOManager->findById($id);
-        
+        $member = $this->member;
         
         if ($request->existInGET('foot')) {
             //chargement des downlines
@@ -411,20 +363,10 @@ class MembersController extends AdminController
      * @param Response $response
      */
     public function executeTree (Request $request, Response $response) : void {
-        
-        $id = intval($request->getDataGET('id'), 10);
-        if (!$this->memberDAOManager->checkById($id)) {
-            $response->sendError();
-        }
-        
-        $response->sendRedirect("/admin/members/{$id}/");
-        
+        $response->sendRedirect("/admin/members/{$this->member->getId()}/");
         $request->addAttribute(self::ATT_SELECTED_ITEM_MENU, self::ATT_ITEM_MENU_DOWNLINES);
         
-        /**
-         * @var Member $member
-         */
-        $member = $this->memberDAOManager->findById($id);
+        $member = $this->member;
         
         
         if ($request->existInGET('foot')) {
@@ -471,17 +413,9 @@ class MembersController extends AdminController
      * @param Response $response
      */
     public function executeWithdrawalsMember (Request $request, Response $response) : void {
-        $id = intval($request->getDataGET('id'), 10);
-        if (!$this->memberDAOManager->checkById($id)) {
-            $response->sendError();
-        }
-        
         $request->addAttribute(self::ATT_SELECTED_ITEM_MENU, self::ATT_ITEM_MENU_WITHDRAWALS);
-        
-        /**
-         * @var Member $member
-         */
-        $member = $this->memberDAOManager->findById($id);
+
+        $member = $this->member;
         
         if ($request->existInGET('requestId')) {
             $this->withdrawalDAOManager->validate(intval($request->getDataGET('requestId')), $this->getConnectedAdmin()->getId());
@@ -489,7 +423,7 @@ class MembersController extends AdminController
         
         
         if ($this->gradeMemberDAOManager->checkCurrentByMember($member->getId())) {
-            $gradeMember = $this->gradeMemberDAOManager->findCurrentByMember($id);
+            $gradeMember = $this->gradeMemberDAOManager->findCurrentByMember($member->getId());
             $gradeMember->setMember($member);
             $request->addAttribute(self::ATT_GRADE_MEMBER, $gradeMember);
         }
@@ -504,7 +438,7 @@ class MembersController extends AdminController
         $compte = $this->memberDAOManager->loadAccount($member);
         
         if ($this->withdrawalDAOManager->checkByMember($member->getId())) {
-            $withdrawals = $this->withdrawalDAOManager->checkByMember($member->getId());
+            $withdrawals = $this->withdrawalDAOManager->findByMember($member->getId());
         }else {
             $withdrawals = array();
         }
@@ -523,23 +457,15 @@ class MembersController extends AdminController
      */
     public function executeStateMember (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Union members");
-        $id = intval($request->getDataGET('id'), 10);
-        if (!$this->memberDAOManager->checkById($id)) {
-            $response->sendError();
-        }
-        
         $state = ($request->getDataGET('state') == 'enable');
-        
-        /**
-         * @var Member $member
-         */
-        $member = $this->memberDAOManager->findById($id);
+
+        $member = $this->member;
         
         if ($state != $member->isEnable()) {
-            $this->memberDAOManager->updateState($id, $state);
+            $this->memberDAOManager->updateState($member->getId(), $state);
         }
         
-        $response->sendRedirect("/admin/members/{$id}/");
+        $response->sendRedirect("/admin/members/{$member->getId()}/");
         
     }
     
@@ -549,20 +475,13 @@ class MembersController extends AdminController
      * @param Response $response
      */
     public function executeUpgradeMember (Request $request, Response $response) : void {
-        $id = intval($request->getDataGET('id'), 10);
-        if (!$this->memberDAOManager->checkById($id)) {
-            $response->sendError();
+
+        if ($this->gradeMemberDAOManager->checkRequest($$this->member->getId())) {
+            $response->sendRedirect("/admin/members/{$this->member->getId()}/");
         }
-        
-        if ($this->gradeMemberDAOManager->checkRequest($id)) {
-            $response->sendRedirect("/admin/members/{$id}/");
-        }
-        
-        /**
-         * @var Member $member
-         */
-        $member = $this->memberDAOManager->findById($id);
-        $gradeMember = $this->gradeMemberDAOManager->findCurrentByMember($id);
+
+        $member = $this->member;
+        $gradeMember = $this->gradeMemberDAOManager->findCurrentByMember($member->getId());
         $gradeMember->setMember($member);
         
         if ($request->getMethod() == Request::HTTP_POST) {
@@ -572,14 +491,13 @@ class MembersController extends AdminController
             $gradeMember = $form->upgradeAfterValidation($request);
             
             if (!$form->hasError()) {
-                $response->sendRedirect("/admin/members/{$id}/");
+                $response->sendRedirect("/admin/members/{$member->getId()}/");
             }
             
             $request->addAttribute(self::ATT_GRADE_MEMBER, $gradeMember);
             $form->includeFeedback($request);
         }
-        
-        $request->addAttribute(self::ATT_MEMBER, $member);
+
         $request->addAttribute(self::ATT_GRADE_MEMBER, $gradeMember);
         $grades = $this->gradeDAOManager->findAll();
         $request->addAttribute(self::ATT_GRADES, $grades);
@@ -592,11 +510,9 @@ class MembersController extends AdminController
      * @param Response $response
      */
     public function executeCertifyMember (Request $request, Response $response) : void {
-        
-        $id = intval($request->getDataGET('id'), 10);
         $gmId = intval($request->getDataGET('idGradeMember'), 10);
         
-        if (!$this->memberDAOManager->checkById($id) || !$this->gradeMemberDAOManager->checkById($gmId)) {
+        if (!$this->gradeMemberDAOManager->checkById($gmId)) {
             $response->sendError();
         }
         
@@ -617,6 +533,26 @@ class MembersController extends AdminController
         
         $request->addToast($form->buildToastMessage());
         $response->sendRedirect("/admin/members/");
+    }
+    
+    
+    /**
+     * Visualisation des uplines du compte d'un membre
+     * @param Request $request
+     * @param Response $response
+     */
+    public function executeUplinesMember (Request $request, Response $response) : void {
+        
+        if(!$this->memberDAOManager->checkParent($this->member->getId()) || !$this->memberDAOManager->checkSponsor($this->member->getId())) {
+            $response->sendRedirect("/admin/members/{$this->member->getId()}/");
+        }
+        
+        $this->member->setSponsor($this->memberDAOManager->findById($this->member->getSponsor()->getId()));
+        $this->member->getSponsor()->setPacket($this->gradeMemberDAOManager->findCurrentByMember($this->member->getSponsor()->getId()));
+
+        $this->member->setParent($this->memberDAOManager->findById($this->member->getParent()->getId()));
+        $this->member->getParent()->setPacket($this->gradeMemberDAOManager->findCurrentByMember($this->member->getParent()->getId()));
+        
     }
 }
 

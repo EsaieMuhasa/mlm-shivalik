@@ -1,5 +1,4 @@
 <?php
-use Applications\Admin\AdminApplication;
 use Applications\Admin\Modules\Members\MembersController;
 use Core\Shivalik\Entities\Account;
 use Core\Shivalik\Entities\GradeMember;
@@ -7,6 +6,7 @@ use Core\Shivalik\Entities\Member;
 use Core\Shivalik\Entities\Withdrawal;
 use PHPBackend\Request;
 use PHPBackend\AppConfig;
+use Core\Shivalik\Filters\SessionAdminFilter;
 
 /**
  * @var Member $member
@@ -32,6 +32,8 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
  * @var Withdrawal[] $operations
  */
 $operations = $_REQUEST[MembersController::ATT_WITHDRAWALS];
+
+$admin = $_SESSION[SessionAdminFilter::ADMIN_CONNECTED_SESSION];
 ?>
 
 <div class="row">
@@ -70,7 +72,7 @@ $operations = $_REQUEST[MembersController::ATT_WITHDRAWALS];
 							</th>
     						
     						<td class="text-center">
-    							<?php if ($w->admin==null && AdminApplication::getConnectedUser()->getOffice()->getId() == $w->office->id) : ?>
+    							<?php if ($w->admin==null && $admin->getOffice()->getId() == $w->office->id) : ?>
     							<a class="btn btn-danger" href="<?php echo "/admin/members/{$member->getId()}/withdrawals/{$w->id}.html"; ?>">
     								<span class="glyphicon glyphicon-ok"></span> Accept
     							</a>

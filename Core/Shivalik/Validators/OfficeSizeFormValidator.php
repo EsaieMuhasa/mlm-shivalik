@@ -92,7 +92,7 @@ class OfficeSizeFormValidator extends DefaultFormValidator {
 				$os->setInitDate(new \DateTime());
 				$this->officeSizeDAOManager->create($os);
 				
-				$form->processingPhoto($office, $form->getPhoto(), true);
+				$form->processingPhoto($office, $form->getPhoto(), true, true, $request->getApplication()->getConfig());
 				$this->officeDAOManager->updatePhoto($office->getId(), $office->getPhoto());
 			} catch (DAOException $e) {
 				$this->setMessage($e->getMessage());
