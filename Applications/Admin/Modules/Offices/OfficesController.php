@@ -300,13 +300,21 @@ class OfficesController extends AdminController {
 			$response->sendRedirect("/admin/offices/{$this->office->getId()}/");
 		}
 		
+	}
+	
+	/**
+	 * Creation de l'administrateur de l'office
+	 * @param Request $request
+	 * @param Response $response
+	 */
+	public function executeCreateOfficeAdmin (Request $request, Response $response) : void {
 		if ($request->getMethod() == Request::HTTP_POST) {
 			$form = new OfficeAdminFormValidator($this->getDaoManager());
 			$request->addAttribute($form::FIELD_OFFICE, $this->office);
 			$admin = $form->createAfterValidation($request);
 			
 			if (!$form->hasError()){
-				$response->sendRedirect("/admin/offices/{$this->office->getId()}/");
+				$response->sendRedirect("/admin/offices/{$this->office->getId()}/admin.html");
 			}
 			
 			$form->includeFeedback($request);

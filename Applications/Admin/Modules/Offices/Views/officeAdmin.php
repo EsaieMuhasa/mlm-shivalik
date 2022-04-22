@@ -5,7 +5,7 @@ use Applications\Admin\Modules\Offices\OfficesController;
 
 
 <?php if (!isset($_REQUEST[OfficesController::ATT_OFFICE_ADMIN]) || $_REQUEST[OfficesController::ATT_OFFICE_ADMIN] == null) { ?>
-<a class="btn btn-primary" href="admin.html">
+<a class="btn btn-primary" href="admin/new.html">
 	<span class="fa fa-plus"></span> Create an administrator account for this office
 </a>
 <?php } else { 
