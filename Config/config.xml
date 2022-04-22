@@ -28,6 +28,7 @@
 	<definitions>
 		<define name="webData" value="Web/data"/>
 		<define name="webLogger" value="Web/logger"/>
+		<define name="website" value="www.hivalikherbals.org"/>
 		
 		<define name="logo" value="/logo.jpg"/>
 		<define name="icone_airtel" value="/img/airtel.jpg"/>

@@ -178,7 +178,7 @@ class OfficeFormValidator extends DefaultFormValidator
     	$matricule = $request->getDataPOST(self::FIELD_MEMBER);
     	
     	$this->processingName($office, $name);
-    	$this->processingPhoto($office, $photo);
+    	$this->processingPhoto($office, $photo, false, true, $request->getApplication()->getConfig());
     	$this->processingMember($office, $matricule);
     	
     	$form = new LocalisationFormValidator($this->officeDAOManager->getDaoManager());

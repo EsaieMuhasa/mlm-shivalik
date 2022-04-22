@@ -30,6 +30,9 @@ class MemberFormValidator extends UserFormValidator
     const MEMBER_FEEDBACK = 'memberFeedback';
     const FIELD_CHILD = 'child';
     const FIELD_GRADE =  'grade';
+    const FIELD_MATRICUL = 'matricul';
+    
+    const RGX_MATRICUL = '#^[A-Z]([0-9]{1,7})#';
     
     /**
      * la photo encours de traitement
@@ -85,6 +88,27 @@ class MemberFormValidator extends UserFormValidator
             }
         } catch (DAOException $e) {
             throw new IllegalFormValueException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+    
+    /**
+     * Validation de l'Id du membre
+     * @param string $matricul
+     * @throws IllegalFormValueException
+     */
+    private function validationMatricul ($matricul) : void {
+        if($matricul == null) {
+            throw new IllegalFormValueException("Please enter the member ID");
+        } else if (!preg_match(self::RGX_MATRICUL, $matricul)) {
+            throw new IllegalFormValueException("Enter member id in valid format");
+        } else {
+            try {
+                if (!$this->memberDAOManager->checkByMatricule($matricul)) {
+                    throw new IllegalFormValueException("unknown member ID in database");
+                }
+            } catch (DAOException $e) {
+                throw new IllegalFormValueException($e->getMessage(), $e->getCode(), $e);
+            }
         }
     }
     
@@ -315,6 +339,21 @@ class MemberFormValidator extends UserFormValidator
         } catch (IllegalFormValueException $e) {
             $this->addError(self::FIELD_SPONSOR, $e->getMessage());
         }
+    }
+    
+    /**
+     * processuce de validation/traitement du matricule
+     * @param Member $member
+     * @param string $matricul
+     */
+    private function processingMatricul (Member $member, $matricul) : void {
+        try {
+            $this->validationMatricul($matricul);
+        } catch (IllegalFormValueException $e) {
+            $this->addError(self::FIELD_MATRICUL, $e->getMessage());
+        }
+        
+        $member->setMatricule($matricul);
     }
     
     /**
@@ -611,6 +650,30 @@ class MemberFormValidator extends UserFormValidator
     	}
     	$this->result = $this->hasError()? "update failure":"";
         return $user;
+    }
+    
+    /**
+     * Recherche de la personne proprietaire de l'ID qui ce trouve dans le POST
+     * de la requette
+     * @param Request $request
+     * @return Member
+     */
+    public function searchByIdAfterValidation (Request $request) : Member {
+        $member = new Member();
+        
+        $matricul = $request->getDataPOST(self::FIELD_MATRICUL);
+        $this->processingMatricul($member, $matricul);
+        
+        if (!$this->hasError()) {
+            try {
+                $member = $this->memberDAOManager->findByMatricule($matricul);
+            } catch (DAOException $e) {
+                $this->setMessage($e->getMessage());
+            }
+        }
+        
+        $this->setResult("{$member->getNames()}", "Query execution failed");
+        return $member;
     }
     
     /**

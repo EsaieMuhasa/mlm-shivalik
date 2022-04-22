@@ -122,16 +122,10 @@ $option = isset($_GET['option'])? $_GET['option'] : null;
                     			<span class="glyphicon glyphicon-tree-conifer"></span> Tree
                     		</a>
         	        	</li>
-		            	<li role="separator" class="divider"></li>
+		            	<li role="separator" class="divider"></li>        				
         				<li class="<?php echo (isset($_REQUEST[OfficesController::ATT_ACTIVE_ITEM_MENU]) && $_REQUEST[OfficesController::ATT_ACTIVE_ITEM_MENU] == OfficesController::ATT_ITEM_MENU_OFFICE_ADMIN)? "active":""; ?>">
-        					<a href="/admin/members/<?php echo $member->id; ?>/admin.html">
-        						<span class="glyphicon glyphicon-user"></span> Sponsorship
-        					</a>
-        				</li>
-        				
-        				<li class="<?php echo (isset($_REQUEST[OfficesController::ATT_ACTIVE_ITEM_MENU]) && $_REQUEST[OfficesController::ATT_ACTIVE_ITEM_MENU] == OfficesController::ATT_ITEM_MENU_OFFICE_ADMIN)? "active":""; ?>">
-        					<a href="/admin/members/<?php echo $member->id; ?>/admin.html">
-        						<span class="glyphicon glyphicon-hand-up"></span> Upline
+        					<a href="/admin/members/<?php echo $member->id; ?>/uplines.html">
+        						<span class="glyphicon glyphicon-hand-up"></span> Uplines
         					</a>
         				</li>
 		          	</ul>

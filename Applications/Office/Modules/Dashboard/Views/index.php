@@ -31,7 +31,7 @@ $office = $_SESSION[SessionOfficeFilter::OFFICE_CONNECTED_SESSION]->getOffice();
 	</div>
 	<div class="panel-body">
 		<div class="row">
-			<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+			<div class="col-sm-6 col-xs-12">
 		        <div class="info-box green-bg">
 		            <i class="fa fa-users"></i>
 		            <div class="count"><?php echo ($_REQUEST[DashboardController::PARAM_MEMBER_COUNT]); ?></div>
@@ -39,7 +39,7 @@ $office = $_SESSION[SessionOfficeFilter::OFFICE_CONNECTED_SESSION]->getOffice();
 		        </div>
 		        <!--/.info-box-->
 		    </div>
-		    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+		    <div class="col-sm-6 col-xs-12">
 		        <div class="info-box green-bg">
 		            <i class="fa fa-graduation-cap"></i>
 		            <div class="count"><?php echo ($office->countUpgrades()); ?></div>
@@ -47,7 +47,10 @@ $office = $_SESSION[SessionOfficeFilter::OFFICE_CONNECTED_SESSION]->getOffice();
 		        </div>
 		        <!--/.info-box-->
 		    </div>
-		    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+		</div>
+		
+		<div class="row">
+		    <div class="col-sm-6 col-xs-12">
 		        <div class="info-box blue-bg">
 		            <i class="fa fa-money"></i>
 		            <div class="count"><?php echo "{$office->getSoldRequestWithdrawals()} {$config->get('devise')}"; ?></div>
@@ -55,7 +58,7 @@ $office = $_SESSION[SessionOfficeFilter::OFFICE_CONNECTED_SESSION]->getOffice();
 		        </div>
 		        <!--/.info-box-->
 		    </div>
-		    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+		    <div class="col-sm-6 col-xs-12">
 		        <div class="info-box blue-bg">
 		            <i class="glyphicon glyphicon-ok-circle"></i>
 		            <div class="count"><?php echo "{$office->getSoldAcceptWithdrawals()} {$config->get('devise')}"; ?></div>
@@ -83,18 +86,18 @@ $office = $_SESSION[SessionOfficeFilter::OFFICE_CONNECTED_SESSION]->getOffice();
 		    
 		    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
 		        <div class="info-box blue-bg">
-		            <i class="glyphicon glyphicon-trash"></i>
-		            <div class="count"><?php echo ("{$office->getUsedVirtualMoney()} {$config->get('devise')}"); ?></div>
-		            <div class="title">trash</div>
+		            <i class="glyphicon glyphicon-retweet"></i>
+		            <div class="count"><?php echo ("{$office->getSoldRetroCommission()} {$config->get('devise')}"); ?></div>
+		            <div class="title">AFILIATION</div>
 		        </div>
 		        <!--/.info-box-->
 		    </div>
 		    
 		    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-		        <div class="info-box blue-bg">
-		            <i class="glyphicon glyphicon-retweet"></i>
-		            <div class="count"><?php echo ("{$office->getSoldRetroCommission()} {$config->get('devise')}"); ?></div>
-		            <div class="title">AFILIATION</div>
+		        <div class="info-box red-bg">
+		            <i class="glyphicon glyphicon-trash"></i>
+		            <div class="count"><?php echo ("{$office->getUsedVirtualMoney()} {$config->get('devise')}"); ?></div>
+		            <div class="title">trash</div>
 		        </div>
 		        <!--/.info-box-->
 		    </div>

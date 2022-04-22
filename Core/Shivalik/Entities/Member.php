@@ -87,8 +87,7 @@ class Member extends User implements TernaryNode
             throw new PHPBackendException("invalide param valeur in setPacket method");
         }
         
-        if($this->packet != null)
-            $this->packet->setMember($this);
+        //if($this->packet != null) $this->packet->setMember($this);
     }
 
     /**

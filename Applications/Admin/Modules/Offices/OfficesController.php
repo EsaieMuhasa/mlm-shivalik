@@ -3,33 +3,39 @@
 namespace Applications\Admin\Modules\Offices;
 
 use Applications\Admin\AdminController;
+use Core\Shivalik\Entities\Office;
+use Core\Shivalik\Entities\OfficeSize;
+use Core\Shivalik\Entities\RequestVirtualMoney;
+use Core\Shivalik\Entities\VirtualMoney;
+use Core\Shivalik\Managers\AuxiliaryStockDAOManager;
+use Core\Shivalik\Managers\CommandDAOManager;
 use Core\Shivalik\Managers\CountryDAOManager;
-use Core\Shivalik\Managers\SizeDAOManager;
+use Core\Shivalik\Managers\GradeMemberDAOManager;
+use Core\Shivalik\Managers\OfficeAdminDAOManager;
 use Core\Shivalik\Managers\OfficeDAOManager;
 use Core\Shivalik\Managers\OfficeSizeDAOManager;
-use Core\Shivalik\Managers\OfficeAdminDAOManager;
-use Core\Shivalik\Managers\GradeMemberDAOManager;
-use Core\Shivalik\Managers\VirtualMoneyDAOManager;
-use Core\Shivalik\Managers\RequestVirtualMoneyDAOManager;
+use Core\Shivalik\Managers\ProductDAOManager;
 use Core\Shivalik\Managers\RaportWithdrawalDAOManager;
-use Core\Shivalik\Entities\Office;
+use Core\Shivalik\Managers\RequestVirtualMoneyDAOManager;
+use Core\Shivalik\Managers\SizeDAOManager;
+use Core\Shivalik\Managers\StockDAOManager;
+use Core\Shivalik\Managers\VirtualMoneyDAOManager;
+use Core\Shivalik\Validators\OfficeAdminFormValidator;
+use Core\Shivalik\Validators\OfficeFormValidator;
+use Core\Shivalik\Validators\OfficeSizeFormValidator;
+use Core\Shivalik\Validators\VirtualMoneyFormValidator;
+use Core\Shivalik\Validators\WithdrawalFormValidator;
 use PHPBackend\Application;
 use PHPBackend\Request;
 use PHPBackend\Response;
 use PHPBackend\Calendar\Month;
-use Core\Shivalik\Entities\OfficeSize;
-use Core\Shivalik\Validators\OfficeSizeFormValidator;
-use Core\Shivalik\Validators\OfficeFormValidator;
-use Core\Shivalik\Validators\OfficeAdminFormValidator;
-use Core\Shivalik\Validators\WithdrawalFormValidator;
-use Core\Shivalik\Entities\RequestVirtualMoney;
-use Core\Shivalik\Entities\VirtualMoney;
-use Core\Shivalik\Validators\VirtualMoneyFormValidator;
+use Core\Shivalik\Validators\AuxiliaryStockFormValidator;
 
 /**
- *
  * @author Esaie MUHASA
- *        
+ * Controlle des actions qui touches:
+ * + les offices: les offices en tant que donne
+ * + Les operations faitent dans un office (stocks, vente, afiliations, ...)      
  */
 class OfficesController extends AdminController {
 	
@@ -40,6 +46,8 @@ class OfficesController extends AdminController {
 	const ATT_ITEM_MENU_HISTORY = 'OFFICE_ACTIVE_ITEM_MENU_HISTORY';
 	const ATT_ITEM_MENU_OFFICE_ADMIN = 'OFFICE_ACTIVE_ITEM_MENU_OFFICE_ADMIN';
 	const ATT_ITEM_MENU_VIRTUAL_MONEY = 'OFFICE_ACTIVE_ITEM_MENU_VIRTUAL_MONEY';
+	const ATT_ITEM_MENU_STOCKS = 'OFFICE_ACTIVE_ITEM_MENU_STOCKS';
+	//==
 	
 	const ATT_SIZES = 'sizes';
 	const ATT_COUNTRYS = 'countrys';
@@ -65,6 +73,11 @@ class OfficesController extends AdminController {
 	
 	const ATT_MONTH = 'MONTH';
 	const CONFIG_MAX_MEMBER_VIEW_STEP = 'maxMembers';
+	
+	//stock
+	const ATT_STOCK = 'stock';
+	const ATT_STOCKS = 'stocks';
+	//==
 	
 	/**
 	 * @var CountryDAOManager
@@ -112,6 +125,31 @@ class OfficesController extends AdminController {
 	private $raportWithdrawalDAOManager;
 	
 	/**
+	 * @var StockDAOManager
+	 */
+	private $stockDAOManager;
+	
+	/**
+	 * @var ProductDAOManager
+	 */
+	private $productDAOManager;
+	
+	/**
+	 * @var AuxiliaryStockDAOManager
+	 */
+	private $auxiliaryStockDAOManager;
+	
+	/**
+	 * @var CommandDAOManager
+	 */
+	private $commandDAOManager;
+	
+	/**
+	 * dans le cas de la consultation de l'une des branches qui contiens les operations fait dans un office
+	 * cette attribut est initialiser par la methode init.
+	 * Il est null uniquement dans le cas ci-dessous:
+	 * + visialisation de la liste des offices
+	 * + creation d'un nouveau office
 	 * @var Office
 	 */
 	private $office;
@@ -127,12 +165,10 @@ class OfficesController extends AdminController {
 	}
 	
 	/**
-	 * chargement des donnes obligatorie
-	 * lors d ela consultation d'un office, on chage les donnees qui le concerne 
-	 * @param Request $request
-	 * @param Response $response
+	 * {@inheritDoc}
+	 * @see \PHPBackend\Http\HTTPController::init()
 	 */
-	private function init (Request $request, Response $response) : void {
+	protected function init (Request $request, Response $response) : void {
 		if ($request->existInGET('id')) {
 			$id = intval($request->getDataGET('id'), 10);//l'identifiant de l'office
 			
@@ -230,7 +266,7 @@ class OfficesController extends AdminController {
 			$office = $form->updateAfterValidation($request);
 			
 			if (!$form->hasError()) {
-				$response->sendRedirect("/admin/offices/");
+				$response->sendRedirect("/admin/offices/{$id}/");
 			}
 			
 			$request->addAttribute(self::ATT_OFFICE, $office);
@@ -241,6 +277,7 @@ class OfficesController extends AdminController {
 	}
 	
 	/**
+	 * Visualisation/ou creation d'un administrateur pour un office
 	 * @param Request $request
 	 * @param Response $response
 	 */
@@ -263,13 +300,21 @@ class OfficesController extends AdminController {
 			$response->sendRedirect("/admin/offices/{$this->office->getId()}/");
 		}
 		
+	}
+	
+	/**
+	 * Creation de l'administrateur de l'office
+	 * @param Request $request
+	 * @param Response $response
+	 */
+	public function executeCreateOfficeAdmin (Request $request, Response $response) : void {
 		if ($request->getMethod() == Request::HTTP_POST) {
 			$form = new OfficeAdminFormValidator($this->getDaoManager());
 			$request->addAttribute($form::FIELD_OFFICE, $this->office);
 			$admin = $form->createAfterValidation($request);
 			
 			if (!$form->hasError()){
-				$response->sendRedirect("/admin/offices/{$this->office->getId()}/");
+				$response->sendRedirect("/admin/offices/{$this->office->getId()}/admin.html");
 			}
 			
 			$form->includeFeedback($request);
@@ -280,7 +325,7 @@ class OfficesController extends AdminController {
 	}
 	
 	/**
-	 * 
+	 * Initialisation du mot de passe d'un administrateur d'un office
 	 * @param Request $request
 	 * @param Response $response
 	 */
@@ -334,6 +379,7 @@ class OfficesController extends AdminController {
 	}
 	
 	/**
+	 * Redirection de l'argent, dans un autre office
 	 * @param Request $request
 	 * @param Response $response
 	 */
@@ -463,6 +509,7 @@ class OfficesController extends AdminController {
 	}
 	
 	/**
+	 * Visualisation des comptes qui ont upgrader leurs compte dans un office
 	 * @param Request $request
 	 * @param Response $response
 	 */
@@ -548,6 +595,78 @@ class OfficesController extends AdminController {
 	    $request->addAttribute(self::ATT_WITHDRAWALS, $withdrawals);
 	    $request->addAttribute(self::ATT_RAPORTS_WITHDRAWALS, $raports);
 	}
+	
+	//gestion de stock
+	//==   ====    ===
+	
+	/**
+	 * consultation des stocks d'un office
+	 * @param Request $request
+	 * @param Response $response
+	 */
+	public function executeStocks(Request $request, Response $response) : void {
+	    $request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_STOCKS);
+	    
+	    if ($this->auxiliaryStockDAOManager->checkByOffice($this->office->getId())) {
+	        $stocks = $this->auxiliaryStockDAOManager->loadByOffice($this->office->getId());
+	    } else {
+	        $stocks = [];
+	    }
+	    
+	    $request->addAttribute(self::ATT_STOCKS, $stocks);
+	}
+	
+	/**
+	 * Creation d'un nouveau stock auxiliare
+	 * @param Request $request
+	 * @param Response $response
+	 */
+	public function executeAddStock(Request $request, Response $response) : void{
+	    $request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_STOCKS);
+	    
+	    if (!$this->stockDAOManager->checkByStatus(false)) {
+	        $response->sendError("Unable to perform this operation because all stocks are empty");
+	    }
+	    
+	    if ($request->getMethod() == Request::HTTP_POST) {
+	        $form = new AuxiliaryStockFormValidator($this->getDaoManager());
+	        $request->addAttribute($form::FIELD_OFFICE, $this->office);
+	        $stock = $form->createAfterValidation($request);
+	        
+	        if (!$form->hasError()) {
+        	    $response->sendRedirect("/admin/offices/{$this->office->getId()}/stocks/");
+	        }
+	        
+	        $request->addAttribute(self::ATT_STOCK, $stock);
+	        $form->includeFeedback($request);
+	    }
+	    
+	    $request->addAttribute(self::ATT_STOCKS, $this->stockDAOManager->findByStatus(false));
+	}
+	
+	/**
+	 * Mis en jour d'un stock auxiliaire
+	 * @param Request $request
+	 * @param Response $response
+	 */
+	public function executeUpdateStock(Request $request, Response $response) : void {
+	    $request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_STOCKS);
+	    
+	    $response->sendRedirect("/admin/offices/{$this->office->getId()}/stocks/");
+	}
+	
+	/**
+	 * Supression d'un stock auxiliaire
+	 * @param Request $request
+	 * @param Response $response
+	 */
+	public function executeRemoveStock(Request $request, Response $response) : void{
+	    
+	    
+	    $response->sendRedirect("/admin/offices/{$this->office->getId()}/stocks/");
+	}
+	//==
+	//==
 
 }
 

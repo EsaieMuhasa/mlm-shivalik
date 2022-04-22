@@ -7,7 +7,7 @@ use PHPBackend\PHPBackendException;
 
 /**
  * Calendrier d'un mois d'un annee
- * @author Esaie MHS
+ * @author Esaie MUHASA
  * @tutorial cette classe vous facilite la manipulation des calendrier.
  * Il est totalement configurable
  */
@@ -82,6 +82,12 @@ class Month
     private $selectedDates = array();
     
     /**
+     * Collection de index des semaine selectionner
+     * @var int[]
+     */
+    private $selectedWeeks = array();
+    
+    /**
      * collection des dates pour lequels les evenements existe
      * @var \DateTime[]
      */
@@ -109,6 +115,17 @@ class Month
      * @var integer
      */
     private $currentWeek = -1;
+    /**
+     * la date du premier jour en cours d'iteration
+     * @var \DateTime
+     */
+    private $firstDayOfCurrentWeek;
+    
+    /**
+     * la derniere dante en cours d'iteration
+     * @var \DateTime
+     */
+    private $lastDayOfCurrentWeek;
     
     /**
      * Le numero du jours de la semaine encours d'iteration
@@ -135,7 +152,7 @@ class Month
         }
         
         if ($local == null) {
-            $local = self::LOCAL_FR;
+            $local = self::LOCAL_EN;
         }
         
         if ($firstDayOfWeek==null || ($firstDayOfWeek != self::FIRST_DAY_MONDAY && $firstDayOfWeek != self::FIRST_DAY_SUNDAY)) {
@@ -359,11 +376,16 @@ class Month
         if ($this->weeksNumber==0) {
             $start = $this->getFirstDay();
             $end = $this->getLastDay();
+            $startNext = $this->getLastDay()->modify('+1 day');
+            
             $weeks = intval($end->format('W')) - intval($start->format('W'));
             if ($weeks < 0) {
                 $weeks =intval($end->format('W'));
-            }            
-            $this->weeksNumber = $weeks + 2;
+            } 
+            
+            $weeks += ($this->getFirstDay()->format('d-m-Y') == $this->getFirstDayOfFirstWeek()->format('d-m-Y')? 0 : 1);
+            $weeks += ($startNext->format('W') == $end->format('W')? 0 : 1);
+            $this->weeksNumber = $weeks == 7? 6 : $weeks;
         }
         
         return $this->weeksNumber;
@@ -426,7 +448,8 @@ class Month
     public function resetCursor () : void{
         $this->currentDay = 0;
         $this->currentWeek = -1;
-        $this->currentDate = null;
+        $this->firstDayOfCurrentWeek = null;
+        $this->lastDayOfCurrentWeek = null;
     }
     
     /**
@@ -439,11 +462,105 @@ class Month
             $this->currentWeek++;
             //avance d'un cran, puis on remet les jours a zero
             $this->currentDay=0;
+            
+            //les dates
+            $this->firstDayOfCurrentWeek = $this->getFirstDayOfFirstWeek()->modify(($this->currentDay + ($this->currentWeek*7)).' days');
+            $this->lastDayOfCurrentWeek = $this->getFirstDayOfFirstWeek()->modify(($this->currentDay + 6 + ($this->currentWeek*7)).' days');
+            //==
             return $this->currentWeek;
         }
+        $this->firstDayOfCurrentWeek = null;
+        $this->lastDayOfCurrentWeek = null;
         throw new PHPBackendException('Impossible de de faire avancer le curseur sur la semaine suivante');
     }
     
+    /**
+     * Renvoie la semaine encours d'iteration
+     * @return number
+     */
+    public function getCurrentWeek() : int {
+        return $this->currentWeek;
+    }
+    
+    /**
+     * Est-ce que l'index de cette semaine est parmis les semaine selectionner??
+     * @param int $index
+     * @return bool
+     */
+    public function isSelectedWeek (int $index) : bool {
+        foreach ($this->selectedWeeks as $week) {
+            if ($week == $index) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /** 
+     * Ajout de l'index d'une semaine parmis les semaine selectionner
+     * @param int $index
+     * @throws PHPBackendException
+     */
+    public function addSelectedWeek (int $index) : void {
+        if ($index > $this->getWeeks() || $index < 0) {
+            throw new PHPBackendException("Index out off max weeks count: {$index}");
+        }
+        if (!$this->isSelectedWeek($index)) {
+            $this->selectedWeeks[] = $index;
+        }
+    }
+    
+    /**
+     * retire l'index de la semaine parmis les index de semaine selectionner
+     * @param int $index
+     * @throws PHPBackendException
+     */
+    public function removeSelectedWeek (int $index) : void {
+        if ($index > $this->getWeeks() || $index < 0) {
+            throw new PHPBackendException("Index out off max weeks count: {$index}");
+        }
+        
+        if ($this->isSelectedWeek($index)) {
+            for ($i = 0; $i < count($this->selectedWeeks); $i++) {
+                if ($this->selectedWeeks[$i] == $index) {
+                    array_splice($this->selectedWeeks, $i);
+                    break;
+                }
+            }
+        }
+    }
+    
+    /**
+     * netoyage de semaines deja selectionner
+     */
+    public function removeSelectedWeeks () : void {
+        $this->selectedWeeks = [];
+    }
+    
+    /**
+     * Renvoie date du premier jour de la semaine en cours d'iteration
+     * @throws PHPBackendException
+     * @return \DateTime
+     */
+    public function getFirstDayOfCurrentWeek () : \DateTime{
+        if ($this->getCurrentWeek() == -1 || $this->firstDayOfCurrentWeek == null) {
+            throw new PHPBackendException("Impossible d'effectue cette operation car le curseur est a la position -1");
+        }
+        return $this->firstDayOfCurrentWeek;
+    }
+    
+    /**
+     * Renvoie le dernier jour de la semaine en cours d'iteration
+     * @throws PHPBackendException
+     * @return \DateTime
+     */
+    public function getLastDayOfCurrentWeek () : \DateTime {
+        if ($this->getCurrentWeek() == -1 || $this->lastDayOfCurrentWeek == null) {
+            throw new PHPBackendException("Impossible d'effectue cette operation car le curseur est a la position -1");
+        }
+        return $this->lastDayOfCurrentWeek;
+    }
+
     /**
      * Recuperation du jours suivant du mois.
      * Si le cursor a deja attein la fin, alors une exception sera lever
@@ -533,22 +650,24 @@ class Month
      * Recuperation de la date actuel
      * @return \DateTime
      */
-    public function getToday() : \DateTime{
+    public static function getToday() : \DateTime{
         return new \DateTime();
     }
     
     /**
+     * Renvoie le e numero de l'annee actuel (l'annee du mois encours)
      * @return number
      */
-    public function getYear()
+    public function getYear() : int
     {
         return $this->year;
     }
 
     /**
+     * Renvoie le numero du mois encours
      * @return number
      */
-    public function getMonth()
+    public function getMonth() : int
     {
         return $this->month;
     }

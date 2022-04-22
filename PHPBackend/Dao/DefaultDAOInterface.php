@@ -153,6 +153,22 @@ abstract class DefaultDAOInterface implements DAOInterface
     }
     
     /**
+     * Renvoie le nom de la vue materiel de cette table
+     * @return string
+     */
+    protected  function getViewName () : string {
+        return "V_{$this->getTableName()}";
+    }
+    
+    /**
+     * ce DAO as-t-elle une vue materiel dans la BDD
+     * @return bool
+     */
+    protected function hasView () : bool {
+        return false;
+    }
+    
+    /**
      * {@inheritDoc}
      * @see \PHPBackend\Dao\DAOInterface::addListener()
      */
@@ -218,7 +234,7 @@ abstract class DefaultDAOInterface implements DAOInterface
      */
     public function checkByColumnName(string $columName, $value, $id = null): bool
     {
-        return UtilitaireSQL::columnValueExist($this->getConnection(), $this->getTableName(), $columName, $value, $id);
+        return UtilitaireSQL::columnValueExist($this->getConnection(), $this->hasView()? $this->getViewName() : $this->getTableName(), $columName, $value, $id);
     }
 
     /**
@@ -227,16 +243,16 @@ abstract class DefaultDAOInterface implements DAOInterface
      */
     public function countAll(): int
     {
-        return UtilitaireSQL::count($this->getConnection(), $this->getTableName());
+        return UtilitaireSQL::count($this->getConnection(), $this->hasView()? $this->getViewName() : $this->getTableName());
     }
 
     /**
      * {@inheritDoc}
      * @see \PHPBackend\Dao\DAOInterface::countByCreationHistory()
      */
-    public function countByCreationHistory(\DateTime $dateMin, \DateTime $dateMax = null): int
+    public function countByCreationHistory(\DateTime $dateMin, ?\DateTime $dateMax = null): int
     {      
-        return UtilitaireSQL::countByCreationHistory($this->getConnection(), $this->getTableName(), self::FIELD_DATE_AJOUT, TRUE, $dateMin, $dateMax);        
+        return UtilitaireSQL::countByCreationHistory($this->getConnection(), $this->hasView()? $this->getViewName() : $this->getTableName(), self::FIELD_DATE_AJOUT, TRUE, $dateMin, $dateMax);        
     }
 
 
@@ -273,7 +289,7 @@ abstract class DefaultDAOInterface implements DAOInterface
      */
     public function findAll(?int $limit = null, int $offset = 0): array
     {
-        return UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, [], $limit, $offset);
+        return UtilitaireSQL::findAll($this->getConnection(), $this->hasView()? $this->getViewName() : $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, [], $limit, $offset);
     }
 
     /**
@@ -282,7 +298,7 @@ abstract class DefaultDAOInterface implements DAOInterface
      */
     public function findAllByColumName(string $columName, $value, ?int $limit = null, int $offset = 0): array
     {
-        return UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), $columName, true, array($columName => $value), $limit, $offset);
+        return UtilitaireSQL::findAll($this->getConnection(), $this->hasView()? $this->getViewName() : $this->getTableName(), $this->getMetadata()->getName(), $columName, true, array($columName => $value), $limit, $offset);
     }
 
     /**
@@ -291,7 +307,7 @@ abstract class DefaultDAOInterface implements DAOInterface
      */
     public function findAllById(array $ids, bool $forward = true): array
     {
-        return UtilitaireSQL::findIn($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), "id", $ids);
+        return UtilitaireSQL::findIn($this->getConnection(), $this->hasView()? $this->getViewName() : $this->getTableName(), $this->getMetadata()->getName(), "id", $ids);
     }
 
     /**
@@ -300,7 +316,7 @@ abstract class DefaultDAOInterface implements DAOInterface
      */
     public function findByColumnName(string $columnName, $value, bool $forward = true)
     {
-        return UtilitaireSQL::findUnique($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), $columnName, $value);
+        return UtilitaireSQL::findUnique($this->getConnection(), $this->hasView()? $this->getViewName() : $this->getTableName(), $this->getMetadata()->getName(), $columnName, $value);
     }
 
     /**
@@ -309,7 +325,7 @@ abstract class DefaultDAOInterface implements DAOInterface
      */
     public function findByCreationHistory(\DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset = 0): array
     {
-        return UtilitaireSQL::findCreationHistory($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, $dateMin, $dateMax, array(), $limit, $offset);
+        return UtilitaireSQL::findCreationHistory($this->getConnection(), $this->hasView()? $this->getViewName() : $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, $dateMin, $dateMax, array(), $limit, $offset);
     }
 
     /**
@@ -363,7 +379,7 @@ abstract class DefaultDAOInterface implements DAOInterface
      */
     public function checkByCreationHistory(\DateTime $dateMin, ?\DateTime $dateMax = null, ?int $limit = null, int $offset = 0): bool
     {
-        return UtilitaireSQL::hasCreationHistory($this->getConnection(), $this->getTableName(), self::FIELD_DATE_AJOUT, TRUE, $dateMin, $dateMax, array(), $limit, $offset);
+        return UtilitaireSQL::hasCreationHistory($this->getConnection(), $this->hasView()? $this->getViewName() : $this->getTableName(), self::FIELD_DATE_AJOUT, TRUE, $dateMin, $dateMax, array(), $limit, $offset);
     }
 
     /**
@@ -372,7 +388,7 @@ abstract class DefaultDAOInterface implements DAOInterface
      */
     public function hasData(): bool
     {
-        return UtilitaireSQL::hasData($this->getConnection(), $this->getTableName());
+        return UtilitaireSQL::hasData($this->getConnection(), $this->hasView()? $this->getViewName() : $this->getTableName());
     }
 
     /**
@@ -390,7 +406,7 @@ abstract class DefaultDAOInterface implements DAOInterface
      */
     public function checkAll(?int $limit = null, int $offset = 0): bool
     {
-        return UtilitaireSQL::checkAll($this->getConnection(), $this->getTableName(), array(), $limit, $offset);
+        return UtilitaireSQL::checkAll($this->getConnection(), $this->hasView()? $this->getViewName() : $this->getTableName(), array(), $limit, $offset);
     }
 
     /**
@@ -399,7 +415,7 @@ abstract class DefaultDAOInterface implements DAOInterface
      */
     public function checkAllByColumName(string $columName, $value, int $limit = null, int $offset = 0): bool
     {
-        return UtilitaireSQL::checkAll($this->getConnection(), $this->getTableName(), array($columName => $value), $limit, $offset);
+        return UtilitaireSQL::checkAll($this->getConnection(), $this->hasView()? $this->getViewName() : $this->getTableName(), array($columName => $value), $limit, $offset);
     }
 
     /**
@@ -408,7 +424,7 @@ abstract class DefaultDAOInterface implements DAOInterface
      */
     public function countAllByColumName(string $columName, $value): int
     {
-        return UtilitaireSQL::count($this->getConnection(), $this->getTableName(), array($columName => $value));
+        return UtilitaireSQL::count($this->getConnection(), $this->hasView()? $this->getViewName() : $this->getTableName(), array($columName => $value));
     }
 
 
