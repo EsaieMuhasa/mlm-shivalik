@@ -74,6 +74,9 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
     		
     		<div class="form-group text-center">
     			<button class="btn btn-primary" type="submit"><span class="fa fa-forward"></span> Next</button>
+    			<a class="btn btn-danger" href="/office/products/command/cancel.html">
+            		<span class="glyphicon glyphicon-remove"></span> Cancel
+            	</a>
     		</div>
 		</form>
 	</div>

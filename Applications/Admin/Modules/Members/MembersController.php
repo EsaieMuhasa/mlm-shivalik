@@ -308,7 +308,7 @@ class MembersController extends AdminController
             $request->addAttribute(self::RIGHT_CHILDS, $right);
         }
         
-        $account = $this->memberDAOManager->loadAccount($member);
+        $account = $this->memberDAOManager->loadAccount($this->member);
         $request->addAttribute(self::ATT_COMPTE, $account);
     }
     

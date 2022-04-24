@@ -43,6 +43,11 @@ class Account
     private $soldeGenration;
     
     /**
+     * @var float
+     */
+    private $purchaseBunus;//bonus de reachat
+    
+    /**
      * @var number
      */
     private $leftMembershipPv;
@@ -326,6 +331,13 @@ class Account
     /**
      * @return number
      */
+    public function getPurchaseBunus() {
+        return $this->purchaseBunus;
+    }
+
+    /**
+     * @return number
+     */
     public function getWallet()
     {
         return $this->wallet;
@@ -375,6 +387,7 @@ class Account
         $this->withdrawalsRequest = 0;
         $this->soldeOfficeBonus = 0;
         $this->soldeGenration = 0.0;
+        $this->purchaseBunus = 0.0;
         
         foreach ($this->getOperations() as $operation) {
             if ($operation instanceof Withdrawal) {
@@ -387,7 +400,9 @@ class Account
                 
             }else if ($operation instanceof BonusGeneration) {
                 $this->soldeGenration += $operation->getAmount();
-            } else if ($operation instanceof OfficeBonus) {
+            }else if ($operation instanceof PurchaseBonus) {
+                $this->purchaseBunus += $operation->getAmount();
+            }else if ($operation instanceof OfficeBonus) {
                 $this->soldeOfficeBonus += $operation->getAmount();
             }else if ($operation instanceof PointValue) {
                 if ($operation->getFoot() == PointValue::FOOT_LEFT) {
@@ -424,7 +439,7 @@ class Account
             }
         }
         
-        $this->solde = $this->soldeGenration + $this->soldeOfficeBonus + $this->withdrawalsRequest - $this->withdrawals;
+        $this->solde = $this->soldeGenration + $this->soldeOfficeBonus + $this->purchaseBunus + $this->withdrawalsRequest - $this->withdrawals;
     }
 
 }

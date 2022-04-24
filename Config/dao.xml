@@ -13,11 +13,7 @@
 			name="\Core\Shivalik\Entities\BonusGeneration" 
 			specification="\Core\Shivalik\Managers\BonusGenerationDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\BonusGenerationDAOManagerImplementation1"/>
-			
-		<!-- 
-		Core\Shivalik\Entities\Country 
-		Core\Shivalik\Entities\Country
-		-->
+
 		<entity 
 			name="\Core\Shivalik\Entities\Country"
 			specification="\Core\Shivalik\Managers\CountryDAOManager" 

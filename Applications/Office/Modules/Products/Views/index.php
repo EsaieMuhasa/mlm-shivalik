@@ -24,6 +24,11 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
  * @var Command[] $commands
  */
 $commands = $_REQUEST[ProductsController::ATT_COMMANDS];
+
+$somme = 0 ;
+foreach ($commands as $c) {
+    $somme += $c->getAmount();
+}
 ?>
 
 <h2><?php echo ($_REQUEST['title']); ?></h2>
@@ -120,7 +125,7 @@ $commands = $_REQUEST[ProductsController::ATT_COMMANDS];
     		<div class="col-lg-12 col-md-12 col-sm-6 col-xs-12">
     			<div class="info-box blue-bg">
 		            <i class="fa fa-money"></i>
-		            <div class="count"><?php echo "0 {$config->get('devise')}"; ?></div>
+		            <div class="count"><?php echo "{$somme} {$config->get('devise')}"; ?></div>
 		            <div class="title">vente</div>
 		        </div>
     		</div>
@@ -178,6 +183,21 @@ $commands = $_REQUEST[ProductsController::ATT_COMMANDS];
     			</tr>
     		</tfoot>
     	</table>
+    	
+    	<div class="row">
+    		<div class="col-xs-12 text-right">
+    			<div class=" btn-group">
+            		<?php if ($command->getDeliveryDate() == null) : ?>
+        			<a class="btn btn-primary" href="<?php echo "/office/products/commands/{$command->id}/delivered.html"; ?>">
+        				<span class="glyphicon glyphicon-ok"></span> Delivered
+    				</a>
+            		<?php endif;?>
+    				<a class="btn btn-info" target="_black" href="<?php echo "/office/products/commands/{$command->id}/pdf.pdf"; ?>">
+    					<span class="fa fa-print"></span> PDF
+    				</a>
+    			</div>
+    		</div>
+    	</div>
     </div>
 	<?php endforeach; ?>
 </div>

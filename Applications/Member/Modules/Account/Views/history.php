@@ -7,6 +7,7 @@ use PHPBackend\Request;
 use Core\Shivalik\Entities\Withdrawal;
 use Core\Shivalik\Entities\PointValue;
 use Core\Shivalik\Entities\BonusGeneration;
+use Core\Shivalik\Entities\PurchaseBonus;
 
 /**
  * @var Month $month
@@ -36,6 +37,11 @@ $points = $_REQUEST[AccountController::ATT_POINTS_VALUES];
  * @var BonusGeneration[] $bonus
  */
 $bonus = $_REQUEST[AccountController::ATT_BONUS_GENERATIONS];
+
+/**
+ * @var PurchaseBonus[] $purchases
+ */
+$purchases = $_REQUEST[AccountController::ATT_PURCHASE_BONUS];
 
 if ($month->hasSelectedDate()) {
     $date = $month->getFirstSelectedDate();
@@ -82,7 +88,7 @@ if ($month->hasSelectedDate()) {
         </section>
 		<?php endif; ?>
 		
-		<?php if (!empty($points)) : ?>
+		<?php if (!empty($bonus)) : ?>
 		<section class="table-responsive">
         	<table class="table panel panel-default">
         		<caption>Generational bonus</caption>
@@ -96,6 +102,31 @@ if ($month->hasSelectedDate()) {
         		<tbody class="panel-body">
         			<?php $num = 0; ?>
 					<?php foreach ($bonus as $bn): ?>
+    					<tr>
+    						<td><?php  $num++; echo ($num);?> </td>
+    						<td><?php echo ("{$bn->getAmount()} {$config->get('devise')}");?></td>
+    						<td><?php echo ($bn->dateAjout->format('d/m/Y \a\t H\h:i'));?></td>
+    					</tr>
+					<?php endforeach; ?>
+        		</tbody>
+        	</table>
+        </section>
+		<?php endif; ?>
+		
+		<?php if (!empty($purchases)) : ?>
+		<section class="table-responsive">
+        	<table class="table panel panel-default">
+        		<caption>Purchase bonus</caption>
+        		<thead class="panel-heading">
+        			<tr>
+        				<th>N°</th>
+        				<th>Amount</th>
+        				<th>date and time</th>
+        			</tr>
+        		</thead>
+        		<tbody class="panel-body">
+        			<?php $num = 0; ?>
+					<?php foreach ($purchases as $bn): ?>
     					<tr>
     						<td><?php  $num++; echo ($num);?> </td>
     						<td><?php echo ("{$bn->getAmount()} {$config->get('devise')}");?></td>

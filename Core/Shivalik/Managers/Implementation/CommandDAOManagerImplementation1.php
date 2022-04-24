@@ -39,6 +39,17 @@ class CommandDAOManagerImplementation1 extends DefaultDAOInterface implements Co
 
     /**
      * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\CommandDAOManager::load()
+     */
+    public function load ($command): Command {
+        $com = ($command instanceof Command) ? $command : $this->findById(intval($command, 10));
+        $com->setMember($this->memberDAOManager->findById($com->getMember()->getId()));
+        $com->setProducts($this->getDaoManager()->getManagerOf(ProductOrdered::class)->findByCommand($com->getId()));
+        return $com;
+    }
+
+    /**
+     * {@inheritDoc}
      * @see \PHPBackend\Dao\DefaultDAOInterface::createInTransaction()
      * @param Command $entity
      */
@@ -78,6 +89,7 @@ class CommandDAOManagerImplementation1 extends DefaultDAOInterface implements Co
         $pv->setMember($member);
         $pv->setFoot(null);
         $pv->setValue($value);
+        $pv->setCommand($entity);
         
         $purchaseBonus[] = $bonus;
         $pointValues[] = $pv;
@@ -218,7 +230,7 @@ class CommandDAOManagerImplementation1 extends DefaultDAOInterface implements Co
             return $data;
         }
         
-        $SQL = "SELECT * FROM {$this->getTableName()} WHERE {$column} = {$value} AND deliveryDate IS ".($delivered? 'NOT ':'')."NULL";
+        $SQL = "SELECT * FROM {$this->getTableName()} WHERE {$column} = {$value} AND deliveryDate IS ".($delivered? 'NOT ':'')."NULL ORDER BY dateAjout DESC";
         $SQL .= $limit !== null? " LIMIT {$limit} OFFSET {$offset}" : "";
         
         $return = [];
@@ -360,7 +372,7 @@ class CommandDAOManagerImplementation1 extends DefaultDAOInterface implements Co
         $params['dateMax'] = $max->format('Y-m-d\T23:59:59');
         $params[$column] = $value;
         
-        $SQL = "SELECT * FROM {$this->getTableName()} WHERE {$column} = :{$column} AND deliveryDate IS ".($delivered? 'NOT ':'')."NULL";
+        $SQL = "SELECT * FROM {$this->getTableName()} WHERE {$column} = :{$column} AND deliveryDate IS ".($delivered? 'NOT ':'')."NULL ORDER BY dateAjout DESC";
         $SQL .= " {$columnName} >= :dateMin AND {$columnName} <=:dateMax ";
         $SQL .= $limit !== null? " LIMIT {$limit} OFFSET {$offset}" : "";
         

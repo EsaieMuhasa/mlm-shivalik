@@ -20,6 +20,7 @@ use PHPBackend\Http\HTTPController;
 use PHPBackend\Image2D\Mlm\TreeFormatter;
 use PHPBackend\Image2D\Mlm\Ternary\TernaryTreeBuilder;
 use PHPBackend\Image2D\Mlm\Ternary\TernaryTreeRender;
+use Core\Shivalik\Managers\PurchaseBonusDAOManager;
 
 /**
  *
@@ -45,6 +46,7 @@ class AccountController extends HTTPController
     
     const ATT_MONTH = 'month';
     const ATT_BONUS_GENERATIONS = 'bonusGeneration';
+    const ATT_PURCHASE_BONUS = 'purchaseBonus';
     const ATT_BONUS_SPONSORING = 'bonusSponsoring';
     const ATT_POINTS_VALUES = 'pointValues';
     
@@ -77,6 +79,11 @@ class AccountController extends HTTPController
      * @var WithdrawalDAOManager
      */
     private $withdrawalDAOManager;
+    
+    /**
+     * @var PurchaseBonusDAOManager
+     */
+    private $purchaseBonusDAOManager;
     
     /**
      * @var OfficeDAOManager
@@ -391,9 +398,16 @@ class AccountController extends HTTPController
             $bonus = array();
         }
         
+        if ($this->purchaseBonusDAOManager->checkHistoryByMember($member->getId(), $dateMin, $dateMax)) {
+            $purchase = $this->purchaseBonusDAOManager->findHistoryByMember($member->getId(), $dateMin, $dateMax);
+        } else {
+            $purchase = [];
+        }
+        
         $request->addAttribute(self::ATT_POINTS_VALUES, $points);
         $request->addAttribute(self::ATT_WITHDRAWELS, $withdrawals);
         $request->addAttribute(self::ATT_BONUS_GENERATIONS, $bonus);
+        $request->addAttribute(self::ATT_PURCHASE_BONUS, $purchase);
         $request->addAttribute(self::ATT_MONTH, $month);
     }
 }

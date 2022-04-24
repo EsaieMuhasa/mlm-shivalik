@@ -3,7 +3,10 @@ namespace Applications\Admin\Modules\Products;
 
 use Applications\Admin\AdminController;
 use Core\Shivalik\Entities\Product;
+use Core\Shivalik\Managers\AuxiliaryStockDAOManager;
 use Core\Shivalik\Managers\CategoryDAOManager;
+use Core\Shivalik\Managers\CommandDAOManager;
+use Core\Shivalik\Managers\OfficeDAOManager;
 use Core\Shivalik\Managers\ProductDAOManager;
 use Core\Shivalik\Managers\StockDAOManager;
 use Core\Shivalik\Validators\CategoryValidator;
@@ -12,6 +15,10 @@ use Core\Shivalik\Validators\StockFormValidator;
 use PHPBackend\Application;
 use PHPBackend\Request;
 use PHPBackend\Response;
+use PHPBackend\Calendar\Month;
+use PHPBackend\Calendar\Year;
+use Core\Shivalik\Entities\Stock;
+use Core\Shivalik\Entities\Command;
 
 /**
  *
@@ -28,7 +35,14 @@ class ProductsController extends AdminController
     const ATT_COUNT_PRODUCT = 'count_products';
     
     const ATT_STOCK ='stock';
-    const ATT_STOCKS ='stocks';    
+    const ATT_STOCKS ='stocks';
+    
+    const ATT_COMMAND = 'command';
+    const ATT_COMMANDS = 'commands';
+    
+    const ATT_MONTH = 'SELECTED_MONTH';
+    const ATT_YEAR = 'SELECTED_YEAR';
+    const ATT_OFFICES = 'LIST_OFFICES';
     
     //activation/desactivation des menus
     const ATT_ACTIVE_MENU = 'PRODUCT_ACTIVE_ITEM_MENU';
@@ -45,6 +59,11 @@ class ProductsController extends AdminController
     private $productDAOManager;
     
     /**
+     * @var CommandDAOManager
+     */
+    private $commandDAOManager;
+    
+    /**
      * @var CategoryDAOManager
      */
     private $categoryDAOManager;
@@ -53,6 +72,16 @@ class ProductsController extends AdminController
      * @var StockDAOManager
      */
     private $stockDAOManager;
+    
+    /**
+     * @var AuxiliaryStockDAOManager
+     */
+    private $auxiliaryStockDAOManager;
+    
+    /**
+     * @var OfficeDAOManager
+     */
+    private $officeDAOManager;
     
     
     /**
@@ -108,9 +137,73 @@ class ProductsController extends AdminController
     /**
      * dashboad de gestion des produits
      * @param Request $request
+     * @param Response $response
      */
-    public function executeIndex (Request $request ) : void {
+    public function executeIndex (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_ACTIVE_MENU, self::ITEM_MENU_DASHBOARD);
+        $request->addAttribute(self::ATT_ACTIVE_MENU, self::ITEM_MENU_DASHBOARD);
+        
+        $limit = $request->existInGET('limit')? intval($request->getDataGET('limit'), 10) : 5;
+        $offset = $request->existInGET('offset')? intval($request->getDataGET('offset'), 10) : 0;
+        $title = '';
+        
+        if ($request->existInGET('firstDay')) {//selection des operations faite dans une semaine
+            $firstDay = new \DateTime($request->getDataGET('firstDay'));
+            $lastDay = new \DateTime($request->getDataGET('lastDay'));
+            $week = intval($request->getDataGET('week'), 10);
+            $month = new Month(intval($firstDay->format('m'), 10), intval($firstDay->format('Y'), 10));
+            $month->addSelectedWeek($week);
+            $title = 'Commands of '.($week+1).'<sup>th</sup> week, of '.$month;
+        } else if($request->existInGET('month')){//selection des commandes faites dans un mois
+            $monthIndex = intval($request->getDataGET('month'), 10);
+            if($monthIndex > 12){
+                $response->sendError();
+            }
+            $yearIndex = intval($request->getDataGET('year'), 10);
+            $month = new Month($monthIndex, $yearIndex);
+            $title = 'Commands of '.$month;
+            $firstDay = $month->getFirstDay();
+            $lastDay = $month->getLastDay();
+        } else  {//selection des operations faite en une date
+            $date = new \DateTime($request->getDataGET('date'));
+            $month = new Month(intval($date->format('m'), 10), intval($date->format('Y'), 10));
+            $month->addSelectedDate($date);
+            $title = 'Commands of '.$date->format('d').' '.$month;
+            $firstDay = $date;
+            $lastDay = $date;
+        }
+        
+        $year = new Year($month->getYear());
+        $year->addSelectedMonth($month->getMonth());
+        
+        /**
+         * @var Command[][] $commands
+         */
+        $commands = [];
+        if ($this->commandDAOManager->checkByCreationHistory($firstDay, $lastDay, $limit, $offset)) {
+            
+            $offices = $this->officeDAOManager->findAll();
+            
+            foreach ($offices as $office) {
+                if ($this->commandDAOManager->checkByOfficeAtDate($office->getId(), $firstDay, $lastDay, null, $limit, $offset)) {
+                    $commands["office-{$office->getId()}"] = $this->commandDAOManager->findByOfficeAtDate($office->getId(), $firstDay, $lastDay, null, $limit, $offset);
+                }
+            }
+            
+            foreach ($commands as $command) {
+                foreach ($command as $c) {
+                    $this->commandDAOManager->load($c);
+                }
+            }
+        } else {
+            $offices = [];
+        }
+        
+        $request->addAttribute(self::ATT_OFFICES, $offices);
+        $request->addAttribute(self::ATT_COMMANDS, $commands);
+        $request->addAttribute(self::ATT_YEAR, $year);
+        $request->addAttribute(self::ATT_MONTH, $month);
+        $request->addAttribute('title', $title);
     }
     
     /**
@@ -298,7 +391,17 @@ class ProductsController extends AdminController
             $response->sendError();
         }
         
+        /**
+         * @var Stock[] $stocks
+         */
         $stocks = $this->stockDAOManager->findAll($limit, $offset);
+        foreach ($stocks as $stock) {
+            $this->stockDAOManager->load($stock);
+            $stock->setProduct($this->productDAOManager->findById($stock->getProduct()->getId()));
+            foreach ($stock->getAuxiliaries() as $aux) {
+                $this->auxiliaryStockDAOManager->load($aux);
+            }
+        }
         $request->addAttribute(self::ATT_STOCKS, $stocks);
         $request->addAttribute(self::ATT_ACTIVE_MENU, self::ITEM_MENU_STOCKS);
     }

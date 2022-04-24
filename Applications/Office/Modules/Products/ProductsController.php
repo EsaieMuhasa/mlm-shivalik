@@ -180,14 +180,47 @@ class ProductsController extends HTTPController
     
     /**
      * Pour effectuer une commande
+     * + affichage de la commande
+     * + exportation de la commande en PDF
+     * + signalier la livraison de la commande
      * @param Request $request
      * @param Response $response
      */
     public function executeCommand (Request $request, Response $response) : void {
-        if(!$request->getSession()->hasAttribute(self::ATT_COMMAND)) {
+        if(!$request->getSession()->hasAttribute(self::ATT_COMMAND) && !$request->existInGET('id')) {
             $response->sendRedirect("/office/products/command/member.html");
         }
         
+        if ($request->existInGET('id')) {
+            $id = intval($request->getDataGET('id'), 10);
+            $option = $request->getDataGET('option');//pdf|deliverrd
+            
+            if (!$this->commandDAOManager->checkById($id)) {
+                $response->sendError();
+            }
+            /**
+             * @var Command $command
+             */
+            $command  = $this->commandDAOManager->findById($id);
+            if ($command->getOffice()->getId() != $this->office->getId()) {
+                $response->sendError();
+            }
+            
+            if ($option != 'pdf') {//pour signalier la livraison de la commande
+                if ($command->getDeliveryDate() != null) {
+                    $response->sendError();
+                }
+                
+                $this->commandDAOManager->deliver($id);
+                $response->sendRedirect("/office/products/commands-of-{$command->getDateAjout()->format('d-m-Y')}/");
+            }
+            
+            $this->commandDAOManager->load($command);
+        } else {
+            $command = $request->getSession()->getAttribute(self::ATT_COMMAND);
+        }
+        
+        $request->addAttribute(self::ATT_COMMAND, $command);
         $request->addAttribute(self::ATT_ACTIVE_MENU, self::ITEM_MENU_COMMAND);
     }
     
@@ -289,8 +322,7 @@ class ProductsController extends HTTPController
         
         $stocks = $this->auxiliaryStockDAOManager->loadByOffice($this->office->getId(), false);
         $request->addAttribute(self::ATT_STOCKS, $stocks);
-        
-        
+
         $request->addAttribute(self::ATT_ACTIVE_MENU, self::ITEM_MENU_COMMAND);
     }
     
