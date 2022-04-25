@@ -15,7 +15,6 @@ $admin = $_SESSION[SessionOfficeFilter::OFFICE_CONNECTED_SESSION];
 		</a>
 	</li>
 
-
 	<li>
 		<a href="/office/">
     		<span class="nav-item-icon">
@@ -31,6 +30,15 @@ $admin = $_SESSION[SessionOfficeFilter::OFFICE_CONNECTED_SESSION];
         		<span class="fa fa-users"></span>
     		</span>
     		<span class="nav-item-caption">Members</span>
+		</a>
+	</li>
+	
+	<li>
+		<a href="/office/products/">
+    		<span class="nav-item-icon">
+        		<span class="fa fa-leaf"></span>
+    		</span>
+    		<span class="nav-item-caption">Products</span>
 		</a>
 	</li>
 	

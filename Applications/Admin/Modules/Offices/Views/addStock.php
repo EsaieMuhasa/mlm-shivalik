@@ -1,0 +1,1 @@
+<?php require '_form-stock.php';?>

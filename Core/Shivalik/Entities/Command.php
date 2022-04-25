@@ -42,34 +42,36 @@ class Command extends DBEntity
     private $note;
     
     /**
+     * Rubrique de la commande
+     * @var ProductOrdered[]
+     */
+    private $products = [];
+    
+    /**
      * @return \DateTime
      */
-    public function getDeliveryDate() :?\DateTime
-    {
+    public function getDeliveryDate() :?\DateTime {
         return $this->deliveryDate;
     }
 
     /**
      * @return \Core\Shivalik\Entities\Member
      */
-    public function getMember() : ?Member
-    {
+    public function getMember() : ?Member {
         return $this->member;
     }
 
     /**
      * @param \DateTime $deliveryDate
      */
-    public function setDeliveryDate($deliveryDate) : void
-    {
+    public function setDeliveryDate($deliveryDate) : void {
         $this->deliveryDate = $this->hydrateDate($deliveryDate);
     }
 
     /**
      * @param \Core\Shivalik\Entities\Member|int $member
      */
-    public function setMember($member) : void
-    {
+    public function setMember($member) : void {
         if ($member === null || $member instanceof Member) {
             $this->member = $member;
         } else if (self::isInt($member)) {
@@ -82,32 +84,28 @@ class Command extends DBEntity
     /**
      * @return \Core\Shivalik\Entities\Office
      */
-    public function getOffice() : ?Office
-    {
+    public function getOffice() : ?Office {
         return $this->office;
     }
 
     /**
      * @return \Core\Shivalik\Entities\OfficeAdmin
      */
-    public function getOfficeAdmin() : ?OfficeAdmin
-    {
+    public function getOfficeAdmin() : ?OfficeAdmin {
         return $this->officeAdmin;
     }
 
     /**
      * @return string
      */
-    public function getNote() : ?string
-    {
+    public function getNote() : ?string {
         return $this->note;
     }
 
     /**
      * @param \Core\Shivalik\Entities\Office $office
      */
-    public function setOffice($office) : void
-    {
+    public function setOffice($office) : void {
         if($office == null || $office instanceof Office) {
             $this->office = $office;
         } else if (self::isInt($office)) {
@@ -120,8 +118,7 @@ class Command extends DBEntity
     /**
      * @param \Core\Shivalik\Entities\OfficeAdmin $officeAdmin
      */
-    public function setOfficeAdmin($officeAdmin) : void
-    {
+    public function setOfficeAdmin($officeAdmin) : void {
         if($officeAdmin == null || $officeAdmin instanceof OfficeAdmin) {
             $this->officeAdmin = $officeAdmin;
         } else if (self::isInt($officeAdmin)) {
@@ -135,9 +132,81 @@ class Command extends DBEntity
     /**
      * @param string $note
      */
-    public function setNote($note) : void
-    {
+    public function setNote($note) : void {
         $this->note = $note;
+    }
+    
+    /**
+     * @return \Core\Shivalik\Entities\ProductOrdered []
+     */
+    public function getProducts() {
+        return $this->products;
+    }
+
+    /**
+     * @param \Core\Shivalik\Entities\ProductOrdered[]  $products
+     */
+    public function setProducts(array $products) : void {
+        foreach ($products as $product) {
+            $product->setCommand($this);
+        }
+        $this->products = $products;
+    }
+    
+    /**
+     * comptage du nombre de produit sur la commande
+     * @return int
+     */
+    public function getCountProduct() : int  {
+        if ($this->products != null && !empty($this->products)) {
+            return count($this->products);
+        }
+        return 0;
+    }
+    
+    /**
+     * renvoie le montant total a payer pour la commande
+     * @return float
+     */
+    public function getAmount () : float {
+        if($this->getCountProduct() != 0) {
+            $amount = 0;
+            foreach ($this->products as $pr) {
+                $amount += $pr->getAmount();
+            }
+            return $amount;
+        }
+        return 0;
+    }
+    
+    /**
+     * Renvoie la sommes des prix unitaire
+     * @return float
+     */
+    public function getTotalUnitPrice () : float {
+        if($this->getCountProduct() != 0) {
+            $amount = 0;
+            foreach ($this->products as $pr) {
+                $amount += $pr->getStock()->getUnitPrice();
+            }
+            return $amount;
+        }
+        return 0;
+    }
+    
+    /**
+     * Renvoie la quantite total des elements sur la commande
+     * @return int
+     */
+    public function getTotalQuantity () : int  {
+        if($this->getCountProduct() != 0) {
+            $qt = 0;
+            foreach ($this->products as $pr) {
+                $qt += $pr->getQuantity();
+            }
+            return $qt;
+        }
+        return 0;
     }
 
     

@@ -19,7 +19,7 @@ use PHPBackend\DBEntity;
  * @author Esaie Muhasa
  *
  */
-class UtilitaireSQL
+final class UtilitaireSQL
 {
     private function __construct(){}
     
@@ -32,8 +32,7 @@ class UtilitaireSQL
      * @throws \PDOException
      * @return \PDOStatement
      */
-    public static  function prepareStatement (\PDO $pdo, string $sql, array $params = []) : \PDOStatement
-    {
+    public static  function prepareStatement (\PDO $pdo, string $sql, array $params = []) : \PDOStatement {
         /**
          * @var \PDOStatement $result
          */
@@ -58,8 +57,7 @@ class UtilitaireSQL
      * @throws DAOException
      * @return int|void
      */
-    public static function insert (\PDO $pdo, string $tableName, array $data, $returnGeneratedKey=true) 
-    {
+    public static function insert (\PDO $pdo, string $tableName, array $data, $returnGeneratedKey=true) {
         $SQL = 'INSERT INTO '.$tableName.' ( ';
         $SQL_SUITE = ' VALUES (';
         
@@ -114,8 +112,7 @@ class UtilitaireSQL
      * @throws DAOException s'il y a erreur lors de la modification ou echec de modification
      * @return void
      */
-    public static function update (\PDO $pdo, string $tableName, array $data, $id=null) : void
-    {
+    public static function update (\PDO $pdo, string $tableName, array $data, $id=null) : void {
         $SQL = 'UPDATE '.$tableName.' SET ';
         $SQL_SUITE = ' WHERE id ='.$id;
         
@@ -166,8 +163,7 @@ class UtilitaireSQL
      * @param int $id
      * @throws DAOException
      */
-    public static  function delete (\PDO $pdo, string $tableName, string $columnName, $whereValue) : void
-    {
+    public static  function delete (\PDO $pdo, string $tableName, string $columnName, $whereValue) : void {
         try {
             $result = $pdo->prepare("DELETE FROM {$tableName}  WHERE {$columnName} = :{$columnName}");
             if ($result == false){
@@ -227,8 +223,8 @@ class UtilitaireSQL
      * @throws DAOException s'il y erreur lors de la communication avec le SGBD
      * @return boolean true si la veur existe, sinon false
      */
-    public static function columnValueExist(\PDO $pdo, string $tableName, string $columnName, $columnValue, $id = null) : bool
-    {
+    public static function columnValueExist(\PDO $pdo, string $tableName, string $columnName, $columnValue, $id = null) : bool {
+        $return = false;
         try {
             $result = $pdo->prepare('SELECT '.$columnName.' FROM '.$tableName.' WHERE '.$columnName.'=:'.$columnName.($id !== null ? ' AND id!='.$id : '').' LIMIT 1 OFFSET 0');
             if ($result == false){
@@ -240,17 +236,14 @@ class UtilitaireSQL
                 $result->closeCursor();
                 throw new DAOException('Echec d\'exécution de la requête. re-essayez svp!...');
             }
-            
             if($result->fetch()){
-                $result->closeCursor();
-                return true;
-            }else {
-                $result->closeCursor();
-                return false;
+                $return = true;
             }
+            $result->closeCursor();
         } catch (\Exception $e) {
             throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
         }
+        return $return;
     }
     
     /**
@@ -264,8 +257,7 @@ class UtilitaireSQL
      * @param int $offset
      * @return Object[]
      */
-    public static function findAll(\PDO $pdo, string $tableName, string $entityClassName, string $columnOrder, bool $deskOrder = true, array $filters = array(), ?int $limit=null, int $offset=0)
-    {
+    public static function findAll(\PDO $pdo, string $tableName, string $entityClassName, string $columnOrder, bool $deskOrder = true, array $filters = array(), ?int $limit=null, int $offset=0) {
         $data = array();
         $entityClass = $entityClassName;
         
@@ -282,18 +274,17 @@ class UtilitaireSQL
             $statement = $pdo->prepare($SQL);
             $statut = $statement->execute($filters);
             if ($statut) {
-                if ($row = $statement->fetch()) {
+                while ($row = $statement->fetch()) {
                     $data [] = new $entityClass($row);
-                    while ($row = $statement->fetch()) {
-                        $data [] = new $entityClass($row);
-                    }
-                } else {
+                }
+                $statement->closeCursor();
+                if (empty($data)){
                     throw new DAOException('Aucune donnée retournée pour la requête de sélection');
                 }
             }else {
+                $statement->closeCursor();
                 throw new DAOException('Echec d\'exéctionn de la requête. Ré-essayez svp! ...');
             }
-            $statement->closeCursor();
         } catch (\Exception $e) {
             throw new DAOException("Error in selection query: {$SQL}", DAOException::ERROR_CODE, $e);
         }
@@ -445,7 +436,7 @@ class UtilitaireSQL
         $data = array();
         
         try {
-            $SQL = 'SELECT * FROM '.$tableName.' WHERE id '.($in? '':'NOT').' IN (';
+            $SQL = 'SELECT * FROM '.$tableName.' WHERE id '.($in? '':'NOT').' IN(';
             $args = $values;
             
             for ($i = 0; $i < count($values); $i++) {
@@ -514,9 +505,7 @@ class UtilitaireSQL
         if ($dateMax == null) {
             $dateMax = $dateMin;
         }
-        
-        
-        
+
         $params = array();
         
         $params['dateMin'] = $dateMin->format('Y-m-d\T00:00:00');
@@ -535,7 +524,7 @@ class UtilitaireSQL
             }
         }
         
-        $SQL .= ($limit !== null? (" LIMIT {$limit} OFFSET ".($offset!=0? $offset:'0')):'');
+        $SQL .= " ORDER BY {$columnName} DESC".($limit !== null? (" LIMIT {$limit} OFFSET ".($offset!=0? $offset:'0')):'');
         $data = array();
         try {
             $result = $pdo->prepare($SQL);
@@ -584,9 +573,7 @@ class UtilitaireSQL
         if ($dateMax == null) {
             $dateMax = $dateMin;
         }
-        
-        
-        
+
         $params = array();
         
         $params['dateMin'] = $dateMin->format('Y-m-d\T00:00:00');
@@ -652,8 +639,7 @@ class UtilitaireSQL
         if ($dateMax == null) {
             $dateMax = $dateMin;
         }
-        
-        
+
         $params = array();
         
         $params['dateMin'] = $dateMin->format('Y-m-d\T00:00:00');

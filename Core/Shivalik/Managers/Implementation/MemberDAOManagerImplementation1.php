@@ -14,6 +14,7 @@ use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
 use Core\Shivalik\Entities\OfficeBonus;
 use Core\Shivalik\Entities\GradeMember;
+use Core\Shivalik\Entities\PurchaseBonus;
 
 /**
  *
@@ -22,6 +23,7 @@ use Core\Shivalik\Entities\GradeMember;
  */
 class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements MemberDAOManager
 {
+    const OPERATIONS_ENTITIES = [PointValue::class, BonusGeneration::class, OfficeBonus::class, Withdrawal::class, PurchaseBonus::class];
     /**
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\MemberDAOManager::loadAccount()
@@ -29,9 +31,7 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
     public function loadAccount ($member, bool $calcul = true) : Account {
         $account = new Account(($member instanceof Member)? $member : $this->findById($member));
         
-        $daos = [PointValue::class, BonusGeneration::class, OfficeBonus::class, Withdrawal::class];
-        
-        foreach ($daos as $dao) {
+        foreach (self::OPERATIONS_ENTITIES as $dao) {
             /**
              * @var AbstractOperationDAOManager $interface
              */
@@ -724,7 +724,7 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
     {
         $return = false;
         try {
-            $statement = $this->pdo->prepare("SELECT id FROM {$this->getTableName()} WHERE id=:id AND sponsor IS NOT NULL");
+            $statement = $this->getConnection()->prepare("SELECT id FROM {$this->getTableName()} WHERE id=:id AND sponsor IS NOT NULL");
             if($statement->execute(array('id' => $memberId))){
                 if($statement->fetch()){
                     $return = true;
@@ -810,11 +810,13 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
         foreach ($indexs as $index) {//premier niveau de recherche, pour est elements uniques
             $partiels = [];
             if ($this->checkByMatricule($index)) {
-                $partiels[] = $this->findByMatricule($index);
+                $member = $this->findByMatricule($index);
+                $partiels[] = $member;
             }
             
             if ($this->checkByPseudo($index)) {
-                $partiels[] = $this->findByPseudo($index);
+                $member = $this->findByPseudo($index);
+                $partiels[] = $member;
             }
             
             if (empty($partiels)) {//s'il on n'a rien eu pour la selection prioritarie
@@ -890,7 +892,10 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
                 $sql2 .= " ORDER BY name";
                 $statement2 = UtilitaireSQL::prepareStatement($pdo, $sql2, $sql2Params);
                 while ($row = $statement2->fetch()) {
-                    $data[] = new Member($row);
+                    $member = new Member($row);
+                    $member->setParent(null);
+                    $member->setSponsor(null);
+                    $data[] = $member;
                 }
                 $statement2->closeCursor();
             } catch (\PDOException $e) {

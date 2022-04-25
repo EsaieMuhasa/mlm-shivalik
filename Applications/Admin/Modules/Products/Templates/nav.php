@@ -64,16 +64,13 @@ use Applications\Admin\Modules\Products\ProductsController;
                 		<li class="<?php echo (isset($_REQUEST[ProductsController::ATT_ACTIVE_MENU]) && $_REQUEST[ProductsController::ATT_ACTIVE_MENU] == ProductsController::ITEM_MENU_ADD_PRODUCT)? "active" : ""; ?>">
         	        		<a href="/admin/products/stocks/add.html">New stock</a>
         	        	</li>
-                		<li class="<?php echo ""; ?>">
-        	        		<a href="/admin/products/stocks/">Show vailable stocks</a>
-        	        	</li>
         	        	<li class="<?php echo (isset($_REQUEST[ProductsController::ATT_ACTIVE_MENU]) && $_REQUEST[ProductsController::ATT_ACTIVE_MENU] == ProductsController::ITEM_MENU_ADD_PRODUCT)? "active" : ""; ?>">
-        	        		<a href="/admin/products/stocks/all/">Show all Stocks</a>
+        	        		<a href="/admin/products/stocks/">Show all Stocks</a>
         	        	</li>	        	
         	        	<li role="separator" class="divider"></li>
         	        	<li class="">
-        	        		<a href="/admin/stocks/charts/">
-                    			<span class="fa fa-task"></span> Evolutions
+        	        		<a href="/admin/stocks/stocks/">
+                    			<span class="fa fa-task"></span> Others
                     		</a>
         	        	</li>
                 	</ul>

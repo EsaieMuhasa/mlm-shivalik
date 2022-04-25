@@ -7,14 +7,6 @@ use Core\Shivalik\Entities\Product;
  * @var Product[] $products
  */
 $product = $_REQUEST[ProductsController::ATT_PRODUCT];
-$products = $_REQUEST[ProductsController::ATT_PRODUCTS];
-
-$offset = isset($_GET['offset'])? $_GET['offset'] : 0;
-$limit = isset($_GET['limit'])? $_GET['limit'] : 4;
-
-$prev = $offset - 4;
-$next = $offset + 4;
-$count = intval($_REQUEST[ProductsController::ATT_COUNT_PRODUCT], 10);
 ?>
 <section class="row">
 	<div class="col-xs-12">
@@ -33,46 +25,48 @@ $count = intval($_REQUEST[ProductsController::ATT_COUNT_PRODUCT], 10);
             			<a href="update.html" class="btn btn-primary">Update</a>
             			<a href="stocks/add.html" class="btn btn-info">new stocks</a>
             		</div>
+            		<br>
+            		
     			</div>
     			<div class="col-md-4 col-sm-4 col-xs-12">
     				<img class="thumbnail" src="/<?php echo $product->picture;?>" alt="<?php echo htmlspecialchars($product->name); ?>"/>
     			</div>
+    			
+    			<?php if($product->hasStock()) : ?>
+    			<div class="col-xs-12">
+            		<div class="panel panel-default">
+            			<div class="panel-heading">
+            				<strong class="panel-title">Stocks</strong>
+            			</div>
+            			<div class="panel-body">
+            				<ul class="list-group">
+                				<?php foreach ($product->getStocks() as $stock) : ?>
+            					<li class="list-group-item">
+            						<h4><?php echo $stock->getFormatedDateAjout(); ?></h4>
+            						<div class="row">
+            							<div class="col-xs-8 col-sm-9 col-md-10">
+                                			<div class="progress">
+                                            	<div class="progress-bar" role="progressbar" aria-valuenow="<?php echo ($stock->getSoldToPercent()); ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?php echo ($stock->getSoldToPercent()); ?>%;"><?php echo ($stock->getSoldToPercent()); ?>% (<?php echo ("{$stock->getSold()}/{$stock->getQuantity()}"); ?>)</div>
+                                            </div>        					
+            							</div>
+            							<div class="col-xs-4 col-sm-3 col-md-2 text-right">
+            								<a href="stocks/<?php echo $stock->id; ?>/update.html" class="btn btn-xs btn-primary">
+            									<span class="fa fa-edit"></span><span class="-hidden-xs">Update</span>
+            								</a>
+            								<a href="stocks/<?php echo $stock->id; ?>/delete.html" class="btn btn-xs btn-danger">
+            									<span class="glyphicon glyphicon-remove-sign"></span><span class="-hidden-xs">Delete</span>
+            								</a>
+            							</div>
+            						</div>
+            					</li>
+                                <?php endforeach; ?>
+            				</ul>
+            			</div>
+            		</div>
+    			</div>
+    			<?php endif;?>
+    			
     		</div>
 		</div>
-	</div>
-	
-	<div class="col-xs-12">
-		<h2><?php echo  htmlspecialchars($product->getCategory()->getTitle()); ?></h2>
-		<div class="row">
-			<?php foreach ($products as $p) : ?>
-			<div class="col-sm-4 col-md-3 col-lg-3">
-                <div class="thumbnail">
-        			<img src="/<?php echo $p->picture;?>" alt="<?php echo htmlspecialchars($p->name); ?>"/>
-                    <div class="caption">
-                        <h3 class="h3 <?php echo ($p->id == $product->id? 'text-info' : ''); ?>"><?php echo htmlspecialchars($p->name); ?></h3>
-                        <p class="text-right">
-                        	<small class="label label-danger"> <?php echo $p->defaultUnitPrice; ?> $</small>
-                            <small class="label label-info"> <?php echo $p->packagingSize; ?> </small>
-                        </p>
-                        <p class="text-justify"><?php echo htmlspecialchars($p->getDescription(100)); ?></p>
-                        <div class="btn-group">
-                        	<a href="/admin/products/<?php echo "{$p->id}/{$limit}-more-skips-{$offset}.html"; ?>" class="btn btn-xs btn-primary" role="button">See more</a>
-                        	<a href="/admin/products/<?php echo $p->id; ?>/update.html" class="btn btn-xs btn-default" role="button">Update</a>
-                        </div>
-                    </div>
-                </div>
-			</div>
-			<?php endforeach;?>
-		</div>
-		<nav aria-label="products pager navigation">
-            <ul class="pager">
-            	<?php if ($prev>=0) : ?>
-                <li class="previous"><a href="/admin/products/<?php echo "{$product->id}/{$limit}-more-skips-{$prev}.html"; ?>">Previous</a></li>
-            	<?php endif;?>
-            	<?php if ($next < $count) : ?>
-                <li class="next"><a href="/admin/products/<?php echo "{$product->id}/{$limit}-more-skips-{$next}.html"; ?>">Next</a></li>
-            	<?php endif;?>
-            </ul>
-        </nav>
 	</div>
 </section>

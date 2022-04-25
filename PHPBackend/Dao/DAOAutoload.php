@@ -2,15 +2,15 @@
 namespace PHPBackend\Dao;
 
 /**
+ * 
+ * @author Esaie MUHASA
  *
- * @author Esaie MHS
- *        
  */
 trait DAOAutoload
 {
     
     /**
-     * Injecteur de dependance des DAOs
+     * Injecteur des implementations des DAOs
      * @param DAOManagerFactory $daoManager
      * @return void
      */
@@ -30,8 +30,8 @@ trait DAOAutoload
             
             if ($config->hasAlias($propertieName)) {
                 $propertie->setAccessible(true);
-                $propertie->setValue($this, $daoManager->find($propertieName));
-                $propertie->setAccessible(false);
+                $propertie->setValue ($this, $daoManager->find($propertieName));
+                $propertie->setAccessible (false);
             }
         }
         

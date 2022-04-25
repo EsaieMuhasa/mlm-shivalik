@@ -33,6 +33,7 @@
 	 	<route action="downlines" urlPattern="/admin/members/([0-9]+)/(downlines)/(left|middle|right|all)\.html" paramsNames="id,option,foot"/>
 	 	<route action="downlinesHierarchy" urlPattern="/admin/members/([0-9]+)/(downlines-hierarchy)/" paramsNames="id,option"/>
 	 	<route action="downlinesHierarchy" urlPattern="/admin/members/([0-9]+)/(downlines-hierarchy)/(left|middle|right|all)\.(json|xml|html)" paramsNames="id,option,foot,ext"/>
+		<route action="uplinesMember" urlPattern="/admin/members/([0-9]+)/uplines\.html" paramsNames="id"/>
 	 	<route action="certifyMember" urlPattern="/admin/members/([0-9]+)/(certify)-([0-9]+)\.html" paramsNames="id,option,idGradeMember"/>
 		<route action="tree" urlPattern="/admin/members/([0-9]+)/(tree)/(left|middle|right|all)\.html" paramsNames="id,option,foot"/>
 		
@@ -52,6 +53,7 @@
 		<route action="upgrades" urlPattern="/admin/offices/([0-9]+)/upgrades\.html" paramsNames="id"/>
 		<route action="dashboard" urlPattern="/admin/offices/([0-9]+)/" paramsNames="id"/>
 		<route action="officeAdmin" urlPattern="/admin/offices/([0-9]+)/admin\.html" paramsNames="id"/>
+		<route action="createOfficeAdmin" urlPattern="/admin/offices/([0-9]+)/admin/new\.html" paramsNames="id"/>
 		<route action="officeAdmin" urlPattern="/admin/offices/([0-9]+)/(enable|disable)-([0-9]+)\.html" paramsNames="id,option,adminId"/>
 		<route action="resetPassword" urlPattern="/admin/offices/([0-9]+)/reset-([0-9]+)\.html" paramsNames="id,adminId"/>
 		<route action="redirectWithdrawal" urlPattern="/admin/offices/([0-9]+)/withdrawals/([0-9]+)/redirect\.html" paramsNames="id,withdrawalId"/>
@@ -65,9 +67,49 @@
 		<route action="history" urlPattern="/admin/offices/([0-9]+)/history/" paramsNames="id"/>
 		<route action="history" urlPattern="/admin/offices/([0-9]+)/history/([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})\.html" paramsNames="id,date"/>
 		<route action="history" urlPattern="/admin/offices/([0-9]+)/history/([0-9]{1,2})-([0-9]{4})\.html" paramsNames="id,month,year"/>
+		
+		<!-- stock -->
+		<route action="stocks" urlPattern="/admin/offices/([0-9]+)/stocks/" paramsNames="id"/>
+		<route action="addStock" urlPattern="/admin/offices/([0-9]+)/stocks/add\.html" paramsNames="id"/>
+		<route action="updateStock" urlPattern="/admin/offices/([0-9]+)/stocks/([0-9]+)/update\.html" paramsNames="id,stockId"/>
+		<route action="removeStock" urlPattern="/admin/offices/([0-9]+)/stocks/([0-9]+)/remove\.html" paramsNames="id,stockId"/>
+		<!-- //stock -->
+		
+		<!-- select commands of date -->
+		<route action="index" urlPattern="/admin/offices/([0-9]+)/products/" paramsNames="id"/>
+		<route action="index" urlPattern="/admin/offices/([0-9]+)/products/commands-of-([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})/" paramsNames="id,date"/>
+		<route action="index" urlPattern="/admin/offices/([0-9]+)/products/commands-of-([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})/([0-9]+)-([0-9]+)\.html" paramsNames="id,date,limit,offset"/>
+		<!-- // -->
+		
+		<!-- select commands of month -->
+		<route action="index" urlPattern="/admin/offices/([0-9]+)/products/commands-of-([0-9]{1,2})-([0-9]{4})/" paramsNames="id,month,year"/>
+		<route action="index" urlPattern="/admin/offices/([0-9]+)/products/commands-of-([0-9]{1,2})-([0-9]{4})/([0-9]+)-([0-9]+)\.html" paramsNames="id,month,year,limit,offset"/>
+		<!-- // -->
+		
+		<!-- select commands of week -->
+		<route action="index" urlPattern="/admin/offices/([0-9]+)/products/commands-of-([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})-to-([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})-week-([0-5])/" paramsNames="id,firstDay,lastDay,week"/>
+		<route action="index" urlPattern="/admin/offices/([0-9]+)/products/commands-of-([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})-to-([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})-week-([0-5])/([0-9]+)-([0-9]+)\.html" paramsNames="id,firstDay,lastDay,week,limit,offset"/>
+		<!-- // -->
 	</module>
 	
 	<module name="Products">
+		
+		<!-- select commands of date -->
+		<route action="index" urlPattern="/admin/products/"/>
+		<route action="index" urlPattern="/admin/products/commands-of-([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})/" paramsNames="date"/>
+		<route action="index" urlPattern="/admin/products/commands-of-([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})/([0-9]+)-([0-9]+)\.html" paramsNames="date,limit,offset"/>
+		<!-- // -->
+		
+		<!-- select commands of month -->
+		<route action="index" urlPattern="/admin/products/commands-of-([0-9]{1,2})-([0-9]{4})/" paramsNames="month,year"/>
+		<route action="index" urlPattern="/admin/products/commands-of-([0-9]{1,2})-([0-9]{4})/([0-9]+)-([0-9]+)\.html" paramsNames="month,year,limit,offset"/>
+		<!-- // -->
+		
+		<!-- select commands of week -->
+		<route action="index" urlPattern="/admin/products/commands-of-([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})-to-([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})-week-([0-5])/" paramsNames="firstDay,lastDay,week"/>
+		<route action="index" urlPattern="/admin/products/commands-of-([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})-to-([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})-week-([0-5])/([0-9]+)-([0-9]+)\.html" paramsNames="firstDay,lastDay,week,limit,offset"/>
+		<!-- // -->
+	
 		<!-- categorisation des produits -->
 		<route action="categories" urlPattern="/admin/products/categories/"/>
 		<route action="addCategory" urlPattern="/admin/products/categories/add\.html"/>
@@ -76,8 +118,6 @@
 		<route action="classement" urlPattern="/admin/products/categories/([0-9]+)/" paramsNames="id"/>
 		<route action="classement" urlPattern="/admin/products/categories/([0-9]+)/([0-9]+)-([0-9]+)\.html" paramsNames="id,limit,offset"/>
 		<!-- // -->
-		
-		<route action="index" urlPattern="/admin/products/"/>
 		
 		<!-- visualisation des produits -->
 		<route action="showProducts" urlPattern="/admin/products/(grid|table)/" paramsNames="affichage"/>
@@ -90,8 +130,9 @@
 		<route action="product" urlPattern="/admin/products/([0-9]+)/([0-9]+)-more-skips-([0-9]+)\.html" paramsNames="id,limit,offset"/>
 		<route action="updateProduct" urlPattern="/admin/products/([0-9]+)/update\.html" paramsNames="id"/>
 		
-		<route action="stocks" urlPattern="/admin/stocks/"/>
-		<route action="stocks" urlPattern="/admin/stocks/([0-9]+)-([0-9]+)\.html" paramsNames="limit,offset"/>
+		<route action="stocks" urlPattern="/admin/products/stocks/"/>
+		<route action="stocks" urlPattern="/admin/products/stocks/([0-9]+)-([0-9]+)\.html" paramsNames="limit,offset"/>
+
 	</module>
 	
 </app-routes>

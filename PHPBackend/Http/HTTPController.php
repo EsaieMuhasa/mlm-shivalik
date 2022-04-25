@@ -7,6 +7,8 @@ use PHPBackend\PHPBackendException;
 use PHPBackend\Application;
 use PHPBackend\Page;
 use PHPBackend\Dao\DAOManagerFactory;
+use PHPBackend\Request;
+use PHPBackend\Response;
 /**
  *
  * @author Esaie MHS
@@ -65,7 +67,16 @@ abstract class HTTPController implements Controller
         $this->setView($action);
         $this->hydrateInterfaces($this->getDaoManager());
         $application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, "");
+        $this->init($application->getRequest(), $application->getResponse());
     }
+    
+    /**
+     * methode d'initialisation
+     * Cette methode est automaqiauement executer lors de la construction
+     * @param Request $request
+     * @param Response $response
+     */
+    protected function init (Request $request, Response $response) : void {}
     
     
     /**

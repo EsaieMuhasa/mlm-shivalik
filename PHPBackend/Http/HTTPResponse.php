@@ -155,12 +155,13 @@ final class HTTPResponse implements Response
     
     /**
      * Envoei d'un vue au format PDF
+     * @param string $fileName
      * @param string $orientation l'orientation des pages (landscape ou port)
      * @param string $size
      */
-    public function sendPDF(string $orientation='portrait', string $size = 'A4'){
+    public function sendPDF(?string $fileName = null, string $orientation='portrait', string $size = 'A4'){
         
-        require_once (__DIR__).DIRECTORY_SEPARATOR.'ExternalDependencies'.DIRECTORY_SEPARATOR.'dompdf'.DIRECTORY_SEPARATOR.'autoload.inc.php';
+        require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'dompdf'.DIRECTORY_SEPARATOR.'autoload.inc.php';
         
         //def("DOMPDF_ENABLE_REMOTE", false);
         $pdf = new Dompdf();
@@ -170,7 +171,7 @@ final class HTTPResponse implements Response
         $pdf->setPaper($size, $orientation);
         $pdf->render();
         
-        exit($pdf->stream('onlinediab-com-document.pdf', array('Attachment' => 0)));
+        exit($pdf->stream(($fileName == null? $this->getApplication()->getConfig()->get('website').'-document-'.time() : $fileName).'.pdf', array('Attachment' => 0)));
     }
     
 

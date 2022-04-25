@@ -49,7 +49,7 @@ $office = $_REQUEST[OfficesController::ATT_OFFICE];
 	        	
 	        	<li class="<?php echo (isset($_REQUEST[OfficesController::ATT_ACTIVE_ITEM_MENU]) && $_REQUEST[OfficesController::ATT_ACTIVE_ITEM_MENU] == OfficesController::ATT_ITEM_MENU_MEMBERS)? "active":""; ?>">
 	        		<a href="/admin/offices/<?php echo $office->id; ?>/" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-		         		<span class="fa fa-users"></span> Users<span class="caret"></span>
+		         		<span class="fa fa-users"></span> Users <span class="caret"></span>
 		         	</a>
 		          	<ul class="dropdown-menu">
 		            	<li><a href="/admin/offices/<?php echo $office->id; ?>/members.html"><span class="fa fa-users"></span> Membership</a></li>
@@ -62,7 +62,22 @@ $office = $_REQUEST[OfficesController::ATT_OFFICE];
         				</li>
 		          	</ul>
 	        	</li>
-				
+	        	
+				<li class="<?php echo (isset($_REQUEST[OfficesController::ATT_ACTIVE_ITEM_MENU]) && $_REQUEST[OfficesController::ATT_ACTIVE_ITEM_MENU] == OfficesController::ATT_ITEM_MENU_STOCKS)? "active":""; ?>">
+					<a href="/admin/offices/<?php echo $office->id; ?>/stocks/" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+						<span class="fa fa-database"></span> Stocks<span class="caret"></span>
+					</a>
+					<ul class="dropdown-menu">
+		            	<li><a href="/admin/offices/<?php echo $office->id; ?>/stocks/add.html"><span class="fa fa-plus"></span> New stock</a></li>
+		            	<li><a href="/admin/offices/<?php echo $office->id; ?>/stocks/"><span class="icon_document"></span> Show available stocks</a></li>
+		            	<li role="separator" class="divider"></li>
+        				<li class="<?php echo (isset($_REQUEST[OfficesController::ATT_ACTIVE_ITEM_MENU]) && $_REQUEST[OfficesController::ATT_ACTIVE_ITEM_MENU] == OfficesController::ATT_ITEM_MENU_OFFICE_ADMIN)? "active":""; ?>">
+        					<a href="/admin/offices/<?php echo $office->id; ?>/stocks/">
+        						<span class="glyphicon glyphicon-list"></span> Show all stocks
+        					</a>
+        				</li>
+		          	</ul>
+				</li>
 				
 				<li class="<?php echo (isset($_REQUEST[OfficesController::ATT_ACTIVE_ITEM_MENU]) && $_REQUEST[OfficesController::ATT_ACTIVE_ITEM_MENU] == OfficesController::ATT_ITEM_MENU_VIRTUAL_MONEY)? "active":""; ?>">
 					<a href="/admin/offices/<?php echo $office->id; ?>/virtualmoney/">
