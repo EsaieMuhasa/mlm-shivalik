@@ -74,9 +74,42 @@
 		<route action="updateStock" urlPattern="/admin/offices/([0-9]+)/stocks/([0-9]+)/update\.html" paramsNames="id,stockId"/>
 		<route action="removeStock" urlPattern="/admin/offices/([0-9]+)/stocks/([0-9]+)/remove\.html" paramsNames="id,stockId"/>
 		<!-- //stock -->
+		
+		<!-- select commands of date -->
+		<route action="index" urlPattern="/admin/offices/([0-9]+)/products/" paramsNames="id"/>
+		<route action="index" urlPattern="/admin/offices/([0-9]+)/products/commands-of-([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})/" paramsNames="id,date"/>
+		<route action="index" urlPattern="/admin/offices/([0-9]+)/products/commands-of-([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})/([0-9]+)-([0-9]+)\.html" paramsNames="id,date,limit,offset"/>
+		<!-- // -->
+		
+		<!-- select commands of month -->
+		<route action="index" urlPattern="/admin/offices/([0-9]+)/products/commands-of-([0-9]{1,2})-([0-9]{4})/" paramsNames="id,month,year"/>
+		<route action="index" urlPattern="/admin/offices/([0-9]+)/products/commands-of-([0-9]{1,2})-([0-9]{4})/([0-9]+)-([0-9]+)\.html" paramsNames="id,month,year,limit,offset"/>
+		<!-- // -->
+		
+		<!-- select commands of week -->
+		<route action="index" urlPattern="/admin/offices/([0-9]+)/products/commands-of-([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})-to-([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})-week-([0-5])/" paramsNames="id,firstDay,lastDay,week"/>
+		<route action="index" urlPattern="/admin/offices/([0-9]+)/products/commands-of-([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})-to-([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})-week-([0-5])/([0-9]+)-([0-9]+)\.html" paramsNames="id,firstDay,lastDay,week,limit,offset"/>
+		<!-- // -->
 	</module>
 	
 	<module name="Products">
+		
+		<!-- select commands of date -->
+		<route action="index" urlPattern="/admin/products/"/>
+		<route action="index" urlPattern="/admin/products/commands-of-([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})/" paramsNames="date"/>
+		<route action="index" urlPattern="/admin/products/commands-of-([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})/([0-9]+)-([0-9]+)\.html" paramsNames="date,limit,offset"/>
+		<!-- // -->
+		
+		<!-- select commands of month -->
+		<route action="index" urlPattern="/admin/products/commands-of-([0-9]{1,2})-([0-9]{4})/" paramsNames="month,year"/>
+		<route action="index" urlPattern="/admin/products/commands-of-([0-9]{1,2})-([0-9]{4})/([0-9]+)-([0-9]+)\.html" paramsNames="month,year,limit,offset"/>
+		<!-- // -->
+		
+		<!-- select commands of week -->
+		<route action="index" urlPattern="/admin/products/commands-of-([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})-to-([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})-week-([0-5])/" paramsNames="firstDay,lastDay,week"/>
+		<route action="index" urlPattern="/admin/products/commands-of-([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})-to-([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})-week-([0-5])/([0-9]+)-([0-9]+)\.html" paramsNames="firstDay,lastDay,week,limit,offset"/>
+		<!-- // -->
+	
 		<!-- categorisation des produits -->
 		<route action="categories" urlPattern="/admin/products/categories/"/>
 		<route action="addCategory" urlPattern="/admin/products/categories/add\.html"/>
@@ -85,8 +118,6 @@
 		<route action="classement" urlPattern="/admin/products/categories/([0-9]+)/" paramsNames="id"/>
 		<route action="classement" urlPattern="/admin/products/categories/([0-9]+)/([0-9]+)-([0-9]+)\.html" paramsNames="id,limit,offset"/>
 		<!-- // -->
-		
-		<route action="index" urlPattern="/admin/products/"/>
 		
 		<!-- visualisation des produits -->
 		<route action="showProducts" urlPattern="/admin/products/(grid|table)/" paramsNames="affichage"/>
@@ -99,8 +130,9 @@
 		<route action="product" urlPattern="/admin/products/([0-9]+)/([0-9]+)-more-skips-([0-9]+)\.html" paramsNames="id,limit,offset"/>
 		<route action="updateProduct" urlPattern="/admin/products/([0-9]+)/update\.html" paramsNames="id"/>
 		
-		<route action="stocks" urlPattern="/admin/stocks/"/>
-		<route action="stocks" urlPattern="/admin/stocks/([0-9]+)-([0-9]+)\.html" paramsNames="limit,offset"/>
+		<route action="stocks" urlPattern="/admin/products/stocks/"/>
+		<route action="stocks" urlPattern="/admin/products/stocks/([0-9]+)-([0-9]+)\.html" paramsNames="limit,offset"/>
+
 	</module>
 	
 </app-routes>

@@ -436,7 +436,7 @@ final class UtilitaireSQL
         $data = array();
         
         try {
-            $SQL = 'SELECT * FROM '.$tableName.' WHERE id '.($in? '':'NOT').' IN (';
+            $SQL = 'SELECT * FROM '.$tableName.' WHERE id '.($in? '':'NOT').' IN(';
             $args = $values;
             
             for ($i = 0; $i < count($values); $i++) {
@@ -524,7 +524,7 @@ final class UtilitaireSQL
             }
         }
         
-        $SQL .= ($limit !== null? (" LIMIT {$limit} OFFSET ".($offset!=0? $offset:'0')):'');
+        $SQL .= " ORDER BY {$columnName} DESC".($limit !== null? (" LIMIT {$limit} OFFSET ".($offset!=0? $offset:'0')):'');
         $data = array();
         try {
             $result = $pdo->prepare($SQL);

@@ -39,11 +39,11 @@ class PointValue extends AbstractBonus
      */
     public function setFoot($foot) : void 
     {
-        if ($foot < self::FOOT_LEFT) {
+        if ($foot !== null && $foot < self::FOOT_LEFT) {
             $foot = self::FOOT_LEFT;
         }
         
-        if ($foot > self::FOOT_RIGTH) {
+        if ($foot !== null && $foot > self::FOOT_RIGTH) {
             $foot = self::FOOT_RIGTH;
         }
         

@@ -12,6 +12,16 @@ use PHPBackend\Dao\DAOException;
  */
 interface CommandDAOManager extends DAOInterface {
     
+    
+    /**
+     * Chargement complete d'une commande
+     * @param Command|int $command
+     * @return Command
+     * @throws DAOException tantative de cargement d'une commande qui n'existe pas dans la BDD
+     * ou s'il y a erreur dans le processuce de chargement des donnees
+     */
+    public function load ($command) : Command;
+    
     /**
      * verification des commands deja effectuer par un membre
      * @param int $memberId

@@ -6,6 +6,7 @@ use Core\Shivalik\Entities\Stock;
 use Core\Shivalik\Managers\AuxiliaryStockDAOManager;
 use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
+use Core\Shivalik\Entities\Office;
 
 /**
  *
@@ -22,6 +23,7 @@ class AuxiliaryStockDAOManagerImplementation1 extends StockDAOManagerImplementat
     public function load($stock): Stock {
         $data = ($stock instanceof AuxiliaryStock) ? $stock : $this->findById(intval($stock, 10), true);
         $data->setParent($this->getDaoManager()->getManagerOf(Stock::class)->findById($data->getParent()->getId(), true));
+        $data->setOffice($this->getDaoManager()->getManagerOf(Office::class)->findById($data->getOffice()->getId(), false));
         
         return $data;
     }

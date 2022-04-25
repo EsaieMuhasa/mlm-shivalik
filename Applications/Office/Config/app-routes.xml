@@ -52,6 +52,9 @@
 		
 		<route action="command" urlPattern="/office/products/command/"/>
 		<route action="command" urlPattern="/office/products/command/pdf\.pdf"/>
+		<route action="command" urlPattern="/office/products/commands/([0-9]+)/(pdf)\.pdf" paramsNames="id,option"/>
+		<route action="command" urlPattern="/office/products/commands/([0-9]+)/(delivered)\.html" paramsNames="id,option"/>
+		
 		<route action="validateCommand" urlPattern="/office/products/command/validate\.html"/>
 		<route action="cancelCommand" urlPattern="/office/products/command/cancel\.html"/>
 		<route action="memberCommand" urlPattern="/office/products/command/member\.html"/>

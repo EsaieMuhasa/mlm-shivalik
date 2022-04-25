@@ -9,7 +9,7 @@ use PHPBackend\AppConfig;
  * @var Command $command
  * @var AppConfig $config
  */
-$command = $_SESSION[ProductsController::ATT_COMMAND];
+$command = $_REQUEST[ProductsController::ATT_COMMAND];
 $config = $_REQUEST[Request::ATT_APP_CONFIG];
 ?>
 
