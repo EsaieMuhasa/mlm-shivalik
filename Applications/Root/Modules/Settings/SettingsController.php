@@ -5,6 +5,7 @@ use Core\Shivalik\Filters\SessionRootFilter;
 use Core\Shivalik\Managers\CountryDAOManager;
 use Core\Shivalik\Managers\GenerationDAOManager;
 use Core\Shivalik\Managers\GradeDAOManager;
+use Core\Shivalik\Managers\MemberDAOManager;
 use Core\Shivalik\Managers\OfficeAdminDAOManager;
 use Core\Shivalik\Managers\OfficeDAOManager;
 use Core\Shivalik\Managers\SizeDAOManager;
@@ -12,6 +13,7 @@ use Core\Shivalik\Validators\CountryFormValidator;
 use Core\Shivalik\Validators\GenerationFormValidator;
 use Core\Shivalik\Validators\GradeFormValidator;
 use Core\Shivalik\Validators\LocalisationFormValidator;
+use Core\Shivalik\Validators\MemberFormValidator;
 use Core\Shivalik\Validators\OfficeAdminFormValidator;
 use Core\Shivalik\Validators\OfficeFormValidator;
 use Core\Shivalik\Validators\SizeFormValidator;
@@ -19,7 +21,10 @@ use PHPBackend\Application;
 use PHPBackend\Request;
 use PHPBackend\Response;
 use PHPBackend\Http\HTTPController;
-use Core\Shivalik\Validators\MemberFormValidator;
+use Core\Shivalik\Filters\SessionAdminFilter;
+use Core\Shivalik\Filters\SessionMemberFilter;
+use Core\Shivalik\Filters\SessionOfficeFilter;
+use Core\Shivalik\Entities\OfficeAdmin;
 
 /**
  *
@@ -83,6 +88,11 @@ class SettingsController extends HTTPController
     private $sizeDAOManager;
     
     /**
+     * @var MemberDAOManager
+     */
+    private $memberDAOManager;
+    
+    /**
 	 * {@inheritDoc}
 	 * @see \PHPBackend\Http\HTTPController::__construct()
 	 */
@@ -121,6 +131,42 @@ class SettingsController extends HTTPController
                 $request->addAttribute('result', 'Connection failure');
             }
         }
+    }
+    
+    /**
+     * Connexion de root a une session X
+     * @param Request $request
+     * @param Response $response
+     */
+    public function executeLoginAdmin (Request $request, Response $response) : void {
+        $id = intval($request->getDataGET('id'), 10);
+        $user = $request->getDataGET('session');
+        
+        switch ($user) {
+            case 'office' : {
+                /**
+                 * @var OfficeAdmin $officeAdmin
+                 */
+                $officeAdmin = $this->officeAdminDAOManager->findById($id);
+                $officeAdmin->setOffice($this->officeDAOManager->findById($officeAdmin->getOffice()->getId()));
+                if ($officeAdmin->getOffice()->isCentral()) {
+                    $user = 'admin';
+                    $request->getSession()->addAttribute(SessionAdminFilter::ADMIN_CONNECTED_SESSION, $officeAdmin);
+                } else {                    
+                    $request->getSession()->addAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION, $officeAdmin);
+                }
+            } break;
+            case 'member' : {
+                $member = $this->memberDAOManager->findById($id);
+                if ($this->officeDAOManager->checkByMember($member->getId())) {//our les utilisateur qui ont des bureau
+                    $office = $this->officeDAOManager->findByMember($member->getId());
+                    $member->setOfficeAccount($office);
+                }
+                $request->getSession()->addAttribute(SessionMemberFilter::MEMBER_CONNECTED_SESSION, $member);
+            } break;
+        }
+        
+        $response->sendRedirect("/{$user}/");
     }
 
     /**

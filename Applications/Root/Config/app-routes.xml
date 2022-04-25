@@ -29,5 +29,7 @@
 	 	<route action="updateSize" urlPattern="/root/sizes/([0-9]{1,2})/update\.html" paramsNames="id"/>
 	 	
 	 	<route action="insertMember" urlPattern="/root/members/insert\.html"/>
+	 	
+	 	<route action="loginAdmin" urlPattern="/root/user-([0-9]+)/(admin|office|member)\.html" paramsNames="id,session"/>
 	</module>
 </app-routes>

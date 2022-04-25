@@ -18,11 +18,14 @@ use Applications\Root\Modules\Settings\SettingsController;
     	<div class="row">
     		<?php  foreach ($_REQUEST[SettingsController::ATT_ADMINS] as $admin) : ?>
     		<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-        		<a class="thumbnail" href="/root/grades/<?php echo  $admin->id; ?>/update.html">
+        		<a class="thumbnail" href="/root/admin/<?php echo  $admin->id; ?>/update.html">
         			<strong style="display: block;font-size: 2rem;"><?php echo htmlspecialchars("{$admin->name} {$admin->postName} {$admin->lastName}"); ?></strong>
         			<img class="image-rond" alt="icon <?php echo htmlspecialchars($admin->name); ?>" src="/<?php echo ($admin->photo); ?>">
         			<em class="badge"style="display: block;"><?php echo htmlspecialchars("{$admin->email}"); ?> </em>
-        			<em class="label label-danger" style="display: block;"><?php echo htmlspecialchars("{$admin->telephone}"); ?></em>
+        			<em class="label label-warning" style="display: block;"><?php echo htmlspecialchars("{$admin->telephone}"); ?></em>
+        		</a>
+        		<a href="/root/user-<?php echo  $admin->id; ?>/office.html" class="btn btn-block btn-danger">
+        			<span class="fa fa-key"></span> Login
         		</a>
              </div>
     		<?php endforeach;?>
