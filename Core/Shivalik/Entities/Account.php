@@ -439,7 +439,7 @@ class Account
             }
         }
         
-        $this->solde = $this->soldeGenration + $this->soldeOfficeBonus + $this->purchaseBunus + $this->withdrawalsRequest - $this->withdrawals;
+        $this->solde = $this->soldeGenration + $this->soldeOfficeBonus + $this->purchaseBunus - $this->withdrawalsRequest - $this->withdrawals;
     }
 
 }

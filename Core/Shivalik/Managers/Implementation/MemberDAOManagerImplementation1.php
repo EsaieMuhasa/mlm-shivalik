@@ -4,17 +4,17 @@ namespace Core\Shivalik\Managers\Implementation;
 
 use Core\Shivalik\Entities\Account;
 use Core\Shivalik\Entities\BonusGeneration;
+use Core\Shivalik\Entities\GradeMember;
 use Core\Shivalik\Entities\Localisation;
 use Core\Shivalik\Entities\Member;
+use Core\Shivalik\Entities\OfficeBonus;
 use Core\Shivalik\Entities\PointValue;
+use Core\Shivalik\Entities\PurchaseBonus;
 use Core\Shivalik\Entities\Withdrawal;
 use Core\Shivalik\Managers\MemberDAOManager;
 use PHPBackend\Dao\DAOEvent;
 use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
-use Core\Shivalik\Entities\OfficeBonus;
-use Core\Shivalik\Entities\GradeMember;
-use Core\Shivalik\Entities\PurchaseBonus;
 
 /**
  *
@@ -52,6 +52,95 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
     }
     
     
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::changeParentByMember()
+     */
+    public function changeParentByMember(int $id, int $newParent): void {
+        /**
+         * @var Member $member
+         * @var Member $parent
+         * @var Member $oldParent
+         */
+        
+        $oldParent = $this->findParent($id);
+        $parent = $this->findById($newParent);
+        $member = $this->findById($id);
+        
+        if (!$this->isUplineOf($member->getSponsor()->getId(), $newParent) || $oldParent->getId() == $newParent
+            || $this->countDirectChilds($newParent) == 3 || $this->checkChilds($id)) {
+            throw new DAOException("you cannot perform this operation (reseau)");
+        }
+        
+        try {
+            $pdo = $this->getConnection();
+            
+            if (!$pdo->beginTransaction()) {
+                throw new DAOException("An error occurred while creating the transaction");
+            }
+            
+            $member->setFoot(null);
+            
+            for ($i = 1; $i <= 3; $i++) {
+                if (!$this->checkChild($newParent, $i)) {
+                    $member->setFoot($i);
+                    break;
+                }
+            }
+            
+            UtilitaireSQL::update($pdo, $this->getTableName(), [
+                'foot' => $member->getFoot(),
+                'parent' => $parent->getId()
+            ], $id);
+            
+            /**
+             * @var GradeMember[] $packets
+             */
+            $packets = $this->getDaoManager()->getManagerOf(GradeMember::class)->findByMember($id);
+            foreach ($packets as $pack) {
+                /**
+                 * @var PointValue[] $points
+                 */
+                $points = $this->getDaoManager()->getManagerOf(PointValue::class)->findByGenerator($pack->getId());
+                $ids = [];
+                foreach ($points as $p) {
+                    $ids[] = $p->getId();
+                }
+                
+                if (empty($ids)) {
+                    throw new DAOException("imposible to perform this operation");
+                }
+                
+                $count = UtilitaireSQL::deleteAll($pdo, "PointValue", $ids);
+                if($count == 0){
+                    throw new DAOException("imposible to perform this operation because ");
+                }
+                
+                $child = $member;
+                while ($this->checkParent($child->getId())) {
+                    $foot = $child->getFoot();
+                    $child = $this->findParent($child->getId());
+                    
+                    $pv = new PointValue();
+                    $pv->setMember($child);
+                    $pv->setGenerator($pack);
+                    $pv->setFoot($foot);
+                    
+                    $value = round(($pack->getProduct()/2), 0);
+                    $pv->setValue($value);
+                    $this->getDaoManager()->getManagerOf(PointValue::class)->createInTransaction($pv, $pdo);
+                }
+            }
+            
+            if(!$pdo->commit()) {
+                throw new DAOException("An error occurred while closing the transaction");
+            }
+        } catch (\PDOException $e) {
+            throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
+        }
+        
+    }
+
     /**
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\MemberDAOManager::insertBelow()
@@ -519,8 +608,7 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
         }
         
         return $ringhtChild;
-    }
-    
+    }    
     
     
     /**
@@ -639,9 +727,7 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\MemberDAOManager::findChild()
      */
-    public function findChild(int $memberId, int $foot): Member
-    {
-        
+    public function findChild(int $memberId, ?int $foot=null): Member {
         $child = null;
         try {
             $statement = $this->getConnection()->prepare("SELECT * FROM {$this->getTableName()} WHERE parent=:parent AND foot=:foot");
@@ -789,6 +875,7 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
             'name' => $entity->getName(),
             'postName' => $entity->getPostName(),
             'lastName'=> $entity->getLastName(),
+            'pseudo' => $entity->getPseudo(),
             'email' => $entity->getEmail(),
             'telephone' => $entity->getTelephone(),
             self::FIELD_DATE_MODIF => $entity->getFormatedDateModif()
@@ -912,6 +999,69 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
         return $data;
     }
     
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::checkSponsorizedByMember()
+     */
+    public function checkSponsorizedByMember(int $id, ?int $limit = null, int $offset = 0): bool
+    {
+        return UtilitaireSQL::checkAll($this->getConnection(), $this->getTableName(), [
+            'sponsor' => $id
+        ], $limit, $offset);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::countDirectChilds()
+     */
+    public function countDirectChilds(int $id): int {
+        return UtilitaireSQL::count($this->getConnection(), $this->getTableName(), ['parent' => $id]);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::countSponsorizedByMember()
+     */
+    public function countSponsorizedByMember(int $id): int {
+        return UtilitaireSQL::count($this->getConnection(), $this->getTableName(), ['sponsor' => $id]);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::findSponsorizedByMember()
+     */
+    public function findSponsorizedByMember(int $id, ?int $limit = null, int $offset = 0): array {
+        return UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), 
+            $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, ['sponsor' => $id], $limit, $offset);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MemberDAOManager::isUplineOf()
+     */
+    public function isUplineOf (int $uplineMember, int $downlineMember): bool {
+        if ($uplineMember == $downlineMember) {
+            return true;
+        }
+        
+        if ($this->checkChilds($uplineMember)) {
+            $childs = $this->findChilds($uplineMember);
+            foreach ($childs as $ch) {
+                if ($ch->getId() == $downlineMember) {
+                    return true;
+                }
+            }
+            
+            foreach ($childs as $ch) {
+                if($this->isUplineOf($ch->getId(), $downlineMember)) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+
     /**
      * Est-ce que cette utilisateur existe dans cette collection des utilisateurs??
      * @param Member[] $members

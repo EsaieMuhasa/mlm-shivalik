@@ -267,13 +267,22 @@ class MemberFormValidator extends UserFormValidator
      */
     private function processingParent (Member $member, $parent, VarList $foots) : void {
         try {
-            $this->validationParent($parent);
-            if ($parent != null) {
-                $member->setParent($this->memberDAOManager->findByMatricule($parent));
-            }
-            
             if ($member->getSponsor() === null) {
                 return;
+            }
+            
+            if ($this->memberDAOManager->countDirectChilds($member->getSponsor()->getId()) != 3) {
+                $member->setParent($member->getSponsor());
+            } else { 
+                
+                $this->validationParent($parent);
+                
+                if ($parent != null) {
+                    $memberParent = $this->memberDAOManager->findByMatricule($parent);
+                    if($this->memberDAOManager->isUplineOf($member->getSponsor()->getId(), $memberParent->getId())){                    
+                        $member->setParent($memberParent->getId());
+                    }
+                }
             }
             
             /**
@@ -283,13 +292,13 @@ class MemberFormValidator extends UserFormValidator
             $foot = null;
 
             foreach ($foots->getItems() as $item) {//verification des pieds du parent
-                if (!$this->memberDAOManager->checkChild($parentNode->getId(), intval($item->getValue()))) {
+                if (!$this->memberDAOManager->checkChild($parentNode->getId(), intval($item->getValue(), 10))) {
                     $foot = intval($item->getValue(), 10);
                     break;
                 }
             }
             
-            if ($foot === null) {
+            if ($foot === null) {//dans le cas où tout les pieds du parent sont deja occuper
                 
                 while ($this->memberDAOManager->checkChilds($parentNode->getId())) {
                     $childs =$this->memberDAOManager->findChilds($parentNode->getId());

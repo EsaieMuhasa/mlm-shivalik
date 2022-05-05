@@ -8,8 +8,8 @@
 	 	<route action="downlines" urlPattern="/member/downlines/(left|right|middle|all)\.html" paramsNames="foot"/>
 	 	
 	 	<route action="tree" urlPattern="/member/tree/"/>
-	 	<route action="tree" urlPattern="/member/tree/(left|right|middle|all)\.html" paramsNames="foot"/>
-	 	<route action="tree" urlPattern="/member/tree/(left|right|middle|all)-(stack|tree)\.html" paramsNames="foot,affichage"/>
+	 	<route action="tree" urlPattern="/member/tree/(left|right|middle|all)\.(json|html)" paramsNames="foot,ext"/>
+	 	<route action="tree" urlPattern="/member/tree/(left|right|middle|all)-(stack|tree)\.(json|html)" paramsNames="foot,affichage,ext"/>
 	 	
 	 	<route action="withdrawals" urlPattern="/member/withdrawals/"/>
 	 	<route action="newWithdrawal" urlPattern="/member/withdrawals/new\.html"/>

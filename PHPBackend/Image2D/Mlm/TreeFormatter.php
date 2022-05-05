@@ -45,7 +45,8 @@ class TreeFormatter extends TreeBuilder
         if ($format == self::FORMAT_JSON) {
             $root = $this->getRoot();
             $json = " {";
-            $json .= "\"name\":\"{$root->getNodeName()}\"";
+            $json .= "\"Id\":\"{$root->getId()}\",";
+            $json .= "\"name\":\"{$root->getNodeName()} [{$root->matricule}]\"";
             $json .= ",\"icon\":\"{$root->getIcon()->getDefault()}\"";
             $json .= ",\"foot\":".($root->getFoot()==null? "null" : $root->getFoot());
             if ($root->hasChilds()) {
@@ -106,6 +107,7 @@ class TreeFormatter extends TreeBuilder
     private function formatChild ($node, string $format) : string {
         if ($format == self::FORMAT_JSON) {            
             $json = " {";
+            $json .= "\"Id\":\"{$node->getId()}\",";
             $json .= "\"name\":\"{$node->getNodeName()}\"";
             $json .= ",\"icon\":\"{$node->getIcon()->getDefault()}\"";
             $json .= ",\"foot\":".($node->getFoot()==null? "null" : $node->getFoot());
@@ -140,9 +142,9 @@ class TreeFormatter extends TreeBuilder
         }else{
             $html = "<li> ";
             $html .= "<img style=\"width: 25px; border-radius: 50%;\" src=\"/{$node->getIcon()->getDefault()}\"/>";
-            $html .= "<strong> {$node->getNodeName()}</strong>";
+            $html .= "<strong> {$node->getSponsor()->getId()} => {$node->getNodeName()}</strong>";
             if ($node->getFoot() != null) {
-                $html .= " <span class=\"badge\">foot: {$node->getFoot()}</span>";
+                $html .= " <span class=\"badge\">foot: {$node->getFoot()}, ID {$node->id}</span>";
             }
             if ($node->hasChilds()) {
                 $html .= "<ul>";

@@ -107,18 +107,13 @@ $option = isset($_GET['option'])? $_GET['option'] : null;
 		         	
 		          	<ul class="dropdown-menu">
         	        	<li class="<?php echo (isset($_REQUEST[MembersController::ATT_SELECTED_ITEM_MENU]) && $_REQUEST[MembersController::ATT_SELECTED_ITEM_MENU] == MembersController::ATT_ITEM_MENU_DOWNLINES)? "active":""; ?>">
-            	        	<a class="" href="/admin/members/<?php echo $member->getId().'/'; ?>downlines/" title="show downline member's of <?php echo htmlspecialchars("{$member->getNames()}") ?>">
+            	        	<a class="" href="/admin/members/<?php echo $member->getId(); ?>/downlines/" title="show downline member's of <?php echo htmlspecialchars("{$member->getNames()}") ?>">
                     			<span class="fa fa-sitemap"></span> Downlines
-                    		</a>
-        	        	</li>
-        	        	<li class="">
-            	        	<a class="" href="/admin/members/<?php echo $member->getId().'/'; ?>downlines-hierarchy/all.html" title="show downline member's of <?php echo htmlspecialchars("{$member->getNames()}") ?>">
-                    			<span class="glyphicon glyphicon-align-center"></span> Downlines hierarchy
                     		</a>
         	        	</li>
         	        	
         	        	<li class="">
-            	        	<a class="" href="/admin/members/<?php echo $member->getId().'/'; ?>downlines/" title="show downline member's of <?php echo htmlspecialchars("{$member->getNames()}") ?>">
+            	        	<a class="" href="/admin/members/<?php echo $member->getId(); ?>/tree/" title="show downline member's of <?php echo htmlspecialchars("{$member->getNames()}") ?>">
                     			<span class="glyphicon glyphicon-tree-conifer"></span> Tree
                     		</a>
         	        	</li>

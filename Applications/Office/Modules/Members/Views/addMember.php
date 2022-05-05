@@ -18,7 +18,7 @@ $office = $_SESSION[SessionOfficeFilter::OFFICE_CONNECTED_SESSION]->getOffice();
 </div>
 <div class="row">
 	<div class="col-xs-12">
-		<?php if ($office->getAvailableVirtualMoney() < 80 || $office->hasDebts()) { ?>
+		<?php if ($office->getAvailableVirtualMoney() < 80) { ?>
 		<div class="alert alert-danger">
 			<h2 class="alert-title">Warning</h2>
 			<p>impossible to perform this operation because the office wallet is insufficient</p>

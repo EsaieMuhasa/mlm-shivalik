@@ -116,12 +116,13 @@ class ProductsController extends AdminController
         $limit = $request->existInGET('limit')? intval($request->getDataGET('limit'), 10) : 12;
         $offset = $request->existInGET('offset')? intval($request->getDataGET('offset'), 10) : 0;
         $affichage = $request->existInGET('affichage')? $request->getDataGET('affichage') : 'table';
+        
         $count = $this->productDAOManager->countAll();
         
         if ($this->productDAOManager->checkAll($limit, $offset)) {
             $products = $this->productDAOManager->findAll($limit, $offset);
         } else {
-            if ($count !=0 ) {
+            if ($count != 0 ) {
                 $response->sendError();
             }
             

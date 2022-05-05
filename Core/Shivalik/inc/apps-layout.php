@@ -57,6 +57,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
         </section>
         <!-- container section end -->
         <!-- javascripts -->
+        <script src="/js/orgchart.js"></script>
         <script src="/js/dist/jquery.js"></script>
         <script src="/js/dist/bootstrap.min.js"></script>
         <!-- nice scroll -->
@@ -73,5 +74,6 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
         </script>
         <script type="text/javascript" src="/js/dist/ckeditor.js"></script>
         <script src="/js/admin.js"></script>
+        <script src="/js/mlm.js"></script>
     </body>
 </html>

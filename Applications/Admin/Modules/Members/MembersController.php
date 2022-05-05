@@ -14,8 +14,6 @@ use PHPBackend\Request;
 use PHPBackend\Response;
 use PHPBackend\ToastMessage;
 use PHPBackend\Image2D\Mlm\TreeFormatter;
-use PHPBackend\Image2D\Mlm\Ternary\TernaryTreeBuilder;
-use PHPBackend\Image2D\Mlm\Ternary\TernaryTreeRender;
 
 /**
  *
@@ -30,7 +28,8 @@ class MembersController extends AdminController
     const ATT_ITEM_MENU_DOWNLINES = 'ITEM_MENU_DOWNLINES';
     
     const CONFIG_MAX_MEMBER_VIEW_STEP = 'maxMembers';
-    
+    const PARAM_DOWNLINE_COUNT = 'PARAM_DOWNLINE_COUNT';
+    const ATT_TREE_FORMATTER = 'TREE_FORMATTER';
     
     const ATT_COUNTRYS = 'countrys';    
     const ATT_LOCALISATION = 'localisation';
@@ -238,9 +237,11 @@ class MembersController extends AdminController
         	}
         	$form->includeFeedback($request);
         	$request->addAttribute($form::MEMBER_FEEDBACK, $form->toFeedback());
+        } else {
+            $member = $this->member;
         }
         
-        $compte = $this->memberDAOManager->loadAccount($member);
+        $compte = $this->memberDAOManager->loadAccount($this->member);
         
         $request->addAttribute(self::ATT_COMPTE, $compte);
         $request->addAttribute(self::ATT_MEMBER, $member);
@@ -363,7 +364,6 @@ class MembersController extends AdminController
      * @param Response $response
      */
     public function executeTree (Request $request, Response $response) : void {
-        $response->sendRedirect("/admin/members/{$this->member->getId()}/");
         $request->addAttribute(self::ATT_SELECTED_ITEM_MENU, self::ATT_ITEM_MENU_DOWNLINES);
         
         $member = $this->member;
@@ -374,32 +374,45 @@ class MembersController extends AdminController
             switch ($request->getDataGET('foot')){
                 case 'left' : {//left
                     $childs = $this->memberDAOManager->findDownlinesStacks($member->getId(), Member::LEFT_FOOT);
+                    $count = $this->memberDAOManager->countLeftChild($member->getId());
                 }break;
                 
                 case 'middle' : {//middle
                     $childs = $this->memberDAOManager->findDownlinesStacks($member->getId(), Member::MIDDEL_FOOT);
+                    $count = $this->memberDAOManager->countRightChild($member->getId());
                 }break;
                 
                 case 'right' : {//right
                     $childs = $this->memberDAOManager->findDownlinesStacks($member->getId(), Member::RIGHT_FOOT);
+                    $count = $this->memberDAOManager->countMiddleChild($member->getId());
                 }break;
                 
                 default : {//all Member
                     $childs = $this->memberDAOManager->findDownlinesStacks($member->getId());
+                    $count = $this->memberDAOManager->countChilds($member->getId());
                 }
             }
             
-        }else {
-            $childs = $this->memberDAOManager->findDownlinesStacks($member->getId());
+            $request->addAttribute(self::PARAM_DOWNLINE_COUNT, $count);
+            $request->addAttribute(self::ATT_MEMBERS, $childs);
+            
+            $member->setChilds($childs);
+            $member->setParent(null);
+            
+            $formater = new TreeFormatter($member);
+            $request->addAttribute(self::ATT_TREE_FORMATTER, $formater);  
+            
         }
         
-        $member->setChilds($childs);
-        $member->setParent(null);
+        //comptage des downlines
+        $left = $this->memberDAOManager->countLeftChild($member->getId());
+        $middle = $this->memberDAOManager->countMiddleChild($member->getId());
+        $right = $this->memberDAOManager->countRightChild($member->getId());
         
-        $builder = new TernaryTreeBuilder($member, 100);
-        $render = new TernaryTreeRender($builder);
-        
-        $render->render();
+        $request->addAttribute(self::LEFT_CHILDS, $left);
+        $request->addAttribute(self::MIDDLE_CHILDS, $middle);
+        $request->addAttribute(self::RIGHT_CHILDS, $right);
+
         $account = $this->memberDAOManager->loadAccount($member);
         $account->calcul();
         $request->addAttribute(self::ATT_COMPTE, $account);

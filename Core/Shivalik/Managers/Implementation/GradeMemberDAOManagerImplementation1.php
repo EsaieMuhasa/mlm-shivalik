@@ -717,6 +717,23 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
     
     /**
      * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\GradeMemberDAOManager::countByMember()
+     */
+    public function countByMember(int $member): int {
+        return UtilitaireSQL::count($this->getConnection(), $this->getTableName(), ['member' => $member]);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\GradeMemberDAOManager::findByMember()
+     */
+    public function findByMember(int $member): array {
+        return UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), 
+            $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, ['member'=> $member]);
+    }
+
+    /**
+     * {@inheritDoc}
      * @see \Core\Shivalik\Managers\GradeMemberDAOManager::countUpgrades()
      */
     public function countUpgrades(?int $officeId = null): int

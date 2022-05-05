@@ -3,6 +3,7 @@
 <app-routes>
 	<module name="Settings">
 	 	<route action="index" urlPattern="/root/"/>
+	 	<route action="index" urlPattern="/root/([0-9]+)-to-([0-9]+)" paramsNames="member,parent"/>
 	 	
 	 	<route action="admins" urlPattern="/root/admins/"/>
 	 	<route action="addAdmin" urlPattern="/root/admins/add\.html"/>

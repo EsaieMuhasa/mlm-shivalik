@@ -33,6 +33,9 @@
 	 	<route action="downlines" urlPattern="/admin/members/([0-9]+)/(downlines)/(left|middle|right|all)\.html" paramsNames="id,option,foot"/>
 	 	<route action="downlinesHierarchy" urlPattern="/admin/members/([0-9]+)/(downlines-hierarchy)/" paramsNames="id,option"/>
 	 	<route action="downlinesHierarchy" urlPattern="/admin/members/([0-9]+)/(downlines-hierarchy)/(left|middle|right|all)\.(json|xml|html)" paramsNames="id,option,foot,ext"/>
+	 	<route action="tree" urlPattern="/admin/members/([0-9]+)/tree/" paramsNames="id"/>
+	 	<route action="tree" urlPattern="/admin/members/([0-9]+)/tree/(left|middle|right|all)\.(json|html)" paramsNames="id,foot,ext"/>
+	 	<route action="tree" urlPattern="/admin/members/([0-9]+)/tree/(left|middle|right|all)-(stack|tree)\.(json|html)" paramsNames="id,foot,affichage,ext"/>
 		<route action="uplinesMember" urlPattern="/admin/members/([0-9]+)/uplines\.html" paramsNames="id"/>
 	 	<route action="certifyMember" urlPattern="/admin/members/([0-9]+)/(certify)-([0-9]+)\.html" paramsNames="id,option,idGradeMember"/>
 		<route action="tree" urlPattern="/admin/members/([0-9]+)/(tree)/(left|middle|right|all)\.html" paramsNames="id,option,foot"/>

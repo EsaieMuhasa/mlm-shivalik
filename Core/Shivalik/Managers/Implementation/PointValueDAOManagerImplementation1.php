@@ -57,6 +57,24 @@ class PointValueDAOManagerImplementation1 extends AbstractBonusDAOManager implem
 
     /**
      * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\PointValueDAOManager::checkByGenerator()
+     */
+    public function checkByGenerator(int $gradMember, ?int $limit = null, int $offset = 0): bool
+    {
+        return UtilitaireSQL::checkAll($this->getConnection(), $this->getTableName(), ['generator' => $gradMember], $limit, $offset);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\PointValueDAOManager::findByGenerator()
+     */
+    public function findByGenerator(int $gradMember, ?int $limit = null, int $offset = 0): array{
+        return UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(),
+            $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, ['generator' => $gradMember], $limit, $offset);
+    }
+
+    /**
+     * {@inheritDoc}
      * @see \Core\Shivalik\Managers\Implementation\AbstractOperationDAOManager::update()
      */
     public function update ($entity, $id) : void

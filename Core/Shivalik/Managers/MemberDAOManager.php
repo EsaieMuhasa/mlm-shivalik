@@ -20,6 +20,18 @@ interface MemberDAOManager extends UserDAOManager
 	public function loadAccount ($member, bool $calcul = true) : Account;
 	
 	/**
+	 * 
+	 * changement du compte parent d'un compte
+	 * Les operations ci-dessous sont au rendez-vous:
+	 * + supression recusive de tout les PV
+	 * + verification de la coherance entre les uplines du compte (parent doit etre un compte du reseau du sponsor)
+	 * @param int $id le compte a faire migrer
+	 * @param int $newParent le compte qui seras considerer comme parent
+	 * @throws DAOException dans le cas ou il y a une erreur lors de la pigration du compte
+	 */
+	public function changeParentByMember (int $id, int $newParent) : void;
+	
+	/**
 	 * Insersion d'un nouveau compte au dessu d'un autre compte dans la hierarchie
 	 * Cette methode, recalcule tout les PVs de upline.
 	 * Losque de l'insersion du compte, aucun bonus n'est recue, 
@@ -29,6 +41,51 @@ interface MemberDAOManager extends UserDAOManager
 	 * @throws DAOException si une erreur surviens dans la transaction
 	 */
 	public function insertBelow (Account $newAccount, Account $existAcount) : void;
+	
+	/**
+	 * Comptage des enfants directe d'un membre 
+	 * la valeur retourner par cette methode varie entre 0 et 3 (systeme ternaire)
+	 * @param int $id
+	 * @return int
+	 * @throws DAOException
+	 */
+	public function countDirectChilds (int $id) : int;
+	
+	/**
+	 * Verification si le membre ce trouvent dans le reseau d'un membre
+	 * @param int $uplineMember
+	 * @param int $downlineMember
+	 * @return bool
+	 * @throws DAOException
+	 */
+	public function isUplineOf (int $uplineMember, int $downlineMember) : bool;
+	
+	/**
+	 * comptage des noudes sponsoriser par un membre
+	 * @param int $id
+	 * @return int
+	 * @throws DAOException
+	 */
+	public function countSponsorizedByMember (int $id) : int;
+	
+	/**
+	 * versifie s'il y a des membre sponsoriser par le compte dont l'id est en premier parametre
+	 * @param int $id
+	 * @param int $limit
+	 * @param int $offset
+	 * @return bool
+	 * @throws DAOException
+	 */
+	public function checkSponsorizedByMember (int $id, ?int $limit = null, int $offset = 0) : bool;
+	
+	/**
+	 * Recuperartion de la collection des membres sponsoriser par le compte en premier parametre
+	 * @param int $id
+	 * @param int $limit
+	 * @param int $offset
+	 * @return array
+	 */
+	public function findSponsorizedByMember (int $id, ?int $limit = null, int $offset = 0) : array;
     
 	/**
 	 * revoie le nombre de compte deja creer par un office

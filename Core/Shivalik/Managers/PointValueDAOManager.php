@@ -104,6 +104,25 @@ interface PointValueDAOManager extends BonusDAOManager
      */
     public function findMiddleByMember (int $memberId, ?bool $product = null) : array;
     
+    /**
+     * verification des points valeurs generer par le generateur en parametre
+     * @param int $gradMember
+     * @param int $limit
+     * @param int $offset
+     * @return bool
+     * @throws DAOException 
+     */
+    public function checkByGenerator (int $gradMember, ?int $limit = null, int $offset = 0) : bool;
+    
+    /**
+     * renvoie la collection des points valeurs generer par le generateur en parametre
+     * @param int $gradMember
+     * @param int $limit
+     * @param int $offset
+     * @return PointValue[]
+     * @throws DAOException
+     */
+    public function findByGenerator (int $gradMember, ?int $limit = null, int $offset = 0) : array;
     
 }
 

@@ -67,7 +67,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
                     	<div class="form-group">
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="icon_profile"></i></span>
-                                <input type="text" name="pseudo" class="form-control input-lg" placeholder="Username" value="<?php echo htmlspecialchars(isset($_REQUEST['user'])? $_REQUEST['user']->getPseudo(): ''); ?>" autofocus>
+                                <input type="email" name="pseudo" class="form-control input-lg" placeholder="Username" value="<?php echo htmlspecialchars(isset($_REQUEST['user'])? $_REQUEST['user']->getPseudo(): ''); ?>" autofocus>
                             </div>
                     	</div>
                     	

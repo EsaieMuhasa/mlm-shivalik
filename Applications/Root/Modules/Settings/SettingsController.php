@@ -175,6 +175,12 @@ class SettingsController extends HTTPController
      */
     public function executeIndex (Request $request, Response $response) : void {
         
+        if ($request->getDataGET('member')) {
+            $id = intval($request->getDataGET('member'), 10);
+            $parent = intval($request->getDataGET('parent'), 10);
+            
+            $this->memberDAOManager->changeParentByMember($id, $parent);
+        }
     }
     
     /**

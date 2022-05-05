@@ -10,6 +10,7 @@ use Core\Shivalik\Managers\MemberDAOManager;
 use Core\Shivalik\Managers\OfficeBonusDAOManager;
 use Core\Shivalik\Managers\OfficeDAOManager;
 use Core\Shivalik\Managers\PointValueDAOManager;
+use Core\Shivalik\Managers\PurchaseBonusDAOManager;
 use Core\Shivalik\Managers\WithdrawalDAOManager;
 use Core\Shivalik\Validators\WithdrawalFormValidator;
 use PHPBackend\Application;
@@ -18,9 +19,6 @@ use PHPBackend\Response;
 use PHPBackend\Calendar\Month;
 use PHPBackend\Http\HTTPController;
 use PHPBackend\Image2D\Mlm\TreeFormatter;
-use PHPBackend\Image2D\Mlm\Ternary\TernaryTreeBuilder;
-use PHPBackend\Image2D\Mlm\Ternary\TernaryTreeRender;
-use Core\Shivalik\Managers\PurchaseBonusDAOManager;
 
 /**
  *
@@ -328,28 +326,18 @@ class AccountController extends HTTPController
             $member->setChilds($members);
             $member->setParent(null);
             
-            if ($request->getDataGET('affichage') == 'stack') {
-                $formater = new TreeFormatter($member);
-                $request->addAttribute(self::ATT_TREE_FORMATTER, $formater);
-            }else{
-                $response->sendRedirect("/member/tree/{$request->getDataGET('foot')}-stack.html");
-                $builder = new TernaryTreeBuilder($member, 200);
-                $render = new TernaryTreeRender($builder);
-                
-                $render->render();
-            }
-            
-        }else {
-            
-            //comptage des downlines
-            $left = $this->memberDAOManager->countLeftChild($member->getId());
-            $middle = $this->memberDAOManager->countMiddleChild($member->getId());
-            $right = $this->memberDAOManager->countRightChild($member->getId());
-            
-            $request->addAttribute(self::LEFT_CHILDS, $left);
-            $request->addAttribute(self::MIDDLE_CHILDS, $middle);
-            $request->addAttribute(self::RIGHT_CHILDS, $right);
+            $formater = new TreeFormatter($member);
+            $request->addAttribute(self::ATT_TREE_FORMATTER, $formater);            
         }
+        
+        //comptage des downlines
+        $left = $this->memberDAOManager->countLeftChild($member->getId());
+        $middle = $this->memberDAOManager->countMiddleChild($member->getId());
+        $right = $this->memberDAOManager->countRightChild($member->getId());
+        
+        $request->addAttribute(self::LEFT_CHILDS, $left);
+        $request->addAttribute(self::MIDDLE_CHILDS, $middle);
+        $request->addAttribute(self::RIGHT_CHILDS, $right);
     }
     
     

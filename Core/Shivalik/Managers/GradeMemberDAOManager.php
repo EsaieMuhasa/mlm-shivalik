@@ -202,5 +202,22 @@ interface GradeMemberDAOManager extends DAOInterface
      */
     public function load ($gradeMember) : GradeMember;
     
+    /**
+     * Comptage des inscriptions d'un compte membre 
+     * @param int $member
+     * @return int
+     * @throws DAOException 
+     */
+    public function countByMember (int $member) : int;
+    
+    /**
+     * selection de la collection des grades du compte d'un membre
+     * @param int $member
+     * @return GradeMember[]
+     * @throws DAOException aucune inscription, ou une erreur est survenue lors dela communication avec le systeme
+     * de gestion de base de donnee
+     */
+    public function findByMember (int $member) : array;
+    
 }
 

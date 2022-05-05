@@ -81,6 +81,12 @@ interface Node
     public function getNodeName () : string;
     
     /**
+     * renvoie l'identifiant du noeud
+     * @return string
+     */
+    public function getId ();
+    
+    /**
      * revoie une collection des noeuds anfants
      * @return Node[]
      */
