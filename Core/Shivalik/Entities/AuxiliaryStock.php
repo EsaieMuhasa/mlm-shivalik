@@ -231,7 +231,10 @@ class AuxiliaryStock extends Stock
      * @throws PHPBackendException
      */
     public function setUnitPrice($unitPrice): void {
-        throw new PHPBackendException("setUnitPrice() => operation not supported");
+        if ($this->parent == null) {
+            $this->parent = new Stock();
+        }
+        $this->parent->setUnitPrice($unitPrice);
     }
 
 

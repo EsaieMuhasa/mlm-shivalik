@@ -139,8 +139,7 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
 	 * {@inheritDoc}
 	 * @see \Core\Shivalik\Managers\GradeMemberDAOManager::findRequestedByMember()
 	 */
-    public function findRequestedByMember(int $memberId): GradeMember
-    {
+    public function findRequestedByMember(int $memberId): GradeMember {
         if (!$this->hasRequested($memberId)) {
             throw new DAOException("no current account upgrade request");
         }
@@ -280,8 +279,7 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
      * {@inheritDoc}
      * @see \PHPBackend\Dao\DefaultDAOInterface::findById()
      */
-    public function findById($id, bool $forward = true)
-    {
+    public function findById($id, bool $forward = true) {
         /**
          * @var GradeMember $gm
          */
@@ -300,8 +298,7 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
      * {@inheritDoc}
      * @see \PHPBackend\Dao\DefaultDAOInterface::findByCreationHistory()
      */
-    public function findByCreationHistory(\DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset = 0) : array
-    {
+    public function findByCreationHistory(\DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset = 0) : array {
         $grades = parent::findByCreationHistory($dateMin, $dateMax, $limit, $offset);
         foreach ($grades as $gm) {
             $gm->setGrade($this->gradeDAOManager->findById($gm->getGrade()->getId()));
@@ -318,8 +315,7 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\GradeMemberDAOManager::findUpgradeHistory()
      */
-    public function findUpgradeHistory(\DateTime $dateMin, \DateTime $dateMax = null, ?int $officeId=null, ?int $limit = null, int $offset = 0)
-    {
+    public function findUpgradeHistory(\DateTime $dateMin, \DateTime $dateMax = null, ?int $officeId=null, ?int $limit = null, int $offset = 0) {
         $SQL = 'SELECT * FROM '.$this->getTableName().' WHERE dateAjout >= :dateMin  AND dateAjout <=:dateMax AND old IS NOT NULL';
         
         if ($dateMax == null) {
@@ -385,8 +381,7 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\GradeMemberDAOManager::checkUpgradeHistory()
      */
-    public function checkUpgradeHistory(\DateTime $dateMin, \DateTime $dateMax = null, ?int $officeId=null, ?int $limit = null, int $offset = 0): bool
-    {
+    public function checkUpgradeHistory(\DateTime $dateMin, \DateTime $dateMax = null, ?int $officeId=null, ?int $limit = null, int $offset = 0): bool {
         $SQL = 'SELECT * FROM '.$this->getTableName().' WHERE dateAjout >= :dateMin  AND dateAjout <=:dateMax AND old IS NOT NULL';
         
         if ($dateMax == null) {
@@ -700,6 +695,7 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
             'membership' => $entity->getMembership(),
             'officePart' => $entity->getOfficePart(),
         	'office' => $entity->getOffice()->getId(),
+            'monthlyOrder' => ($entity->getMonthlyOrder() != null? $entity->getMonthlyOrder()->getId() : null),
             self::FIELD_DATE_AJOUT => $entity->getFormatedDateAjout()
         ]);
         $entity->setId($id);

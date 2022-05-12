@@ -94,7 +94,7 @@ class PointValueDAOManagerImplementation1 extends AbstractBonusDAOManager implem
             'generator' => $pv->getGenerator()->getId(),
             'value' => $pv->getValue(),
             'foot' => $pv->getFoot(),
-            'command' => $pv->getCommand() != null? $pv->getCommand()->getId() : null,
+            'monthlyOrder' => $pv->getMonthlyOrder() != null? $pv->getMonthlyOrder()->getId() : null,
             self::FIELD_DATE_AJOUT => $pv->getFormatedDateAjout()            
         ]);
         $pv->setId($id);

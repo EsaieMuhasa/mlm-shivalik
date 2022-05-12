@@ -62,6 +62,8 @@ class Account
      */
     private $middleMembershipPv;
     
+    private $personalMembershipPv;
+    
     /**
      * @var number
      */
@@ -242,6 +244,14 @@ class Account
     }
 
     /**
+     * @return mixed
+     */
+    public function getPersonalMembershipPv()
+    {
+        return $this->personalMembershipPv;
+    }
+
+    /**
      * Return sold of point value at left foot of this account
      * @return number
      */
@@ -382,6 +392,7 @@ class Account
         $this->rightProductPv = 0;
         $this->middleProductPv = 0;
         $this->personalProductPv = 0;
+        $this->personalMembershipPv = 0;
         $this->wallet = 0;
         $this->withdrawals = 0;
         $this->withdrawalsRequest = 0;
@@ -405,25 +416,26 @@ class Account
             }else if ($operation instanceof OfficeBonus) {
                 $this->soldeOfficeBonus += $operation->getAmount();
             }else if ($operation instanceof PointValue) {
+                
                 if ($operation->getFoot() == PointValue::FOOT_LEFT) {
-                    if ($operation->getCommand() == null) {
+                    if ($operation->getMonthlyOrder() == null) {
                         $this->leftMembershipPv += $operation->getValue();
                     } else {
                         $this->leftProductPv += $operation->getValue();
                     }
                 }else if ($operation->getFoot() == PointValue::FOOT_MIDDEL) {
-                    if ($operation->getCommand() == null) {
+                    if ($operation->getMonthlyOrder() == null) {
                         $this->middleMembershipPv += $operation->getValue();
                     } else {
                         $this->middleProductPv += $operation->getValue();
                     }
                 }else if ($operation->getFoot() == PointValue::FOOT_RIGTH) {
-                    if ($operation->getCommand() == null) {
+                    if ($operation->getMonthlyOrder() == null) {
                         $this->rightMembershipPv += $operation->getValue();
                     } else {
                         $this->rightProductPv += $operation->getValue();
                     }
-                } else if ($operation->getCommand() != null) {//effort personnel
+                } else if ($operation->getMonthlyOrder() != null) {//effort personnel
                     $this->personalProductPv += $operation->getValue();
                 } else {
                     throw new PHPBackendException("Invalid data integrity. Unable to classify point value");

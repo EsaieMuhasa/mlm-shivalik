@@ -137,7 +137,7 @@ foreach ($commands as $c) {
     		<div class="col-lg-12 col-md-12 col-sm-6 col-xs-12">
     			<div class="info-box blue-bg">
 		            <i class="fa fa-comment"></i>
-		            <div class="count"><?php echo count($commands); ?></div>
+		            <div class="count"><?php echo $_REQUEST[ProductsController::ATT_COUNT_COMMANDS]; ?></div>
 		            <div class="title">command count</div>
 		        </div>
     		</div>
@@ -168,7 +168,7 @@ foreach ($commands as $c) {
     		<div class="col-md-6 col-sm-6 col-xs-12">
     			<div class="info-box blue-bg">
     	            <i class="fa fa-comment"></i>
-    	            <div class="count"><?php echo count($commands); ?></div>
+    	            <div class="count"><?php echo count($byOffice); ?></div>
     	            <div class="title">command count</div>
     	        </div>
     		</div>

@@ -4,11 +4,18 @@ use Core\Shivalik\Entities\User;
 use Core\Shivalik\Validators\MemberFormValidator;
 use PHPBackend\AppConfig;
 use PHPBackend\Request;
+use Core\Shivalik\Entities\Member;
+use Core\Shivalik\Entities\MonthlyOrder;
 
 /**
  * @var AppConfig $config
+ * @var Member $member
+ * @var MonthlyOrder $monthly
  */
 $config = $_REQUEST[Request::ATT_APP_CONFIG];
+$member = isset($_REQUEST[MembersController::ATT_SPONSOR])? $_REQUEST[MembersController::ATT_SPONSOR] : null;
+$monthly = isset($_REQUEST[MembersController::ATT_MONTHLY_ORDER_FOR_ACCOUNT])? $_REQUEST[MembersController::ATT_MONTHLY_ORDER_FOR_ACCOUNT]: null;
+
 ?>
 <section class="panel">
     <header class="panel-heading">
@@ -34,7 +41,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
         			<div class="col-md-6">
                 		<div class="form-group <?php echo (isset($_REQUEST[MemberFormValidator::MEMBER_FEEDBACK]->errorSponsor)? 'has-error':'');?>">
                 			<label class="form-label" for="sponsor-member">Sponsor (put in this filed ID of sponsor member)</label>
-                			<input type="text" name="sponsor" value="<?php echo htmlspecialchars((isset($_REQUEST['member']) && $_REQUEST['member']->sponsor!=null)? $_REQUEST['member']->sponsor->matricule:'');?>" id="postName-member" class="form-control" placeholder="put here ID of sponsor member" autocomplete="off"/>
+                			<input type="text" <?php echo isset($_GET['id'])? 'readonly="readonly"' : ''; ?> name="sponsor" value="<?php echo htmlspecialchars(isset($_GET['id']) ? $member->getMatricule() : ((isset($_REQUEST['member']) && $_REQUEST['member']->sponsor!=null)? $_REQUEST['member']->sponsor->matricule:''));?>" id="postName-member" class="form-control" placeholder="put here ID of sponsor member" autocomplete="off"/>
                 			<?php if (isset($_REQUEST[MemberFormValidator::MEMBER_FEEDBACK]->errorSponsor)){?>
                 			<p class="help-block"><?php echo htmlspecialchars($_REQUEST[MemberFormValidator::MEMBER_FEEDBACK]->errorSponsor);?></p>
                 			<?php }?>
@@ -58,6 +65,17 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
         				<div class="form-group <?php echo (isset($_REQUEST['errors']['grade'])? 'has-error':'');?>">                			
                 			<div class="row">
                     			<?php  foreach ($_REQUEST[MembersController::ATT_GRADES] as $grade) : ?>
+                					
+                					<?php
+                					$membership = 20;
+                					$officePart = 10;
+                					$product = $grade->amount - $membership - $officePart;
+                					?>
+                    			
+                    			<?php if ($monthly != null && $monthly->getAvailable() < $product) {
+                    			    continue;
+                    			}?>
+                    			
                     			<label class="col-lg-2 col-md-3 col-sm-4 col-xs-6" for="grade-<?php echo $grade->id;?>" style="padding-bottom: 30px;">
                     				
                     				<span class="thumbnail">
@@ -69,12 +87,6 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
                         						<?php echo ("{$grade->amount} {$config->get('devise')}"); ?>
                         					</span>
                     					</span>
-                    					
-                    					<?php
-                    					$membership = 20;
-                    					$officePart = 10;
-                    					$product = $grade->amount - $membership - $officePart;
-                    					?>
                     					
                     					<span style="display: block;">
                         					<span class="label label-default">

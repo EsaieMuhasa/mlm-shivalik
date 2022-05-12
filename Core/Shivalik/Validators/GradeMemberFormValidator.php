@@ -11,6 +11,9 @@ use PHPBackend\Request;
 use PHPBackend\Dao\DAOException;
 use PHPBackend\Validator\DefaultFormValidator;
 use PHPBackend\Validator\IllegalFormValueException;
+use Core\Shivalik\Managers\MonthlyOrderDAOManager;
+use Applications\Office\Modules\Members\MembersController;
+use Core\Shivalik\Entities\MonthlyOrder;
 
 /**
  *
@@ -39,6 +42,11 @@ class GradeMemberFormValidator extends DefaultFormValidator
      * @var GradeDAOManager
      */
     private $gradeDAOManager;
+    
+    /**
+     * @var MonthlyOrderDAOManager
+     */
+    private $monthlyOrderDAOManager;
     
     /**
      * validation du packet soliciter par le membre
@@ -307,6 +315,83 @@ class GradeMemberFormValidator extends DefaultFormValidator
             
         }
         $this->result = $this->hasError()? "failed to upgrade account packages" :"account package upgrade success";
+        return $gm;
+    }
+    
+    /**
+     * Affiliation d'un membre sur le bonus de re-achat d'un compte X
+     * @param Request $request
+     * @return GradeMember
+     */
+    public function affiliateAfterValidation (Request $request) : GradeMember {
+        $gm = new GradeMember();
+        $grade = $request->getDataPOST(self::FIELD_GRADE);
+        
+        /**
+         * @var Member $sponsor
+         * @var MonthlyOrder $monthly
+         */
+        $sponsor = $request->getAttribute(MemberFormValidator::FIELD_SPONSOR);
+        $monthly = $request->getAttribute(MembersController::ATT_MONTHLY_ORDER_FOR_ACCOUNT);
+        
+        //validation du membre
+        $formMember = new MemberFormValidator($this->getDaoManager());
+        $member = $formMember->processingMember($request);
+        
+        //validation de l'adresse du membre
+        $formLocalisation = new LocalisationFormValidator($this->getDaoManager());
+        $localisation = $formLocalisation->processingLocalisation($request);
+        $member->setLocalisation($localisation);
+        
+        $this->addFeedback(LocalisationFormValidator::LOCALISATION_FEEDBACK, $formLocalisation->toFeedback());
+        $this->addFeedback(MemberFormValidator::MEMBER_FEEDBACK, $formMember->toFeedback());
+        
+        $this->processingGrade($gm, $grade);
+        $this->processingMember($gm, $member);
+        
+        $gm->setMember($member);
+        
+        if ( $member->getSponsor() == null || $member->getSponsor()->getId() != $sponsor->getId()) {
+            $this->setMessage("The parent field must not be modified");
+        }
+        
+        if (!$this->hasError()) {
+            
+            $gm->setMonthlyOrder($monthly);
+            $gm->setInitDate(new \DateTime());
+            $gm->getMember()->setAdmin($request->getAttribute(self::FIELD_OFFICE_ADMIN));
+            $gm->getMember()->setOffice($gm->getMember()->getAdmin()->getOffice());
+            $gm->setOffice($gm->getMember()->getAdmin()->getOffice());
+            $gm->setGrade($this->gradeDAOManager->findById($gm->getGrade()->getId()));
+            $this->processingProduct($gm, $gm->getGrade()->getAmount()-30);
+            $this->processingMembership($gm, 20, 10);
+            
+            // --verification de la monais virtuel
+            $money = (($gm->getMembership()/3)*2);
+            if ($money > $member->getOffice()->getAvailableVirtualMoney()) {
+                $this->setMessage("impossible to perform this operation because the office wallet is insufficient. requered money: {$money} {$request->getApplication()->getConfig()->get('devise')}, your walet: {$member->getOffice()->getAvailableVirtualMoney()} {$request->getApplication()->getConfig()->get('devise')}");
+            } else if ($gm->getProduct() > $monthly->getAvailable()) {
+                $this->setMessage("impossible to perform this operation because the member wallet is insufficient. requered money: {$gm->getProduct()} {$request->getApplication()->getConfig()->get('devise')}, sponsor member walet: {$monthly->getAvailable()} {$request->getApplication()->getConfig()->get('devise')}");
+            }
+            // \\--
+            
+            if (!$this->hasError()) {
+                try {
+                    $this->gradeMemberDAOManager->create($gm);
+                    if ($formMember->getProcessPhoto()->isFile()) {
+                        $formMember->processingPhoto($member, $formMember->getProcessPhoto(), true, $request->getApplication()->getConfig());
+                    }else{
+                        $member->setPhoto('img/user.png');
+                    }
+                    $this->memberDAOManager->updatePhoto($member->getId(), $member->getPhoto());
+                } catch (DAOException $e) {
+                    $this->setMessage($e->getMessage());
+                }
+            }
+        }
+        
+        $this->result = $this->hasError()? "Failure to register member" : "successful registration of member";
+        
         return $gm;
     }
     /**

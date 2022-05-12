@@ -207,7 +207,7 @@ class Office extends DBEntity
 	public function getSoldProduct() : int {
 	    $solde = 0;
 	    foreach ($this->operations as $operation) {
-	        $solde += $operation->getProduct();
+	        $solde += $operation->getMonthlyOrder()!=null? 0 : $operation->getProduct();
 	    }
 	    return $solde;
 	}
@@ -308,7 +308,6 @@ class Office extends DBEntity
 		}
 		
 		$return = ($money- $this->getUsedVirtualMoney());
-		
 		return $return < 0? 0 : $return;
 	}
 	

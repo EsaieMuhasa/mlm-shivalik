@@ -39,6 +39,7 @@ class ProductsController extends AdminController
     
     const ATT_COMMAND = 'command';
     const ATT_COMMANDS = 'commands';
+    const ATT_COUNT_COMMANDS = 'count_commands';
     
     const ATT_MONTH = 'SELECTED_MONTH';
     const ATT_YEAR = 'SELECTED_YEAR';
@@ -181,12 +182,16 @@ class ProductsController extends AdminController
          * @var Command[][] $commands
          */
         $commands = [];
+        $countCommand = $this->commandDAOManager->countByCreationHistory($firstDay, $lastDay);
+        
         if ($this->commandDAOManager->checkByCreationHistory($firstDay, $lastDay, $limit, $offset)) {
             
-            $offices = $this->officeDAOManager->findAll();
+            $allOffices = $this->officeDAOManager->findAll();
+            $offices = [];
             
-            foreach ($offices as $office) {
+            foreach ($allOffices as $office) {
                 if ($this->commandDAOManager->checkByOfficeAtDate($office->getId(), $firstDay, $lastDay, null, $limit, $offset)) {
+                    $offices[] = $office;
                     $commands["office-{$office->getId()}"] = $this->commandDAOManager->findByOfficeAtDate($office->getId(), $firstDay, $lastDay, null, $limit, $offset);
                 }
             }
@@ -202,6 +207,7 @@ class ProductsController extends AdminController
         
         $request->addAttribute(self::ATT_OFFICES, $offices);
         $request->addAttribute(self::ATT_COMMANDS, $commands);
+        $request->addAttribute(self::ATT_COUNT_COMMANDS, $countCommand);
         $request->addAttribute(self::ATT_YEAR, $year);
         $request->addAttribute(self::ATT_MONTH, $month);
         $request->addAttribute('title', $title);

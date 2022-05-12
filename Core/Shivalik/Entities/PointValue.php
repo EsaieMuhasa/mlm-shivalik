@@ -22,9 +22,9 @@ class PointValue extends AbstractBonus
     
     /**
      * Pour le reachat.
-     * @var Command
+     * @var MonthlyOrder
      */
-    private $command;
+    private $monthlyOrder;
 
     /**
      * @return int
@@ -85,25 +85,25 @@ class PointValue extends AbstractBonus
     }
     
     /**
-     * @return \Core\Shivalik\Entities\Command
+     * @return \Core\Shivalik\Entities\MonthlyOrder
      * Different de null dans le cas où le PV ont été générer par l'achat des produits
      */
-    public function getCommand () : ?Command
+    public function getMonthlyOrder () : ?MonthlyOrder
     {
-        return $this->command;
+        return $this->monthlyOrder;
     }
 
     /**
-     * @param \Core\Shivalik\Entities\Command | int $command
+     * @param \Core\Shivalik\Entities\MonthlyOrder | int $monthlyOrder
      */
-    public function setCommand ($command) : void
+    public function setMonthlyOrder ($monthlyOrder) : void
     {
-        if ($command instanceof Command || $command == null) {
-            $this->command = $command;
-        } else if (self::isInt($command)) {
-            $this->command = new Command(['id' => $command]);
+        if ($monthlyOrder instanceof MonthlyOrder || $monthlyOrder == null) {
+            $this->monthlyOrder = $monthlyOrder;
+        } else if (self::isInt($monthlyOrder)) {
+            $this->monthlyOrder = new MonthlyOrder(['id' => $monthlyOrder]);
         } else {
-            throw new PHPBackendException("illegal argument valeur in setCommand () method param");
+            throw new PHPBackendException("illegal argument valeur in setMonthlyOrder () method param");
         }
     }
     

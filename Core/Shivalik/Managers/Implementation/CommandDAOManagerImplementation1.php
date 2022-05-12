@@ -7,12 +7,9 @@ use Core\Shivalik\Entities\Command;
 use PHPBackend\Dao\UtilitaireSQL;
 use Core\Shivalik\Entities\ProductOrdered;
 use PHPBackend\Dao\DAOException;
-use Core\Shivalik\Entities\PurchaseBonus;
-use Core\Shivalik\Entities\GradeMember;
-use Core\Shivalik\Entities\PointValue;
-use Core\Shivalik\Entities\NotificationReceiver;
 use Core\Shivalik\Managers\MemberDAOManager;
-use Core\Shivalik\Entities\Generation;
+use Core\Shivalik\Entities\MonthlyOrder;
+use Core\Shivalik\Managers\MonthlyOrderDAOManager;
 
 /**
  *
@@ -54,10 +51,31 @@ class CommandDAOManagerImplementation1 extends DefaultDAOInterface implements Co
      * @param Command $entity
      */
     public function createInTransaction($entity, \PDO $pdo): void {
+        if ($entity->getMonthlyOrder() == null || $entity->getMonthlyOrder()->getId() == null || $entity->getMonthlyOrder()->getId() <= 0) {
+            
+            $m = intval($entity->getFormatedDateAjout('m'), 10);
+            $y = intval($entity->getFormatedDateAjout('Y'), 10);
+            
+            /**
+             * @var MonthlyOrderDAOManager $monthlyDao
+             */
+            $monthlyDao = $this->getManagerFactory()->getManagerOf(MonthlyOrder::class);
+            if($monthlyDao->checkByMemberOfMonth($entity->getMember()->getId(), $m, $y)) {                
+                $monthly = $monthlyDao->findByMemberOfMonth($entity->getMember()->getId(), $m, $y);
+            } else {
+                $monthly = new MonthlyOrder();
+                $monthly->setMember($entity->getMember());
+                $monthly->setDateAjout($entity->getDateAjout());
+                $monthlyDao->createInTransaction($monthly, $pdo);
+            }
+            
+            $entity->setMonthlyOrder($monthly);
+        }
         $id = UtilitaireSQL::insert($pdo, $this->getTableName(), [
             self::FIELD_DATE_AJOUT => $entity->getFormatedDateAjout(),
             'member' => $entity->getMember()->getId(),
             'office' => $entity->getOffice()->getId(),
+            'monthlyOrder' => $entity->getMonthlyOrder()->getId(),
             'officeAdmin' => $entity->getOfficeAdmin() != null? $entity->getOfficeAdmin()->getId() : null
         ]);
         
@@ -66,88 +84,6 @@ class CommandDAOManagerImplementation1 extends DefaultDAOInterface implements Co
         foreach ($entity->getProducts() as $pr) {
             $this->getManagerFactory()->getManagerOf(ProductOrdered::class)->createInTransaction($pr, $pdo);
         }
-        
-        //bonus reachat et PV
-        $member = $entity->getMember();
-        $generator = $this->getManagerFactory()->getManagerOf(GradeMember::class)->findCurrentByMember($member->getId());
-        $bonus = new PurchaseBonus();
-        $pv = new PointValue();
-        $now = new \DateTime();
-        
-        $notificationReceivers = [];
-        $pointValues = [];
-        $purchaseBonus = [];
-        
-        $bonus->setGenerator($generator);
-        $bonus->setMember($member);
-        $bonus->setAmount(($entity->getAmount() / 100) * 15);
-        $bonus->setDateAjout($now);
-        $bonus->setCommand($entity);
-        
-        $value = round(($entity->getAmount()/2), 0);
-        $pv->setGenerator($generator);
-        $pv->setMember($member);
-        $pv->setFoot(null);
-        $pv->setValue($value);
-        $pv->setCommand($entity);
-        
-        $purchaseBonus[] = $bonus;
-        $pointValues[] = $pv;
-        
-        if ($entity->getMember()->getParent() != null) {
-            
-            $parent = $entity->getMember();
-            $generationNumber = Generation::MIN_GENERATION;
-            
-            $amountBonusGeneration = ($entity->getAmount()/100);
-            $amountBonusGeneration = round($amountBonusGeneration, 2, PHP_ROUND_HALF_DOWN);
-
-            while ($this->memberDAOManager->checkParent($parent->getId())) {
-                $foot = $parent->getFoot();//les PV sont appercue au pied du parent, identifier par le foot du fils de sont arbre
-                $parent = $this->memberDAOManager->findParent($parent->getId());
-                
-                $pv = new PointValue();
-                $pv->setGenerator($generator);
-                $pv->setMember($parent);
-                $pv->setFoot($foot);
-                $pv->setValue($value);
-                $pv->setCommand($entity);
-                
-                if ($generationNumber <= 15) {//bonus jusqu'au 15 em generation
-                    
-                    $bonus = new PurchaseBonus();
-                    $bonus->setGenerator($generator);
-                    $bonus->setMember($parent);
-                    $bonus->setCommand($entity);
-                    $bonus->setAmount($amountBonusGeneration);
-                    $bonus->setDateAjout($now);
-                    $bonus->setGeneration($generationNumber);
-                    
-                    $title = "Purchase bonus";
-                    $description = "Congratulations {$parent->getNames()}. You got $ {$amountBonusGeneration} bonus, for your downline {$entity->getMember()->getMatricule()} account purchase bonus.";
-                    $notificationReceivers[] = NotificationReceiver::buildNotificationReceiver($title, $description, $parent);
-                    $purchaseBonus[] = $bonus;
-                    
-                    $generationNumber++;
-                }
-                
-                $title = "PV purchase bonus";
-                $description = "Congratulations {$parent->getNames()}. You got  {$pv->getValue()} PV, for your downline {$entity->getMember()->getMatricule()} account, purchase bonus";
-                $notificationReceivers[] = NotificationReceiver::buildNotificationReceiver($title, $description, $parent);
-                $pointValues[]= $pv;
-                
-            }
-        }
-        foreach ($purchaseBonus as $bn) {
-            $this->getDaoManager()->getManagerOf(PurchaseBonus::class)->createInTransaction($bn, $pdo);
-        }
-        foreach ($pointValues as $point) {
-            $this->getDaoManager()->getManagerOf(PointValue::class)->createInTransaction($point, $pdo);
-        }
-        foreach ($notificationReceivers as $receiver) {
-            $this->getDaoManager()->getManagerOf(NotificationReceiver::class)->createInTransaction($receiver, $pdo);
-        }
-        
     }
     
     /**

@@ -454,9 +454,5 @@ class Member extends User implements TernaryNode
         return $this->sponsor != null;
     }
 
-    
-    
-
-
 }
 

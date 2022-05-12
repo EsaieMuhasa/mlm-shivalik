@@ -112,7 +112,12 @@
 			name="\Core\Shivalik\Entities\ProductOrdered" 
 			specification="\Core\Shivalik\Managers\ProductOrderedDAOManager" 
 			implementation="\Core\Shivalik\Managers\Implementation\ProductOrderedDAOManagerImplementation1"/>
-			
+		
+		<entity 
+			name="\Core\Shivalik\Entities\MonthlyOrder" 
+			specification="\Core\Shivalik\Managers\MonthlyOrderDAOManager" 
+			implementation="\Core\Shivalik\Managers\Implementation\MonthlyOrderDAOManagerImplementation1"/>
+				
 		<entity 
 			name="\Core\Shivalik\Entities\PurchaseBonus" 
 			specification="\Core\Shivalik\Managers\PurchaseBonusDAOManager" 

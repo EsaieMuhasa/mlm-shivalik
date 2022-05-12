@@ -30,20 +30,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
     <body>
         <!-- .container-fluid --> 
         <div class="container-fluid">
-            <nav class="default-navbar">
-                <div class="container"> 
-                </div>
-            </nav>
-            <!-- Header -->
-            
             <?php echo $_REQUEST[Page::ATT_VIEW]; ?>
-            
-            <footer class="default-footer">
-                <div class="container text-center">
-                    <p>Copyright &copy; 2021 Shivalik. Designed by <a href="mailto:<?php echo htmlspecialchars($config->get('designerEmail')); ?>" rel="nofollow"><?php echo htmlspecialchars($config->get('designerName')); ?></a></p>
-                </div>
-            </footer>
-            
         </div>
         <!-- /.container-fluid --> 
     </body>

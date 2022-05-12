@@ -55,6 +55,7 @@ if ($month->hasSelectedDate()) {
     	<h1 class="page-header"><i class="fa fa-calendar"></i> <?php echo ($_REQUEST[AccountController::ATT_VIEW_TITLE]); ?></h1><hr/>
     </div>
 </div>
+
 <div class="row">
 	<div class="col-lg-8 col-md-7 col-sm-6 col-xs-12">
 		<h2><?php echo htmlspecialchars(($date==null? "":"{$date->format('d ')}").$month); ?></h2>

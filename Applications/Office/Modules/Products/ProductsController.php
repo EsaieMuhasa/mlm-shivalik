@@ -25,8 +25,7 @@ use Core\Shivalik\Managers\ProductOrderedDAOManager;
  * @author Esaie MUHASA
  *        
  */
-class ProductsController extends HTTPController
-{
+class ProductsController extends HTTPController {
     const ATT_CATEGORY = 'category';
     const ATT_CATEGORIES = 'categories';
     
@@ -243,7 +242,15 @@ class ProductsController extends HTTPController
     public function executeValidateCommand (Request $request, Response $response) : void{
         if ($request->getSession()->hasAttribute(self::ATT_COMMAND)) {
             $title = "";
+            /**
+             * @var Command $command
+             */
             $command = $request->getSession()->getAttribute(self::ATT_COMMAND);
+            
+            if($command->getCountProduct() == 0){
+                $response->sendRedirect("/office/products/cancel.html");
+            }
+            
             try {
                 $this->commandDAOManager->create($command);
                 $request->getSession()->removeAttribute(self::ATT_COMMAND);

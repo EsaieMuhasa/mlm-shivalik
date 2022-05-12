@@ -1,10 +1,11 @@
 <?php
-use Applications\Admin\Modules\Members\MembersController;
 use Applications\Root\Modules\Settings\SettingsController;
 use Core\Shivalik\Entities\Account;
 use Core\Shivalik\Entities\Generation;
 use Core\Shivalik\Entities\GradeMember;
 use Core\Shivalik\Entities\Member;
+use Core\Shivalik\Entities\MonthlyOrder;
+use Applications\Office\Modules\Members\MembersController;
 
 /**
  * @var Member $member
@@ -77,8 +78,10 @@ $option = isset($_GET['option'])? $_GET['option'] : null;
 <div class="row">
 	<?php if ($gradeMember!=null) { ?>
 	<div class="col-sm-2 col-xs-6">
-		<div class="thumbnail text-left">
+		<div class="thumbnail text-left text-center">
+			<?php if ($requestedGradeMember!=null) : ?>
 			<span class="label label-info" style="display: block;">current</span>
+			<?php endif; ?>
 			<img style="" alt="" src="/<?php echo ("{$gradeMember->getGrade()->getIcon()}") ?>">
 			<?php echo htmlspecialchars("{$gradeMember->getGrade()->getName()}") ?>
 		</div>
@@ -94,6 +97,43 @@ $option = isset($_GET['option'])? $_GET['option'] : null;
 		</span>
 	</div>
 	<?php } ?>
+	
+    <?php if (isset($_REQUEST[MembersController::ATT_MONTHLY_ORDER_FOR_ACCOUNT])) : ?>
+    <?php 
+    /**
+     * @var MonthlyOrder $monthly
+     */
+    $monthly = $_REQUEST[MembersController::ATT_MONTHLY_ORDER_FOR_ACCOUNT]; ?>
+	<div class="<?php echo (($requestedGradeMember!=null)? 'col-sm-8':'col-sm-10'); ?> col-xs-12">
+		<div class="alert alert-info">
+			<strong><span class="glyphicon glyphicon-warning-sign"></span> Purchase accounting for the month of <?php echo $monthly->getFormatedDateAjout("M Y") ?> </strong>
+			<table class="table table-bordered table-condansed">
+				<tbody>
+					<tr>
+						<td>Amount realize </td>
+						<td><?php echo $monthly->getAmount(); ?> USD</td>
+					</tr>
+					<tr>
+						<td>Used amount</td>
+						<td><?php echo $monthly->getUsed(); ?> USD</td>
+					</tr>
+				</tbody>
+				<tfoot>
+					<tr>
+						<th>Available amount</th>
+						<th><?php echo $monthly->getAvailable(); ?> USD</th>
+					</tr>
+				</tfoot>
+			</table>
+			
+			<a class="btn btn-danger" href="affiliate.html">
+				<span class="fa fa-user"></span> Affiliate a new member
+			</a>
+		</div>
+		
+	</div>
+    <?php endif; ?>
+	
 </div>
 <hr/>
 

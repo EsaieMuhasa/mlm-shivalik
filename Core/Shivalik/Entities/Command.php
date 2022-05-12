@@ -1,27 +1,21 @@
 <?php
 namespace Core\Shivalik\Entities;
 
-use PHPBackend\DBEntity;
 use PHPBackend\PHPBackendException;
+use PHPBackend\Dao\DAOException;
 
 /**
  *
  * @author Esaie MUHASA
  *        
  */
-class Command extends DBEntity
+class Command extends Operation
 {
     /**
      * date de livraison de la commande
      * @var \DateTime
      */
     private $deliveryDate;
-    
-    /**
-     * dans le cas ou c'est un membre adherant qui ait effectuer la commande, on garde une reference
-     * @var Member
-     */
-    private $member;
     
     /**
      * l'office dans la quel la commande a ete faite
@@ -42,6 +36,11 @@ class Command extends DBEntity
     private $note;
     
     /**
+     * @var MonthlyOrder
+     */
+    private $monthlyOrder;
+    
+    /**
      * Rubrique de la commande
      * @var ProductOrdered[]
      */
@@ -55,30 +54,10 @@ class Command extends DBEntity
     }
 
     /**
-     * @return \Core\Shivalik\Entities\Member
-     */
-    public function getMember() : ?Member {
-        return $this->member;
-    }
-
-    /**
      * @param \DateTime $deliveryDate
      */
     public function setDeliveryDate($deliveryDate) : void {
         $this->deliveryDate = $this->hydrateDate($deliveryDate);
-    }
-
-    /**
-     * @param \Core\Shivalik\Entities\Member|int $member
-     */
-    public function setMember($member) : void {
-        if ($member === null || $member instanceof Member) {
-            $this->member = $member;
-        } else if (self::isInt($member)) {
-            $this->member = new Member(array('id' => $member));
-        } else {
-            throw new PHPBackendException("invalide argument value");
-        }
     }
     
     /**
@@ -166,9 +145,10 @@ class Command extends DBEntity
     
     /**
      * renvoie le montant total a payer pour la commande
-     * @return float
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Entities\Operation::getAmount()
      */
-    public function getAmount () : float {
+    public function getAmount () : ?float {
         if($this->getCountProduct() != 0) {
             $amount = 0;
             foreach ($this->products as $pr) {
@@ -179,6 +159,14 @@ class Command extends DBEntity
         return 0;
     }
     
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Entities\Operation::setAmount()
+     */
+    public function setAmount($amount): void {
+        throw new DAOException("Opertion not supported");
+    }
+
     /**
      * Renvoie la sommes des prix unitaire
      * @return float
@@ -208,7 +196,26 @@ class Command extends DBEntity
         }
         return 0;
     }
-
     
+    /**
+     * @return \Core\Shivalik\Entities\MonthlyOrder
+     */
+    public function getMonthlyOrder () : ?MonthlyOrder {
+        return $this->monthlyOrder;
+    }
+
+    /**
+     * @param \Core\Shivalik\Entities\MonthlyOrder|int $monthlyOrder
+     */
+    public function setMonthlyOrder ($monthlyOrder) {
+        if ($monthlyOrder == null || $monthlyOrder instanceof MonthlyOrder) {
+            $this->monthlyOrder = $monthlyOrder;
+        } else if (self::isInt($monthlyOrder)) {
+            $this->monthlyOrder = new MonthlyOrder(['monthlyOrder' => $monthlyOrder]);
+        } else {
+            throw new DAOException("invalid argument as method parameter setMonthOrder()");
+        }
+    }
+
 }
 

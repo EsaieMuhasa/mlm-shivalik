@@ -5,6 +5,7 @@ use PHPBackend\Http\HTTPFilter;
 use PHPBackend\Request;
 use PHPBackend\Response;
 use Core\Shivalik\Entities\Member;
+use Core\Shivalik\Managers\MonthlyOrderDAOManager;
 
 /**
  *
@@ -14,6 +15,12 @@ use Core\Shivalik\Entities\Member;
 class SessionMemberFilter extends HTTPFilter
 {
     const MEMBER_CONNECTED_SESSION = 'Member_in_corrent_Session';
+    const ATT_MONTHLY_ORDER_FOR_ACCOUNT = 'MONTHLY_ORDER_FOR_ACCOUNT';
+    
+    /**
+     * @var MonthlyOrderDAOManager
+     */
+    private $monthlyOrderDAOManager;
 
     /**
      * {@inheritDoc}
@@ -28,6 +35,11 @@ class SessionMemberFilter extends HTTPFilter
             $member = $request->getSession()->getAttribute(self::MEMBER_CONNECTED_SESSION);
             
             if ($member->isEnable()) {
+                
+                if($this->monthlyOrderDAOManager->checkByMemberOfMonth($member->getId()));{
+                    $monthly = $this->monthlyOrderDAOManager->findByMemberOfMonth($member->getId());
+                    $request->addAttribute(self::ATT_MONTHLY_ORDER_FOR_ACCOUNT, $monthly);
+                }
                 return;
             }
         }

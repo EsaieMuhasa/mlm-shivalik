@@ -33,7 +33,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
 	<div class="panel-body">
         
         <div class="row">
-            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                 <div class="info-box blue-bg">
                     <i class="fa fa-tag"></i>
                     <div class="count"><?php echo ($compte->getLeftMembershipPv()); ?></div>
@@ -42,7 +42,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
                 <!--/.info-box-->
             </div>
             
-            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                 <div class="info-box blue-bg">
                     <i class="fa fa-tag"></i>
                     <div class="count"><?php echo ($compte->getMiddleMembershipPv()); ?></div>
@@ -51,7 +51,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
                 <!--/.info-box-->
             </div>
             
-            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                 <div class="info-box blue-bg">
                     <i class="fa fa-tag"></i>
                     <div class="count"><?php echo ($compte->getRightMembershipPv()); ?></div>
@@ -60,7 +60,18 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
                 <!--/.info-box-->
             </div>
             
-            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+        </div>
+        
+        <div class="row">
+        	<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="info-box blue-bg">
+                    <i class="fa fa-tag"></i>
+                    <div class="count"><?php echo ($compte->getPersonalMembershipPv()); ?></div>
+                    <div class="title">Perso PV</div>
+                </div>
+                <!--/.info-box-->
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <div class="info-box brown-bg">
                     <i class="fa fa-tags"></i>
                     <div class="count"><?php echo ($compte->getMembershipPv()); ?></div>

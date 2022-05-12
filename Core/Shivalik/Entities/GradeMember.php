@@ -45,8 +45,7 @@ class GradeMember extends DBEntity
      * @var Member
      */
     private $member;
-    
-    
+
     /**
      * @var Grade
      */
@@ -67,6 +66,11 @@ class GradeMember extends DBEntity
      * @var VirtualMoney
      */
     private $virtualMoney;
+    
+    /**
+     * @var MonthlyOrder
+     */
+    private $monthlyOrder;
     
     /**
 	 * @return Office
@@ -273,7 +277,25 @@ class GradeMember extends DBEntity
             throw new PHPBackendException("invalide param value type in setVirtualMoney() param method");
         }
     }
+    /**
+     * @return \Core\Shivalik\Entities\MonthlyOrder
+     */
+    public function getMonthlyOrder () : ?MonthlyOrder{
+        return $this->monthlyOrder;
+    }
 
+    /**
+     * @param \Core\Shivalik\Entities\MonthlyOrder | int $monthlyOrder
+     */
+    public function setMonthlyOrder ($monthlyOrder) : void {
+        if ($monthlyOrder == null || $monthlyOrder instanceof MonthlyOrder) {
+            $this->monthlyOrder = $monthlyOrder;
+        } else if (self::isInt($monthlyOrder)) {
+            $this->monthlyOrder = new MonthlyOrder(['id' => $monthlyOrder]);
+        } else {
+            throw new PHPBackendException("invalide param value type in setMonthlyOrder() param method");
+        }
+    }
 
 }
 

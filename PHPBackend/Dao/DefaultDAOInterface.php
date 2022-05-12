@@ -359,6 +359,7 @@ abstract class DefaultDAOInterface implements DAOInterface
     /**
      * alance de la methode getManagerFactory()
      * @return DAOManagerFactory
+     * @deprecated nous vous recomandons d'utiliser getManagerFactory()
      */
     public function getDaoManager () : DAOManagerFactory {
         return $this->getManagerFactory();

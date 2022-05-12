@@ -11,6 +11,7 @@ use Core\Shivalik\Managers\CountryDAOManager;
 use Core\Shivalik\Managers\GradeDAOManager;
 use Core\Shivalik\Managers\GradeMemberDAOManager;
 use Core\Shivalik\Managers\MemberDAOManager;
+use Core\Shivalik\Managers\MonthlyOrderDAOManager;
 use Core\Shivalik\Managers\PointValueDAOManager;
 use Core\Shivalik\Managers\VirtualMoneyDAOManager;
 use Core\Shivalik\Managers\WithdrawalDAOManager;
@@ -37,6 +38,7 @@ class MembersController extends HTTPController {
 	const ATT_COMPTE = 'compte';
 	const ATT_MEMBERS = 'members';
 	const ATT_MEMBER = 'member';
+	const ATT_SPONSOR = 'sponsorMember';
 	const ATT_GRADE_MEMBER = 'gradeMember';
 	const ATT_REQUESTED_GRADE_MEMBER = 'RequestedGradeMember';
 	const ATT_GRADES = 'grades';
@@ -47,6 +49,8 @@ class MembersController extends HTTPController {
 	const LEFT_CHILDS = 'LEFT';
 	const MIDDLE_CHILDS = 'MIDDLE';
 	const RIGHT_CHILDS = 'RIGHT';
+	
+	const ATT_MONTHLY_ORDER_FOR_ACCOUNT = 'MONTHLY_ORDER_FOR_ACCOUNT';
 	
 	/**
 	 * @var MemberDAOManager
@@ -87,6 +91,11 @@ class MembersController extends HTTPController {
 	 * @var VirtualMoneyDAOManager
 	 */
 	private $virtualMoneyDAOManager;
+	
+	/**
+	 * @var MonthlyOrderDAOManager
+	 */
+	private $monthlyOrderDAOManager;
 	
 	/**
 	 * {@inheritDoc}
@@ -170,7 +179,7 @@ class MembersController extends HTTPController {
 	
 	
 	/**
-	 * Adhesion d'un nouveau membre
+	 * Adhesion d'un nouveau membre, sur wallet de l'office
 	 * @param Request $request
 	 * @param Request $response
 	 */
@@ -214,6 +223,72 @@ class MembersController extends HTTPController {
 		$request->addAttribute(self::ATT_GRADES, $grades);
 	}
 	
+	/**
+	 * affiliation d'un membre.
+	 * la facturation se fait sur le compte du sponsor du compte
+	 * @param Request $request
+	 * @param Response $response
+	 */
+	public function executeAffiliateMember (Request $request, Response $response) : void {
+	    
+	    $office = $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice();
+	    
+	    if ($this->gradeMemberDAOManager->checkByOffice($office->getId())) {
+	        $office->setOperations($this->gradeMemberDAOManager->findByOffice($office->getId()));
+	    }
+	    
+	    if ($this->virtualMoneyDAOManager->checkByOffice($office->getId())) {
+	        $office->setVirtualMoneys($this->virtualMoneyDAOManager->findByOffice($office->getId()));
+	    }
+	    
+	    $id = intval($request->getDataGET('id'), 10);
+	    if (!$this->memberDAOManager->checkById($id)) {
+	        $response->sendError();
+	    }
+	    
+	    /**
+	     * @var Member $member
+	     */
+	    $member = $this->memberDAOManager->findById($id);
+	    
+	    if ($this->monthlyOrderDAOManager->checkByMemberOfMonth($member->getId())) {
+	        $monthly = $this->monthlyOrderDAOManager->findByMemberOfMonth($member->getId());
+	        $request->addAttribute(self::ATT_MONTHLY_ORDER_FOR_ACCOUNT, $monthly);
+	    } else {
+	        $response->sendRedirect("/office/members/{$id}/");
+	    }
+	    $request->addAttribute(MemberFormValidator::FIELD_SPONSOR, $member);
+	    $request->addAttribute(self::ATT_SPONSOR, $member);
+	    $request->addAttribute(self::ATT_MEMBER, null);
+	    
+	    if ($request->getMethod() == Request::HTTP_POST) {
+	        /**
+	         * on prefere passer pas L'inscription au pack, qui utilise dans le colices
+	         * le validateur d'un membre et tout les validateurs qui y sont lier
+	         * @var \Core\Shivalik\Validators\GradeMemberFormValidator $form
+	         */
+	        $form = new GradeMemberFormValidator($this->getDaoManager());
+	        $request->addAttribute(GradeMemberFormValidator::FIELD_OFFICE_ADMIN, $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION));
+	        $gm = $form->affiliateAfterValidation($request);
+	        
+	        if (!$form->hasError()) {
+	            $response->sendRedirect("/office/members/");
+	        }
+	        
+	        $request->addAttribute(LocalisationFormValidator::LOCALISATION_FEEDBACK, $form->getFeedback(LocalisationFormValidator::LOCALISATION_FEEDBACK));
+	        $request->addAttribute(MemberFormValidator::MEMBER_FEEDBACK, $form->getFeedback(MemberFormValidator::MEMBER_FEEDBACK));
+	        $form->includeFeedback($request);
+	        
+	        $request->addAttribute(self::ATT_GRADE_MEMBER, $gm);
+	        $request->addAttribute(self::ATT_MEMBER, $gm->getMember());
+	        $request->addAttribute(self::ATT_LOCALISATION, $gm->getMember()->getLocalisation());
+	    }
+	    
+	    $request->addAttribute(self::ATT_COUNTRYS, $this->countryDAOManager->findAll());
+	    $grades = $this->gradeDAOManager->findAll();
+	    $request->addAttribute(self::ATT_GRADES, $grades);
+	}
+	
 	
 	/**
 	 * Dashboard du compte d'un membre
@@ -243,7 +318,12 @@ class MembersController extends HTTPController {
 			$request->addAttribute(self::ATT_REQUESTED_GRADE_MEMBER, $requestedGradeMember);
 		}
 		
-		//Chargement des PV;
+		if($this->monthlyOrderDAOManager->checkByMemberOfMonth($member->getId()));{
+		    $monthly = $this->monthlyOrderDAOManager->findByMemberOfMonth($member->getId());
+		    $request->addAttribute(self::ATT_MONTHLY_ORDER_FOR_ACCOUNT, $monthly);
+		}
+		
+		//Chargement du compte
 		$compte = $this->getAccount($member);
 		
 		$request->addAttribute(self::ATT_COMPTE, $compte);

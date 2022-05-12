@@ -16,9 +16,9 @@ class PurchaseBonus extends AbstractBonus
     private $generation;
     
     /**
-     * @var Command
+     * @var MonthlyOrder
      */
-    private $command;
+    private $monthlyOrder;
     
     /**
      * @return int|null
@@ -29,11 +29,11 @@ class PurchaseBonus extends AbstractBonus
     }
 
     /**
-     * @return \Core\Shivalik\Entities\Command
+     * @return \Core\Shivalik\Entities\MonthlyOrder
      */
-    public function getCommand() : ?Command
+    public function getMonthlyOrder() : ?MonthlyOrder
     {
-        return $this->command;
+        return $this->monthlyOrder;
     }
 
     /**
@@ -45,16 +45,16 @@ class PurchaseBonus extends AbstractBonus
     }
 
     /**
-     * @param \Core\Shivalik\Entities\Command $command
+     * @param \Core\Shivalik\Entities\MonthlyOrder $monthlyOrder
      */
-    public function setCommand($command) : void
+    public function setMonthlyOrder($monthlyOrder) : void
     {
-        if ($command == null || $command instanceof Command) {
-            $this->command = $command;
-        } elseif(self::isInt($command)) {
-            $this->command = new Command(['id' => $command]);
+        if ($monthlyOrder == null || $monthlyOrder instanceof MonthlyOrder) {
+            $this->monthlyOrder = $monthlyOrder;
+        } elseif(self::isInt($monthlyOrder)) {
+            $this->monthlyOrder = new MonthlyOrder(['id' => $monthlyOrder]);
         } else {
-            throw new PHPBackendException("Invalid argoument in setCommand() : void method");
+            throw new PHPBackendException("Invalid argoument in setMonthlyOrder() : void method");
         }
     }
 
