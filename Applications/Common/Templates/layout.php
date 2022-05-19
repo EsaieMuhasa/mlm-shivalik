@@ -57,7 +57,7 @@ $activeMenu = isset($_REQUEST[IndexController::ACTIVE_ITEM_MENU])? $_REQUEST[Ind
                         
                     <ul class="default-nav">
                         <li><a href="/" class="<?php echo ($activeMenu == IndexController::ITEM_MENU_HOME? 'active' : ''); ?>">Home</a></li>
-                        <li><a href="/products/">Products</a></li>
+                        <li><a href="/products/" class="<?php echo ($activeMenu == IndexController::ITEM_MENU_PRODUCT? 'active' : ''); ?>">Products</a></li>
                         <li><a href="/news/">News</a></li>
                         <li><a href="/about.html" class="<?php echo ($activeMenu == IndexController::ITEM_MENU_ABOUT? 'active' : ''); ?>">About</a></li>
                         <li><a href="/contact.html" class="<?php echo ($activeMenu == IndexController::ITEM_MENU_CONTACT? 'active' : ''); ?>">Contact</a></li>

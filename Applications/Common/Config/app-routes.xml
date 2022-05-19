@@ -7,6 +7,8 @@
 	 	<route action="index" urlPattern="/index.html"/>
 	 	<route action="about" urlPattern="/about.html"/>
 	 	<route action="contact" urlPattern="/contact.html"/>
+	 	<route action="products" urlPattern="/products/"/>
+	 	<route action="products" urlPattern="/products/([0-9]{1,3})-([0-9]{1,3})\.html" paramsNames="limit,offset"/>
 	</module>
 	
 	<module name="News">
