@@ -22,9 +22,9 @@ class PurchaseBonusDAOManagerImplementation1 extends AbstractBonusDAOManager imp
             'generator' => $bonus->getGenerator()->getId(),
             'member' => $bonus->getMember()->getId(),
             'generation' => $bonus->getGeneration(),
-            'command' => $bonus->getCommand()->getId(),
+            'monthlyOrder' => $bonus->getMonthlyOrder()->getId(),
             'amount' => $bonus->getAmount(),
-            'dateAjout' => $bonus->getDateAjout()->format('Y-m-d')
+            'dateAjout' => $bonus->getDateAjout()->format('Y-m-d H:i:s')
         ), true);
         $bonus->setId($id);
     }

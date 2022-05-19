@@ -64,6 +64,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
                 </div>
                 <!--/.info-box-->
             </div>
+            
         </div>
 	</div>
 	<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
@@ -76,6 +77,25 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
 			</div>
 			<div class="panel-footer">above the distribution of members for each pack</div>
 		</div>
+		
+		<?php if ($_REQUEST[DashboardController::ATT_PURCHASE] > 0) : ?>
+		<div class="panel palel-default">
+			<div class="panel-heading">
+				<strong class="panel-title"><span class="glyphicon glyphicon-warning-sign"></span> Purchase</strong>
+			</div>
+			<div class="panel-body">
+				<div class="alert alert-info">
+					<strong>Purchase of month of <?php $date = new DateTime(); echo $date->format("M Y") ?> </strong>
+					<h3><?php echo $_REQUEST[DashboardController::ATT_PURCHASE]; ?> $</h3>
+				</div>
+			</div>
+			<?php if ($_REQUEST[DashboardController::ATT_DISPTCH_PURCHASE]) : ?>
+			<div class="panel-footer">
+				<a href="/admin/dispatch-purchase-of-month.html" class="btn btn-danger">Dispatch</a>
+			</div>
+			<?php endif; ?>
+		</div>
+		<?php endif; ?>
 	</div>
 </div>
 

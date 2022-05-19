@@ -96,7 +96,7 @@ final class UtilitaireSQL
                 return $pdo->lastInsertId();
             }
         } catch (\Exception $e) {
-            throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
+            throw new DAOException("{$e->getMessage()} => SQL_QUERY: {$SQL}", DAOException::ERROR_CODE, $e);
         }
     }
 

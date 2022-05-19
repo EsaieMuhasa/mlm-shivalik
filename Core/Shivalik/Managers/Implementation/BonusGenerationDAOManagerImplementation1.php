@@ -23,7 +23,7 @@ class BonusGenerationDAOManagerImplementation1 extends AbstractBonusDAOManager i
             'member' => $bonus->getMember()->getId(),
             'generation' => $bonus->getGeneration()? $bonus->getGeneration()->getId() : null,
             'amount' => $bonus->getAmount(),
-            'dateAjout' => $bonus->getDateAjout()->format('Y-m-d')
+            'dateAjout' => $bonus->getDateAjout()->format('Y-m-d H:i:s')
         ), true);
         
         $bonus->setId($id);

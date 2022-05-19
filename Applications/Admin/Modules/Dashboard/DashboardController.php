@@ -21,6 +21,10 @@ use PHPBackend\Application;
 use PHPBackend\Request;
 use PHPBackend\Response;
 use PHPBackend\Graphics\ChartJS\ChartConfig;
+use Core\Shivalik\Managers\MonthlyOrderDAOManager;
+use Core\Shivalik\Entities\MonthlyOrder;
+use PHPBackend\Dao\DAOException;
+use PHPBackend\ToastMessage;
 
 /**
  *
@@ -42,6 +46,9 @@ class DashboardController extends AdminController {
 	const ATT_GRADES = 'packets';
 	const ATT_GENERATIONS = 'generations';
 	const ATT_SIZES = 'sizes';//office sizes
+	
+	const ATT_PURCHASE = "purchase";
+	const ATT_DISPTCH_PURCHASE = "dispatchPurchase";
 	
 	/**
 	 * @var GradeDAOManager
@@ -87,6 +94,11 @@ class DashboardController extends AdminController {
 	 * @var RaportWithdrawalDAOManager
 	 */
 	private $raportWithdrawalDAOManager;
+	
+	/**
+	 * @var MonthlyOrderDAOManager
+	 */
+	private $monthlyOrderDAOManager;
 	
 	/**
 	 * 
@@ -171,11 +183,45 @@ class DashboardController extends AdminController {
             $rapports = [];
         }
         
+        //re-achat en attante
+        $purchase = 0;
+        $now = new \DateTime();
+        if($this->monthlyOrderDAOManager->checkByMonth(null, null, true)) {
+            /**
+             * @var MonthlyOrder[] $purchases
+             */
+            $purchases = $this->monthlyOrderDAOManager->findByMonth(null, null, true);
+            foreach ($purchases as $p) {
+                $purchase += $p->getAvailable();
+            }
+        }
+        $dispatchable = intval($now->format('d'), 10) >= 27 && $purchase > 0;
+        
+        $request->addAttribute(self::ATT_PURCHASE, $purchase);
+        $request->addAttribute(self::ATT_DISPTCH_PURCHASE, $dispatchable);
         $request->addAttribute(self::ATT_RAPORT_WITHDRAWALS, $rapports);
         $request->addAttribute(self::ATT_WITHDRAWALS, $all);
         $request->addAttribute(self::ATT_SOLDE_WITHDRAWALS_SERVED, $served);
         $request->addAttribute(self::PARAM_UPGRADES_COUNT, $this->gradeMemberDAOManager->countUpgrades());
         $request->addAttribute(self::PARAM_MEMBER_COUNT, $this->memberDAOManager->countAll());
+    }
+    
+    /**
+     * Dispatching du bonus mensuel de re-achat
+     * @param Request $request
+     * @param Response $response
+     */
+    public function executeDispatchPurchase (Request $request, Response $response) : void {
+        try {
+            $this->monthlyOrderDAOManager->dispatchPurchaseBonus();
+            
+            $toast = new ToastMessage("Alert", "succesfull dispatching of purchase bonus", ToastMessage::MESSAGE_SUCCESS);
+            $request->addToast($toast);
+        } catch (DAOException $e) {
+            $request->addToast(new ToastMessage("Error", $e->getMessage(), ToastMessage::MESSAGE_ERROR));
+        }
+        
+        $response->sendRedirect("/admin/");
     }
     
     /**

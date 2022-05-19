@@ -37,7 +37,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
 	<div class="panel-body">
         
         <div class="row">
-            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                 <div class="info-box blue-bg">
                     <i class="fa fa-tag"></i>
                     <div class="count"><?php echo ($compte->getLeftMembershipPv()); ?></div>
@@ -46,7 +46,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
                 <!--/.info-box-->
             </div>
             
-            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                 <div class="info-box blue-bg">
                     <i class="fa fa-tag"></i>
                     <div class="count"><?php echo ($compte->getMiddleMembershipPv()); ?></div>
@@ -55,7 +55,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
                 <!--/.info-box-->
             </div>
             
-            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                 <div class="info-box blue-bg">
                     <i class="fa fa-tag"></i>
                     <div class="count"><?php echo ($compte->getRightMembershipPv()); ?></div>
@@ -64,7 +64,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
                 <!--/.info-box-->
             </div>
             
-            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+            <div class="col-lg-12 col-md-12 col-sm-6 col-xs-12">
                 <div class="info-box brown-bg">
                     <i class="fa fa-tags"></i>
                     <div class="count"><?php echo ($compte->getMembershipPv()); ?></div>

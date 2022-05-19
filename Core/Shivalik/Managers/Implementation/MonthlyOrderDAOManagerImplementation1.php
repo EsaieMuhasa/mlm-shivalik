@@ -26,6 +26,15 @@ class MonthlyOrderDAOManagerImplementation1 extends AbstractOperationDAOManager 
     
     /**
      * {@inheritDoc}
+     * @see \PHPBackend\Dao\DefaultDAOInterface::hasView()
+     */
+    protected function hasView(): bool {
+        return true;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
      * @see \Core\Shivalik\Managers\MonthlyOrderDAOManager::dispatchPurchaseBonus()
      */
     public function dispatchPurchaseBonus(): void {
@@ -35,7 +44,7 @@ class MonthlyOrderDAOManagerImplementation1 extends AbstractOperationDAOManager 
         $dateMin = "{$befor->format('T-m')}-28 01:00:00";
         $dateMax = "{$date->format('Y-m')}-28 23:59:59";
         
-        $SQL = "SELECT * FROM {$this->getViewName()} WHERE (dateAjout BETWEEN  :dateMin AND :dateMax)";
+        $SQL = "SELECT * FROM {$this->getViewName()} WHERE (dateAjout BETWEEN  :dateMin AND :dateMax) AND disabilityDate IS NULL";
         
         $mothlyOrders = [];
         $pdo = $this->getConnection();
@@ -47,13 +56,15 @@ class MonthlyOrderDAOManagerImplementation1 extends AbstractOperationDAOManager 
             
             $statement = UtilitaireSQL::prepareStatement($pdo, $SQL, ['dateMin' => $dateMin, 'dateMax' => $dateMax]);
             while ($row = $statement->fetch()) {
-                $mothlyOrders[] = new MonthlyOrder($row);
+                $order = new MonthlyOrder($row);
+                $order->setMember($this->memberDAOManager->findById($order->getMember()->getId()));
+                $mothlyOrders[] = $order; 
             }
             $statement->closeCursor();
         
             foreach ($mothlyOrders as $order) {
                 //desactivation du compte memsuel
-                UtilitaireSQL::update($pdo, $this->getTableName(), ['disabilityDate' => $date->format('d-m-Y H:i:s')], $order->getId());
+                UtilitaireSQL::update($pdo, $this->getTableName(), ['disabilityDate' => $date->format('Y-m-d H:i:s')], $order->getId());
                 
                 if($order->getAvailable() == 0){
                     continue;
@@ -74,7 +85,7 @@ class MonthlyOrderDAOManagerImplementation1 extends AbstractOperationDAOManager 
                 $bonus->setMember($member);
                 $bonus->setAmount(($order->getAvailable() / 100) * 15);
                 $bonus->setDateAjout($now);
-                $bonus->getMonthlyOrder($order);
+                $bonus->setMonthlyOrder($order);
                 
                 $value = round(($order->getAmount()/2), 0);
                 $pv->setGenerator($generator);
@@ -147,6 +158,109 @@ class MonthlyOrderDAOManagerImplementation1 extends AbstractOperationDAOManager 
         } catch (\PDOException $e) {
             throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MonthlyOrderDAOManager::checkByMonth()
+     */
+    public function checkByMonth (?int $month = null, ?int $year = null, ?bool $status = null, int $offset = 0): bool {
+        if ($month === null || $year === null) {
+            $now = new \DateTime();
+            $month = $month == null? intval($now->format('m'), 10) : $month;
+            $year = $year == null? intval($now->format('Y'), 10) : $year;
+        }
+        
+        $m = ($month < 10? "0":"").$month;
+        $date  = new \DateTime("01-{$m}-{$year}");
+        $befor = (clone $date)->modify('-1 month');
+        
+        $dateMin = "28-{$befor->format('Y-m')} 01:00:00";
+        $dateMax = "{$date->format('Y-m')}-28 23:59:59";
+        
+        $SQL_STATUS = $status !== null? ("AND disabilityDate IS ". ($status? '':'NOT ')."NULL") : ("");
+        $SQL = "SELECT * FROM {$this->getViewName()} WHERE (dateAjout BETWEEN :dateMin AND :dateMax) {$SQL_STATUS} LIMIT 1 OFFSET {$offset}";
+        $return = false;
+        try {
+            $statement = UtilitaireSQL::prepareStatement($this->getConnection(), $SQL, ['dateMin' => $dateMin, 'dateMax' => $dateMax]);
+            if ($statement->fetch()) {
+                $return = true;
+            }
+            $statement->closeCursor();
+        } catch (\PDOException $e) {
+            throw new DAOException($e->getMessage()." {$SQL}", DAOException::ERROR_CODE, $e);
+        }
+        return $return;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MonthlyOrderDAOManager::countByMonth()
+     */
+    public function countByMonth(?int $month = null, ?int $year = null, ?bool $status = null): int {
+        if ($month === null || $year === null) {
+            $now = new \DateTime();
+            $month = $month == null? intval($now->format('m'), 10) : $month;
+            $year = $year == null? intval($now->format('Y'), 10) : $year;
+        }
+        
+        $m = ($month < 10? "0":"").$month;
+        $date  = new \DateTime("01-{$m}-{$year}");
+        $befor = (clone $date)->modify('-1 month');
+        
+        $dateMin = "28-{$befor->format('Y-m')} 01:00:00";
+        $dateMax = "{$date->format('Y-m')}-28 23:59:59";
+        
+        $SQL_STATUS = $status !== null? ("AND disabilityDate IS ". ($status? '':'NOT ')."NULL") : ("");
+        $SQL = "SELECT COUNT(*) AS nombre FROM {$this->getViewName()} WHERE (dateAjout BETWEEN :dateMin AND :dateMax) {$SQL_STATUS}";
+        $return = 0;
+        try {
+            $statement = UtilitaireSQL::prepareStatement($this->getConnection(), $SQL, ['dateMin' => $dateMin, 'dateMax' => $dateMax]);
+            if ($row = $statement->fetch()) {
+                $return = $row['nombre'];
+            }
+            $statement->closeCursor();
+        } catch (\PDOException $e) {
+            throw new DAOException($e->getMessage()." {$SQL}", DAOException::ERROR_CODE, $e);
+        }
+        return $return;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MonthlyOrderDAOManager::findByMonth()
+     */
+    public function findByMonth(?int $month = null, ?int $year = null, ?bool $status = null, ?int $limit = null, int $offset = 0): array {
+        if ($month === null || $year === null) {
+            $now = new \DateTime();
+            $month = $month == null? intval($now->format('m'), 10) : $month;
+            $year = $year == null? intval($now->format('Y'), 10) : $year;
+        }
+        
+        $m = ($month < 10? "0":"").$month;
+        $date  = new \DateTime("01-{$m}-{$year}");
+        $befor = (clone $date)->modify('-1 month');
+        
+        $dateMin = "28-{$befor->format('Y-m')} 01:00:00";
+        $dateMax = "{$date->format('Y-m')}-28 23:59:59";
+        
+        $SQL_STATUS = $status !== null? ("AND disabilityDate IS ". ($status? '':'NOT ')."NULL") : ("");
+        $SQL_LIMIT = $limit !== null? ("LIMIT {$limit} OFFSET {$offset}") : ("");
+        $SQL = "SELECT * FROM {$this->getViewName()} WHERE (dateAjout BETWEEN :dateMin AND :dateMax) {$SQL_STATUS} {$SQL_LIMIT}";
+        $data = [];
+        try {
+            $statement = UtilitaireSQL::prepareStatement($this->getConnection(), $SQL, ['dateMin' => $dateMin, 'dateMax' => $dateMax]);
+            while ($row = $statement->fetch()) {
+                $data[] = new MonthlyOrder($row);
+            }
+            $statement->closeCursor();
+            if (empty($data)) {
+                throw  new DAOException("no data matched by this query in database");
+            }
+        } catch (\PDOException $e) {
+            throw new DAOException($e->getMessage()." {$SQL}", DAOException::ERROR_CODE, $e);
+        }
+        return $data;
     }
 
     /**

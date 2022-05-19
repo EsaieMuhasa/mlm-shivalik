@@ -103,7 +103,7 @@ class ProductValidator extends DefaultFormValidator
      */
     private function validationDescription ($description) : void {
         if ($description ==  null) {
-            throw new IllegalFormValueException("producti description is required");
+            //throw new IllegalFormValueException("producti description is required");
         } else if (strlen($description) <= self::MIN_LENGTH_DESCRIPTION || strlen($description) > self::MAX_LENGTH_DESCRIPTION) {
             throw new IllegalFormValueException("product name can not succed ");
         }
@@ -272,8 +272,7 @@ class ProductValidator extends DefaultFormValidator
      * @see \PHPBackend\Validator\FormValidator::updateAfterValidation()
      * @return Product
      */
-    public function updateAfterValidation(\PHPBackend\Request $request)
-    {
+    public function updateAfterValidation(\PHPBackend\Request $request) {
         $product = new Product();
         $name = $request->getDataPOST(self::FIELD_NAME);
         $description = $request->getDataPOST(self::FIELD_DESCRIPTION);

@@ -36,7 +36,7 @@ class SessionMemberFilter extends HTTPFilter
             
             if ($member->isEnable()) {
                 
-                if($this->monthlyOrderDAOManager->checkByMemberOfMonth($member->getId()));{
+                if($this->monthlyOrderDAOManager->checkByMemberOfMonth($member->getId())){
                     $monthly = $this->monthlyOrderDAOManager->findByMemberOfMonth($member->getId());
                     $request->addAttribute(self::ATT_MONTHLY_ORDER_FOR_ACCOUNT, $monthly);
                 }

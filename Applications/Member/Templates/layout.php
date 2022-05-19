@@ -57,7 +57,9 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
                     /**
                      * @var MonthlyOrder $monthly
                      */
-                    $monthly = $_REQUEST[SessionMemberFilter::ATT_MONTHLY_ORDER_FOR_ACCOUNT]; ?>
+                    $monthly = $_REQUEST[SessionMemberFilter::ATT_MONTHLY_ORDER_FOR_ACCOUNT]; 
+                    if($monthly->getDisabilityDate() == null) :
+                    ?>
                     <div class="row">
                     	<div class="col-xs-12">
                     		<div class="alert alert-info">
@@ -83,6 +85,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
                     		</div>
                     	</div>
                     </div>
+                    <?php endif; ?>
                     <?php endif; ?>
                     
                     <?php echo $_REQUEST[Page::ATT_VIEW];?>

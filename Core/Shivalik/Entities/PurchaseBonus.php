@@ -52,7 +52,8 @@ class PurchaseBonus extends AbstractBonus
         if ($monthlyOrder == null || $monthlyOrder instanceof MonthlyOrder) {
             $this->monthlyOrder = $monthlyOrder;
         } elseif(self::isInt($monthlyOrder)) {
-            $this->monthlyOrder = new MonthlyOrder(['id' => $monthlyOrder]);
+            $this->monthlyOrder = new MonthlyOrder();
+            $this->monthlyOrder->setId($monthlyOrder);
         } else {
             throw new PHPBackendException("Invalid argoument in setMonthlyOrder() : void method");
         }

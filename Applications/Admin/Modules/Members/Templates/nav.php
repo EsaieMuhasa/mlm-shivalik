@@ -5,6 +5,8 @@ use Applications\Root\Modules\Settings\SettingsController;
 use Core\Shivalik\Entities\Account;
 use Core\Shivalik\Entities\GradeMember;
 use Core\Shivalik\Entities\Member;
+use Core\Shivalik\Entities\MonthlyOrder;
+use Core\Shivalik\Filters\SessionMemberFilter;
 
 /**
  * @var Member $member
@@ -165,3 +167,36 @@ $option = isset($_GET['option'])? $_GET['option'] : null;
 		</div><!-- /.navbar-collapse -->
 	</div><!-- /.container-fluid -->
 </nav>
+
+<?php if (isset($_REQUEST[SessionMemberFilter::ATT_MONTHLY_ORDER_FOR_ACCOUNT])) : ?>
+<?php 
+/**
+ * @var MonthlyOrder $monthly
+ */
+$monthly = $_REQUEST[SessionMemberFilter::ATT_MONTHLY_ORDER_FOR_ACCOUNT]; ?>
+<div class="row">
+	<div class="col-xs-12">
+		<div class="alert alert-info">
+			<strong><span class="glyphicon glyphicon-<?php echo ($monthly->getDisabilityDate() != null? 'ok':'warning-sign'); ?>"></span> Purchase accounting for the month of <?php echo $monthly->getFormatedDateAjout("M Y") ?> </strong>
+			<table class="table table-bordered table-condansed">
+				<tbody>
+					<tr>
+						<td>Amount realize </td>
+						<td><?php echo $monthly->getAmount(); ?> USD</td>
+					</tr>
+					<tr>
+						<td>Used amount</td>
+						<td><?php echo $monthly->getUsed(); ?> USD</td>
+					</tr>
+				</tbody>
+				<tfoot>
+					<tr>
+						<th>Available amount</th>
+						<th><?php echo $monthly->getAvailable(); ?> USD</th>
+					</tr>
+				</tfoot>
+			</table>
+		</div>
+	</div>
+</div>
+<?php endif; ?>

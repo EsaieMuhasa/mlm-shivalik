@@ -4,6 +4,7 @@
 
 	<module name="Dashboard">
 	 	<route action="index" urlPattern="/admin/"/>
+	 	<route action="dispatchPurchase" urlPattern="/admin/dispatch-purchase-of-month\.html"/>
 	 	<route action="statistics" urlPattern="/admin/dashboard/statistics/"/>
 		<route action="chartPackets" urlPattern="/admin/dashboard/statistics/config-chart-packets\.json"/>
 		<route action="settings" urlPattern="/admin/dashboard/settings/"/>

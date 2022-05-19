@@ -14,6 +14,8 @@ use PHPBackend\Request;
 use PHPBackend\Response;
 use PHPBackend\ToastMessage;
 use PHPBackend\Image2D\Mlm\TreeFormatter;
+use Core\Shivalik\Managers\MonthlyOrderDAOManager;
+use Core\Shivalik\Filters\SessionMemberFilter;
 
 /**
  *
@@ -68,6 +70,11 @@ class MembersController extends AdminController
     private $gradeMemberDAOManager;
     
     /**
+     * @var MonthlyOrderDAOManager
+     */
+    private $monthlyOrderDAOManager;
+    
+    /**
      * @var Member
      */
     private $member;//le compte du membre encours de consultation
@@ -76,7 +83,7 @@ class MembersController extends AdminController
      * {@inheritDoc}
      * @see \PHPBackend\Http\HTTPController::init()
      */
-    protected function init(Request $request, Response $response): void {
+    protected function init (Request $request, Response $response): void {
         parent::init($request, $response);
         
         if ($request->existInGET('id')) {
@@ -86,6 +93,11 @@ class MembersController extends AdminController
             }
             $this->member = $this->memberDAOManager->findById($id);
             $request->addAttribute(self::ATT_MEMBER, $this->member);
+            
+            if($this->monthlyOrderDAOManager->checkByMemberOfMonth($this->member->getId())){
+                $monthly = $this->monthlyOrderDAOManager->findByMemberOfMonth($this->member->getId());
+                $request->addAttribute(SessionMemberFilter::ATT_MONTHLY_ORDER_FOR_ACCOUNT, $monthly);
+            }
         }
         
         $nombre = $this->memberDAOManager->countAll();

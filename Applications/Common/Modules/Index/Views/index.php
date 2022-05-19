@@ -175,13 +175,15 @@ $member = isset($_SESSION[SessionMemberFilter::MEMBER_CONNECTED_SESSION])? $_SES
                     <img src="/<?php echo $product->picture; ?>" alt="">
                     <div class="prix">
                         <p class="enable-prix"><?php echo $product->defaultUnitPrice; ?> $</p>
-                        <p class="disable-prix">4.3 $</p>
+                        <p class="disable-prix"></p>
                     </div>
                 </div>
                 <aside>
-                    <strong><?php echo htmlspecialchars($product->name)?></strong>
+                    <strong style="border-bottom: none;"><?php echo htmlspecialchars($product->name)?></strong>
+                    <!-- 
                     <p><?php echo htmlspecialchars($product->getDescription(150))?>...</p>
                     <a href="" class="btn btn-default custom-btn">See more</a>
+                     -->
                 </aside>
             </article>
             <?php endforeach; ?>

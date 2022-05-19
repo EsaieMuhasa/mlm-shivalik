@@ -318,7 +318,7 @@ class MembersController extends HTTPController {
 			$request->addAttribute(self::ATT_REQUESTED_GRADE_MEMBER, $requestedGradeMember);
 		}
 		
-		if($this->monthlyOrderDAOManager->checkByMemberOfMonth($member->getId()));{
+		if($this->monthlyOrderDAOManager->checkByMemberOfMonth($member->getId())){
 		    $monthly = $this->monthlyOrderDAOManager->findByMemberOfMonth($member->getId());
 		    $request->addAttribute(self::ATT_MONTHLY_ORDER_FOR_ACCOUNT, $monthly);
 		}
