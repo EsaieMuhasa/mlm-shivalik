@@ -2,6 +2,8 @@
 namespace Core\Shivalik\Entities;
 
 
+use PHPBackend\PHPBackendException;
+
 /**
  *
  * @author Esaie MUHASA
@@ -27,6 +29,19 @@ class MonthlyOrder extends Operation {
     private $used;
     
     /**
+     * montant manue.
+     * Cette attribut a plus d'importance dans le cas d'integration des fiches dans le systeme
+     * (sortie du systeme manue de gestion de stock au systeme informatiser)
+     * @var number
+     */
+    private $manualAmount = 0;
+    
+    /**
+     * @var Office
+     */
+    private $office;
+    
+    /**
      * {@inheritDoc}
      * @see \Core\Shivalik\Entities\Operation::setAmount()
      */
@@ -49,6 +64,9 @@ class MonthlyOrder extends Operation {
      * @return number
      */
     public function getAvailable () : float {
+        if ($this->manualAmount != 0) {
+            return $this->manualAmount;
+        }
         return $this->available;
     }
 
@@ -65,10 +83,14 @@ class MonthlyOrder extends Operation {
     protected function setAvailable ($available) : void{
         $this->available = $available;
     }
+    
     /**
      * @return number
      */
     public function getUsed() : ?float{
+        if ($this->manualAmount != 0) {
+            return $this->manualAmount;
+        }
         return $this->used;
     }
 
@@ -85,5 +107,39 @@ class MonthlyOrder extends Operation {
             $this->setAvailable($this->getAmount() - $used);
     }
     
+    /**
+     * @return number
+     */
+    public function getManualAmount() {
+        return $this->manualAmount;
+    }
+
+    /**
+     * @param number $manualAmount
+     */
+    public function setManualAmount($manualAmount) : void {
+        $this->manualAmount = $manualAmount;
+    }
+    
+    /**
+     * @return \Core\Shivalik\Entities\Office
+     */
+    public function getOffice () : ?Office{
+        return $this->office;
+    }
+
+    /**
+     * @param \Core\Shivalik\Entities\Office|int $office
+     */
+    public function setOffice ($office) : void {
+        if ($office == null || $office instanceof Office) {
+            $this->office = $office;
+        } else if (self::isInt($office)) {
+            $this->office = new Office(['id' => $office]);
+        } else {
+            throw new PHPBackendException("invalid arguement in setOffice() method of ". get_class($this). " class");
+        }
+    }
+
 }
 

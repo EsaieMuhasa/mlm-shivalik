@@ -46,6 +46,12 @@ use Applications\Office\Modules\Products\ProductsController;
             			<span class="icon_folder-add_alt"></span> Command
             		</a>
 	        	</li>
+	        	
+	        	<li class="<?php echo (isset($_REQUEST[ProductsController::ATT_ACTIVE_MENU]) && $_REQUEST[ProductsController::ATT_ACTIVE_MENU] == ProductsController::ITEM_MENU_PRODUCTS)? "active" : ""; ?>">
+	        		<a href="/office/products/purchase/">
+            			<span class="icon_tags"></span> Purchase bonus
+            		</a>
+	        	</li>
 			</ul>
 		</div><!-- /.navbar-collapse -->
 	</div><!-- /.container-fluid -->

@@ -63,12 +63,14 @@ class MonthlyOrderDAOManagerImplementation1 extends AbstractOperationDAOManager 
             $statement->closeCursor();
         
             foreach ($mothlyOrders as $order) {
-                //desactivation du compte memsuel
-                UtilitaireSQL::update($pdo, $this->getTableName(), ['disabilityDate' => $date->format('Y-m-d H:i:s')], $order->getId());
                 
-                if($order->getAvailable() == 0){
+                if($order->getAvailable() == 0 || $order->getDisabilityDate() != null){
                     continue;
                 }
+                
+                //desactivation du compte memsuel
+                $order->setDisabilityDate($date);
+                UtilitaireSQL::update($pdo, $this->getTableName(), ['disabilityDate' => $date->format('Y-m-d H:i:s')], $order->getId());
                 
                 //bonus reachat et PV
                 $member = $order->getMember();
@@ -158,6 +160,148 @@ class MonthlyOrderDAOManagerImplementation1 extends AbstractOperationDAOManager 
         } catch (\PDOException $e) {
             throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MonthlyOrderDAOManager::dispatchManualPurchaseBonus()
+     */
+    public function dispatchManualPurchaseBonus(MonthlyOrder $order): void {
+        $now  = new \DateTime();
+        try {
+            $pdo = $this->getConnection();
+            
+            if (!$pdo->beginTransaction()) {
+                throw new DAOException("Impossible to perform this operation because an error occured in starting transaction process");
+            }
+            
+            //insert monthly order in database
+            $order->setDateAjout($now);
+            $order->setDisabilityDate($now);
+            $id = UtilitaireSQL::insert($pdo, $this->getTableName(), [
+                'member' => $order->getMember()->getId(),
+                self::FIELD_DATE_AJOUT => $order->getFormatedDateAjout(),
+                'disabilityDate' => $order->getDisabilityDate()->format('Y-m-d H:i:s'),
+                'manualAmount' => $order->getManualAmount(),
+                'office' => $order->getOffice()->getId()
+            ]);
+            $order->setId($id);
+            //==
+            
+            //purchase bonas end dispatching PVs
+            $member = $order->getMember();
+            $generator = $this->getManagerFactory()->getManagerOf(GradeMember::class)->findCurrentByMember($member->getId());
+            $bonus = new PurchaseBonus();
+            $pv = new PointValue();
+            
+            $notificationReceivers = [];
+            $pointValues = [];
+            $purchaseBonus = [];
+            
+            $bonus->setGenerator($generator);
+            $bonus->setMember($member);
+            $bonus->setAmount(($order->getAvailable() / 100) * 15);
+            $bonus->setDateAjout($now);
+            $bonus->setMonthlyOrder($order);
+            
+            $value = round(($order->getAmount()/2), 0);
+            $pv->setGenerator($generator);
+            $pv->setMember($member);
+            $pv->setFoot(null);
+            $pv->setValue($value);
+            $pv->setMonthlyOrder($order);
+            
+            $purchaseBonus[] = $bonus;
+            $pointValues[] = $pv;
+            
+            if ($member->getParent() != null) {
+                
+                $parent = $order->getMember();
+                $generationNumber = Generation::MIN_GENERATION;
+                
+                $amountBonusGeneration = ($order->getAmount()/100);
+                $amountBonusGeneration = round($amountBonusGeneration, 2, PHP_ROUND_HALF_DOWN);
+                
+                while ($this->memberDAOManager->checkParent($parent->getId())) {
+                    $foot = $parent->getFoot();//les PV sont appercue au pied du parent, identifier par le foot du fils de sont arbre
+                    $parent = $this->memberDAOManager->findParent($parent->getId());
+                    
+                    $pv = new PointValue();
+                    $pv->setGenerator($generator);
+                    $pv->setMember($parent);
+                    $pv->setFoot($foot);
+                    $pv->setValue($value);
+                    $pv->setMonthlyOrder($order);
+                    
+                    if ($generationNumber <= 15) {//bonus jusqu'au 15 em generation
+                        
+                        $bonus = new PurchaseBonus();
+                        $bonus->setGenerator($generator);
+                        $bonus->setMember($parent);
+                        $bonus->setMonthlyOrder($order);
+                        $bonus->setAmount($amountBonusGeneration);
+                        $bonus->setDateAjout($now);
+                        $bonus->setGeneration($generationNumber);
+                        
+                        $title = "Purchase bonus";
+                        $description = "Congratulations {$parent->getNames()}. You got $ {$amountBonusGeneration} bonus, for your downline {$member->getMatricule()} account purchase bonus.";
+                        $notificationReceivers[] = NotificationReceiver::buildNotificationReceiver($title, $description, $parent);
+                        $purchaseBonus[] = $bonus;
+                        
+                        $generationNumber++;
+                    }
+                    
+                    $title = "PV purchase bonus";
+                    $description = "Congratulations {$parent->getNames()}. You got  {$pv->getValue()} PV, for your downline {$member->getMatricule()} account, purchase bonus";
+                    $notificationReceivers[] = NotificationReceiver::buildNotificationReceiver($title, $description, $parent);
+                    $pointValues[]= $pv;
+                    
+                }
+            }
+            foreach ($purchaseBonus as $bn) {
+                $this->getDaoManager()->getManagerOf(PurchaseBonus::class)->createInTransaction($bn, $pdo);
+            }
+            foreach ($pointValues as $point) {
+                $this->getDaoManager()->getManagerOf(PointValue::class)->createInTransaction($point, $pdo);
+            }
+            foreach ($notificationReceivers as $receiver) {
+                $this->getDaoManager()->getManagerOf(NotificationReceiver::class)->createInTransaction($receiver, $pdo);
+            }
+            
+            if (!$pdo->commit()) {
+                throw new DAOException("Failed to execute the operation because an error occurred while closing the transaction");
+            }
+        } catch (\PDOException $e) {
+            throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MonthlyOrderDAOManager::checkManualBurchaseBonusByOffice()
+     */
+    public function checkManualBurchaseBonusByOffice (int $officeId, ?int $limit = null, int $offset = 0): bool {
+        return UtilitaireSQL::checkAll($this->getConnection(), $this->getTableName(), ['office' => $officeId], $limit, $offset);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MonthlyOrderDAOManager::findManualBurchaseBonusByOffice()
+     */
+    public function findManualBurchaseBonusByOffice (int $officeId, ?int $limit = null, int $offset = 0): array {
+        $orders = UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, ['office' => $officeId], $limit, $offset);
+        foreach ($orders as $order) {
+            $order->setMember($this->memberDAOManager->findById($order->getMember()->getId()));
+        }
+        return $orders;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\MonthlyOrderDAOManager::countManualBurchaseBonusByOffice()
+     */
+    public function countManualBurchaseBonusByOffice(int $officeId): int {
+        return UtilitaireSQL::count($this->getConnection(), $this->getTableName(), ['office' => $officeId]);
     }
 
     /**
@@ -283,7 +427,7 @@ class MonthlyOrderDAOManagerImplementation1 extends AbstractOperationDAOManager 
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\MonthlyOrderDAOManager::checkByMemberOfMonth()
      */
-    public function checkByMemberOfMonth(int $memberId, ?int $month=null, ?int $year=null): bool {
+    public function checkByMemberOfMonth(int $memberId, ?bool $dispatched = false, ?int $month=null, ?int $year=null): bool {
         
         if ($month === null || $year === null) {
             $now = new \DateTime();
@@ -298,7 +442,8 @@ class MonthlyOrderDAOManagerImplementation1 extends AbstractOperationDAOManager 
         $dateMin = "28-{$befor->format('Y-m')} 01:00:00";
         $dateMax = "{$date->format('Y-m')}-28 23:59:59";
         
-        $SQL = "SELECT * FROM {$this->getTableName()} WHERE member = {$memberId} AND (dateAjout BETWEEN :dateMin AND :dateMax) LIMIT 1";
+        $END_AND = $dispatched !== null? (' AND disabilityDate IS '.($dispatched? 'NOT ' : '').'NULL') : '';
+        $SQL = "SELECT * FROM {$this->getTableName()} WHERE member = {$memberId}{$END_AND} AND (dateAjout BETWEEN :dateMin AND :dateMax) LIMIT 1";
         $return = false;
         try {
             $statement = UtilitaireSQL::prepareStatement($this->getConnection(), $SQL, ['dateMin' => $dateMin, 'dateMax' => $dateMax]);
@@ -317,7 +462,7 @@ class MonthlyOrderDAOManagerImplementation1 extends AbstractOperationDAOManager 
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\MonthlyOrderDAOManager::findByMemberOfMonth()
      */
-    public function findByMemberOfMonth(int $memberId, ?int $month = null, ?int $year = null): MonthlyOrder {
+    public function findByMemberOfMonth(int $memberId, ?bool $dispatched = false, ?int $month = null, ?int $year = null): MonthlyOrder {
         if ($month === null || $year === null) {
             $now = new \DateTime();
             $month = $month == null? intval($now->format('m'), 10) : $month;
@@ -331,7 +476,8 @@ class MonthlyOrderDAOManagerImplementation1 extends AbstractOperationDAOManager 
         $dateMin = "{$befor->format('T-m')}-28 01:00:00";
         $dateMax = "{$date->format('Y-m')}-28 23:59:59";
         
-        $SQL = "SELECT * FROM {$this->getViewName()} WHERE member = {$memberId} AND (dateAjout BETWEEN  :dateMin AND :dateMax) LIMIT 1";
+        $END_AND = $dispatched !== null? (' AND disabilityDate IS '.($dispatched? 'NOT ' : '').'NULL') : '';
+        $SQL = "SELECT * FROM {$this->getViewName()} WHERE member = {$memberId}{$END_AND} AND (dateAjout BETWEEN  :dateMin AND :dateMax) LIMIT 1";
         try {
             $statement = UtilitaireSQL::prepareStatement($this->getConnection(), $SQL, ['dateMin' => $dateMin, 'dateMax' => $dateMax]);
             if ($row = $statement->fetch()) {

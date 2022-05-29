@@ -19,6 +19,8 @@ use Core\Shivalik\Entities\Product;
 use PHPBackend\Dao\DAOException;
 use PHPBackend\ToastMessage;
 use Core\Shivalik\Managers\ProductOrderedDAOManager;
+use Core\Shivalik\Managers\MonthlyOrderDAOManager;
+use Core\Shivalik\Validators\MonthlyOrderFormValidator;
 
 /**
  *
@@ -51,6 +53,10 @@ class ProductsController extends HTTPController {
     const ATT_COMMANDS = 'commands';
     const ATT_MEMBER = 'member';
     
+    const ATT_MONTHLY_ORDERS = 'monthlyOrders';
+    const ATT_MONTHLY_ORDERS_COUNT = 'monthlyOrdersCount';
+    const ATT_MONTHLY_ORDER = 'monthlyOrder';
+    
     /**
      * @var ProductDAOManager
      */
@@ -75,6 +81,11 @@ class ProductsController extends HTTPController {
      * @var AuxiliaryStockDAOManager
      */
     private $auxiliaryStockDAOManager;
+    
+    /**
+     * @var MonthlyOrderDAOManager
+     */
+    private $monthlyOrderDAOManager;
     
     /**
      * @var Office
@@ -333,5 +344,48 @@ class ProductsController extends HTTPController {
         $request->addAttribute(self::ATT_ACTIVE_MENU, self::ITEM_MENU_COMMAND);
     }
     
+    /**
+     * show manual monthly perchase bonus
+     * @param Request $request
+     * @param Response $response
+     */
+    public function executePurchase (Request $request, Response $response) : void {
+        $limit = $request->existInGET('limit')? intval($request->getDataGET('limit'), 10) : intval($request->getApplication()->getConfig()->get('defaultLimit')->getValue(), 10);
+        $offset = $request->existInGET('offset')? intval($request->getDataGET('offset'), 10) : 0;
+        
+        $count  = $this->monthlyOrderDAOManager->countManualBurchaseBonusByOffice($this->office->getId());
+        if ($count != 0) {
+            if ($this->monthlyOrderDAOManager->checkManualBurchaseBonusByOffice($this->office->getId(), $limit, $offset)) {
+                $orders =  $this->monthlyOrderDAOManager->findManualBurchaseBonusByOffice($this->office->getId(), $limit, $offset);
+            } else {
+                $response->sendError("No data matched by this url: {$request->getURI()}");
+            }
+        } else {
+            $orders = [];
+        }
+        
+        $request->addAttribute(self::ATT_MONTHLY_ORDERS, $orders);
+        $request->addAttribute(self::ATT_MONTHLY_ORDERS_COUNT, $count);
+    }
+    
+    /**
+     * adding manual monthly purchase bonus
+     * @param Request $request
+     * @param Response $response
+     */
+    public function executeAddPurchase (Request $request, Response $response) : void {
+        
+        if($request->getMethod() == Request::HTTP_POST) {
+            $form = new MonthlyOrderFormValidator($this->getDaoManager());
+            $request->addAttribute($form::FIELD_OFFICE, $this->office);
+            $order = $form->createAfterValidation($request);
+            if(!$form->hasError()) {
+                $response->sendRedirect('/office/products/purchase/');
+            }
+            
+            $request->addAttribute(self::ATT_MONTHLY_ORDER, $order);
+            $form->includeFeedback($request);
+        }
+    }
+    
 }
-

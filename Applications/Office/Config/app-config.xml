@@ -3,6 +3,7 @@
 <app-config>
 	<definitions>
 		<define name="maxMembers" value="12"/>
+		<define name="defaultLimit" value="10"/>
 	</definitions>
 	<users>
 		<user password="esaie@01056" pseudo="esaiemuhasa.dev@gmail.com"/>

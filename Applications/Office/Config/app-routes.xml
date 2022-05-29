@@ -60,5 +60,11 @@
 		<route action="cancelCommand" urlPattern="/office/products/command/cancel\.html"/>
 		<route action="memberCommand" urlPattern="/office/products/command/member\.html"/>
 		<route action="productCommand" urlPattern="/office/products/command/product\.html"/>
+		
+		<!-- to manage member file content monthly bonus -->
+		<route action="purchase" urlPattern="/office/products/purchase/"/>
+		<route action="purchase" urlPattern="/office/products/purchase/([0-9]+)-([0-9]+)\.html" paramsNames="limit,offset"/>
+		<route action="addPurchase" urlPattern="/office/products/purchase/add\.html"/>
+		<!-- // -->
 	</module>
 </app-routes>

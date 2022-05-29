@@ -19,6 +19,40 @@ interface MonthlyOrderDAOManager extends OperationDAOManager {
     public function dispatchPurchaseBonus () : void;
     
     /**
+     * utility for dispatching of bonus when monthly purchase was saved on member file in office
+     * @param MonthlyOrder $order
+     * @throws DAOException when a error occured in process
+     */
+    public function dispatchManualPurchaseBonus (MonthlyOrder $order) : void;
+
+    /**
+     * check if office indexed by value at first param value has purchase bonus
+     * @param int $officeId : ID of office in database
+     * @param int $limit count off result to select matched query selection
+     * @param int $offset
+     * @return bool
+     * @throws DAOException when a error occured in process
+     */
+    public function checkManualBurchaseBonusByOffice (int $officeId, ?int $limit = null, int $offset = 0) : bool;
+    
+    /**
+     * select all operation of office in first param of this method
+     * @param int $officeId : ID of office in database
+     * @param int $limit
+     * @param int $offset : count of occurrence to ignore in selection query
+     * @return MonthlyOrder[]
+     */
+    public function findManualBurchaseBonusByOffice (int $officeId, ?int $limit = null, int $offset = 0) : array;
+    
+    /**
+     * utility to count all operation executed by office
+     * @param int $officeId
+     * @return int
+     * @throws DAOException
+     */
+    public function countManualBurchaseBonusByOffice (int $officeId) : int;
+    
+    /**
      * Comptage des operations enregister au compte du mois dont les coordonnees sont en prametre
      * @param int $month index du mois (une valeur numerique entier compris entre 1 et 12)
      * @param int $yer une valeur numerique entier superrieur a 1970
@@ -55,20 +89,22 @@ interface MonthlyOrderDAOManager extends OperationDAOManager {
     /**
      * Check membre where id is first param in this function
      * @param int $memberId membre id in database
+     * @param bool $dispatched
      * @param int $month index of month (in 1 et 12 interval)
      * @param int $year than 1970
      * @return bool
      * @throws DAOException:: when a error occured in process
      */
-    public function checkByMemberOfMonth (int $memberId, ?int $month = null, ?int $year = null) : bool;
+    public function checkByMemberOfMonth (int $memberId, ?bool $dispatched = false, ?int $month = null, ?int $year = null) : bool;
     
     /**
      * renvoie le compte mensuel de commandes du membre
      * @param int $memberId
+     * @param bool $dispatched
      * @param int $month
      * @param int $year
      * @return MonthlyOrder
      */
-    public function findByMemberOfMonth (int $memberId, ?int $month = null, ?int $year = null) : MonthlyOrder;
+    public function findByMemberOfMonth (int $memberId, ?bool $dispatched = false, ?int $month = null, ?int $year = null) : MonthlyOrder;
 }
 
