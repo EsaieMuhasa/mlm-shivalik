@@ -16,6 +16,8 @@ use PHPBackend\Dao\DAOEvent;
 use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\DefaultDAOInterface;
 use PHPBackend\Dao\UtilitaireSQL;
+use Core\Shivalik\Entities\VirtualMoney;
+use Core\Shivalik\Entities\MoneyGradeMember;
 
 /**
  *
@@ -472,14 +474,23 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\GradeMemberDAOManager::enable()
      */
-    public function enable(GradeMember $entity): void
-    {
-        $pdo = $this->getConnection();
+    public function enable(GradeMember $gm): void {
+        $this->dispatchBonusAndPointValues($gm);
+    }
+
+    /**
+     * activation d'un packet et distribution du bonus generationnel et des points valeur
+     * @param GradeMember $entity
+     * @param \PDO $transaction
+     * @throws DAOException
+     */
+    private function dispatchBonusAndPointValues (GradeMember $entity, ?\PDO $transaction = null): void {
+        $pdo = $transaction == null? $this->getConnection() : $transaction;
         try {
             
             $notificationReceivers = [];//collection des recepteurs des notifications
             
-            if (!$pdo->beginTransaction()) {
+            if (($transaction == null && !$pdo->beginTransaction()) || !$pdo->inTransaction()) {//on demare la transaction uniquement dans le cas où aucune instance de PDO n'est  passer en parametre
                 throw new DAOException("an unknown error occurred while creating a member's rank activation transaction");
             }
             
@@ -516,7 +527,7 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
                     'dateAjout' => new \DateTime()
                 ));
                 
-                $this->getDaoManager()->getManagerOf(BonusGeneration::class)->createInTransaction($bonusSponsor, $pdo);
+                $this->getManagerFactory()->getManagerOf(BonusGeneration::class)->createInTransaction($bonusSponsor, $pdo);
                 
                 //Envoie de la notification du sponsor du compte
                 $title = "Sponsoring bonus";
@@ -550,7 +561,7 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
                             'dateAjout' => new \DateTime()
                         ));
                         
-                        $this->getDaoManager()->getManagerOf(BonusGeneration::class)->createInTransaction($bonusGeneration, $pdo);
+                        $this->getManagerFactory()->getManagerOf(BonusGeneration::class)->createInTransaction($bonusGeneration, $pdo);
                         
                         //Envoie de la notification des uplines du compte
                         $title = "Generationnel bonus";
@@ -582,7 +593,7 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
                     
                     $value = round(($entity->getProduct()/2), 0);
                     $pv->setValue($value);
-                    $this->getDaoManager()->getManagerOf(PointValue::class)->createInTransaction($pv, $pdo);
+                    $this->getManagerFactory()->getManagerOf(PointValue::class)->createInTransaction($pv, $pdo);
                     
                     $title = "Generationnel bonus";
                     $description = "Congratulations {$child->getNames()}. You got  {$pv->getValue()} PV, for your downline {$entity->getMember()->getMatricule()} account, sponsorized by {$entity->getMember()->getSponsor()->getNames()}";
@@ -591,24 +602,27 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
             }
             
             foreach ($notificationReceivers as $receiver) {
-                $this->getDaoManager()->getManagerOf(NotificationReceiver::class)->createInTransaction($receiver, $pdo);
+                $this->getManagerFactory()->getManagerOf(NotificationReceiver::class)->createInTransaction($receiver, $pdo);
             }
             
-            $commit = $pdo->commit();
-            
-            if (!$commit) {
-                throw new DAOException("Transaction validation failure");
+            if ($transaction  == null) {//on commite la trasaction dans le cas ou on est responsable de sa creation            
+                $commit = $pdo->commit();
+                
+                if (!$commit) {
+                    throw new DAOException("Transaction validation failure");
+                }
             }
             
             foreach ($notificationReceivers as $rs) {
-                $event = new DAOEvent($this->getDaoManager()->getManagerOf(NotificationReceiver::class), DAOEvent::TYPE_CREATION, $rs);
+                $event = new DAOEvent($this->getManagerFactory()->getManagerOf(NotificationReceiver::class), DAOEvent::TYPE_CREATION, $rs);
                 $this->dispatchEvent($event);
             }
             
         } catch (\PDOException $e) {
-            try {
-                $pdo->rollBack();
-            } catch (\Exception $e) {
+            if ($transaction == null) {
+                try {
+                    $pdo->rollBack();
+                } catch (\Exception $e) {}
             }
             throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
         }
@@ -618,37 +632,69 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\GradeMemberDAOManager::upgrade()
      */
-    public function upgrade(GradeMember $gm) : void
-    {
+    public function upgrade(GradeMember $gm) : void {
         try {
             $pdo = $this->getConnection();
             
-            if ($pdo->beginTransaction()) { 
-                
-                $gm->setInitDate(new \DateTime());
-                
-                $id = UtilitaireSQL::insert($pdo, $this->getTableName(), [                    
-                    'old' => $gm->getOld()->getId(),
-                    'member' => $gm->getMember()->getId(),
-                    'grade' => $gm->getGrade()->getId(),
-                	'office' => $gm->getOffice()->getId(),
-                    'product' => $gm->getProduct(), 
-                    self::FIELD_DATE_AJOUT => $gm->getFormatedDateAjout()
-                ]);
-                
-                $gm->setId($id);
-                $pdo->commit();
-                
-                $this->enable($gm);
-            }else{
-                throw new DAOException("an error occurred while starting the transaction");
+            if (!$pdo->beginTransaction()) { 
+                throw new DAOException("an error occurred while starting the transaction");  
             }
             
+            $gm->setInitDate(new \DateTime());
+            
+            $id = UtilitaireSQL::insert($pdo, $this->getTableName(), [                    
+                'old' => $gm->getOld()->getId(),
+                'member' => $gm->getMember()->getId(),
+                'grade' => $gm->getGrade()->getId(),
+            	'office' => $gm->getOffice()->getId(),
+                'product' => $gm->getProduct(),
+                'monthlyOrder' => ($gm->getMonthlyOrder() != null? $gm->getMonthlyOrder()->getId() : null),
+                self::FIELD_DATE_AJOUT => $gm->getFormatedDateAjout()
+            ]);
+            
+            $gm->setId($id);
+            $this->dispatchBonusAndPointValues($gm, $pdo);
+            
+            if ($gm->getMonthlyOrder() == null) {
+                /**
+                 * @var VirtualMoney[] $virtuals
+                 */
+                $virtuals = $this->getManagerFactory()->getManagerOf(VirtualMoney::class)->findByOffice($gm->getOffice()->getId());
+                
+                $moneyGrades = [];//les virtuels toucher pour l'operation
+                $resteProduct = $gm->getProduct();
+                foreach ($virtuals as $virtual) {
+                    $product = $virtual->getSubstractableToAvailableProduct($resteProduct);
+                    
+                    $resteProduct -= $product;
+                    
+                    if ($product != 0) {
+                        $money = new MoneyGradeMember();
+                        $money->setProduct($product);
+                        $money->setVirtualMoney($virtual);
+                        $money->setGradeMember($gm);
+                        $money->setDateAjout($gm->getDateAjout());
+                        
+                        $moneyGrades[] = $money;
+                        $virtual->substract($product, 0);
+                    }
+                    
+                    if ($resteProduct == 0) {
+                        break;
+                    }
+                }
+                
+                if (empty($moneyGrades)) {
+                    throw new DAOException("You cannot perform this operation because your virtual wallet cannot support this operation");
+                }
+                
+                $this->getManagerFactory()->getManagerOf(MoneyGradeMember::class)->createAllInTransaction($moneyGrades, $pdo);            
+            }
+            $pdo->commit();
         } catch (\PDOException $e) {
             try {
                 $pdo->rollBack();
-            } catch (\Exception $e) {
-            }
+            } catch (\Exception $e) {}
             throw new DAOException("an error occurred during the transaction: {$e->getMessage()}");
         }
         
@@ -658,23 +704,25 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
      * {@inheritDoc}
      * @see \PHPBackend\Dao\DefaultDAOInterface::create()
      */
-    public function create($entity): void
-    {
+    public function create($entity): void {
+        $pdo = $this->getConnection();
         try {
-            $pdo = $this->getConnection();
             if (!$pdo->beginTransaction()) {
                 throw new DAOException("An errot occurred in creating transaction process");
             }
             
             $this->createInTransaction($entity, $pdo);
+            $this->dispatchBonusAndPointValues($entity, $pdo);
             if(!$pdo->commit()){
                 throw new DAOException("An errors occurend in commit transaction process");
             }
         } catch (\PDOException $e) {
+            try {            
+                $pdo->rollBack();
+            } catch (\Exception $ex) {}
             throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
         }
 
-        $this->enable($entity);
     }
 
     /**
@@ -682,8 +730,12 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
      * @see \PHPBackend\Dao\DAOInterface::createInTransaction()
      * @param GradeMember $entity
      */
-    public function createInTransaction($entity, \PDO $pdo): void
-    {
+    public function createInTransaction($entity, \PDO $pdo): void {
+        /**
+         * @var VirtualMoney[] $virtuals
+         */
+        $virtuals = $this->getManagerFactory()->getManagerOf(VirtualMoney::class)->findByOffice($entity->getOffice()->getId());
+        
         $generator = $entity->getMember();
         if($generator->getId() == null || $generator->getId() <= 0){//on commence par creer le generateur
             $this->memberDAOManager->createInTransaction($generator, $pdo);
@@ -700,14 +752,48 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
         ]);
         $entity->setId($id);
 
+        $moneyGrades = [];//les virtuels toucher pour l'operation
+        $resteProduct = $entity->getProduct();
+        $resteAfiliate = $entity->getMembership();
+        foreach ($virtuals as $virtual) {
+            $product = $virtual->getSubstractableToAvailableProduct($resteProduct);
+            $afiliate = $virtual->getSubstractableToAvailableAfiliate($resteAfiliate);
+            
+            if ($entity->getMonthlyOrder() != null) {
+                $product = 0;
+            }
+            $resteAfiliate -= $afiliate;
+            $resteProduct -= $product;
+            
+            if ($product != 0 || $afiliate != 0) {
+                $money = new MoneyGradeMember();
+                $money->setProduct($product);
+                $money->setAfiliate($afiliate);
+                $money->setVirtualMoney($virtual);
+                $money->setGradeMember($entity);
+                $money->setDateAjout($entity->getDateAjout());
+                
+                $moneyGrades[] = $money;
+                $virtual->substract($product, $afiliate);
+            }
+            
+            if ($resteAfiliate == 0 && $resteProduct == 0) {
+                break;
+            }
+        }
+        
+        if (empty($moneyGrades)) {
+            throw new DAOException("You cannot perform this operation because your virtual wallet cannot support this operation");
+        }
+        
+        $this->getManagerFactory()->getManagerOf(MoneyGradeMember::class)->createAllInTransaction($moneyGrades, $pdo);
     }
 
     /**
      * {@inheritDoc}
      * @see \PHPBackend\Dao\DAOInterface::update()
      */
-    public function update($entity, $id) : void
-    {
+    public function update($entity, $id) : void {
         throw new DAOException("Cannot perform this operation");
     }
     
@@ -732,8 +818,7 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\GradeMemberDAOManager::countUpgrades()
      */
-    public function countUpgrades(?int $officeId = null): int
-    {
+    public function countUpgrades(?int $officeId = null): int {
         $return = 0;
         try {
             $statement = $this->getConnection()->prepare("SELECT COUNT(*) AS nombre FROM {$this->getTableName()} WHERE old IS NOT NULL ".($officeId === null? "":(" AND office=:office")));

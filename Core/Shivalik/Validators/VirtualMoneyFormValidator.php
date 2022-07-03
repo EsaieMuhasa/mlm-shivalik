@@ -11,6 +11,7 @@ use PHPBackend\Request;
 use PHPBackend\Dao\DAOException;
 use PHPBackend\Validator\DefaultFormValidator;
 use PHPBackend\Validator\IllegalFormValueException;
+use PHPBackend\PHPBackendException;
 
 /**
  *
@@ -20,6 +21,8 @@ use PHPBackend\Validator\IllegalFormValueException;
 class VirtualMoneyFormValidator extends DefaultFormValidator {
 	
 	const FIELD_AMOUNT = 'amount';
+	const FIELD_PRODUCT = 'product';
+	const FIELD_AFILIATE = 'afiliate';
 	const FIELD_OFFICE = 'office';
 	const FIELD_REQUEST_MONEY = 'request';
 	
@@ -49,8 +52,50 @@ class VirtualMoneyFormValidator extends DefaultFormValidator {
 	}
 	
 	/**
+	 * validation du montant d'afficliation
+	 * @param number $amount
+	 * @throws IllegalFormValueException
+	 */
+	private function validationAfiliateAmount ($amount) : void {
+	    $this->validationAmount($amount);
+	    
+	    if (($amount % 20) != 0) {
+	        throw new IllegalFormValueException("the affiliate amount must be a multiple of 20");
+	    }
+	}
+	
+	/**
+	 * Validation du montant corespondant au produit acheter
+	 * @param VirtualMoney $money
+	 * @param number $product
+	 */
+	private function processingProductAmount (VirtualMoney $money, $product) : void {
+	    try {
+	        $this->validationAmount($product);
+	    } catch (IllegalFormValueException $e) {
+	        $this->addError(self::FIELD_PRODUCT, $e->getMessage());
+	    }
+	    $money->setProduct($product);
+	}
+	
+	/**
+	 * Validation du montant prevue pour les affiliations
+	 * @param VirtualMoney $money
+	 * @param number $afiliate
+	 */
+	private function processingAfiliateAmount (VirtualMoney $money, $afiliate) : void {
+	    try {
+	        $this->validationAfiliateAmount($afiliate);
+	    } catch (IllegalFormValueException $e) {
+	        $this->addError(self::FIELD_AFILIATE, $e->getMessage());
+	    }
+	    $money->setAfiliate($afiliate);
+	}
+	
+	/**
 	 * @param VirtualMoney $money
 	 * @param number $amount
+	 * @deprecated le amount n'est plus d'actualite, et sera suprimer dans la table d'ici quelque jours
 	 */
 	private function processingAmount (VirtualMoney $money, $amount) : void {
 		try {
@@ -63,49 +108,38 @@ class VirtualMoneyFormValidator extends DefaultFormValidator {
 	}
 	
 	/**
-	 * lors de l'envoie d'un nouveau forfait, verification dette
 	 * {@inheritDoc}
 	 * @see \PHPBackend\Validator\FormValidator::createAfterValidation()
 	 * @return VirtualMoney
 	 */
 	public function createAfterValidation(Request $request) {
 		$money = new VirtualMoney();
-		$amount = $request->getDataPOST(self::FIELD_AMOUNT);
+		$product = $request->getDataPOST(self::FIELD_PRODUCT);
+		$afiliate = $request->getDataPOST(self::FIELD_AFILIATE);
 		
-		$this->processingAmount($money, $amount);
+		$this->processingAfiliateAmount($money, $afiliate);
+		$this->processingProductAmount($money, $product);
 		
 		if (!$this->hasError()) {
 			$money->setOffice($request->getAttribute(self::FIELD_OFFICE));
-			$money->setRequest($request->getAttribute(self::FIELD_REQUEST_MONEY));
-			try {
-			    if ($this->gradeMemberDAOManager->checkByOffice($money->getOffice()->getId(), null, false)) {
-			        //si l'office a deja effectuer des operations, alors on verifie la dette
-    			    $debts = $this->gradeMemberDAOManager->findByOffice($money->getOffice()->getId(), null, false);
-    			    
-    			    foreach ($debts as $d) {//calcul de la dette
-    			        if ($money->getAmount() >= $d->getMembership()) {
-    			            $money->addDebt($d);//on classe l'operation
-    			            $money->setAmount($money->getAmount()-$d->getMembership());//on recalcule le montant
-    			        }else{
-    			            break;
-    			        }
-    			    }
-			    }
-    			
-			    
+			try {			    
 			    $generator = $this->officeSizeDAOManager->findCurrentByOffice($money->getOffice()->getId());//le packet actuel de l'office
 			    
 			    //calcul du %
 			    $bonus = new OfficeBonus();
 			    $bonus->setGenerator($generator);
-			    $amountBonus = ($money->getAmount() / 100) * $generator->getSize()->getPercentage();
+			    $amountBonus = ($money->getProduct() / 100.0) * $generator->getSize()->getPercentage();
 			    $bonus->setAmount($amountBonus);
 			    //--calcul du %
 			    
 			    $bonus->setMember($money->getOffice()->getMember());
 			    $bonus->setVirtualMoney($money);
-			    $money->setBonus($bonus);
 			    
+			    if ($amountBonus <= 0) {
+			        $bonus = null;
+			    }
+			    
+			    $money->setBonus($bonus);
 			    
 				$this->virtualMoneyDAOManager->create($money);
 			} catch (DAOException $e) {
@@ -122,8 +156,7 @@ class VirtualMoneyFormValidator extends DefaultFormValidator {
 	 * @see \PHPBackend\Validator\FormValidator::updateAfterValidation()
 	 */
 	public function updateAfterValidation(Request $request) {
-		// TODO Auto-generated method stub
-		
+		throw new PHPBackendException("you cannot perform this operation");
 	}
 
 

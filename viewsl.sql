@@ -92,4 +92,46 @@ CREATE OR REPLACE VIEW V_MonthlyOrder AS
         ) AS used,
         (SELECT (SUM(V_Command.amount)) FROM V_Command WHERE V_Command.monthlyOrder = MonthlyOrder.id) AS amount
     FROM MonthlyOrder;-- INNER JOIN Command ON Command.monthlyOrder = MonthlyOrder.id;
-    
+
+CREATE OR REPLACE VIEW V_VirtualMoney AS
+    SELECT DISTINCT
+        VirtualMoney.id AS id,
+        VirtualMoney.dateAjout AS dateAjout,
+        VirtualMoney.dateModif AS dateModif,
+        VirtualMoney.deleted AS deleted,
+        VirtualMoney.product AS product,
+        VirtualMoney.afiliate AS afiliate,
+        VirtualMoney.office AS office,
+        (
+            SELECT (VirtualMoney.product - (SUM(MoneyGradeMember.product))) FROM MoneyGradeMember WHERE MoneyGradeMember.virtualMoney = VirtualMoney.id
+        ) AS availableProduct,
+        (
+            SELECT (VirtualMoney.afiliate - (SUM(MoneyGradeMember.afiliate))) FROM MoneyGradeMember WHERE MoneyGradeMember.virtualMoney = VirtualMoney.id
+        ) AS availableAfiliate,
+        (
+            SELECT SUM(MoneyGradeMember.product) FROM MoneyGradeMember WHERE MoneyGradeMember.virtualMoney = VirtualMoney.id
+        ) AS usedProduct,
+        (
+            SELECT SUM(MoneyGradeMember.afiliate) FROM MoneyGradeMember WHERE MoneyGradeMember.virtualMoney = VirtualMoney.id
+        ) AS usedAfiliate
+    FROM VirtualMoney LEFT OUTER JOIN MoneyGradeMember ON VirtualMoney.id = MoneyGradeMember.virtualMoney;
+
+CREATE OR REPLACE VIEW V_Office AS 
+    SELECT DISTINCT
+        Office.id AS id,
+        Office.dateAjout AS dateAjout,
+        Office.dateModif AS dateModif,
+        Office.central AS central,
+        Office.`name` AS `name`,
+        Office.photo AS photo,
+        Office.localisation AS localisation,
+        Office.member AS member,
+        Office.visible AS visible,
+        (
+            SELECT SUM(V_VirtualMoney.availableProduct) FROM V_VirtualMoney WHERE V_VirtualMoney.office = Office.id
+        ) AS availableProduct,
+        (
+            SELECT SUM(V_VirtualMoney.availableAfiliate) FROM V_VirtualMoney WHERE V_VirtualMoney.office = Office.id
+        ) AS availableAfiliate
+            
+    FROM Office LEFT JOIN V_VirtualMoney ON Office.id = V_VirtualMoney.office;

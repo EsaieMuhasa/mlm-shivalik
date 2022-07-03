@@ -5,7 +5,6 @@ namespace Applications\Admin\Modules\Offices;
 use Applications\Admin\AdminController;
 use Core\Shivalik\Entities\Office;
 use Core\Shivalik\Entities\OfficeSize;
-use Core\Shivalik\Entities\RequestVirtualMoney;
 use Core\Shivalik\Entities\VirtualMoney;
 use Core\Shivalik\Managers\AuxiliaryStockDAOManager;
 use Core\Shivalik\Managers\CommandDAOManager;
@@ -20,6 +19,7 @@ use Core\Shivalik\Managers\RequestVirtualMoneyDAOManager;
 use Core\Shivalik\Managers\SizeDAOManager;
 use Core\Shivalik\Managers\StockDAOManager;
 use Core\Shivalik\Managers\VirtualMoneyDAOManager;
+use Core\Shivalik\Validators\AuxiliaryStockFormValidator;
 use Core\Shivalik\Validators\OfficeAdminFormValidator;
 use Core\Shivalik\Validators\OfficeFormValidator;
 use Core\Shivalik\Validators\OfficeSizeFormValidator;
@@ -29,7 +29,6 @@ use PHPBackend\Application;
 use PHPBackend\Request;
 use PHPBackend\Response;
 use PHPBackend\Calendar\Month;
-use Core\Shivalik\Validators\AuxiliaryStockFormValidator;
 
 /**
  * @author Esaie MUHASA
@@ -46,6 +45,7 @@ class OfficesController extends AdminController {
 	const ATT_ITEM_MENU_HISTORY = 'OFFICE_ACTIVE_ITEM_MENU_HISTORY';
 	const ATT_ITEM_MENU_OFFICE_ADMIN = 'OFFICE_ACTIVE_ITEM_MENU_OFFICE_ADMIN';
 	const ATT_ITEM_MENU_VIRTUAL_MONEY = 'OFFICE_ACTIVE_ITEM_MENU_VIRTUAL_MONEY';
+	const ATT_ITEM_MENU_WITHDRAWALS = 'OFFICE_ACTIVE_ITEM_MENU_WITHDRAWALS';
 	const ATT_ITEM_MENU_STOCKS = 'OFFICE_ACTIVE_ITEM_MENU_STOCKS';
 	//==
 	
@@ -70,6 +70,7 @@ class OfficesController extends AdminController {
 	const ATT_VIRTUAL_MONEYS = 'virtualMoneys';
 	const ATT_REQUEST_VIRTUAL_MONEY = 'requestVirtualMoney';
 	const ATT_RAPORTS_WITHDRAWALS = 'raportWithdrawals';
+	const ATT_COUNT_WITHDRAWALS = 'count_withdrawals_occurences';//nombre d'occurence des retrait deja fait dans un  office
 	
 	const ATT_MONTH = 'MONTH';
 	const CONFIG_MAX_MEMBER_VIEW_STEP = 'maxMembers';
@@ -177,6 +178,9 @@ class OfficesController extends AdminController {
 			}
 			
 			$office = $this->officeDAOManager->findById($id);
+			if ($office->isCentral()) {
+			    $response->sendError("No matched ressource at this URL: {$request->getURI()}");
+			}
 			$request->addAttribute(self::ATT_OFFICE, $office);
 			
 			$this->office = $office;
@@ -347,7 +351,7 @@ class OfficesController extends AdminController {
 	}
 	
 	/**
-	 * le tableau de bord dans un bureau
+	 * le tableau de bord d'un bureau
 	 * @param Request $request
 	 * @param Response $response
 	 */
@@ -372,10 +376,32 @@ class OfficesController extends AdminController {
 		
 		$request->addAttribute(self::ATT_VIRTUAL_MONEYS, $requests);
 		$request->addAttribute(self::ATT_COUNT_MEMEBERS, $nombreMembre);
-		
-		
-		$offices = $this->officeDAOManager->findAll();
-		$request->addAttribute(self::ATT_OFFICES, $offices);
+	}
+	
+	/**
+	 * visualisation des operations de retraits effectuer dans un office
+	 * @param Request $request
+	 * @param Response $response
+	 */
+	public function executeWithdrawals (Request $request, Response $response) : void {
+	    $request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_WITHDRAWALS);
+	    
+	    $limit = $request->existInGET('limit')? intval($request->getDataGET('limit'), 10) : intval($request->getApplication()->getConfig()->get('defaultLimit')->getValue(), 10);
+	    $offset = $request->existInGET('offset')? intval($request->getDataGET('offset'), 10) : 0;
+	    
+	    $this->office = $this->officeDAOManager->load($this->office);
+	    $count = $this->withdrawalDAOManager->countByOffice($this->office->getId(), null, null);
+	    
+	    if ($this->withdrawalDAOManager->checkByOffice($this->office->getId(), null, null, $limit, $offset)) {
+	        $serveds = $this->withdrawalDAOManager->findByOffice($this->office->getId(), null, null, $limit, $offset);
+	        $request->addAttribute(self::ATT_WITHDRAWALS, $serveds);
+	    } else {
+	        $request->addAttribute(self::ATT_WITHDRAWALS, []);
+	    }
+	    
+	    $offices = $this->officeDAOManager->findAll();
+	    $request->addAttribute(self::ATT_OFFICES, $offices);
+	    $request->addAttribute(self::ATT_COUNT_WITHDRAWALS, $count);
 	}
 	
 	/**
@@ -408,7 +434,7 @@ class OfficesController extends AdminController {
         $form->redirectAfterValidation($request);
         
         $request->addToast($form->buildAppMessage());
-        $response->sendRedirect("/admin/offices/{$office}/");
+        $response->sendRedirect("/admin/offices/{$office}/withdrawals/");
 	}
 	
 	/**
@@ -444,23 +470,7 @@ class OfficesController extends AdminController {
 	public function executeSendVirtualMoney (Request $request, Response $response) : void {
 		$request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_VIRTUAL_MONEY);
 		
-	    $money = new RequestVirtualMoney();
 	    $virtual = new VirtualMoney();
-	    
-		if ($request->existInGET('request')) {
-		    $id = intval($request->getDataGET('request'), 10);
-		    if (!$this->requestVirtualMoneyDAOManager->checkById($id)) {
-		        $response->sendError();
-		    }
-		    
-		    $requestMoney = $this->requestVirtualMoneyDAOManager->findById($id);
-		    if ($requestMoney->getOffice()->getId() != $this->office->getId()) {
-		        $response->sendError();
-		    }
-		    
-		    $money->setAmount($requestMoney->getAmount());
-		    $request->addAttribute(VirtualMoneyFormValidator::FIELD_REQUEST_MONEY, $requestMoney);
-		}
 		
 		if ($request->getMethod() == Request::HTTP_POST) {
 			$form = new VirtualMoneyFormValidator($this->getDaoManager());
@@ -471,11 +481,6 @@ class OfficesController extends AdminController {
 				$response->sendRedirect("/admin/offices/{$this->office->getId()}/virtualmoney/");
 			}
 			$form->includeFeedback($request);
-		}
-		
-		if ($this->gradeMemberDAOManager->checkByOffice($this->office->getId(), null, false)) {//Recuperation de toutes les operations 
-		    //qui ne sont pas encore payer
-		    $virtual->setDebts($this->gradeMemberDAOManager->findByOffice($this->office->getId(), null, false));
 		}
 		
 		$request->addAttribute(self::ATT_VIRTUAL_MONEY, $virtual);

@@ -47,7 +47,12 @@
 			name="\Core\Shivalik\Entities\VirtualMoney"
 			specification="\Core\Shivalik\Managers\VirtualMoneyDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\VirtualMoneyDAOManagerImplementation1"/>
-			
+		
+		<entity
+			name="\Core\Shivalik\Entities\MoneyGradeMember"
+			specification="\Core\Shivalik\Managers\MoneyGradeMemberDAOManager"
+			implementation="\Core\Shivalik\Managers\Implementation\MoneyGradeMemberDAOManagerImplementation1"/>
+				
 		<entity 
 			name="\Core\Shivalik\Entities\RequestVirtualMoney"
 			specification="\Core\Shivalik\Managers\RequestVirtualMoneyDAOManager"

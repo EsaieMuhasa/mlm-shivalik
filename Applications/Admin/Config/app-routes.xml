@@ -56,6 +56,8 @@
 		<route action="members" urlPattern="/admin/offices/([0-9]+)/members\.html" paramsNames="id"/>
 		<route action="upgrades" urlPattern="/admin/offices/([0-9]+)/upgrades\.html" paramsNames="id"/>
 		<route action="dashboard" urlPattern="/admin/offices/([0-9]+)/" paramsNames="id"/>
+		<route action="withdrawals" urlPattern="/admin/offices/([0-9]+)/withdrawals/" paramsNames="id"/>
+		<route action="withdrawals" urlPattern="/admin/offices/([0-9]+)/withdrawals/([0-9]+)-([0-9]+)\.html" paramsNames="id,limit,offset"/>
 		<route action="officeAdmin" urlPattern="/admin/offices/([0-9]+)/admin\.html" paramsNames="id"/>
 		<route action="createOfficeAdmin" urlPattern="/admin/offices/([0-9]+)/admin/new\.html" paramsNames="id"/>
 		<route action="officeAdmin" urlPattern="/admin/offices/([0-9]+)/(enable|disable)-([0-9]+)\.html" paramsNames="id,option,adminId"/>

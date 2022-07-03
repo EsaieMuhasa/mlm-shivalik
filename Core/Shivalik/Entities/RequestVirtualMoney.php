@@ -8,7 +8,7 @@ use PHPBackend\PHPBackendException;
 /**
  *
  * @author Esaie MHS
- *        
+ * @deprecated   pour des raisons de changement de la logique de gestion des vituels cette classe est complement obsolette 
  */
 class RequestVirtualMoney extends DBEntity {
 	

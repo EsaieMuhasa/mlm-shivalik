@@ -8,7 +8,7 @@ use Core\Shivalik\Entities\RequestVirtualMoney;
 /**
  *
  * @author Esaie MHS
- *        
+ * @deprecated la depreciation de l'entite gerer par cette interface entraine carrement la depreciation de celle-ci 
  */
 interface RequestVirtualMoneyDAOManager extends DAOInterface {
 

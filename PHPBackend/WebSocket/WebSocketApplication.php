@@ -101,6 +101,17 @@ class WebSocketApplication implements Application
         // TODO Auto-generated method stub
         
     }
+    
+    /**
+     * {@inheritDoc}
+     * @see \PHPBackend\Application::getSource()
+     */
+    public function getSource(): Application
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
 
     
 }

@@ -144,7 +144,6 @@ class DashboardController extends AdminController {
         }
         //\\virtualMoney
         
-        //$response->sendRedirect("/admin/members/");
         $members = $this->memberDAOManager->findAll();
         
         $solde = 0;

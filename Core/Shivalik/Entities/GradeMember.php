@@ -64,6 +64,7 @@ class GradeMember extends DBEntity
     /**
      * Forfait virtuel pour lequel l'operation fait reference pour une retrocession
      * @var VirtualMoney
+     * @deprecated pour des raisons d'amelioration de la gestion de virtuel ce champs ne doit plus etre utiliser
      */
     private $virtualMoney;
     
@@ -258,6 +259,7 @@ class GradeMember extends DBEntity
     
     /**
      * @return VirtualMoney
+     * @deprecated pour des raisons liee au changement de la logique de gestion des virtuel cette methode n'est plus d'actualite
      */
     public function getVirtualMoney() : ?VirtualMoney
     {
@@ -266,9 +268,10 @@ class GradeMember extends DBEntity
 
     /**
      * @param VirtualMoney $virtualMoney
+     * @deprecated pour pour des raisons de changement de la logique de gestion des virtule,
+     * cette methode ne dois plus etre utiliser
      */
-    public function setVirtualMoney($virtualMoney) : void
-    {
+    public function setVirtualMoney($virtualMoney) : void {
         if ($virtualMoney instanceof VirtualMoney || $virtualMoney == null) {
             $this->virtualMoney = $virtualMoney;
         }elseif (self::isInt($virtualMoney)) {

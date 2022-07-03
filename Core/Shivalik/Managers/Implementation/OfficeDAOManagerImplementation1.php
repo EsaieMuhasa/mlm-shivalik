@@ -55,6 +55,14 @@ class OfficeDAOManagerImplementation1 extends DefaultDAOInterface implements Off
     
     /**
      * {@inheritDoc}
+     * @see \PHPBackend\Dao\DefaultDAOInterface::hasView()
+     */
+    protected function hasView(): bool {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
      * @see \PHPBackend\Dao\DAOInterface::createInTransaction()
      * @param Office $entity
      */

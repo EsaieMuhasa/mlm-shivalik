@@ -1,10 +1,10 @@
 <?php
-use Applications\Office\OfficeApplication;
 use Applications\Office\Modules\Members\MembersController;
 use Core\Shivalik\Entities\Account;
 use Core\Shivalik\Entities\Member;
 use PHPBackend\AppConfig;
 use PHPBackend\Request;
+use Core\Shivalik\Filters\SessionMemberFilter;
 
 /**
  * @var Member $member
@@ -56,7 +56,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
 							</th>
     						
     						<td class="text-center">
-    							<?php if ($w->admin==null && OfficeApplication::getConnectedUser()->getOffice()->getId() == $w->office->id) : ?>
+    							<?php if ($w->admin == null && $_SESSION[SessionMemberFilter::MEMBER_CONNECTED_SESSION]->getOffice()->getId() == $w->office->id) : ?>
     							<a class="btn btn-danger" href="<?php echo "/office/members/{$member->getId()}/withdrawals/{$w->id}.html"; ?>">
     								<span class="glyphicon glyphicon-ok"></span> Accept
     							</a>

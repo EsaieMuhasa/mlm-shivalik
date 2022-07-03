@@ -10,9 +10,7 @@ use PHPBackend\Dao\UtilitaireSQL;
 use PHPBackend\Dao\DefaultDAOInterface;
 
 /**
- *
  * @author Esaie MHS
- *        
  */
 class VirtualMoneyDAOManagerImplementation1 extends DefaultDAOInterface implements VirtualMoneyDAOManager {
 
@@ -24,6 +22,15 @@ class VirtualMoneyDAOManagerImplementation1 extends DefaultDAOInterface implemen
 		throw new DAOException("unsupported operation");
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 * @see \PHPBackend\Dao\DefaultDAOInterface::hasView()
+	 */
+	protected function hasView(): bool {
+	    return true;
+	}
+	
+	
     /**
      * {@inheritDoc}
      * @see \PHPBackend\Dao\DAOInterface::createInTransaction()
@@ -32,24 +39,24 @@ class VirtualMoneyDAOManagerImplementation1 extends DefaultDAOInterface implemen
     public function createInTransaction($entity, \PDO $pdo): void
     {
         $id = UtilitaireSQL::insert($pdo, $this->getTableName(), [
-			'amount' => $entity->getAmount(),
-		    'expected' => $entity->getExpected(),
-		    'request' => $entity->getRequest()!=null? $entity->getRequest()->getId() : null,
+            'product' => $entity->getProduct(),
+            'afiliate' => $entity->getAfiliate(),
 			'office' => $entity->getOffice()->getId(),
             self::FIELD_DATE_AJOUT => $entity->getFormatedDateAjout()            
         ]);
 		$entity->setId($id); 
 		
-		foreach ($entity->getDebts() as $d) {
-		    UtilitaireSQL::update($pdo, "GradeMember", [
-		        'virtualMoney' => $id		        
-		    ], $d->getId());
-		}
+// 		cette operation est mise en commentaire car le dette ne doivent plus etre admisent
+// 		foreach ($entity->getDebts() as $d) {
+// 		    UtilitaireSQL::update($pdo, "GradeMember", [
+// 		        'virtualMoney' => $id		        
+// 		    ], $d->getId());
+// 		}
 		
 		//EVOIE DU BONUS
-		if ($entity->getBonus()->getAmount()>0) {//ssi suppieur a zero
-		    $this->getDaoManager()->getManagerOf(OfficeBonus::class)->createInTransaction($entity->getBonus(), $pdo);
-		}
+		if ($entity->getBonus() != null) {//ssi n'est pas null
+		    $this->getManagerFactory()->getManagerOf(OfficeBonus::class)->createInTransaction($entity->getBonus(), $pdo);
+		}//==
     }
     
     /**
@@ -57,7 +64,7 @@ class VirtualMoneyDAOManagerImplementation1 extends DefaultDAOInterface implemen
      * @see \Core\Shivalik\Managers\VirtualMoneyDAOManager::findByOffice()
      */
     public function findByOffice (int $officeId) {
-        return UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, ['office' => $officeId]);
+        return UtilitaireSQL::findAll($this->getConnection(), $this->getViewName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, ['office' => $officeId]);
     }
     
     /**
@@ -73,7 +80,7 @@ class VirtualMoneyDAOManagerImplementation1 extends DefaultDAOInterface implemen
      * @see \Core\Shivalik\Managers\VirtualMoneyDAOManager::findByRequest()
      */
     public function findByRequest (int $requestId) : VirtualMoney {
-        return UtilitaireSQL::findUnique($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), "request", $requestId);
+        return UtilitaireSQL::findUnique($this->getConnection(), $this->getViewName(), $this->getMetadata()->getName(), "request", $requestId);
     }
     
     
@@ -109,7 +116,7 @@ class VirtualMoneyDAOManagerImplementation1 extends DefaultDAOInterface implemen
      * @return VirtualMoney[]
      */
     public function findCreationHistoryByOffice (int $officeId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : array {
-        return UtilitaireSQL::findCreationHistory($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, $dateMin, $dateMax, ['office' => $officeId], $limit, $offset);
+        return UtilitaireSQL::findCreationHistory($this->getConnection(), $this->getViewName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, $dateMin, $dateMax, ['office' => $officeId], $limit, $offset);
     }
 
 }

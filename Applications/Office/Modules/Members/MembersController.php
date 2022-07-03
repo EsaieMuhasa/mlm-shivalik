@@ -23,6 +23,7 @@ use PHPBackend\Request;
 use PHPBackend\Response;
 use PHPBackend\ToastMessage;
 use PHPBackend\Http\HTTPController;
+use Core\Shivalik\Managers\OfficeDAOManager;
 
 /**
  *
@@ -96,6 +97,11 @@ class MembersController extends HTTPController {
 	 * @var MonthlyOrderDAOManager
 	 */
 	private $monthlyOrderDAOManager;
+	
+	/**
+	 * @var OfficeDAOManager
+	 */
+	private $officeDAOManager;
 	
 	/**
 	 * {@inheritDoc}
@@ -186,6 +192,8 @@ class MembersController extends HTTPController {
 	public function executeAddMember (Request $request, Response $response) : void {
 		
 		$office = $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice();
+		
+		$office = $this->officeDAOManager->load($office);
 		
 		if ($this->gradeMemberDAOManager->checkByOffice($office->getId())) {
 			$office->setOperations($this->gradeMemberDAOManager->findByOffice($office->getId()));

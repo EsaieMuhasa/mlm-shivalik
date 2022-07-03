@@ -26,57 +26,60 @@ $requests = $_REQUEST[OfficesController::ATT_VIRTUAL_MONEYS];
 </div>
 <?php endif;?>
 
-<div class="row">
-	<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-        <div class="info-box green-bg">
-            <i class="glyphicon glyphicon-ok"></i>
-            <div class="count"><?php echo ("{$office->getAvailableVirtualMoney()} {$config->get('devise')}"); ?></div>
-            <div class="title">Available</div>
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<strong class="panel-title">Virtual moneys</strong>
+	</div>
+	<div class="panel-body">
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="info-box dark-bg">
+                    <i class="glyphicon glyphicon-leaf"></i>
+                    <div class="count"><?php echo ("{$office->getAvailableVirtualMoneyProduct()} {$config->get('devise')}"); ?></div>
+                    <div class="title">Available product account</div>
+                </div>
+                <!--/.info-box-->
+            </div>
+        
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="info-box dark-bg">
+                    <i class="glyphicon glyphicon-user"></i>
+                    <div class="count"><?php echo ("{$office->getAvailableVirualMoneyAfiliate()} {$config->get('devise')}"); ?></div>
+                    <div class="title">Available membership account</div>
+                </div>
+                <!--/.info-box-->
+            </div>
+            
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="info-box red-bg">
+                    <i class="glyphicon glyphicon-trash"></i>
+                    <div class="count"><?php echo ("{$office->getTrashVirtualMoneyProduct()} {$config->get('devise')}"); ?></div>
+                    <div class="title">Trash Product</div>
+                </div>
+                <!--/.info-box-->
+            </div>
+        
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="info-box red-bg">
+                    <i class="glyphicon glyphicon-trash"></i>
+                    <div class="count"><?php echo ("{$office->getTrashVirtualMoneyAfiliate()} {$config->get('devise')}"); ?></div>
+                    <div class="title">Trash Membership</div>
+                </div>
+                <!--/.info-box-->
+            </div>
+            
+            <?php if (!empty($requests)) : ?>
+            <?php foreach ($requests as $request) : ?>
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                <div class="info-box red-bg">
+                    <i class="glyphicon glyphicon-time"></i>
+                    <div class="count"><?php echo ("{$request->getAmount()} {$config->get('devise')}"); ?></div>
+                    <div class="title">Request</div>
+                </div>
+                <!--/.info-box-->
+            </div>
+            <?php endforeach; ?>
+            <?php endif; ?>
         </div>
-        <!--/.info-box-->
-    </div>
-    
-    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-        <div class="info-box green-bg">
-            <i class="glyphicon glyphicon-trash"></i>
-            <div class="count"><?php echo ("{$office->getUsedVirtualMoney()} {$config->get('devise')}"); ?></div>
-            <div class="title">trash</div>
-        </div>
-        <!--/.info-box-->
-    </div>
-    
-    <?php if ($office->getSoldRetroCommission()>0) : ?>
-    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-        <div class="info-box blue-bg">
-            <i class="glyphicon glyphicon-retweet"></i>
-            <div class="count"><?php echo ("{$office->getSoldRetroCommission()} {$config->get('devise')}"); ?></div>
-            <div class="title">membership</div>
-        </div>
-        <!--/.info-box-->
-    </div>
-    <?php endif; ?>
-    
-    <?php if ($office->hasDebts()) : ?>
-    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-        <div class="info-box red-bg">
-            <i class="glyphicon glyphicon-warning-sign"></i>
-            <div class="count"><?php echo ("{$office->getDebts()} {$config->get('devise')}"); ?></div>
-            <div class="title">Debts</div>
-        </div>
-        <!--/.info-box-->
-    </div>
-    <?php endif; ?>
-    
-    <?php if (!empty($requests)) : ?>
-    <?php foreach ($requests as $request) : ?>
-    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-        <a class="info-box red-bg" style="display: block;" href="<?php echo "/admin/offices/{$office->getId()}/virtualmoney/{$request->getId()}/send.html"; ?>">
-            <i class="glyphicon glyphicon-time"></i>
-            <span class="count" style="display: block;"><?php echo ("{$request->getAmount()} {$config->get('devise')}"); ?></span>
-            <span class="title" style="display: block;">Request</span>
-        </a>
-        <!--/.info-box-->
-    </div>
-    <?php endforeach; ?>
-    <?php endif; ?>
+	</div>
 </div>

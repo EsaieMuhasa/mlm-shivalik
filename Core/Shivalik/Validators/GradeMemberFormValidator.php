@@ -66,8 +66,7 @@ class GradeMemberFormValidator extends DefaultFormValidator
      * {@inheritDoc}
      * @see \PHPBackend\Validator\DefaultFormValidator::validationId()
      */
-    protected function validationId($id): void
-    {
+    protected function validationId($id): void {
         parent::validationId($id);
         
         try {
@@ -199,8 +198,7 @@ class GradeMemberFormValidator extends DefaultFormValidator
      * @see \PHPBackend\Validator\FormValidator::createAfterValidation()
      * @return GradeMember
      */
-    public function createAfterValidation(Request $request)
-    {
+    public function createAfterValidation(Request $request) {
         $gm = new GradeMember();
         $grade = $request->getDataPOST(self::FIELD_GRADE);
         
@@ -232,9 +230,15 @@ class GradeMemberFormValidator extends DefaultFormValidator
             $this->processingMembership($gm, 20, 10);
             
             // --verification de la monais virtuel
-            $money = $gm->getProduct() + (($gm->getMembership()/3)*2);
-            if ($money > $member->getOffice()->getAvailableVirtualMoney()) {
-            	$this->setMessage("impossible to perform this operation because the office wallet is insufficient. requered money: {$money} {$request->getApplication()->getConfig()->get('devise')}, your walet: {$member->getOffice()->getAvailableVirtualMoney()} {$request->getApplication()->getConfig()->get('devise')}");
+            $product = $gm->getProduct();
+            $membership = 0;
+            
+            if ($product > $member->getOffice()->getAvailableVirtualMoneyProduct() || $membership >  $member->getOffice()->getAvailableVirualMoneyAfiliate()) {
+                $message = "impossible to perform this operation because the office wallet is insufficient. requered product money: {$product} {$request->getApplication()->getConfig()->get('devise')}, ";
+                $message .= "requered membership money: {$membership} {$request->getApplication()->getConfig()->get('devise')}, ";
+                $message .= "your product wallet: {$member->getOffice()->getAvailableVirtualMoneyProduct()} {$request->getApplication()->getConfig()->get('devise')}";
+                $message .= "your membership wallet: {$member->getOffice()->getAvailableVirualMoneyAfiliate()} {$request->getApplication()->getConfig()->get('devise')}";
+            	$this->setMessage($message);
             }
             // \\--
             
@@ -295,10 +299,16 @@ class GradeMemberFormValidator extends DefaultFormValidator
                     $gm->setOffice($request->getAttribute(self::FIELD_OFFICE_ADMIN)->getOffice());
                     
                 	// --verification de la monais virtuel
-                	$money = $gm->getProduct() + $gm->getMembership();
-                	if ($money > $gm->getOffice()->getAvailableVirtualMoney()) {
-                		$this->setMessage("impossible to perform this operation because the office wallet is insufficient. requered money: {$money} {$request->getApplication()->getConfig()->get('devise')}, your walet: {$gm->getOffice()->getAvailableVirtualMoney()} {$request->getApplication()->getConfig()->get('devise')}");
-                	}
+                    $product = $gm->getProduct();
+                    $membership = (($gm->getMembership()/3)*2);
+                    
+                    if ($product > $member->getOffice()->getAvailableVirtualMoneyProduct() || $membership >  $member->getOffice()->getAvailableVirualMoneyAfiliate()) {
+                        $message = "impossible to perform this operation because the office wallet is insufficient. requered product money: {$product} {$request->getApplication()->getConfig()->get('devise')}, ";
+                        $message .= "requered membership money: {$membership} {$request->getApplication()->getConfig()->get('devise')}, ";
+                        $message .= "your product wallet: {$member->getOffice()->getAvailableVirtualMoneyProduct()} {$request->getApplication()->getConfig()->get('devise')}";
+                        $message .= "your membership wallet: {$member->getOffice()->getAvailableVirualMoneyAfiliate()} {$request->getApplication()->getConfig()->get('devise')}";
+                        $this->setMessage($message);
+                    }
                 	// \\--
                 	
                 	if (!$this->hasError()) {
@@ -368,8 +378,8 @@ class GradeMemberFormValidator extends DefaultFormValidator
             
             // --verification de la monais virtuel
             $money = (($gm->getMembership()/3)*2);
-            if ($money > $member->getOffice()->getAvailableVirtualMoney()) {
-                $this->setMessage("impossible to perform this operation because the office wallet is insufficient. requered money: {$money} {$request->getApplication()->getConfig()->get('devise')}, your walet: {$member->getOffice()->getAvailableVirtualMoney()} {$request->getApplication()->getConfig()->get('devise')}");
+            if ($money > $member->getOffice()->getAvailableVirualMoneyAfiliate()) {
+                $this->setMessage("impossible to perform this operation because the office wallet is insufficient. requered money: {$money} {$request->getApplication()->getConfig()->get('devise')}, your membership wallet: {$member->getOffice()->getAvailableVirualMoneyAfiliate()} {$request->getApplication()->getConfig()->get('devise')}");
             } else if ($gm->getProduct() > $monthly->getAvailable()) {
                 $this->setMessage("impossible to perform this operation because the member wallet is insufficient. requered money: {$gm->getProduct()} {$request->getApplication()->getConfig()->get('devise')}, sponsor member walet: {$monthly->getAvailable()} {$request->getApplication()->getConfig()->get('devise')}");
             }
@@ -399,8 +409,7 @@ class GradeMemberFormValidator extends DefaultFormValidator
      * @see \PHPBackend\Validator\FormValidator::updateAfterValidation()
      * @return GradeMember
      */
-    public function updateAfterValidation(Request $request)
-    {
+    public function updateAfterValidation(Request $request) {
         throw new PHPBackendException("You not have permission to perfom this operation");
     }
     

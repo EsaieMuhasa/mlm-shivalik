@@ -15,7 +15,7 @@ use PHPBackend\PHPBackendException;
 /**
  *
  * @author Esaie MHS
- *        
+ * @deprecated la depreciation de l'entite entraine cel du validateur
  */
 class RequestVirtualMoneyFormValidator extends DefaultFormValidator {
 	const FIELD_AMOUNT = 'amount';

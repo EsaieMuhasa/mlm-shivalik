@@ -92,6 +92,12 @@ class MonthlyOrderFormValidator extends AbstractOperationFormValidator {
         
         if (!$this->hasError()) {
             try {
+                if($this->monthlyOrderDAOManager->checkByMemberOfMonth($order->getMember()->getId(), true)) {
+                    $old = $this->monthlyOrderDAOManager->findByMemberOfMonth($order->getMember()->getId(), true);
+                    if ($old->getManualAmount() == $order->getManualAmount()) {
+                        throw new DAOException("You cannot perform this operation. We have auther monthly bonus of this month to {$memberId} member ID");
+                    }
+                }
                 $this->monthlyOrderDAOManager->dispatchManualPurchaseBonus($order);
             } catch (DAOException $e) {
                 $this->setMessage($e->getMessage());

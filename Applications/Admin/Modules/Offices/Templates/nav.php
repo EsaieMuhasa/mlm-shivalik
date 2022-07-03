@@ -79,6 +79,12 @@ $office = $_REQUEST[OfficesController::ATT_OFFICE];
 		          	</ul>
 				</li>
 				
+				<li class="<?php echo (isset($_REQUEST[OfficesController::ATT_ACTIVE_ITEM_MENU]) && $_REQUEST[OfficesController::ATT_ACTIVE_ITEM_MENU] == OfficesController::ATT_ITEM_MENU_WITHDRAWALS)? "active":""; ?>">
+					<a href="/admin/offices/<?php echo $office->id; ?>/withdrawals/">
+						Withdrawals
+					</a>
+				</li>
+				
 				<li class="<?php echo (isset($_REQUEST[OfficesController::ATT_ACTIVE_ITEM_MENU]) && $_REQUEST[OfficesController::ATT_ACTIVE_ITEM_MENU] == OfficesController::ATT_ITEM_MENU_VIRTUAL_MONEY)? "active":""; ?>">
 					<a href="/admin/offices/<?php echo $office->id; ?>/virtualmoney/">
 						Virtual money

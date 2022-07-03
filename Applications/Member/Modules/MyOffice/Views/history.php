@@ -1,6 +1,5 @@
 <?php
 use Applications\Member\Modules\MyOffice\MyOfficeController;
-use Applications\Member\MemberApplication;
 use PHPBackend\AppConfig;
 use PHPBackend\Request;
 use PHPBackend\Calendar\Year;
@@ -9,6 +8,7 @@ use Core\Shivalik\Entities\Member;
 use Core\Shivalik\Entities\GradeMember;
 use Core\Shivalik\Entities\Withdrawal;
 use Core\Shivalik\Entities\VirtualMoney;
+use Core\Shivalik\Filters\SessionMemberFilter;
  
 
 /**
@@ -25,9 +25,10 @@ $prev = $month->previousMonth();
 $year = new Year($month->getYear());
 
 /**
+ * l'office de l'administrateur actuelement connecter
  * @var Office $office
  */
-$office = MemberApplication::getConnectedMember()->getOfficeAccount();
+$office = $_SESSION[SessionMemberFilter::MEMBER_CONNECTED_SESSION]->getOffice();
 
 /**
  * @var Member[] $members

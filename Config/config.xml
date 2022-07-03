@@ -43,6 +43,7 @@
 		<define name="devise" value="$"/>
 		<define name="minWithdrawal" value="10"/><!-- La plus petite valeur retirable en dolar -->
 		<define name="maxMembers" value="12"/>
+		<define name="defaultLimit" value="15"/>
 		
 		<list name="footsMember">
 			<item name="LEFT" value="1"/>

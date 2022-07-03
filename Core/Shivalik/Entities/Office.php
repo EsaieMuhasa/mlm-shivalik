@@ -201,13 +201,14 @@ class Office extends DBEntity
 	
 	/**
 	 * renvoie le solde des produits
-	 * lorse montant allouer pour l'adhesion a un packet
+	 * lors montant allouer pour l'adhesion a un packet
 	 * @return int
+	 * @deprecated
 	 */
 	public function getSoldProduct() : int {
 	    $solde = 0;
 	    foreach ($this->operations as $operation) {
-	        $solde += $operation->getMonthlyOrder()!=null? 0 : $operation->getProduct();
+	        $solde += $operation->getMonthlyOrder() != null? 0 : $operation->getProduct();
 	    }
 	    return $solde;
 	}
@@ -216,6 +217,7 @@ class Office extends DBEntity
 	 * Revoie le solde de retro-commission, pour tout les operations deja fait
 	 * en ignorant les retrocommissions deja payer
 	 * @return int
+	 * @deprecated deprecier lors de la ceparation des comptes des virtuels
 	 */
 	public function getSoldRetroCommission() : int {
 	    $solde = 0;
@@ -227,11 +229,11 @@ class Office extends DBEntity
 	    return $solde;
 	}
 	
-	
 	/**
 	 * Revoei la somme des dettes de retro-commisssion pour l'ensemble des operations
 	 * qu'a deja effecctuer un office, sans que ceux-ci ne soient deja payer
 	 * @return int
+	 * @deprecated le dettes ne sont plus pris en charge depuis que le compte des virtuels des produits et des affiliations ont ete separer
 	 */
 	public function getSoldDebt () : int {
 	    $debt = 0;
@@ -247,6 +249,7 @@ class Office extends DBEntity
 	/**
 	 * renvoie le solde du monai virtual deja utiliser
 	 * @return int
+	 * @deprecated le le montanta d'achat des poduits et le nontant d'affiliation sont maintenant separer
 	 */
 	public function getSoldTrashVirtualMoney () : int {
 	    return ($this->getSoldProduct() + $this->getSoldRetroCommission());
@@ -291,7 +294,7 @@ class Office extends DBEntity
 	
 
 	/**
-	 * @return multitype:VirtualMoney 
+	 * @return VirtualMoney[]
 	 */
 	public function getVirtualMoneys() {
 		return $this->virtualMoneys;
@@ -300,10 +303,12 @@ class Office extends DBEntity
 	/**
 	 * revoie le solde disponible de la monais virtuel d'un office
 	 * @return int
+	 * @deprecated la depreciation de cette methode viens du fait que la logique de gestion des virtuels a changer
+	 * les dettes ne sont plus prisent en charge
 	 */
 	public function getAvailableVirtualMoney () : int {
 		$money = 0;
-		foreach ($this->getVirtualMoneys() as $virtual) {
+		foreach ($this->virtualMoneys as $virtual) {
 			$money += $virtual->getAmount();
 		}
 		
@@ -312,8 +317,59 @@ class Office extends DBEntity
 	}
 	
 	/**
+	 * renvoie le solde diponible du virtuel d'affiliation, produit a acheter
+	 * @return float
+	 */
+	public function getAvailableVirtualMoneyProduct () : int {
+	    $money = 0;
+	    foreach ($this->virtualMoneys as $virtual) {
+	        $money += $virtual->getAvailableProduct();
+	    }
+	    return $money;
+	}
+	
+	/**
+	 * renvoie le montant utilisable pour le compte des adhesion
+	 * @return int
+	 */
+	public function getAvailableVirualMoneyAfiliate () : int {
+	    $money = 0;
+	    foreach ($this->virtualMoneys as $virtual) {
+	        $money += $virtual->getAvailableAfiliate();
+	    }
+	    return $money;
+	}
+	
+	/**
+	 * Renvoie la somme des montants d'achat des produits lors des affiliation
+	 * ou de mis en niveau des comptes des membres
+	 * @return int
+	 */
+	public function getTrashVirtualMoneyProduct () : int  {
+	    $money = 0;
+	    foreach ($this->virtualMoneys as $virtual) {
+	        $money += $virtual->getUsedProduct();
+	    }
+	    return $money;
+	}
+	
+	/**
+	 * Renvoie le sold des montants des adhesions lors des affiliations
+	 * @return int
+	 */
+	public function getTrashVirtualMoneyAfiliate () : int  {
+	    $money = 0;
+	    foreach ($this->virtualMoneys as $virtual) {
+	        $money += $virtual->getUsedAfiliate();
+	    }
+	    return $money;
+	}
+	
+	/**
 	 * Aliance de la methode getSoldOperation()
 	 * @return int
+	 * @deprecated la depreciation de cette methode viens du faite que la logique de gestion des virtuels a changer
+	 * Le dettes ne sont plus prisent en charge 
 	 */
 	public function getUsedVirtualMoney () : int {
 		return $this->getSoldTrashVirtualMoney();
@@ -322,6 +378,7 @@ class Office extends DBEntity
 	/**
 	 * l'office est en dete??
 	 * @return bool
+	 * @deprecated les dettes ne sont plus pris en charge
 	 */
 	public function hasDebts () : bool {
 		if ($this->getDebts() != 0 ) {
@@ -332,6 +389,7 @@ class Office extends DBEntity
 	
 	/**
 	 * @return bool
+	 * @deprecated les demandes de virtuels ne sont plus pris en charge
 	 */
 	public function hasWaiting () : bool {
 		$return = false;
@@ -346,6 +404,7 @@ class Office extends DBEntity
 	/**
 	 * renvoie la dette de l'office
 	 * @return int
+	 * @deprecated les dettes ne sont plus prise en charge
 	 */
 	public function getDebts () : int {
 		$money = 0;
@@ -359,6 +418,7 @@ class Office extends DBEntity
 
 	/**
 	 * @return multitype:RequestVirtualMoney 
+	 * @deprecated les requettes de demande de virtuel ne sont plus pris en charge
 	 */
 	public function getRequests() {
 		return $this->requests;
@@ -366,13 +426,14 @@ class Office extends DBEntity
 
 	/**
 	 * @param multitype:RequestVirtualMoney  $requests
+	 * @deprecated les requettes de demande de virtuel ne sont plus prisent en charge
 	 */
 	public function setRequests(array $requests) {
 		$this->requests = $requests;
 	}
 
 	/**
-	 * @param multitype:GradeMember  $operations
+	 * @param GradeMember[]  $operations
 	 */
 	public function setOperations($operations) {
 		$this->operations = $operations;
@@ -393,7 +454,7 @@ class Office extends DBEntity
 	}
 	
 	/**
-	 * @param multitype:VirtualMoney  $virtualMoneys
+	 * @param VirtualMoney[]  $virtualMoneys
 	 */
 	public function setVirtualMoneys($virtualMoneys) {
 		$this->virtualMoneys = $virtualMoneys;

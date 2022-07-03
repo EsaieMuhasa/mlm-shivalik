@@ -25,6 +25,13 @@ use Core\Shivalik\Filters\SessionAdminFilter;
 use Core\Shivalik\Filters\SessionMemberFilter;
 use Core\Shivalik\Filters\SessionOfficeFilter;
 use Core\Shivalik\Entities\OfficeAdmin;
+use Core\Shivalik\Entities\VirtualMoney;
+use Core\Shivalik\Entities\GradeMember;
+use PHPBackend\Dao\UtilitaireSQL;
+use Core\Shivalik\Entities\Office;
+use Core\Shivalik\Managers\VirtualMoneyDAOManager;
+use Core\Shivalik\Managers\GradeMemberDAOManager;
+use Core\Shivalik\Entities\MoneyGradeMember;
 
 /**
  *
@@ -638,5 +645,178 @@ class SettingsController extends HTTPController
     }
     
     
+    /***
+     * lors du changement de la logique d'impementation du virtual, un refactoring des donnees 
+     * nous a ete obligatoire. c'est ainsi que cette action ne respectepas les regles de jeux
+     * @param Request $request
+     * @param Response $response
+     * @deprecated il est structement interdit d'executer cette action.
+     */
+    public function executeRefactoringVirtual (Request $request, Response $response) : void {
+        
+        $response->sendError("Reserved to Ing Esaie MUHASA only");
+        
+        /**
+         * @var VirtualMoneyDAOManager $virtualDao
+         * @var GradeMemberDAOManager $gradeMemberDao
+         */
+        $virtualDao = $this->getDaoManager()->getManagerOf(VirtualMoney::class);
+        $gradeMemberDao = $this->getDaoManager()->getManagerOf(GradeMember::class);
+        $moneyDao = $this->getDaoManager()->getManagerOf(MoneyGradeMember::class);
+        
+        try {
+            $pdo = $this->getDaoManager()->getConnection();
+            $pdo->beginTransaction();
+            
+            /**
+             * @var Office[] $offices
+             * @var Office $office
+             */
+            $offices = $this->officeDAOManager->findAll();
+            foreach ($offices as $office) {
+                if ($office->isCentral() || !$virtualDao->checkByOffice($office->getId())) {
+                    continue;//office centrale, ou office sans virtuel
+                }
+                
+                /**
+                 * pour faciliter la tache:
+                 * - on recupere les virtuels de deja envoyer a l'office
+                 * - on on reorganise les champs en ignorant la ruprique d'affiliation
+                 * - on genere les occurences de MoneyGradeMemebr
+                 * @var VirtualMoney[] $virtuals
+                 * @var VirtualMoney $virtual
+                 */
+                $virtuals = $virtualDao->findByOffice($office->getId());
+                $now = new \DateTime();
+                    
+                foreach ($virtuals as $virtual) {
+                    /*
+                     * pour chaque virtuel, on verifie s'il y avait des operation de retro-commussion
+                     * car les retro commussion doiventetre affecter dans le compte afiliate
+                     */
+                    $afiliate = ($virtual->getAmount() != $virtual->getExpected() && $virtual->getExpected() > 0)? ($virtual->getExpected() - $virtual->getAmount()) : 0;
+                    $virtual->setDateModif($now);
+                    
+                    $virtual->setProduct($virtual->getAmount());
+                    $virtual->setAfiliate($afiliate);
+                    UtilitaireSQL::update($pdo, "VirtualMoney", [
+                        'product' => $virtual->getAmount(),
+                        'afiliate' => $afiliate,
+                        'dateModif' => $virtual->getFormatedDateModif(\DateTime::RFC3339)
+                    ], $virtual->getId());
+                    
+                    $virtual->hydrate([
+                        'availableProduct' => $virtual->getProduct(),
+                        'availableAfiliate' => $afiliate
+                    ]);
+                    $virtual->setOffice(null);
+                }
+                
+                if (!$gradeMemberDao->checkByOffice($office->getId())) {//office sans affiliation
+                    continue;
+                }
+                
+                /**
+                 * @var GradeMember[] $members
+                 * @var GradeMember $member
+                 */
+                $members = $gradeMemberDao->findByOffice($office->getId());
+                
+                /*
+                 * parcour de membre affilier dans l'office
+                 */
+                foreach ($members as $gm) {
+                    $moneyGrades = [];//les virtuels toucher pour l'operation
+                    
+                    $resteProduct = $gm->getProduct();
+                    $resteAfiliate = $gm->getMembership();
+                    
+                    for ($i = 0; $i < count($virtuals); $i++) {
+                        $virtual = $virtuals[$i];
+                        
+                        $product = $virtual->getSubstractableToAvailableProduct($resteProduct);
+                        $afiliate = $virtual->getSubstractableToAvailableAfiliate($resteAfiliate);
+                        
+                        $resteAfiliate -= $afiliate;
+                        $resteProduct -= $product;
+                        
+                        if ($product != 0 || $afiliate != 0) {
+                            $money = new MoneyGradeMember();
+                            $money->setProduct($product);
+                            $money->setAfiliate($afiliate);
+                            $money->setVirtualMoney($virtual);
+                            $money->setGradeMember($gm);
+                            $money->setDateAjout($now);
+                            
+                            $moneyGrades[] = $money;
+                            $virtual->substract($product, $afiliate);
+                        }
+                    }
+                    
+                    if (empty($moneyGrades)) {
+                        $money = new MoneyGradeMember();
+                        $money->setProduct(0);
+                        $money->setAfiliate(0);
+                        $money->setVirtualMoney($virtuals[0]);
+                        $money->setGradeMember($gm);
+                        $money->setDateAjout($now);
+                        
+                        $moneyGrades[] = $money;
+                    }
+                    
+                    /*
+                     * dans on verifie le compte afiliation
+                     * s'il n'y a pas de compte capable de satisfaire la requette
+                     * alors s'il le compte d'afiliation n'est pas satisfaisant, on viole le premier viruel en metant enjour son champs afiliate
+                     * si le compte produit ne satisfont pas nos plus, on viole les regles
+                     */
+                    if ($gm->getOld() == null && $resteAfiliate != 0) {//control du depordement des comptes afiliation
+                        $money = $moneyGrades[0];
+                        $virtual = $money->getVirtualMoney();
+                        $virtual->addOnAfiliate($resteAfiliate);
+                        $afiliate = $virtual->getSubstractableToAvailableAfiliate($resteAfiliate);
+                        
+                        UtilitaireSQL::update($pdo, "VirtualMoney", [
+                            'product' => $virtual->getProduct(),
+                            'afiliate' => $virtual->getAfiliate(),
+                            'dateModif' => $virtual->getFormatedDateModif(\DateTime::W3C)
+                        ], $virtual->getId());
+                        
+                        $virtual->substract(0, $resteAfiliate);
+                        $resteAfiliate -= $afiliate;
+                        
+                        $money->setAfiliate($money->getAfiliate() + $afiliate);
+                    }
+                    
+                    if ($resteProduct  > 0) {//control du debordement des comptes produits
+                        $money = $moneyGrades[0];
+                        $virtual = $money->getVirtualMoney();
+                        $virtual->addOnProduct($resteProduct);
+                        $product = $virtual->getSubstractableToAvailableProduct($resteProduct);
+                        
+                        UtilitaireSQL::update($pdo, "VirtualMoney", [
+                            'product' => $virtual->getProduct(),
+                            'afiliate' => $virtual->getAfiliate(),
+                            'dateModif' => $virtual->getFormatedDateModif(\DateTime::W3C)
+                        ], $virtual->getId());
+                        
+                        $virtual->substract($resteProduct, 0);
+                        $resteProduct -= $product;
+                        
+                        $money->setProduct($money->getProduct() + $product);
+                    }
+                    
+                    $moneyDao->createAllInTransaction($moneyGrades, $pdo);
+                }
+            }
+
+            $pdo->commit();
+        } catch (\Exception $e) {
+            $response->sendError($e);
+        }
+        
+        $response->sendRedirect("/root/");
+    }
+        
 }
 
