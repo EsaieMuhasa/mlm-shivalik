@@ -99,6 +99,8 @@ CREATE OR REPLACE VIEW V_VirtualMoney AS
         VirtualMoney.dateAjout AS dateAjout,
         VirtualMoney.dateModif AS dateModif,
         VirtualMoney.deleted AS deleted,
+        VirtualMoney.amount AS amount,
+        VirtualMoney.expected AS expected,
         VirtualMoney.product AS product,
         VirtualMoney.afiliate AS afiliate,
         VirtualMoney.office AS office,

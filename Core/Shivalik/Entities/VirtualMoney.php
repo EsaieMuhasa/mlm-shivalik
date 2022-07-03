@@ -116,7 +116,7 @@ class VirtualMoney extends DBEntity {
 	 * @deprecated pour de raison de changement logique,
 	 * le champs amount ne dois plus etre utiliser.
 	 */
-	public function getAmount() {
+	public function getAmount() : int {
 		return $this->amount;
 	}
 
@@ -233,14 +233,14 @@ class VirtualMoney extends DBEntity {
     /**
      * @return number
      */
-    public function getProduct () {
+    public function getProduct () : int{
         return $this->product;
     }
 
     /**
      * @return number
      */
-    public function getAfiliate () {
+    public function getAfiliate () : int{
         return $this->afiliate;
     }
 
@@ -282,7 +282,7 @@ class VirtualMoney extends DBEntity {
      */
     public function getAvailableProduct() : int{
         if ($this->availableProduct === null) {
-            return $this->product;
+            $this->availableProduct = $this->product;
         }
         return $this->availableProduct;
     }
@@ -293,7 +293,7 @@ class VirtualMoney extends DBEntity {
      */
     public function getAvailableAfiliate() : int {
         if($this->availableAfiliate === null) {
-            return $this->afiliate;
+            $this->availableAfiliate = $this->afiliate;
         }
         return $this->availableAfiliate;
     }
@@ -341,11 +341,14 @@ class VirtualMoney extends DBEntity {
      * @param int $afiliate
      */
     public function substract (int $product, int $afiliate) : void {
+//         var_dump($this);
         $this->setAvailableAfiliate($this->getAvailableAfiliate() - $afiliate);
         $this->setAvailableProduct($this->getAvailableProduct() - $product);
         
         $this->setUsedProduct($this->getUsedProduct() + $product);
         $this->setUsedAfiliate($this->getUsedAfiliate() + $afiliate);
+//         var_dump($this);
+//         exit();
     }
     
     /**
