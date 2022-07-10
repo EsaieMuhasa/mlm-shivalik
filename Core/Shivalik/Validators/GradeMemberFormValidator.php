@@ -14,6 +14,8 @@ use PHPBackend\Validator\IllegalFormValueException;
 use Core\Shivalik\Managers\MonthlyOrderDAOManager;
 use Applications\Office\Modules\Members\MembersController;
 use Core\Shivalik\Entities\MonthlyOrder;
+use Core\Shivalik\Entities\Office;
+use Core\Shivalik\Managers\OfficeDAOManager;
 
 /**
  *
@@ -47,6 +49,11 @@ class GradeMemberFormValidator extends DefaultFormValidator
      * @var MonthlyOrderDAOManager
      */
     private $monthlyOrderDAOManager;
+    
+    /**
+     * @var OfficeDAOManager
+     */
+    private $officeDAOManager;
     
     /**
      * validation du packet soliciter par le membre
@@ -244,7 +251,9 @@ class GradeMemberFormValidator extends DefaultFormValidator
             
             if (!$this->hasError()) {
                 try {
+                    $this->officeDAOManager->load($gm->getOffice());
                     $this->gradeMemberDAOManager->create($gm);
+                    $this->officeDAOManager->load($gm->getOffice());
                     if ($formMember->getProcessPhoto()->isFile()) {
                         $formMember->processingPhoto($member, $formMember->getProcessPhoto(), true, $request->getApplication()->getConfig());
                     }else{
@@ -295,18 +304,21 @@ class GradeMemberFormValidator extends DefaultFormValidator
                 if ($old->getGrade()->getAmount() >= $require->getAmount()) {
                     $this->setMessage("take the higher grade than '{$old->getGrade()->getName()}'");
                 } else {
-                	
-                    $gm->setOffice($request->getAttribute(self::FIELD_OFFICE_ADMIN)->getOffice());
+                	/**
+                	 * @var Office $office
+                	 */
+                    $office = $request->getAttribute(self::FIELD_OFFICE_ADMIN)->getOffice();
+                    $gm->setOffice($office);
                     
                 	// --verification de la monais virtuel
                     $product = $gm->getProduct();
                     $membership = (($gm->getMembership()/3)*2);
                     
-                    if ($product > $member->getOffice()->getAvailableVirtualMoneyProduct() || $membership >  $member->getOffice()->getAvailableVirualMoneyAfiliate()) {
+                    if ($product > $office->getAvailableVirtualMoneyProduct() || $membership >  $office->getAvailableVirualMoneyAfiliate()) {
                         $message = "impossible to perform this operation because the office wallet is insufficient. requered product money: {$product} {$request->getApplication()->getConfig()->get('devise')}, ";
                         $message .= "requered membership money: {$membership} {$request->getApplication()->getConfig()->get('devise')}, ";
-                        $message .= "your product wallet: {$member->getOffice()->getAvailableVirtualMoneyProduct()} {$request->getApplication()->getConfig()->get('devise')}";
-                        $message .= "your membership wallet: {$member->getOffice()->getAvailableVirualMoneyAfiliate()} {$request->getApplication()->getConfig()->get('devise')}";
+                        $message .= "your product wallet: {$office->getAvailableVirtualMoneyProduct()} {$request->getApplication()->getConfig()->get('devise')}";
+                        $message .= "your membership wallet: {$office->getAvailableVirualMoneyAfiliate()} {$request->getApplication()->getConfig()->get('devise')}";
                         $this->setMessage($message);
                     }
                 	// \\--
@@ -316,7 +328,9 @@ class GradeMemberFormValidator extends DefaultFormValidator
 	                    $gm->setGrade($require);
 	                    $gm->setMember($member);
 	                    $old->setCloseDate(new \DateTime());
+	                    $this->officeDAOManager->load($office);
 	                    $this->gradeMemberDAOManager->upgrade($gm);
+	                    $this->officeDAOManager->load($office);
                 	}
                 }                
             } catch (DAOException $e) {

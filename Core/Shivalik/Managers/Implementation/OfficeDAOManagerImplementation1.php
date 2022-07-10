@@ -191,6 +191,14 @@ class OfficeDAOManagerImplementation1 extends DefaultDAOInterface implements Off
          */
         $return = ($office instanceof Office)? $office : $this->findById($office);
         
+        if (!($office instanceof Office)) {
+            $statement = UtilitaireSQL::prepareStatement($this->getConnection(), "", ['id' => $return->getId()]);
+            if ($row = $statement->fetch()) {
+                $return->hydrate($row);
+            }
+            $statement->closeCursor();
+        }
+        
         if ($this->getDaoManager()->getManagerOf(Withdrawal::class)->checkByOffice($return->getId(), null)) {//operation de matching dans le bureau
             $withdrawals = $this->getDaoManager()->getManagerOf(Withdrawal::class)->findByOffice($return->getId(), null);
             $return->setWithdrawals($withdrawals);

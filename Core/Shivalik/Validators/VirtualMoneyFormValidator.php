@@ -46,9 +46,12 @@ class VirtualMoneyFormValidator extends DefaultFormValidator {
 	 * @throws IllegalFormValueException
 	 */
 	private function validationAmount ($amount) : void {
-		if ($amount == null || !preg_match(self::RGX_NUMERIC_POSITIF, $amount)) {
-			throw new IllegalFormValueException("must be a numeric value greater than zero");
+		if ($amount !== null && !preg_match(self::RGX_NUMERIC_POSITIF, $amount)) {
+			throw new IllegalFormValueException("must be a numeric value greater than zero ->{$amount}");
 		}
+		
+		if($amount === null)
+		    $amount = 0;
 	}
 	
 	/**
