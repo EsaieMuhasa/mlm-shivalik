@@ -142,7 +142,7 @@ class AccountController extends HTTPController
         $member = $request->getSession()->getAttribute(SessionMemberFilter::MEMBER_CONNECTED_SESSION);
         
         
-        if ($request->existGET('foot')) {
+        if ($request->existInGET('foot')) {
             //chargement des downlines
             switch ($request->getDataGET('foot')){
                 case 'left' : {//left
@@ -215,6 +215,9 @@ class AccountController extends HTTPController
      */
     public function executeNewWithdrawal (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Withdrawal Money");
+
+        $request->forward('alertMatching', $this->getModule());
+
         $account = $this->getAccount();
         $request->addAttribute(self::ATT_ACCOUNT, $account);
         
@@ -235,6 +238,10 @@ class AccountController extends HTTPController
 
         $request->addAttribute(self::ATT_OFFICES, $offices);
         $request->addAttribute(self::ATT_MEMBER, $account->getMember());
+    }
+
+    public function executeAlertMatching (Request $request, Response $response) : void {
+
     }
     
     /**
