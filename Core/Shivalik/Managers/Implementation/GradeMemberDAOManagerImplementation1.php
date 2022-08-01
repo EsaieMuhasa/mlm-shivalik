@@ -540,9 +540,9 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
                 $parent = clone $sponsor;
                 $generationNumber = Generation::MIN_GENERATION;
                 
-                while ($this->memberDAOManager->checkParent($parent->getId()) && $generationNumber <= Generation::MAX_GENERATION) {
+                while ($this->memberDAOManager->checkSponsor($parent->getId()) && $generationNumber <= Generation::MAX_GENERATION) {
                     
-                    $parent = $this->memberDAOManager->findParent($parent->getId());
+                    $parent = $this->memberDAOManager->findSponsor($parent->getId());
                     
                     $generation = $this->generationDAOManager->findByNumber($generationNumber);
                     $gradeParent = $this->findCurrentByMember($parent->getId());
