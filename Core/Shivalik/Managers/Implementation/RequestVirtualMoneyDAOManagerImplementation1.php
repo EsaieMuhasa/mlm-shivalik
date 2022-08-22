@@ -9,6 +9,7 @@ use PHPBackend\Dao\UtilitaireSQL;
 use PHPBackend\Dao\DefaultDAOInterface;
 use Core\Shivalik\Managers\OfficeDAOManager;
 use Core\Shivalik\Managers\VirtualMoneyDAOManager;
+use DateTime;
 
 /**
  *
@@ -49,6 +50,66 @@ class RequestVirtualMoneyDAOManagerImplementation1 extends DefaultDAOInterface i
 	public function update($entity, $id) : void {
 		throw new DAOException("impossible to perform this operation");
 	}
+
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\RequestVirtualMoneyDAOManager::checkRequestedInInterval()
+     */
+    public function checkRequestedInInterval(DateTime $dateMin, DateTime $dateMax, ?int $officeId = null): bool
+    {
+        $return = false;
+        try {
+            $statement = $this->getConnection()->prepare("SELECT id FROM {$this->getTableName()} WHERE dateAjout>=:dateMin AND dateAjout<=:dateMax ".($officeId!=null? "AND office={$officeId}":""));
+            if ($statement->execute(array('dateMin'  => $dateMin->format('Y-m-d\T00:00:00'), 'dateMax' => $dateMax->format('Y-m-d\T23:59:59')))) {
+                
+                if ($statement->fetch()) {
+                    $return = true;
+                }
+                $statement->closeCursor();
+            }else {
+                $statement->closeCursor();
+                throw new DAOException("an error occurred while executing the query");
+            }
+        } catch (\PDOException $e) {
+            throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
+        }
+        return $return;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Core\Shivalik\Managers\RequestVirtualMoneyDAOManager::findRequestedInInterval()
+     */
+    public function findRequestedInInterval(DateTime $dateMin, DateTime $dateMax, ?int $officeId = null): array
+    {
+        $return = array();
+        try {
+            $statement = $this->getConnection()->prepare("SELECT * FROM {$this->getTableName()} WHERE dateAjout>=:dateMin AND dateAjout<=:dateMax ".($officeId!=null? "AND office={$officeId}":""));
+            if ($statement->execute(array('dateMin'  => $dateMin->format('Y-m-d\T00:00:00'), 'dateMax' => $dateMax->format('Y-m-d\T23:59:59')))) {
+                
+                if ($row = $statement->fetch()) {
+                    $rpr = new RequestVirtualMoney($row, true);
+                    $rpr->setOffice($this->officeDAOManager->findById($rpr->getOffice()->getId(), false));
+                    $return[] = $rpr;
+                    while ($row = $statement->fetch()) {
+                        $rpr = new RequestVirtualMoney($row, true);
+                        $rpr->setOffice($this->officeDAOManager->findById($rpr->getOffice()->getId(), false));
+                        $return[] = $rpr;
+                    }
+                    $statement->closeCursor();
+                } else {
+                    $statement->closeCursor();
+                    throw new DAOException("no report for the selection interval");
+                }
+            }else {
+                $statement->closeCursor();
+                throw new DAOException("an error occurred while executing the query");
+            }
+        } catch (\PDOException $e) {
+            throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
+        }
+        return $return;
+    }
 	
     /**
      * {@inheritDoc}
@@ -118,6 +179,9 @@ class RequestVirtualMoneyDAOManagerImplementation1 extends DefaultDAOInterface i
      */
     public function findByColumnName(string $columnName, $value, bool $forward = true)
     {
+        /**
+         * @var RequestVirtualMoney $request
+         */
         $request = parent::findByColumnName($columnName, $value, $forward);
         $request->setOffice($this->officeDAOManager->findById($request->office->id, false));
         return $request;
@@ -127,7 +191,7 @@ class RequestVirtualMoneyDAOManagerImplementation1 extends DefaultDAOInterface i
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\RequestVirtualMoneyDAOManager::checkByOffice()
      */
-    public function checkByOffice (int $officeId)  {
+    public function checkByOffice (int $officeId) : bool{
         return  $this->columnValueExist('office', $officeId);
     }
     

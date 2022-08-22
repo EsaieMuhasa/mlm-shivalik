@@ -110,7 +110,7 @@ class GradeMember extends DBEntity
     }
 
     /**
-     * @return number
+     * @return float
      */
     public function getMembership() : ?float
     {

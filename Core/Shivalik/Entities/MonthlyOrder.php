@@ -61,7 +61,7 @@ class MonthlyOrder extends Operation {
     }
 
     /**
-     * @return number
+     * @return float
      */
     public function getAvailable () : float {
         if ($this->manualAmount != 0) {
@@ -85,7 +85,7 @@ class MonthlyOrder extends Operation {
     }
     
     /**
-     * @return number
+     * @return float
      */
     public function getUsed() : ?float{
         if ($this->manualAmount != 0) {
