@@ -388,20 +388,6 @@ class Office extends DBEntity
 	}
 	
 	/**
-	 * @return bool
-	 * @deprecated les demandes de virtuels ne sont plus pris en charge
-	 */
-	public function hasWaiting () : bool {
-		$return = false;
-		foreach ($this->requests as $request) {
-			if (empty($request->getResponses())) {
-				return true;
-			}
-		}
-		return $return;
-	}
-	
-	/**
 	 * renvoie la dette de l'office
 	 * @return int
 	 * @deprecated les dettes ne sont plus prise en charge

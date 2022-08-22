@@ -14,7 +14,6 @@ use Core\Shivalik\Managers\GradeMemberDAOManager;
 use Core\Shivalik\Managers\OfficeBonusDAOManager;
 use Core\Shivalik\Managers\OfficeDAOManager;
 use Core\Shivalik\Managers\OfficeSizeDAOManager;
-use Core\Shivalik\Managers\RaportWithdrawalDAOManager;
 use Core\Shivalik\Managers\SizeDAOManager;
 use Core\Shivalik\Managers\VirtualMoneyDAOManager;
 use PHPBackend\Application;
@@ -23,6 +22,7 @@ use PHPBackend\Response;
 use PHPBackend\Graphics\ChartJS\ChartConfig;
 use Core\Shivalik\Managers\MonthlyOrderDAOManager;
 use Core\Shivalik\Entities\MonthlyOrder;
+use Core\Shivalik\Managers\RequestVirtualMoneyDAOManager;
 use PHPBackend\Dao\DAOException;
 use PHPBackend\ToastMessage;
 
@@ -91,9 +91,9 @@ class DashboardController extends AdminController {
 	private $officeSizeDAOManager;
 	
 	/**
-	 * @var RaportWithdrawalDAOManager
+	 * @var RequestVirtualMoneyDAOManager
 	 */
-	private $raportWithdrawalDAOManager;
+	private $requestVirtualMoneyDAOManager;
 	
 	/**
 	 * @var MonthlyOrderDAOManager
@@ -176,8 +176,8 @@ class DashboardController extends AdminController {
             $all = array();
         }
         
-        if ($this->raportWithdrawalDAOManager->countAll() != 0) {
-            $rapports = $this->raportWithdrawalDAOManager->findAll();
+        if ($this->requestVirtualMoneyDAOManager->checkWaiting()) {
+            $rapports = $this->requestVirtualMoneyDAOManager->findWaiting();
         }else {
             $rapports = [];
         }
@@ -194,15 +194,16 @@ class DashboardController extends AdminController {
                 $purchase += $p->getAvailable();
             }
         }
-        $dispatchable = intval($now->format('d'), 10) >= 27 && $purchase > 0;
+        $dispatchable = intval($now->format('d'), 10) >= 26 && $purchase > 0;
         
-        $request->addAttribute(self::ATT_PURCHASE, $purchase);
-        $request->addAttribute(self::ATT_DISPTCH_PURCHASE, $dispatchable);
-        $request->addAttribute(self::ATT_RAPORT_WITHDRAWALS, $rapports);
-        $request->addAttribute(self::ATT_WITHDRAWALS, $all);
-        $request->addAttribute(self::ATT_SOLDE_WITHDRAWALS_SERVED, $served);
-        $request->addAttribute(self::PARAM_UPGRADES_COUNT, $this->gradeMemberDAOManager->countUpgrades());
-        $request->addAttribute(self::PARAM_MEMBER_COUNT, $this->memberDAOManager->countAll());
+        $request
+            ->addAttribute(self::ATT_PURCHASE, $purchase)
+            ->addAttribute(self::ATT_DISPTCH_PURCHASE, $dispatchable)
+            ->addAttribute(self::ATT_RAPORT_WITHDRAWALS, $rapports)
+            ->addAttribute(self::ATT_WITHDRAWALS, $all)
+            ->addAttribute(self::ATT_SOLDE_WITHDRAWALS_SERVED, $served)
+            ->addAttribute(self::PARAM_UPGRADES_COUNT, $this->gradeMemberDAOManager->countUpgrades())
+            ->addAttribute(self::PARAM_MEMBER_COUNT, $this->memberDAOManager->countAll());
     }
     
     /**

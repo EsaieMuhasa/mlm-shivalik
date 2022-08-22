@@ -27,7 +27,7 @@ class Withdrawal extends Operation
     private $telephone;
     
     /**
-     * @var RaportWithdrawal
+     * @var RequestVirtualMoney
      */
     private $raport;
     
@@ -89,22 +89,22 @@ class Withdrawal extends Operation
 		$this->telephone = $telephone;
 	}
     /**
-     * @return RaportWithdrawal
+     * @return RequestVirtualMoney
      */
-    public function getRaport() : ?RaportWithdrawal
+    public function getRaport() : ?RequestVirtualMoney
     {
         return $this->raport;
     }
 
     /**
-     * @param RaportWithdrawal $raport
+     * @param RequestVirtualMoney $raport
      */
     public function setRaport($raport) : void
     {
-        if ($raport == null || $raport instanceof RaportWithdrawal) {
+        if ($raport == null || $raport instanceof RequestVirtualMoney) {
             $this->raport = $raport;
         }else if(self::isInt($raport)){
-            $this->raport = new RaportWithdrawal(array('id' => $raport));
+            $this->raport = new RequestVirtualMoney(array('id' => $raport));
         } else {
             throw new PHPBackendException("invalid value as a parameter of the setRaport() method");
         }

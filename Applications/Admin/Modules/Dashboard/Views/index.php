@@ -149,12 +149,13 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
 	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 		<div class="table-responsive">
 			<table class="table table-bordered table-condenced panel panel-info">
-    			<caption class="panel-title">Offices rapports</caption>
+    			<caption class="panel-title">Offices requests virtual moneys and rapports</caption>
 				<thead class="panel-heading">
 					<tr>
 						<th>Date</th>
 						<th>Office</th>
-						<th>Amount</th>
+						<th>Afilliation</th>
+						<th>Product</th>
 						<th>Options</th>
 					</tr>
 				</thead>
@@ -162,8 +163,9 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
 					<?php foreach ($_REQUEST[DashboardController::ATT_RAPORT_WITHDRAWALS] as $raport) : ?>
 					<tr>
 						<td><?php echo $raport->dateAjout->format('D, d M Y \a\t H:i'); ?></td>
-						<td></td>
-						<td><?php echo $raport->dateAjout->format('D, d M Y \a\t H:i'); ?></td>
+						<td><?php echo htmlspecialchars($raport->office->name); ?></td>
+						<td><?php echo $raport->affiliation; ?></td>
+						<td><?php echo $raport->product; ?></td>
 						<td></td>
 					</tr>
 					<?php endforeach; ?>
