@@ -3,6 +3,7 @@
 namespace Core\Shivalik\Managers\Implementation;
 
 use Core\Shivalik\Entities\RequestVirtualMoney;
+use Core\Shivalik\Entities\Withdrawal;
 use Core\Shivalik\Managers\RequestVirtualMoneyDAOManager;
 use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
@@ -37,10 +38,21 @@ class RequestVirtualMoneyDAOManagerImplementation1 extends DefaultDAOInterface i
     {
         $id = UtilitaireSQL::insert($pdo, $this->getTableName(), [
 			'office' => $entity->getOffice()->getId(),
-			'amount' => $entity->getAmount(),
+			'product' => $entity->getProduct(),
+			'affiliation' => $entity->getAffiliation(),
             self::FIELD_DATE_AJOUT => $entity->getFormatedDateAjout()
         ]);
 		$entity->setId($id);
+
+        if (!empty($entity->getWithdrawals())) {
+            $sql = 'UPDATE Withdrawal SET raport = :raport, dateModif = NOW() WHERE id IN (';
+            foreach ($entity->getWithdrawals() as $w) {
+                $sql .= " {$w->getId()},";
+            }
+
+            $sql = substr($sql, 0, strlen($sql) - 1).')';
+            UtilitaireSQL::prepareStatement($pdo, $sql, ['raport' => $entity->getId()]);
+        }
     }
 
     /**

@@ -17,19 +17,19 @@ class RequestVirtualMoney extends DBEntity {
 	 * @deprecated   pour des raisons de changement de la logique de gestion des vituels cette attribut est obsolette 
 	 * ainsi que sont accesseur et son mitateur.
 	 */
-	private $amount;
+	private $amount = 0;
 
 	/**
 	 * montant prevue pour l'afilisation
 	 * @var float
 	 */
-	private $affiliation;
+	private $affiliation = 0;
 
 	/**
 	 * montant prevue pour l'achat de produit
 	 * @var float
 	 */
-	private $product;
+	private $product = 0;
 	
 	/**
 	 * @var Office
@@ -57,18 +57,23 @@ class RequestVirtualMoney extends DBEntity {
     }
 
     /**
-     * @param multitype:Withdrawal  $withdrawals
+     * @param Withdrawal[]  $withdrawals
      */
     public function setWithdrawals(array $withdrawals) : void
     {
         $this->withdrawals = $withdrawals;
+		$product = 0;
+		foreach ($withdrawals as $w) {
+			$product += $w->getAmount();
+		}
+		$this->product = $product;
     }
 	
 	/**
 	 * @return float
 	 * @deprecated pour des raison de separation des virtules (afiliation et achat produit)
 	 */
-	public function getAmount() {
+	public function getAmount() : ?float{
 		return $this->amount;
 	}
 	
@@ -143,7 +148,7 @@ class RequestVirtualMoney extends DBEntity {
 	 * Get montant prevue pour l'afilisation
 	 * @return  float
 	 */ 
-	public function getAffiliation() : float
+	public function getAffiliation() : ?float
 	{
 		return $this->affiliation;
 	}

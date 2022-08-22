@@ -73,10 +73,10 @@ $office = $_SESSION[SessionMemberFilter::MEMBER_CONNECTED_SESSION]->officeAccoun
         <!--/.info-box-->
     </div>
     
-    <?php if ($_REQUEST[MyOfficeController::ATT_CAN_SEND_RAPORT]) : ?>
+    <?php if ($office->getSoldAcceptWithdrawals() != 0) : ?>
     <div class="col-xs-12">
     	<div class="alert alert-info">
-    		<h2 class="alert-title">Alert</h2>
+    		<strong class="alert-title"><span class="glyphicon glyphicon-ok"></span> Information</strong>
     		<p>You have <?php echo "{$office->getSoldAcceptWithdrawals()} {$config->get('devise')}"; ?> that you have already made matched to the adhering members of the society. By clicking on the button below, the report will be sent directly to the hierarchy.</p>
     		<a class="btn btn-primary" href="/member/office/send-matched-money.html">
     			<span class="fa fa-send"></span> Send report

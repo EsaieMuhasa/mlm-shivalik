@@ -51,8 +51,8 @@ interface WithdrawalDAOManager extends OperationDAOManager
     /**
      * verifie si l'office as des operations qui y ont transiter
      * @param int $officeId
-     * @param bool $state
-     * @param bool $sended
+     * @param bool $state : le matching doit-t-il etre deja servie
+     * @param bool $sended :  le matching doit-t-il etre deja envoyer a l'adminitration centrale???
      * @return bool
      */
     public  function checkByOffice (int $officeId, ?bool $state = false, ?bool $sended=null, ?int $limit = null, int $offset = 0) : bool;
@@ -60,8 +60,8 @@ interface WithdrawalDAOManager extends OperationDAOManager
     /**
      * renvoie les operations qui ont transiter par l'office en premier parametre
      * @param int $officeId
-     * @param bool $state
-     * @param bool $sended
+     * @param bool $state : le matching doit-t-il etre deja servie
+     * @param bool $sended :  le matching doit-t-il etre deja envoyer a l'adminitration centrale???
      * @param int $limit
      * @param int $offset
      * @return Withdrawal[]

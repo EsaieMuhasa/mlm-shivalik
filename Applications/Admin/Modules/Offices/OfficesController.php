@@ -4,8 +4,10 @@ namespace Applications\Admin\Modules\Offices;
 
 use Applications\Admin\AdminController;
 use Core\Shivalik\Entities\Office;
+use Core\Shivalik\Entities\OfficeAdmin;
 use Core\Shivalik\Entities\OfficeSize;
 use Core\Shivalik\Entities\VirtualMoney;
+use Core\Shivalik\Entities\Withdrawal;
 use Core\Shivalik\Managers\AuxiliaryStockDAOManager;
 use Core\Shivalik\Managers\CommandDAOManager;
 use Core\Shivalik\Managers\CountryDAOManager;
@@ -14,7 +16,6 @@ use Core\Shivalik\Managers\OfficeAdminDAOManager;
 use Core\Shivalik\Managers\OfficeDAOManager;
 use Core\Shivalik\Managers\OfficeSizeDAOManager;
 use Core\Shivalik\Managers\ProductDAOManager;
-use Core\Shivalik\Managers\RaportWithdrawalDAOManager;
 use Core\Shivalik\Managers\RequestVirtualMoneyDAOManager;
 use Core\Shivalik\Managers\SizeDAOManager;
 use Core\Shivalik\Managers\StockDAOManager;
@@ -121,11 +122,6 @@ class OfficesController extends AdminController {
 	private $requestVirtualMoneyDAOManager;
 	
 	/**
-	 * @var RaportWithdrawalDAOManager
-	 */
-	private $raportWithdrawalDAOManager;
-	
-	/**
 	 * @var StockDAOManager
 	 */
 	private $stockDAOManager;
@@ -177,6 +173,9 @@ class OfficesController extends AdminController {
 				$response->sendError();
 			}
 			
+			/**
+			 * @var Office $office
+			 */
 			$office = $this->officeDAOManager->findById($id);
 			if ($office->isCentral()) {
 			    $response->sendError("No matched ressource at this URL: {$request->getURI()}");
@@ -295,6 +294,9 @@ class OfficesController extends AdminController {
 				$response->sendError();
 			}
 			
+			/**
+			 * @var OfficeAdmin $admin
+			 */
 			$admin = $this->officeAdminDAOManager->findById($id);
 			if ($admin->getOffice()->getId() != $this->office->getId()) {
 				$response->sendError();
@@ -422,6 +424,9 @@ class OfficesController extends AdminController {
 	        $response->sendError("no data match at request URL");
 	    }
 	    
+		/**
+		 * @var Withdrawal $withdrawal
+		 */
 	    $withdrawal = $this->withdrawalDAOManager->findById($id);
 	    if ($withdrawal->getAdmin() != null) {
 	        $response->sendError("no data match at request URL");
@@ -433,7 +438,7 @@ class OfficesController extends AdminController {
         $request->addAttribute($form::FIELD_OFFICE, $office);
         $form->redirectAfterValidation($request);
         
-        $request->addToast($form->buildAppMessage());
+        $request->addToast($form->buildToastMessage());
         $response->sendRedirect("/admin/offices/{$office}/withdrawals/");
 	}
 	

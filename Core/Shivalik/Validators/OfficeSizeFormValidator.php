@@ -75,6 +75,7 @@ class OfficeSizeFormValidator extends DefaultFormValidator {
 	/**
 	 * {@inheritDoc}
 	 * @see \PHPBackend\Validator\FormValidator::createAfterValidation()
+	 * @return OfficeSize
 	 */
 	public function createAfterValidation(Request $request) {
 		$os = new OfficeSize();

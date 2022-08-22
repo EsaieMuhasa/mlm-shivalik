@@ -4,10 +4,10 @@ namespace Applications\Member\Modules\MyOffice;
 use Core\Shivalik\Entities\Member;
 use Core\Shivalik\Entities\Office;
 use Core\Shivalik\Entities\RaportWithdrawal;
+use Core\Shivalik\Entities\RequestVirtualMoney;
 use Core\Shivalik\Filters\SessionMemberFilter;
 use Core\Shivalik\Managers\GradeMemberDAOManager;
 use Core\Shivalik\Managers\MemberDAOManager;
-use Core\Shivalik\Managers\RaportWithdrawalDAOManager;
 use Core\Shivalik\Managers\RequestVirtualMoneyDAOManager;
 use Core\Shivalik\Managers\VirtualMoneyDAOManager;
 use Core\Shivalik\Managers\WithdrawalDAOManager;
@@ -76,11 +76,6 @@ class MyOfficeController extends HTTPController
     private $requestVirtualMoneyDAOManager;
     
     /**
-     * @var RaportWithdrawalDAOManager
-     */
-    private $raportWithdrawalDAOManager;
-    
-    /**
      * @var Office
      */
     private $office;
@@ -123,8 +118,6 @@ class MyOfficeController extends HTTPController
         }
         
         $this->office->setWithdrawals($withdrawals);
-        
-        $request->addAttribute(self::ATT_CAN_SEND_RAPORT, $this->raportWithdrawalDAOManager->canSendRaport($this->office->getId()));
         $request->addAttribute(self::ATT_COUNT_MEMEBERS, $nombreMembre);
     }
     
@@ -138,10 +131,10 @@ class MyOfficeController extends HTTPController
         
         $limit = $request->existInGET("limit")? intval($request->getDataGET("limit"), 10) : intval($request->getApplication()->getConfig()->get('limitCashout')->getValue(), 10);
         $offset = $request->existInGET('offset')? intval($request->getDataGET('offset'), 10) : 0;
-        $count = $this->withdrawalDAOManager->countByOffice($this->office->getId(), null, false);
+        $count = $this->withdrawalDAOManager->countByOffice($this->office->getId(), null, null);
         
-        if ($this->withdrawalDAOManager->checkByOffice($this->office->getId(), null, false, $limit, $offset)) {
-            $cashouts = $this->withdrawalDAOManager->findByOffice($this->office->getId(), null, false, $limit, $offset);
+        if ($this->withdrawalDAOManager->checkByOffice($this->office->getId(), null, null, $limit, $offset)) {
+            $cashouts = $this->withdrawalDAOManager->findByOffice($this->office->getId(), null, null, $limit, $offset);
             $request->addAttribute(self::ATT_WITHDRAWALS, $cashouts);
         }else {
             $request->addAttribute(self::ATT_WITHDRAWALS, array());
@@ -205,15 +198,13 @@ class MyOfficeController extends HTTPController
      * @param Response $response
      */
     public function executeSendRaportWithdrawals(Request $request, Response $response) : void {
-        if (!$this->raportWithdrawalDAOManager->canSendRaport($this->office->getId()) || !$this->withdrawalDAOManager->checkByOffice($this->office->getId(), true)) {
+        if (!$this->withdrawalDAOManager->checkByOffice($this->office->getId(), true, false)) {
             $response->sendError("impossible to perform this operation because it is active for a precise time limit.");
         }
-        $withdrawals = $this->withdrawalDAOManager->findByOffice($this->office->getId(), true);
-        
-        $raport = new RaportWithdrawal();
-        $raport->setOffice($this->office);
-        $raport->setWithdrawals($withdrawals);
-        $this->raportWithdrawalDAOManager->create($raport);
+        $request->addAttribute(self::ATT_OFFICE, $this->office);
+        $form = new RequestVirtualMoneyFormValidator($this->getDaoManager());
+        $raport = $form->sendMatchingAfterValidation($request);
+        $request->addToast($form->buildToastMessage());
         $response->sendRedirect("/member/office/");
     }
     
@@ -278,11 +269,11 @@ class MyOfficeController extends HTTPController
         
         $date = null;
         
-        if ($request->existGET('date')) {
+        if ($request->existInGET('date')) {
             $date = new \DateTime($request->getDataGET('date'));
             $month = new Month(intval($date->format('m'), 10), intval($date->format('Y'), 10));
             $month->addSelectedDate($date);
-        }elseif ($request->existGET('month')) {
+        }elseif ($request->existInGET('month')) {
             $month = new Month(intval($request->getDataGET('month'), 10), intval($request->getDataGET('year'), 10));
         }else {
             $month = new Month();
