@@ -118,7 +118,7 @@ interface Request extends ApplicationComponent
      * @param string $name
      * @param mixed $value
      */
-    public function addAttribute (string $name, $value) : void;
+    public function addAttribute (string $name, $value) : Request;
     
     /**
      * revoie l'attribut associer au name en parametre

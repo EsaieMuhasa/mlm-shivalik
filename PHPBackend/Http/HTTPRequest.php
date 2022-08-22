@@ -84,6 +84,7 @@ final class HTTPRequest implements Request
      */
     public function fileExist(string $name): bool
     {
+        return $this->existInFILES($name);
     }
 
     /**
@@ -312,9 +313,10 @@ final class HTTPRequest implements Request
      * @param string $value la valuer de l'attribut
      * @return void
      */
-    public function addAttribute($name, $value) : void
+    public function addAttribute($name, $value) : Request
     {
         $_REQUEST[$name] = $value;
+        return $this;
     }
     
     /**
@@ -363,7 +365,7 @@ final class HTTPRequest implements Request
      * @return \PHPBackend\File\UploadedFile
      */
     public function getUloadedFile($key){
-        $file= new UploadedFile($this->existInFILE($key)? $_FILES[$key] : array());
+        $file= new UploadedFile($this->fileExist($key)? $_FILES[$key] : array());
         return $file;
     }
     
