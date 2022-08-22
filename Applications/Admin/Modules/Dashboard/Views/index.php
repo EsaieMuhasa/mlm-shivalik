@@ -167,6 +167,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
 						<td><?php echo $raport->affiliation; ?></td>
 						<td><?php echo $raport->product; ?></td>
 						<td></td>
+						<td></td>
 					</tr>
 					<?php endforeach; ?>
 				</tbody>
