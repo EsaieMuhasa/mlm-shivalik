@@ -34,7 +34,7 @@ class Size extends DBEntity
     }
 
     /**
-     * @return number
+     * @return float
      */
     public function getPercentage() : ?float
     {

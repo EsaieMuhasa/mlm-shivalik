@@ -31,7 +31,7 @@ abstract class Operation extends DBEntity
     }
 
     /**
-     * @return number
+     * @return float
      */
     public function getAmount() : ?float
     {

@@ -163,7 +163,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
 					<tr>
 						<td><?php echo $raport->dateAjout->format('D, d M Y \a\t H:i'); ?></td>
 						<td></td>
-						<td><?php //echo $raport->dateAjout->format('D, d M Y \a\t H:i'); ?></td>
+						<td><?php echo $raport->dateAjout->format('D, d M Y \a\t H:i'); ?></td>
 						<td></td>
 					</tr>
 					<?php endforeach; ?>

@@ -14,7 +14,7 @@ class VirtualMoney extends DBEntity {
 
 	/**
 	 * le montant virtuele accoder
-	 * @var number
+	 * @var float
 	 * @deprecated les histoires des dettes ne doivent plus etre prise en charge.
 	 * c'est ainsi que le montant prevue pour les afiliations, et celuis d'achat des produits, doivent etre separer
 	 */
@@ -22,43 +22,43 @@ class VirtualMoney extends DBEntity {
 	
 	/**
 	 * Corespond au produit expedier
-	 * @var number
+	 * @var float
 	 */
 	private $product = 0;
 	
 	/**
 	 * le nontant utilisatble pour le compte produit
-	 * @var number
+	 * @var float
 	 */
 	private $availableProduct = 0;
 	
 	/**
 	 * Montant utilisable pour le compte affiliation
-	 * @var number
+	 * @var float
 	 */
 	private $availableAfiliate = 0;
 	
 	/**
 	 * le montant deja utiliserpour le compte produit
-	 * @var integer
+	 * @var float
 	 */
 	private $usedProduct = 0;
 	
 	/**
 	 * Montant deja utiliser pour le compte afiliation
-	 * @var integer
+	 * @var float
 	 */
 	private $usedAfiliate = 0;
 	
 	/**
 	 * Correspond au montant prevue pour l'afiliation
-	 * @var number
+	 * @var float
 	 */
 	private $afiliate = 0;
 	
 	/**
 	 * montant virtuel accorder
-	 * @var number
+	 * @var float
 	 * @deprecated
 	 */
 	private $expected;
@@ -112,11 +112,11 @@ class VirtualMoney extends DBEntity {
     }
 
     /**
-	 * @return number
+	 * @return float
 	 * @deprecated pour de raison de changement logique,
 	 * le champs amount ne dois plus etre utiliser.
 	 */
-	public function getAmount() : int {
+	public function getAmount() : float {
 		return $this->amount;
 	}
 
@@ -219,10 +219,10 @@ class VirtualMoney extends DBEntity {
     
     /**
      * Revoie le solde des operations qui ont toucher le montant attendue
-     * @return int
+     * @return float
      * @deprecated les dettes ne sont plus admisent
      */
-    public function getSoldDebts () : int {
+    public function getSoldDebts () : float {
         $sold = 0;
         foreach ($this->getDebts() as $debt) {//la dette touche uniquement l'adhession
             $sold += $debt->getMembership();
@@ -231,21 +231,21 @@ class VirtualMoney extends DBEntity {
     }
     
     /**
-     * @return number
+     * @return float
      */
-    public function getProduct () : int{
+    public function getProduct () : float{
         return $this->product;
     }
 
     /**
-     * @return number
+     * @return float
      */
-    public function getAfiliate () : int{
+    public function getAfiliate () : float{
         return $this->afiliate;
     }
 
     /**
-     * @param number $product
+     * @param float $product
      */
     public function setProduct ($product) : void{
         $this->product = $product;
@@ -278,9 +278,9 @@ class VirtualMoney extends DBEntity {
     
     /**
      * renvoie le nontant utilisable pour le compte produit
-     * @return number
+     * @return float
      */
-    public function getAvailableProduct() : int{
+    public function getAvailableProduct() : ?float{
         if ($this->availableProduct === null) {
             $this->availableProduct = $this->product;
         }
@@ -289,9 +289,9 @@ class VirtualMoney extends DBEntity {
 
     /**
      * renvoie le montant utilisable pour le compte affiliation
-     * @return number
+     * @return float
      */
-    public function getAvailableAfiliate() : int {
+    public function getAvailableAfiliate() : ?float {
         if($this->availableAfiliate === null) {
             $this->availableAfiliate = $this->afiliate;
         }
@@ -300,7 +300,7 @@ class VirtualMoney extends DBEntity {
     
     /**
      * renvoie le montant deja utiliser pour le compte produit
-     * @return number
+     * @return float
      */
     public function getUsedProduct() : int{
         if ($this->usedProduct === null) {
@@ -311,9 +311,9 @@ class VirtualMoney extends DBEntity {
 
     /**
      * renvoie le montant deja utiliser pour le compte afiliation
-     * @return number
+     * @return float
      */
-    public function getUsedAfiliate() : int{
+    public function getUsedAfiliate() : float{
         if ($this->usedAfiliate === null) {
             return 0;
         }
