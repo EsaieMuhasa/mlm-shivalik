@@ -6,6 +6,7 @@ use Applications\Admin\AdminController;
 use Core\Shivalik\Entities\Office;
 use Core\Shivalik\Entities\OfficeAdmin;
 use Core\Shivalik\Entities\OfficeSize;
+use Core\Shivalik\Entities\RequestVirtualMoney;
 use Core\Shivalik\Entities\VirtualMoney;
 use Core\Shivalik\Entities\Withdrawal;
 use Core\Shivalik\Managers\AuxiliaryStockDAOManager;
@@ -30,6 +31,8 @@ use PHPBackend\Application;
 use PHPBackend\Request;
 use PHPBackend\Response;
 use PHPBackend\Calendar\Month;
+use PHPBackend\Dao\DAOException;
+use PHPBackend\ToastMessage;
 
 /**
  * @author Esaie MUHASA
@@ -209,7 +212,7 @@ class OfficesController extends AdminController {
 		 */
 		foreach ($offices as $office) {
 		    if ($this->officeSizeDAOManager->checkByOffice($office->getId())) {
-    		    $office->setOfficeSize($this->officeSizeDAOManager->findCurrentByOffice($office->getId()));
+    		    $office->setSize($this->officeSizeDAOManager->findCurrentByOffice($office->getId()));
 		    }
 		}
 		
@@ -475,7 +478,44 @@ class OfficesController extends AdminController {
 	public function executeSendVirtualMoney (Request $request, Response $response) : void {
 		$request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_VIRTUAL_MONEY);
 		
-	    $virtual = new VirtualMoney();
+		$virtual = new VirtualMoney();
+		//dans le cas où le forfait qui doit etre envoyer est lié à une demande X
+		if ($request->existInGET('request')) {
+			$id = intval($request->getDataGET('request'), 10);
+			if(!$this->requestVirtualMoneyDAOManager->checkById($id)){
+				$response->sendError();
+			}
+
+			/**
+			 * @var RequestVirtualMoney $req
+			 */
+			$req = $this->requestVirtualMoneyDAOManager->findById($id);
+			if($req->getResponse() != null || $req->getOffice()->getId() != $this->office->getId()) {
+				$response->sendError();
+			}
+
+			$opt = $request->getDataGET('option');
+			//pour l'option d'annulation de la requette
+			if ($opt == 'dismiss') {
+				if (!$req->isDeleted()) {
+					try {
+						$this->requestVirtualMoneyDAOManager->moveToTrash($id);
+						$toast = new ToastMessage('Error', "Cancellation success beyond request", ToastMessage::MESSAGE_SUCCESS);
+						$request->addToast($toast);
+					} catch (DAOException $e) {
+						$toast = new ToastMessage('Error', $e->getMessage(), ToastMessage::MESSAGE_ERROR);
+						$request->addToast($toast);
+					}
+				}
+				$response->sendRedirect("/admin/offices/{$this->office->id}/");
+			}
+
+			$virtual->setProduct($req->getProduct());
+			$virtual->setAfiliate($req->getAffiliation());
+			$virtual->setRequest($req);
+			$request->addAttribute(VirtualMoneyFormValidator::FIELD_REQUEST_MONEY, $req);
+		}
+		
 		
 		if ($request->getMethod() == Request::HTTP_POST) {
 			$form = new VirtualMoneyFormValidator($this->getDaoManager());

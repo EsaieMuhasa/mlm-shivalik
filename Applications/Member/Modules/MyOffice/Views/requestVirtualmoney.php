@@ -25,14 +25,26 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
     		<?php }?>
     		<div class="row">
     			<div class="col-xs-12 col-md-6">
-            		<div class="form-group <?php echo (isset($_REQUEST['errors']['amount'])? 'has-error':'');?>">
-            			<label class="form-label" for="amount-office">Amount <span class="text-danger">*</span></label>
+            		<div class="form-group <?php echo (isset($_REQUEST['errors']['product'])? 'has-error':'');?>">
+            			<label class="form-label" for="product-office">Product account <span class="text-danger">*</span></label>
             			<div class="input-group">
-                			<input type="text" name="amount"  value="<?php echo htmlspecialchars(isset($_REQUEST['virtualMoney'])? $_REQUEST['virtualMoney']->amount:'');?>" id="amount-office" class="form-control" autocomplete="off"/>
+                			<input type="number" name="product"  value="<?php echo htmlspecialchars(isset($_REQUEST['virtualMoney'])? $_REQUEST['virtualMoney']->product:'');?>" id="product-office" class="form-control" autocomplete="off"/>
             				<span class="input-group-addon"><?php echo $config->get('devise'); ?></span>
             			</div>
             			<?php if (isset($_REQUEST['errors']['amount'])){?>
             			<p class="help-block"><?php echo htmlspecialchars($_REQUEST['errors']['amount']);?></p>
+            			<?php }?>
+            		</div>
+    			</div>
+    			<div class="col-xs-12 col-md-6">
+            		<div class="form-group <?php echo (isset($_REQUEST['errors']['affiliation'])? 'has-error':'');?>">
+            			<label class="form-label" for="affiliation-office">Membership account <span class="text-danger">*</span></label>
+            			<div class="input-group">
+                			<input type="number" name="affiliation"  value="<?php echo htmlspecialchars(isset($_REQUEST['virtualMoney'])? $_REQUEST['virtualMoney']->affiliation:'');?>" id="amount-office" class="form-control" autocomplete="off"/>
+            				<span class="input-group-addon"><?php echo $config->get('devise'); ?></span>
+            			</div>
+            			<?php if (isset($_REQUEST['errors']['affiliation'])){?>
+            			<p class="help-block"><?php echo htmlspecialchars($_REQUEST['errors']['affiliation']);?></p>
             			<?php }?>
             		</div>
     			</div>

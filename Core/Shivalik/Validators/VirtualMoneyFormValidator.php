@@ -42,7 +42,7 @@ class VirtualMoneyFormValidator extends DefaultFormValidator {
 	private $officeSizeDAOManager;
 	
 	/**
-	 * @param number $amount
+	 * @param float $amount
 	 * @throws IllegalFormValueException
 	 */
 	private function validationAmount ($amount) : void {
@@ -56,7 +56,7 @@ class VirtualMoneyFormValidator extends DefaultFormValidator {
 	
 	/**
 	 * validation du montant d'afficliation
-	 * @param number $amount
+	 * @param float $amount
 	 * @throws IllegalFormValueException
 	 */
 	private function validationAfiliateAmount ($amount) : void {
@@ -96,21 +96,6 @@ class VirtualMoneyFormValidator extends DefaultFormValidator {
 	}
 	
 	/**
-	 * @param VirtualMoney $money
-	 * @param number $amount
-	 * @deprecated le amount n'est plus d'actualite, et sera suprimer dans la table d'ici quelque jours
-	 */
-	private function processingAmount (VirtualMoney $money, $amount) : void {
-		try {
-			$this->validationAmount($amount);
-		} catch (IllegalFormValueException $e) {
-			$this->addError(self::FIELD_AMOUNT, $e->getMessage());
-		}
-		$money->setAmount($amount);
-		$money->setExpected($amount);
-	}
-	
-	/**
 	 * {@inheritDoc}
 	 * @see \PHPBackend\Validator\FormValidator::createAfterValidation()
 	 * @return VirtualMoney
@@ -143,7 +128,7 @@ class VirtualMoneyFormValidator extends DefaultFormValidator {
 			    }
 			    
 			    $money->setBonus($bonus);
-			    
+			    $money->setRequest($request->getAttribute(self::FIELD_REQUEST_MONEY));
 				$this->virtualMoneyDAOManager->create($money);
 			} catch (DAOException $e) {
 				$this->setMessage($e->getMessage());

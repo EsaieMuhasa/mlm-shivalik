@@ -78,7 +78,6 @@ class VirtualMoney extends DBEntity {
 	
 	/**
 	 * @var RequestVirtualMoney
-	 * @deprecated
 	 */
 	private $request;
 	
@@ -150,8 +149,6 @@ class VirtualMoney extends DBEntity {
 	
     /**
      * @return RequestVirtualMoney
-     * @deprecated pour de raison de changement de logique de gestion de virtuel, cette medode n'est plus d'actualite
-     * et dans bon nombre des cas, il renvera NULL
      */
     public function getRequest() : ?RequestVirtualMoney
     {
@@ -160,8 +157,6 @@ class VirtualMoney extends DBEntity {
 
     /**
      * @param RequestVirtualMoney $request
-     * @deprecated pour des raison de changement de logique de gestion des virtuel, cette medode n'auras plus d'effet sur 
-     * l'etat d'un instance de cette classe
      */
     public function setRequest($request): void {
         if ($request instanceof RequestVirtualMoney || $request == null) {
@@ -233,14 +228,14 @@ class VirtualMoney extends DBEntity {
     /**
      * @return float
      */
-    public function getProduct () : float{
+    public function getProduct () : ?float{
         return $this->product;
     }
 
     /**
      * @return float
      */
-    public function getAfiliate () : float{
+    public function getAfiliate () : ?float{
         return $this->afiliate;
     }
 
@@ -248,6 +243,9 @@ class VirtualMoney extends DBEntity {
      * @param float $product
      */
     public function setProduct ($product) : void{
+        if($product == null){
+            $product = 0;
+        }
         $this->product = $product;
     }
 
@@ -255,6 +253,9 @@ class VirtualMoney extends DBEntity {
      * @param number $afiliate
      */
     public function setAfiliate ($afiliate) : void {
+        if($afiliate == null){
+            $afiliate = 0;
+        }
         $this->afiliate = @intval($afiliate, 10);
     }
     
@@ -399,8 +400,6 @@ class VirtualMoney extends DBEntity {
     protected function setUsedAfiliate($usedAfiliate) : void {
         $this->usedAfiliate = $usedAfiliate !== null? @intval($usedAfiliate, 10): $usedAfiliate;
     }
-
-
 
 }
 

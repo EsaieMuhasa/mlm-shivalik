@@ -47,6 +47,11 @@ class RequestVirtualMoney extends DBEntity {
      */
     private $withdrawals = [];
 
+	/**
+	 * le nombre d'operation de matching qui font reference au rapport
+	 * @var int
+	 */
+	private $withdrawalsCount = 0;
 	
     /**
      * @return Withdrawal[]
@@ -67,6 +72,7 @@ class RequestVirtualMoney extends DBEntity {
 			$product += $w->getAmount();
 		}
 		$this->product = $product;
+		$this->withdrawalsCount = count($withdrawals);
     }
 	
 	/**
@@ -160,6 +166,23 @@ class RequestVirtualMoney extends DBEntity {
 	public function setAffiliation(float $affiliation) : void
 	{
 		$this->affiliation = $affiliation;
+	}
+
+	/**
+	 * Get the value of withdrawalsCount
+	 */ 
+	public function getWithdrawalsCount() : int
+	{
+		return $this->withdrawalsCount;
+	}
+
+	/**
+	 * Set the value of withdrawalsCount
+	 * @return  self
+	 */ 
+	public function setWithdrawalsCount(int $withdrawalsCount) : void
+	{
+		$this->withdrawalsCount = $withdrawalsCount;
 	}
 }
 

@@ -42,6 +42,7 @@ class VirtualMoneyDAOManagerImplementation1 extends DefaultDAOInterface implemen
             'product' => $entity->getProduct(),
             'afiliate' => $entity->getAfiliate(),
 			'office' => $entity->getOffice()->getId(),
+			'request' => $entity->getRequest() != null? $entity->getRequest()->getId() : null,
             self::FIELD_DATE_AJOUT => $entity->getFormatedDateAjout()            
         ]);
 		$entity->setId($id); 

@@ -172,7 +172,7 @@ class DAOManagerFactory
      * Recuperation du manager d'un entite
      * @param string $name
      * @throws PHPBackendException
-     * @return \PHPBackend\Dao\DAOInterface
+     * @return \PHPBackend\Dao\DAOInterface|DefaultDAOInterface
      */
     public function getManagerOf($name) : DAOInterface
     {

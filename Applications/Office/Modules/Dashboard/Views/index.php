@@ -27,7 +27,7 @@ $office = $_SESSION[SessionOfficeFilter::OFFICE_CONNECTED_SESSION]->getOffice();
 <hr/>
 <div class="panel panel-default">
 	<div class="panel-heading">
-		<h2 class="panel-title">My office</h2>
+		<h2 class="panel-title">Count of operations on adhering members</h2>
 	</div>
 	<div class="panel-body">
 		<div class="row">
@@ -49,26 +49,35 @@ $office = $_SESSION[SessionOfficeFilter::OFFICE_CONNECTED_SESSION]->getOffice();
 		    </div>
 		</div>
 		
+	</div>
+</div>
+
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h2 class="panel-title">matching operations</h2>
+	</div>
+	<div class="panel-body">
 		<div class="row">
-		    <div class="col-sm-6 col-xs-12">
-		        <div class="info-box blue-bg">
-		            <i class="fa fa-money"></i>
-		            <div class="count"><?php echo "{$office->getSoldRequestWithdrawals()} {$config->get('devise')}"; ?></div>
-		            <div class="title">Requested</div>
-		        </div>
-		        <!--/.info-box-->
-		    </div>
-		    <div class="col-sm-6 col-xs-12">
-		        <div class="info-box blue-bg">
-		            <i class="glyphicon glyphicon-ok-circle"></i>
-		            <div class="count"><?php echo "{$office->getSoldAcceptWithdrawals()} {$config->get('devise')}"; ?></div>
-		            <div class="title">Served</div>
-		        </div>
-		        <!--/.info-box-->
-		    </div>
+			<div class="col-sm-6 col-xs-12">
+				<div class="info-box blue-bg">
+					<i class="fa fa-money"></i>
+					<div class="count"><?php echo "{$office->getSoldRequestWithdrawals()} {$config->get('devise')}"; ?></div>
+					<div class="title">Requested</div>
+				</div>
+				<!--/.info-box-->
+			</div>
+			<div class="col-sm-6 col-xs-12">
+				<div class="info-box blue-bg">
+					<i class="glyphicon glyphicon-ok-circle"></i>
+					<div class="count"><?php echo "{$office->getSoldAcceptWithdrawals()} {$config->get('devise')}"; ?></div>
+					<div class="title">Served</div>
+				</div>
+				<!--/.info-box-->
+			</div>
 		</div>
 	</div>
 </div>
+
 <div class="panel panel-default">
 	<div class="panel-heading">
 		<h2 class="panel-title">Virtual money</h2>

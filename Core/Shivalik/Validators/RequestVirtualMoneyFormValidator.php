@@ -116,38 +116,40 @@ class RequestVirtualMoneyFormValidator extends DefaultFormValidator {
 	/**
 	 * {@inheritDoc}
 	 * @see \PHPBackend\Validator\FormValidator::createAfterValidation()
+	 * @return RequestVirtualMoney
 	 */
 	public function createAfterValidation(Request $request) {
 		$rv = new RequestVirtualMoney();
 		
 		$product = $request->getDataPOST(self::FIELD_PRODUCT);
 		$affiliation = $request->getDataPOST(self::FIELD_AFFILIATION);
-
+		
 		$password = $request->getDataPOST('password');
 		
 		$this
-			->processingProduct($rv, $product)
+		->processingProduct($rv, $product)
 			->processingAffiliation($rv, $affiliation);
-		
-	    if (sha1($password) != $request->getSession()->getAttribute(SessionMemberFilter::MEMBER_CONNECTED_SESSION)->getPassword()) {
-	        $this->addError('password', 'invalid password');
-	    }
-		if (!$this->hasError()) {
-			try {
-				$rv->setOffice($request->getAttribute(self::FIELD_OFFICE));
-				$this->requestVirtualMoneyDAOManager->create($rv);
-			} catch (DAOException $e) {
-				$this->setMessage($e->getMessage());
-		    }
+			
+			if (sha1($password) != $request->getSession()->getAttribute(SessionMemberFilter::MEMBER_CONNECTED_SESSION)->getPassword()) {
+				$this->addError('password', 'invalid password');
+			}
+			if (!$this->hasError()) {
+				try {
+					$rv->setOffice($request->getAttribute(self::FIELD_OFFICE));
+					$this->requestVirtualMoneyDAOManager->create($rv);
+				} catch (DAOException $e) {
+					$this->setMessage($e->getMessage());
+				}
 		}
 		
 		$this->result = $this->hasError()? "Failed to send request":"Successful sending of the request";
 		return $rv;
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 * @see \PHPBackend\Validator\FormValidator::updateAfterValidation()
+	 * @return RequestVirtualMoney
 	 */
 	public function updateAfterValidation(Request $request) {
 		throw new PHPBackendException("unsuported operation");

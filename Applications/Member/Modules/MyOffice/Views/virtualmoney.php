@@ -85,7 +85,7 @@ $requests = $_REQUEST[MyOfficeController::ATT_VIRTUAL_MONEYS];
                     <?php if ($request->getProduct() != 0) : ?>
                     <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
                         <div class="info-box blue-bg">
-                            <i class="glyphicon glyphicon-time"></i>
+                            <i class="glyphicon glyphicon-leaf"></i>
                             <div class="count"><?php echo ("{$request->getProduct()} {$config->get('devise')}"); ?></div>
                             <div class="title">product</div>
                         </div>
@@ -96,7 +96,7 @@ $requests = $_REQUEST[MyOfficeController::ATT_VIRTUAL_MONEYS];
                     <?php if ($request->getAffiliation() != 0) : ?>
                     <div class="col-lg-6 col-md-4 col-sm-6 col-xs-12">
                         <div class="info-box blue-bg">
-                            <i class="glyphicon glyphicon-users"></i>
+                            <i class="fa fa-users"></i>
                             <div class="count"><?php echo ("{$request->getAffiliation()} {$config->get('devise')}"); ?></div>
                             <div class="title">Affiliation</div>
                         </div>

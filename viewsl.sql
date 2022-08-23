@@ -93,6 +93,20 @@ CREATE OR REPLACE VIEW V_MonthlyOrder AS
         (SELECT (SUM(V_Command.amount)) FROM V_Command WHERE V_Command.monthlyOrder = MonthlyOrder.id) AS amount
     FROM MonthlyOrder;-- INNER JOIN Command ON Command.monthlyOrder = MonthlyOrder.id;
 
+CREATE OR REPLACE VIEW V_RequestVirtualMoney AS
+    SELECT DISTINCT
+        RequestVirtualMoney.id AS id,
+        RequestVirtualMoney.dateAjout AS dateAjout,
+        RequestVirtualMoney.dateModif AS dateModif,
+        RequestVirtualMoney.deleted AS deleted,
+        RequestVirtualMoney.amount AS amount,
+        RequestVirtualMoney.product AS product,
+        RequestVirtualMoney.affiliation AS affiliation,
+        RequestVirtualMoney.office AS office,
+        (SELECT VirtualMoney.id FROM VirtualMoney WHERE VirtualMoney.request = RequestVirtualMoney.id) AS `virtual`,
+        (SELECT COUNT(id) As nombre FROM Withdrawal WHERE Withdrawal.raport = RequestVirtualMoney.id) AS withdrawalsCount
+    FROM RequestVirtualMoney;
+
 CREATE OR REPLACE VIEW V_VirtualMoney AS
     SELECT DISTINCT
         VirtualMoney.id AS id,
@@ -104,6 +118,7 @@ CREATE OR REPLACE VIEW V_VirtualMoney AS
         VirtualMoney.product AS product,
         VirtualMoney.afiliate AS afiliate,
         VirtualMoney.office AS office,
+        VirtualMoney.request AS request,
         (
             SELECT (VirtualMoney.product - (SUM(MoneyGradeMember.product))) FROM MoneyGradeMember WHERE MoneyGradeMember.virtualMoney = VirtualMoney.id
         ) AS availableProduct,

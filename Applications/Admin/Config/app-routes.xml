@@ -68,7 +68,7 @@
 		
 		<route action="virtualmoney" urlPattern="/admin/offices/([0-9]+)/virtualmoney/" paramsNames="id"/>
 		<route action="sendVirtualmoney" urlPattern="/admin/offices/([0-9]+)/virtualmoney/send\.html" paramsNames="id"/>
-		<route action="sendVirtualmoney" urlPattern="/admin/offices/([0-9]+)/virtualmoney/([0-9]+)/send\.html" paramsNames="id,request"/>
+		<route action="sendVirtualmoney" urlPattern="/admin/offices/([0-9]+)/virtualmoney/([0-9]+)/(accept|dismiss)\.html" paramsNames="id,request,option"/>
 		
 		<route action="history" urlPattern="/admin/offices/([0-9]+)/history/" paramsNames="id"/>
 		<route action="history" urlPattern="/admin/offices/([0-9]+)/history/([0-9]{1,2}-[0-9]{1,2}-[0-9]{4})\.html" paramsNames="id,date"/>

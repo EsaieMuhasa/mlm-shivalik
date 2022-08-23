@@ -34,25 +34,39 @@ class RequestVirtualMoneyDAOManagerImplementation1 extends DefaultDAOInterface i
      * @see \PHPBackend\Dao\DAOInterface::createInTransaction()
 	 * @param RequestVirtualMoney $entity
      */
+	/**
+     * {@inheritDoc}
+     * @see \PHPBackend\Dao\DAOInterface::createInTransaction()
+	 * @param RequestVirtualMoney $entity
+     */
     public function createInTransaction($entity, \PDO $pdo): void
     {
         $id = UtilitaireSQL::insert($pdo, $this->getTableName(), [
-			'office' => $entity->getOffice()->getId(),
+            'office' => $entity->getOffice()->getId(),
 			'product' => $entity->getProduct(),
 			'affiliation' => $entity->getAffiliation(),
             self::FIELD_DATE_AJOUT => $entity->getFormatedDateAjout()
         ]);
 		$entity->setId($id);
-
+        
         if (!empty($entity->getWithdrawals())) {
             $sql = 'UPDATE Withdrawal SET raport = :raport, dateModif = NOW() WHERE id IN (';
             foreach ($entity->getWithdrawals() as $w) {
                 $sql .= " {$w->getId()},";
             }
-
+            
             $sql = substr($sql, 0, strlen($sql) - 1).')';
             UtilitaireSQL::prepareStatement($pdo, $sql, ['raport' => $entity->getId()]);
         }
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \PHPBackend\Dao\DAOInterface::hasView()
+     */
+    protected function hasView(): bool
+    {
+        return true;
     }
 
     /**
@@ -129,8 +143,8 @@ class RequestVirtualMoneyDAOManagerImplementation1 extends DefaultDAOInterface i
      */
     public function findWaiting(?int $officeId = null)
     {
-        $FIELDS = "{$this->getTableName()}.id AS id, {$this->getTableName()}.office AS office, {$this->getTableName()}.dateAjout AS dateAjout, {$this->getTableName()}.dateModif AS dateModif, {$this->getTableName()}.deleted AS deleted, {$this->getTableName()}.amount AS amount";
-        $SQL = "SELECT {$FIELDS}  FROM {$this->getTableName()} LEFT JOIN VirtualMoney ON  {$this->getTableName()}.id = VirtualMoney.request WHERE VirtualMoney.request IS NULL ".($officeId!=null? "AND {$this->getTableName()}.office={$officeId}":"");
+        $FIELDS = "{$this->getViewName()}.id AS id, {$this->getViewName()}.office AS office, {$this->getViewName()}.dateAjout AS dateAjout, {$this->getViewName()}.dateModif AS dateModif, {$this->getViewName()}.deleted AS deleted, {$this->getViewName()}.amount AS amount, {$this->getViewName()}.product AS product, {$this->getViewName()}.affiliation AS affiliation, {$this->getViewName()}.withdrawalsCount AS withdrawalsCount";
+        $SQL = "SELECT {$FIELDS}  FROM {$this->getViewName()} LEFT JOIN VirtualMoney ON VirtualMoney.request = {$this->getViewName()}.id WHERE VirtualMoney.request IS NULL ".($officeId!=null? "AND {$this->getViewName()}.office={$officeId}":"");
         $return = array();
         try {
             $statementt = $this->getConnection()->prepare($SQL);
@@ -165,7 +179,7 @@ class RequestVirtualMoneyDAOManagerImplementation1 extends DefaultDAOInterface i
      */
     public function checkWaiting(?int $officeId = null): bool
     {
-        $SQL = "SELECT {$this->getTableName()}.id FROM {$this->getTableName()} LEFT JOIN VirtualMoney ON  {$this->getTableName()}.id = VirtualMoney.request WHERE VirtualMoney.request IS NULL ".($officeId!=null? "AND {$this->getTableName()}.office={$officeId}":"");
+        $SQL = "SELECT {$this->getTableName()}.id FROM {$this->getTableName()} LEFT JOIN VirtualMoney ON  VirtualMoney.request = {$this->getTableName()}.id WHERE VirtualMoney.request IS NULL ".($officeId!=null? "AND {$this->getTableName()}.office={$officeId}":"");
         $return = false;
         try {
             $statementt = $this->getConnection()->prepare($SQL);
@@ -212,7 +226,7 @@ class RequestVirtualMoneyDAOManagerImplementation1 extends DefaultDAOInterface i
      * @see \Core\Shivalik\Managers\RequestVirtualMoneyDAOManager::findByOffice()
      */
     public function findByOffice (int $officeId) {
-        return UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, array("office" => $officeId));
+        return UtilitaireSQL::findAll($this->getConnection(), $this->getViewName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, array("office" => $officeId));
     }
     
 
