@@ -103,7 +103,7 @@ class RequestVirtualMoneyFormValidator extends DefaultFormValidator {
 			$virtual->setWithdrawals($withdrawals);
 			try {
 				$this->requestVirtualMoneyDAOManager->create($virtual);
-				$this->setMessage("Report dated {$virtual->getFormatedDateAjout('d F Y')}. You have sent a report of {$virtual->getProduct()} USD to the Shivalik company. Thank you for the trust you have in the Shivalik company.");
+				$this->setMessage("Report dated {$virtual->getFormatedDateAjout('d F Y')}. You have sent a report of {$virtual->getProduct()} USD to the Shivalik company. Thank you for the trust you have in the Shivalik company.", false);
 			} catch (DAOException $e) {
 				$this->setMessage($e->getMessage());
 			}

@@ -103,8 +103,8 @@ class MyOfficeController extends HTTPController
         $request->addAttribute(self::ATT_ACTIVE_ITEM_MENU, self::ATT_ITEM_MENU_DASHBOARD);
         
         $nombreMembre = $this->memberDAOManager->countByOffice($this->office->getId());
-        if ($this->withdrawalDAOManager->checkByOffice($this->office->getId(), null)) {
-            $withdrawals = $this->withdrawalDAOManager->findByOffice($this->office->getId(), null);
+        if ($this->withdrawalDAOManager->checkByOffice($this->office->getId(), null, null)) {
+            $withdrawals = $this->withdrawalDAOManager->findByOffice($this->office->getId(), null, null);
         }else {
             $withdrawals = array();
         }
