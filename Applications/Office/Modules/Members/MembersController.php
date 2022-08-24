@@ -20,10 +20,10 @@ use Core\Shivalik\Validators\LocalisationFormValidator;
 use Core\Shivalik\Validators\MemberFormValidator;
 use PHPBackend\Application;
 use PHPBackend\Request;
-use PHPBackend\Response;
 use PHPBackend\ToastMessage;
 use PHPBackend\Http\HTTPController;
 use Core\Shivalik\Managers\OfficeDAOManager;
+use PHPBackend\Response;
 
 /**
  *
@@ -114,7 +114,7 @@ class MembersController extends HTTPController {
 		$application->getRequest()->addAttribute(self::PARAM_MEMBER_COUNT, $nombre);
 		$application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, "Union members");
 		
-		if ($application->getHttpRequest()->existGET('id')) {//
+		if ($application->getRequest()->existInGET('id')) {//
 			$id = intval($application->getRequest()->getDataGET('id'), 10);
 			$member = $this->memberDAOManager->findById($id);
 			$account = $this->getAccount($member);
@@ -356,7 +356,7 @@ class MembersController extends HTTPController {
 		$member = $this->memberDAOManager->findById($id);
 		
 		
-		if ($request->existGET('foot')) {
+		if ($request->existInGET('foot')) {
 			//chargement des downlines
 			switch ($request->getDataGET('foot')){
 				case 'left' : {//left

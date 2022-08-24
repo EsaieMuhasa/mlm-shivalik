@@ -157,6 +157,11 @@
 			name="\Core\Shivalik\Entities\Transfer" 
 			specification="\Core\Shivalik\Managers\TransferDAOManager" 
 			implementation="\Core\Shivalik\Managers\Implementation\TransferDAOManagerImplementation1"/>
+
+		<entity 
+			name="\Core\Shivalik\Entities\SellSheetIRow" 
+			specification="\Core\Shivalik\Managers\SellSheetIRowDAOManager" 
+			implementation="\Core\Shivalik\Managers\Implementation\SellSheetIRowDAOManagerImplementation1"/>
 			
 	</entities>
 </dao>

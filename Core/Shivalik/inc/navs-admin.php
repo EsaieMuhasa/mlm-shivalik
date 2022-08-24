@@ -16,13 +16,21 @@ $admin = $_SESSION[SessionAdminFilter::ADMIN_CONNECTED_SESSION];
 		</a>
 	</li>
 
-
 	<li>
 		<a href="/admin/">
     		<span class="nav-item-icon">
         		<span class="fa fa-home"></span>
     		</span>
     		<span class="nav-item-caption">Dashbord</span>
+		</a>
+	</li>
+
+	<li>
+		<a href="/admin/raports/">
+    		<span class="nav-item-icon">
+        		<span class="fa fa-book"></span>
+    		</span>
+    		<span class="nav-item-caption">Raports</span>
 		</a>
 	</li>
 	
