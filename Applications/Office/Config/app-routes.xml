@@ -21,7 +21,7 @@
 	 	<route action="index" urlPattern="/office/members/([0-9]+)-([0-9]+)\.html" paramsNames="limit,offset"/>
 	 	<route action="index" urlPattern="/office/members/(table|grid)/([0-9]+)-([0-9]+)\.html" paramsNames="affichage,limit,offset"/>
 	 	<route action="addMember" urlPattern="/office/members/add\.html"/>
-	 	<route action="affiliateMember" urlPattern="/office/members/([0-9]+)/affiliate\.html" paramsNames="id"/>
+	 	<route action="affiliateMember" urlPattern="/office/members/([0-9]+)/(affiliate)\.html" paramsNames="id,option"/>
 	 	
 	 	<route action="member" urlPattern="/office/members/([0-9]+)/" paramsNames="id"/>
 	 	<route action="upgradeMember" urlPattern="/office/members/([0-9]+)/(upgrade)\.html" paramsNames="id,option"/>

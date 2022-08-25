@@ -8,7 +8,7 @@ use Applications\Office\Modules\Members\MembersController;
 /**
  * @var Member $member
  */
-$member = $_REQUEST[MembersController::ATT_MEMBER];
+$member = isset($_REQUEST[MembersController::ATT_SPONSOR])? $_REQUEST[MembersController::ATT_SPONSOR] : $_REQUEST[MembersController::ATT_MEMBER];
 
 /**
  * @var Account $account
@@ -115,24 +115,33 @@ $option = isset($_GET['option'])? $_GET['option'] : null;
 	        	
 	        	<li class="<?php echo $option == 'upgrade'? 'active' : ''; ?>">
 					<a class="" href="/office/members/<?php echo $member->getId().'/'; ?>upgrade.html" title="upgrade account rang of <?php echo htmlspecialchars("{$member->getNames()}") ?>">
-						Upgrade
+						Upgrade account
 					</a>
 	        	</li>
+
+				<?php if ($option == 'affiliate')  : ?>
+	        	<li class="<?php echo $option == 'affiliate'? 'active' : ''; ?>">
+					<a class="" href="/office/members/<?php echo $member->getId().'/'; ?>affiliate.html" title="upgrade account rang of <?php echo htmlspecialchars("{$member->getNames()}") ?>">
+						Affiliate new member
+					</a>
+	        	</li>
+				<?php endif; ?>
+
 			</ul>
 		</div><!-- /.navbar-collapse -->
 	</div><!-- /.container-fluid -->
 </nav>
 
-<div class="row">	
-    <?php if (isset($_REQUEST[MembersController::ATT_MONTHLY_ORDER_FOR_ACCOUNT])) : ?>
+<?php if (isset($_REQUEST[MembersController::ATT_MONTHLY_ORDER_FOR_ACCOUNT]) &&  !isset($_REQUEST[MembersController::ATT_SPONSOR])) : ?>
+<div class="row">
     <?php 
     /**
      * @var MonthlyOrder $monthly
      */
     $monthly = $_REQUEST[MembersController::ATT_MONTHLY_ORDER_FOR_ACCOUNT]; ?>
-	<div class="<?php echo (($requestedGradeMember!=null)? 'col-sm-8':'col-sm-10'); ?> col-xs-12">
+	<div class="col-xs-12">
 		<div class="alert alert-info">
-			<strong><span class="glyphicon glyphicon-warning-sign"></span> Purchase accounting for the month of <?php echo $monthly->getFormatedDateAjout("M Y") ?> </strong>
+			<h3>Purchase accounting for the month of <?php echo $monthly->getFormatedDateAjout("F Y") ?> </h3>
 			<table class="table table-bordered table-condansed">
 				<tbody>
 					<tr>
@@ -158,6 +167,5 @@ $option = isset($_GET['option'])? $_GET['option'] : null;
 		</div>
 		
 	</div>
-    <?php endif; ?>
-	
 </div>
+<?php endif; ?>
