@@ -283,6 +283,9 @@ class MembersController extends HTTPController {
 	    
 	    if ($this->monthlyOrderDAOManager->checkByMemberOfMonth($member->getId())) {
 	        $monthly = $this->monthlyOrderDAOManager->findByMemberOfMonth($member->getId());
+			if($monthly->getAvailable() < 50) {
+				$response->sendRedirect("/office/members/{$id}/");
+			}
 	        $request->addAttribute(self::ATT_MONTHLY_ORDER_FOR_ACCOUNT, $monthly);
 	    } else {
 	        $response->sendRedirect("/office/members/{$id}/");

@@ -28,7 +28,7 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
 {
     
     /**
-     * @var MemberDAOManager
+     * @var MemberDAOManagerImplementation1
      */
     protected $memberDAOManager;
     
@@ -752,9 +752,14 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
         ]);
         $entity->setId($id);
 
+        /**
+         * dansle cas de l'affilisation sur le PV inscrit sur la fiche d'un membre, alors on
+         * ne doit plus soustraire ce montant sur le compte produit de l'office
+         */
         $moneyGrades = [];//les virtuels toucher pour l'operation
-        $resteProduct = $entity->getProduct();
+        $resteProduct = $entity->getMonthlyOrder() == null? $entity->getProduct() : 0;//verification monthly order pour n'est pas toucher le compte produit de l'office injustement
         $resteAfiliate = $entity->getMembership();
+
         foreach ($virtuals as $virtual) {
             $product = $virtual->getSubstractableToAvailableProduct($resteProduct);
             $afiliate = $virtual->getSubstractableToAvailableAfiliate($resteAfiliate);

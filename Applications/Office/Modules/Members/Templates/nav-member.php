@@ -160,10 +160,11 @@ $option = isset($_GET['option'])? $_GET['option'] : null;
 					</tr>
 				</tfoot>
 			</table>
-			
+			<?php if($monthly->getAvailable() >= 50) : ?>
 			<a class="btn btn-danger" href="affiliate.html">
 				<span class="fa fa-user"></span> Affiliate a new member
 			</a>
+			<?php endif; ?>
 		</div>
 		
 	</div>

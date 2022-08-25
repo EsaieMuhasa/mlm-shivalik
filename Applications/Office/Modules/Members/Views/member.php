@@ -13,6 +13,9 @@ $member = $_REQUEST[MembersController::ATT_MEMBER];
  */
 $compte = $_REQUEST[MembersController::ATT_COMPTE];
 
+$parent = $compte->getMember()->getParent();
+$sponsor = $compte->getMember()->getSponsor();
+
 
 /**
  * @var GradeMember $gradeMember
@@ -56,21 +59,21 @@ $requestedGradeMember = isset($_REQUEST[MembersController::ATT_REQUESTED_GRADE_M
                     <div class="row">
                         <div class="col-sm-6 col-xs-12">
                             <div class="thumbnail text-left text-center">
-                                <img style="" alt="" src="/<?php echo ("{$gradeMember->getGrade()->getIcon()}") ?>">
+                                <img style="" alt="" src="/<?php echo ("{$sponsor->getPacket()->getGrade()->getIcon()}") ?>">
                             </div>
                         </div>
                         <div class="col-sm-6 col-xs-12">
                             <div class="thumbnail text-left text-center">
-                                <img style="" alt="" src="/<?php echo ("{$member->getPhoto()}") ?>">
+                                <img style="" alt="" src="/<?php echo ("{$sponsor->getPhoto()}") ?>">
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6 col-sm-6 col-xs-9">
-                    <p class="h4 text-primary"><?php echo ("{$member->matricule}") ?></p>
-                    <p class="h5"><?php echo ("{$member->names}") ?></p>
-                    <p class="h5"><?php echo ("Username: {$member->pseudo}") ?></p>
-                    <p class="h5"><?php echo ("Telephone: {$member->telephone}") ?></p>
+                    <p class="h4 text-primary"><?php echo ("{$sponsor->matricule}") ?></p>
+                    <p class="h5"><?php echo ("{$sponsor->names}") ?></p>
+                    <p class="h5"><?php echo ("Username: {$sponsor->pseudo}") ?></p>
+                    <p class="h5"><?php echo ("Telephone: {$sponsor->telephone}") ?></p>
                 </div>
             </div>
         </div>
@@ -83,21 +86,21 @@ $requestedGradeMember = isset($_REQUEST[MembersController::ATT_REQUESTED_GRADE_M
                     <div class="row">
                         <div class="col-sm-6 col-xs-12">
                             <div class="thumbnail text-left text-center">
-                                <img style="" alt="" src="/<?php echo ("{$gradeMember->getGrade()->getIcon()}") ?>">
+                                <img style="" alt="" src="/<?php echo ("{$parent->getPacket()->getGrade()->getIcon()}") ?>">
                             </div>
                         </div>
                         <div class="col-sm-6 col-xs-12">
                             <div class="thumbnail text-left text-center">
-                                <img style="" alt="" src="/<?php echo ("{$member->getPhoto()}") ?>">
+                                <img style="" alt="" src="/<?php echo ("{$parent->getPhoto()}") ?>">
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6 col-sm-6 col-xs-9">
-                    <p class="h4 text-primary"><?php echo ("{$member->matricule}") ?></p>
-                    <p class="h5"><?php echo ("{$member->names}") ?></p>
-                    <p class="h5"><?php echo ("Username: {$member->pseudo}") ?></p>
-                    <p class="h5"><?php echo ("Telephone: {$member->telephone}") ?></p>
+                    <p class="h4 text-primary"><?php echo ("{$parent->matricule}") ?></p>
+                    <p class="h5"><?php echo ("{$parent->names}") ?></p>
+                    <p class="h5"><?php echo ("Username: {$parent->pseudo}") ?></p>
+                    <p class="h5"><?php echo ("Telephone: {$parent->telephone}") ?></p>
                 </div>
             </div>
         </div>

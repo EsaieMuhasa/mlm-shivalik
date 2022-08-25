@@ -47,6 +47,24 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
         if ($calcul) {
             $account->calcul();
         }
+
+        if($this->checkParent($account->getMember()->getId())) {
+            /**
+             * @var Member $parent
+             */
+            $parent = $this->findById($member->getParent()->getId());
+            $parent->setPacket($this->getManagerFactory()->getManagerOf(GradeMember::class)->findCurrentByMember($parent->getId()));
+            $account->getMember()->setParent($parent);
+        }
+        if($this->checkSponsor($account->getMember()->getId())) {
+            /**
+             * @var Member $sponsor
+             */
+            $sponsor = $this->findById($member->getSponsor()->getId());
+            $sponsor->setPacket($this->getManagerFactory()->getManagerOf(GradeMember::class)->findCurrentByMember($sponsor->getId()));
+            $account->getMember()->setSponsor($sponsor);
+
+        }
         
         return $account;
     }
