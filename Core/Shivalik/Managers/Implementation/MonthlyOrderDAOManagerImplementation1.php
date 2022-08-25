@@ -5,12 +5,14 @@ use Core\Shivalik\Entities\Generation;
 use Core\Shivalik\Entities\GradeMember;
 use Core\Shivalik\Entities\MonthlyOrder;
 use Core\Shivalik\Entities\NotificationReceiver;
+use Core\Shivalik\Entities\Office;
 use Core\Shivalik\Entities\PointValue;
 use Core\Shivalik\Entities\PurchaseBonus;
 use Core\Shivalik\Managers\MonthlyOrderDAOManager;
 use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
 use Core\Shivalik\Managers\MemberDAOManager;
+use DateTime;
 
 /**
  *
@@ -173,6 +175,15 @@ class MonthlyOrderDAOManagerImplementation1 extends AbstractOperationDAOManager 
             
             if (!$pdo->beginTransaction()) {
                 throw new DAOException("Impossible to perform this operation because an error occured in starting transaction process");
+            }
+
+            //check if user has other monthly bonus
+            $month = intval($now->format('m'), 10);
+            $year = intval($now->format('Y'), 10);
+            if ($this->checkByMemberOfMonth($order->getMember()->getId(), null, $month, $year)){
+                $message = "Impossible to perform this operation. the same member account cannot obtain 2 repurchase bonuses for the same month. ";
+                $message .= "This operation could be carried out the following month. Thank you for the confidence you have in favor of the Shivalick company.";
+                throw new DAOException($message);
             }
             
             //insert monthly order in database
@@ -413,14 +424,47 @@ class MonthlyOrderDAOManagerImplementation1 extends AbstractOperationDAOManager 
      * @param MonthlyOrder $entity
      */
     public function createInTransaction($entity, \PDO $pdo): void {
-        if (!$this->checkByMemberOfMonth($entity->getMember()->getId(), 
+        $now = ($entity->getDateAjout() == null)? new DateTime() : $entity->getDateAjout();
+        $month = intval($now->format('m'), 10);
+        $year = intval($now->format('Y'), 10);
+        if ($this->checkByMemberOfMonth($entity->getMember()->getId(), null, $month, $year)){
+            $message = "Impossible to perform this operation. the same member account cannot obtain 2 repurchase bonuses for the same month. ";
+            $message .= "This operation could be carried out the following month. Thank you for the confidence you have in favor of the Shivalick company.";
+            throw new DAOException($message);
+        }
+
+        if (!$this->checkByMemberOfMonth($entity->getMember()->getId(), null,
             intval($entity->getDateAjout()->format('m'), 10), intval($entity->getDateAjout()->format('Y'), 10))) {
             $id = UtilitaireSQL::insert($pdo, $this->getTableName(), [
                 'member' => $entity->getMember()->getId(),
+                'manualAmount' => $entity->getManualAmount(),
+                'office' => $entity->getOffice()->getId(),
                 self::FIELD_DATE_AJOUT => $entity->getFormatedDateAjout()
             ]);
             $entity->setId($id);
         }
+    }
+
+    public function buildByMemberOfMonth (int $memberId, ?Office $office = null) : MonthlyOrder {
+        $now = new DateTime();
+        $month = intval($now->format('m'), 10);
+        $year = intval($now->format('Y'), 10);
+        if ($this->checkByMemberOfMonth($memberId, false, $month, $year)) {
+            return $this->findByMemberOfMonth($memberId, false, $month, $year);
+        }
+
+        if($office == null) {
+            throw new DAOException('This operation cannot be continued because the office responsible for this operation is null');
+        }
+
+        $order = new MonthlyOrder([
+            'office' => $office,
+            'member' => $memberId,
+            self::FIELD_DATE_AJOUT => $now
+        ]);
+
+        $this->createInTransaction($order, $this->getConnection());
+        return $order;
     }
 
     /**

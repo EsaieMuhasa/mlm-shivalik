@@ -11,8 +11,6 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
 $foots = $config->get("footsMember");
 ?>
 
-<?php require_once '_nav-member.php';?>
-
 <?php if (!isset($_GET['foot'])) {?>
 <div class="row">
 

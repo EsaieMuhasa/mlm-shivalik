@@ -10,7 +10,6 @@ $office = $_SESSION[SessionOfficeFilter::OFFICE_CONNECTED_SESSION]->getOffice();
 ?>
 <div class="row">
     <div class="col-lg-12">
-    	<h3 class="page-header"><i class="fa fa-users"></i> <?php echo ($_REQUEST[SettingsController::ATT_VIEW_TITLE]); ?></h3>
     	<ol class="breadcrumb">
     		<li>
     			<i class="fa fa-users"></i>

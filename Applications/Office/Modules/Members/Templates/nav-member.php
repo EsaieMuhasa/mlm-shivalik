@@ -1,7 +1,5 @@
 <?php
-use Applications\Root\Modules\Settings\SettingsController;
 use Core\Shivalik\Entities\Account;
-use Core\Shivalik\Entities\Generation;
 use Core\Shivalik\Entities\GradeMember;
 use Core\Shivalik\Entities\Member;
 use Core\Shivalik\Entities\MonthlyOrder;
@@ -35,7 +33,6 @@ $option = isset($_GET['option'])? $_GET['option'] : null;
 ?>
 <div class="row">
     <div class="col-lg-12">
-    	<h3 class="page-header"><i class="fa fa-users"></i> <?php echo ($_REQUEST[SettingsController::ATT_VIEW_TITLE]); ?></h3>
     	<ol class="breadcrumb">
     		<li>
     			<i class="fa fa-users"></i>
@@ -59,10 +56,10 @@ $option = isset($_GET['option'])? $_GET['option'] : null;
         			<?php if (isset($_GET['foot'])){ ?>
         			<a href="/office/members/<?php echo "{$member->getId()}/{$option}/"; ?>">
         				<span class="fa fa-sitemap"></span>
-        				<?php echo htmlspecialchars("{$option}") ?>
+        				<?php echo htmlspecialchars(ucfirst(str_replace('-', ' ', $option))) ?>
     				</a>
         			<?php } else { ?>
-        			<?php echo htmlspecialchars("{$option}") ?>
+        			<?php echo htmlspecialchars(ucfirst(str_replace('-', ' ', $option))) ?>
         		<?php } ?>
     			</li>
     		<?php }?>
@@ -74,30 +71,59 @@ $option = isset($_GET['option'])? $_GET['option'] : null;
     </div>
 </div>
 
+<nav class="navbar navbar-default">
+	<div class="container-fluid">
+	    <!-- Brand and toggle get grouped for better mobile display -->
+	    <div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+	        	<span class="sr-only">Toggle navigation</span>
+	        	<span class="icon-bar"></span>
+	        	<span class="icon-bar"></span>
+	        	<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="<?php echo "/office/members/{$member->id}/";?>">
+				<span class="fa fa-user"></span> <?php echo htmlspecialchars("{$member->lastName}");?>
+			</a>
+	    </div>
+	
+	    <!-- Collect the nav links, forms, and other content for toggling -->
+	    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+			<ul class="nav navbar-nav">
+	        	<li class="<?php echo $option == null? 'active' : ''; ?>">
+	        		<a href="<?php echo "/office/members/{$member->id}/";?>">
+	        			<span class="glyphicon glyphicon-dashboard"></span> Profil
+	        		</a>
+	        	</li>
+	        	
+	        	<li class="<?php echo $option == 'withdrawals'? 'active' : ''; ?>">
+					<a class="" href="/office/members/<?php echo $member->getId().'/'; ?>withdrawals.html" title="show withdrawals of account <?php echo htmlspecialchars("{$member->getNames()}") ?>">
+						<span class="fa fa-money"></span> Withdrawals
+					</a>
+	        	</li>
+	        	
+	        	<li class="<?php echo $option == 'sell-sheet'? 'active' : ''; ?>">
+					<a class="" href="/office/members/<?php echo $member->getId().'/'; ?>sell-sheet/" title="show sell sheet of account <?php echo htmlspecialchars("{$member->getNames()}") ?>">
+						<span class="fa fa-book"></span> Sell Sheet
+					</a>
+	        	</li>
+				
+	        	<li class="<?php echo $option == 'downlines'? 'active' : ''; ?>">
+					<a class="" href="/office/members/<?php echo $member->getId().'/'; ?>downlines/" title="show downline member's of <?php echo htmlspecialchars("{$member->getNames()}") ?>">
+						<span class="fa fa-sitemap"></span> Downlines
+					</a>
+	        	</li>
+	        	
+	        	<li class="<?php echo $option == 'upgrade'? 'active' : ''; ?>">
+					<a class="" href="/office/members/<?php echo $member->getId().'/'; ?>upgrade.html" title="upgrade account rang of <?php echo htmlspecialchars("{$member->getNames()}") ?>">
+						Upgrade
+					</a>
+	        	</li>
+			</ul>
+		</div><!-- /.navbar-collapse -->
+	</div><!-- /.container-fluid -->
+</nav>
 
-<div class="row">
-	<?php if ($gradeMember!=null) { ?>
-	<div class="col-sm-2 col-xs-6">
-		<div class="thumbnail text-left text-center">
-			<?php if ($requestedGradeMember!=null) : ?>
-			<span class="label label-info" style="display: block;">current</span>
-			<?php endif; ?>
-			<img style="" alt="" src="/<?php echo ("{$gradeMember->getGrade()->getIcon()}") ?>">
-			<?php echo htmlspecialchars("{$gradeMember->getGrade()->getName()}") ?>
-		</div>
-	</div>
-	<?php } ?>
-	
-	<?php if ($requestedGradeMember!=null) { ?>
-	<div class="col-sm-2 col-xs-6">
-		<span class="thumbnail text-left">
-			<span class="label label-danger" style="display: block;">requested</span>
-			<img style="" alt="" src="/<?php echo ("{$requestedGradeMember->getGrade()->getIcon()}") ?>">
-			<?php echo htmlspecialchars("{$requestedGradeMember->getGrade()->getName()}") ?>
-		</span>
-	</div>
-	<?php } ?>
-	
+<div class="row">	
     <?php if (isset($_REQUEST[MembersController::ATT_MONTHLY_ORDER_FOR_ACCOUNT])) : ?>
     <?php 
     /**
@@ -135,32 +161,3 @@ $option = isset($_GET['option'])? $_GET['option'] : null;
     <?php endif; ?>
 	
 </div>
-<hr/>
-
-<div class="row">
-	<div class="col-xs-12">
-	
-		<!-- 
-		<a class="btn btn-primary" href="/office/members/<?php echo $member->getId().'/'.($member->isEnable()? 'disable':'enable'); ?>.html" title="change state of <?php echo htmlspecialchars("{$member->getLastName()} {$member->getName()}") ?>">
-			<?php echo ($member->isEnable()? 'Disable':'Enable'); ?> account
-		</a>
-		 -->
-		 
-		<a class="btn btn-primary" href="/office/members/<?php echo $member->getId().'/'; ?>withdrawals.html" title="show withdrawals of account <?php echo htmlspecialchars("{$member->getNames()}") ?>">
-			<span class="fa fa-money"></span> Withdrawals
-		</a>
-		
-		<?php if ($option != 'downlines') { ?>
-		<a class="btn btn-primary" href="/office/members/<?php echo $member->getId().'/'; ?>downlines/" title="show downline member's of <?php echo htmlspecialchars("{$member->getNames()}") ?>">
-			<span class="fa fa-sitemap"></span> Downlines
-		</a>
-		<?php } ?>
-		
-		<?php if ($member->isEnable() && !$option == 'upgrade' && $requestedGradeMember==null && ($gradeMember!=null && $gradeMember->getGrade()->getMaxGeneration()->getNumber() < Generation::MAX_GENERATION)) { ?>
-		<a class="btn btn-success" href="/office/members/<?php echo $member->getId().'/'; ?>upgrade.html" title="upgrade account rang of <?php echo htmlspecialchars("{$member->getNames()}") ?>">
-			<span class="fa fa-sort-up"></span> Upgrade
-		</a>
-		<?php } ?>
-	</div>
-</div>
-<hr/>

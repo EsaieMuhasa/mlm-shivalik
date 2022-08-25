@@ -5,8 +5,6 @@ use Core\Shivalik\Entities\GradeMember;
 use PHPBackend\AppConfig;
 use PHPBackend\Request;
 
-require_once '_nav-member.php';
-
 /**
  * @var AppConfig $config
  */

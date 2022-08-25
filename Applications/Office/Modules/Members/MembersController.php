@@ -23,6 +23,9 @@ use PHPBackend\Request;
 use PHPBackend\ToastMessage;
 use PHPBackend\Http\HTTPController;
 use Core\Shivalik\Managers\OfficeDAOManager;
+use Core\Shivalik\Managers\ProductDAOManager;
+use Core\Shivalik\Managers\SellSheetRowDAOManager;
+use Core\Shivalik\Validators\SellSheetRowFormValidator;
 use PHPBackend\Response;
 
 /**
@@ -46,6 +49,10 @@ class MembersController extends HTTPController {
 	const ATT_SOLDE = 'solde';
 	const ATT_SOLDE_WITHDRAWALS = 'soldeWithdrawals';
 	const ATT_WITHDRAWALS = 'withdrawals';
+
+	const ATT_SELL_SHEET_ROW = 'sellSheetRow';
+	const ATT_SELL_SHEET_ROWS = 'sellSheetRows';
+	const ATT_PRODUCTS = 'products';
 	
 	const LEFT_CHILDS = 'LEFT';
 	const MIDDLE_CHILDS = 'MIDDLE';
@@ -102,6 +109,16 @@ class MembersController extends HTTPController {
 	 * @var OfficeDAOManager
 	 */
 	private $officeDAOManager;
+
+	/**
+	 * @var ProductDAOManager
+	 */
+	private $productDAOManager;
+
+	/**
+	 * @var SellSheetRowDAOManager
+	 */
+	private $sellSheetRowDAOManager;
 	
 	/**
 	 * {@inheritDoc}
@@ -112,15 +129,20 @@ class MembersController extends HTTPController {
 		parent::__construct($application, $module, $action);
 		$nombre = $this->memberDAOManager->countAll();
 		$application->getRequest()->addAttribute(self::PARAM_MEMBER_COUNT, $nombre);
-		$application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, "Union members");
 		
 		if ($application->getRequest()->existInGET('id')) {//
 			$id = intval($application->getRequest()->getDataGET('id'), 10);
+			/**
+			 * @var Member $member
+			 */
 			$member = $this->memberDAOManager->findById($id);
 			$account = $this->getAccount($member);
 			
 			$application->getRequest()->addAttribute(self::ATT_COMPTE, $account);
 			$application->getRequest()->addAttribute(self::ATT_MEMBER, $member);
+			$application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, $member->getNames());
+		} else {
+			$application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, "Union members");
 		}
 	}
 	
@@ -505,6 +527,58 @@ class MembersController extends HTTPController {
 		$request->addAttribute(self::ATT_GRADE_MEMBER, $gradeMember);
 		$grades = $this->gradeDAOManager->findAll();
 		$request->addAttribute(self::ATT_GRADES, $grades);
+	}
+
+	/**
+	 * affiche la fiche de vente du compte membre dont le compte est encours de consultation
+	 * @param Request $request
+	 * @param Response $response
+	 * @return void
+	 */
+	public function executeSellSheet (Request $request, Response $response ) : void {
+		$id = intval($request->getDataGET('id'), 10);
+		if (!$this->memberDAOManager->checkById($id)){
+			$response->sendError();
+		}
+
+		$member = $this->memberDAOManager->findById($id);
+		$limit = 12;
+		$offset = 0;
+
+		if ($this->sellSheetRowDAOManager->checkByMember($id, $offset)) {
+			$rows = $this->sellSheetRowDAOManager->findByMember($id, $limit, $offset);
+		} else {
+			$rows = [];
+		}
+
+		$request->addAttribute(self::ATT_SELL_SHEET_ROWS, $rows);
+	}
+
+	/**
+	 * ajout d'une nouvelle ligne sur la fiche d'un membre
+	 * @param Request $request
+	 * @param Response $response
+	 * @return void
+	 */
+	public function executeAddSellSheetRow (Request $request, Response $response ) : void {
+
+		if ($request->getMethod() == Request::HTTP_POST) {
+			$member = new Member(['id' => $request->getDataGET('id')]);
+			$form = new SellSheetRowFormValidator($this->getDaoManager());
+			$request
+				->addAttribute($form::ATT_OFFICE, $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice())
+				->addAttribute($form::ATT_MEMBER, $member);
+
+			$row = $form->createAfterValidation($request);
+			if (!$form->hasError()) {
+				$request->addToast($form->buildToastMessage());
+				$response->sendRedirect("/office/members/{$member->getId()}/sell-sheet/");
+			}
+			$form->includeFeedback($request);
+			$request->addAttribute(self::ATT_SELL_SHEET_ROW, $row);
+		}
+		$products = $this->productDAOManager->findAll();
+		$request->addAttribute(self::ATT_PRODUCTS, $products);
 	}
 	
 }

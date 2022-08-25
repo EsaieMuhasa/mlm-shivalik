@@ -2,14 +2,47 @@
 namespace Core\Shivalik\Managers;
 
 use Core\Shivalik\Entities\MonthlyOrder;
-use Core\Shivalik\Entities\SellSheetIRow;
+use Core\Shivalik\Entities\SellSheetRow;
 use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\DAOInterface;
 
 /**
  * @author Esaie Muhasa
  */
-interface SellSheetIRowDAOManager extends DAOInterface {
+interface SellSheetRowDAOManager extends DAOInterface {
+
+    /**
+     * comptage de operations deja faite par un membre
+     *
+     * @param int $memberId
+     * @return int
+     * @throws DAOException
+     */
+    public function countByMember(int $memberId) : int;
+
+    /**
+     * verification de l'existance de operaction qui font reference au membre en premier parametre.
+     * le dexieme parametre joue un role dans la clause limit de la requette sql. il s'ajit du nombre d'occurence
+     * a sauter avant de faire la verification
+     *
+     * @param int $memberId
+     * @param int $offset
+     * @return boolean
+     * @throws DAOException
+     */
+    public function checkByMember(int $memberId, int $offset = 0) : bool;
+
+    /**
+     * selection des operations de vente sur la fiche d'un membre.
+     *
+     * @param int $memberId
+     * @param int|null $limit
+     * @param int $offset
+     * @return SellSheetRow[]
+     * @throws DAOException s'il y a une erreur lors de la communication avec la base de donnee
+     * soit aucun resultat n'est renvoyer par la requette de selection
+     */
+    public function findByMember(int $memberId, ?int $limit = null, int $offset = 0) : array;
 
     /**
      * verfie s'il y a aumoin une operation pour l'achat des produits pour le mois en parametre
@@ -22,7 +55,7 @@ interface SellSheetIRowDAOManager extends DAOInterface {
     /**
      * selection de tout les operations qui reference le mois en parametre
      * @param int $monthlyOrder l'identifiant du mois referencer
-     * @return SellSheetIRow[]
+     * @return SellSheetRow[]
      * @throws DAOException si une erreur surviens dans le processuce de communication avec la base de donnee
      * soit aucun result n'est revoyer par la requette de selection
      */
@@ -49,7 +82,7 @@ interface SellSheetIRowDAOManager extends DAOInterface {
      * @param int[]|MonthlyOrder[] $monthlyOrders
      * @param int $limit
      * @param int $offset
-     * @return SellSheetIRow[]
+     * @return SellSheetRow[]
      * @throws DAOException s'il y a erreur lors de la communication avec la BDD
      */
     public function findByMonthlyOrders (array $monthlyOrders, ?int $limit = null, int $offset = 0) : array;

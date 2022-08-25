@@ -2,6 +2,7 @@
 namespace Core\Shivalik\Managers;
 
 use Core\Shivalik\Entities\MonthlyOrder;
+use Core\Shivalik\Entities\Office;
 use PHPBackend\Dao\DAOException;
 
 /**
@@ -97,6 +98,20 @@ interface MonthlyOrderDAOManager extends OperationDAOManager {
      */
     public function checkByMemberOfMonth (int $memberId, ?bool $dispatched = false, ?int $month = null, ?int $year = null) : bool;
     
+    /**
+     * construit un point de reference du bonus mensuel sur reachat.
+     * La creation d'une nouvelle occurence est fait dans le cas où aucun point de 
+     * reffence du bonus mensuel existe pas. sinon on renvoie l'occurence qui existe.
+     * <p>Meme si le parametre $office n'est pas obligatoire, dans le cas où, on doit créer un point 
+     * de reference pour la fiche de vente, ce parametre deviens utile. dans le cas contraire une exception sera levée</p>
+     *
+     * @param integer $memberId l'identifiant du membre
+     * @param Office $office office qui serait reference dans le cas où on doit creer un point de reference des commande mensuels
+     * @return MonthlyOrder
+     * @throws DAOException s'il y a erreur dans e processuce de communication avec la SGBD
+     */
+    public function buildByMemberOfMonth (int $memberId, ?Office $office = null) : MonthlyOrder;
+
     /**
      * renvoie le compte mensuel de commandes du membre
      * @param int $memberId

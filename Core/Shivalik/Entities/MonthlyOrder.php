@@ -67,6 +67,9 @@ class MonthlyOrder extends Operation {
         if ($this->manualAmount != 0) {
             return $this->manualAmount;
         }
+        if ($this->available == null){
+            return 0 ;
+        }
         return $this->available;
     }
 

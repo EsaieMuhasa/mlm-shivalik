@@ -15,11 +15,6 @@ $offset = isset($_GET['offset'])? $_GET['offset'] : 0;
 
 ?>
 <div class="row">
-    <div class="col-lg-12">
-    	<h3 class="page-header">
-    		<i class="fa fa-users"></i> <?php echo ($_REQUEST[MembersController::ATT_VIEW_TITLE]); ?>
-    	</h3>
-    </div>
 	<div class="col-xs-12 col-sm-5 col-md-6">
 		<a class="btn btn-primary" href="/office/members/add.html"><span class="fa fa-plus"></span> News acount</a>
 		

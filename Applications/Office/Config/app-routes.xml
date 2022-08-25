@@ -28,6 +28,9 @@
 	 	<route action="downlines" urlPattern="/office/members/([0-9]+)/(downlines)/" paramsNames="id,option"/>
 	 	<route action="downlines" urlPattern="/office/members/([0-9]+)/(downlines)/(left|middle|right|all)\.html" paramsNames="id,option,foot"/>
 	
+	 	<route action="sellSheet" urlPattern="/office/members/([0-9]+)/(sell-sheet)/" paramsNames="id,option"/>
+	 	<route action="addSellSheetRow" urlPattern="/office/members/([0-9]+)/(sell-sheet)/add\.html" paramsNames="id,option"/>
+
 		<route action="withdrawalsMember" urlPattern="/office/members/([0-9]+)/(withdrawals)\.html" paramsNames="id,option"/>
 		<route action="withdrawalsMember" urlPattern="/office/members/([0-9]+)/(withdrawals)/([0-9]+)\.html" paramsNames="id,option,requestId"/>
 	</module>

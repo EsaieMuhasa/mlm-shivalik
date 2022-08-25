@@ -11,7 +11,7 @@ use PHPBackend\PHPBackendException;
  * numerisation des elements de la fiche de vente.
  * pour que lorsqu'un membre achete de produit, que ce la soit manifeste dans son compte
  */
-class SellSheetIRow extends DBEntity
+class SellSheetRow extends DBEntity
 {
     /**
      * reference du produit concerner
@@ -38,6 +38,12 @@ class SellSheetIRow extends DBEntity
     private $quantity;
 
     /**
+     * l'office responsable de l'operation
+     * @var Office
+     */
+    private $office;
+
+    /**
      * Get la quantite commander pour ledit produit
      *
      * @return  int
@@ -51,7 +57,7 @@ class SellSheetIRow extends DBEntity
      * Set la quantite commander pour ledit produit
      * @param  float  $quantity  la quantite commander pour ledit produit
      */ 
-    public function setQuantity(float $quantity) : void
+    public function setQuantity($quantity) : void
     {
         $this->quantity = $quantity;
     }
@@ -65,11 +71,15 @@ class SellSheetIRow extends DBEntity
         return $this->unitPrice;
     }
 
+    public function getTotalPrice () : float {
+        return (@floatval($this->quantity) * @floatval($this->unitPrice));
+    }
+
     /**
      * Set le pris unitaire par defaut
      * @param  float  $unitPrice  le pris unitaire par defaut
      */ 
-    public function setUnitPrice(float $unitPrice) : void
+    public function setUnitPrice($unitPrice) : void
     {
         $this->unitPrice = $unitPrice;
     }
@@ -100,11 +110,18 @@ class SellSheetIRow extends DBEntity
 
     /**
      * Set reference du produit concerner
-     * @param  Product  $product  reference du produit concerner
+     * @param  Product|int  $product  reference du produit concerner
+     * @throws PHPBackendException
      */ 
-    public function setProduct(Product $product) : void
+    public function setProduct($product) : void
     {
-        $this->product = $product;
+        if ($product == null || $product instanceof Product){
+            $this->product = $product;
+        } else if(self::isInt($product)) {
+            $this->product = new Product(['id' => $product]);
+        } else {
+            throw new PHPBackendException('invalid data in setProduct() : void method parameter');
+        }
     }
 
     /**
@@ -115,5 +132,31 @@ class SellSheetIRow extends DBEntity
     public function getMonthlyOrder() : ?MonthlyOrder
     {
         return $this->monthlyOrder;
+    }
+    
+
+    /**
+     * Get l'office responsable de l'operation
+     *
+     * @return  Office
+     */ 
+    public function getOffice() : ?Office
+    {
+        return $this->office;
+    }
+
+    /**
+     * Set l'office responsable de l'operation
+     * @param  Office|int  $office  l'office responsable de l'operation
+     */ 
+    public function setOffice($office) : void
+    {
+        if($office == null || $office  instanceof Office){
+            $this->office = $office;
+        } else if (self::isInt($office)) {
+            $this->office = new Office(['id' => $office]);
+        } else {
+            throw new PHPBackendException('invalid argument value in setOffice() method');
+        }
     }
 }

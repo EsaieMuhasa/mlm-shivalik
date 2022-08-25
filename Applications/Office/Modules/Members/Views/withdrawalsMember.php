@@ -23,8 +23,6 @@ $compte = $_REQUEST[MembersController::ATT_COMPTE];
 $config = $_REQUEST[Request::ATT_APP_CONFIG];
 ?>
 
-<?php require_once '_nav-member.php';?>
-
 <?php if (!empty($_REQUEST[MembersController::ATT_WITHDRAWALS])) : ?>
 <div class="row">
     <div class="col-md-12">
@@ -37,6 +35,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
         				<th>Date end time</th>
         				<th>Request ID</th>
         				<th>Amount</th>
+        				<th>Telephone</th>
         				<th class="text-center">status</th>
         				<th class="text-center">Option</th>
         			</tr>
@@ -52,7 +51,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
     						<td><?php echo ($w->telephone);?></td>
     						
     						<th class="text-center">
-    							<span class="glyphicon glyphicon-<?php echo ($w->admin!=null? "ok":"remove"); ?>"></span>
+    							<span class="glyphicon glyphicon-<?php echo ($w->admin!=null? "ok text-success":"remove text-danger"); ?>"></span>
 							</th>
     						
     						<td class="text-center">

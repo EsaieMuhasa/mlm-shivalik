@@ -3,18 +3,20 @@
 namespace Core\Shivalik\Managers\Implementation;
 
 use Core\Shivalik\Entities\MonthlyOrder;
-use Core\Shivalik\Entities\SellSheetIRow;
-use Core\Shivalik\Managers\SellSheetIRowDAOManager;
+use Core\Shivalik\Entities\Office;
+use Core\Shivalik\Entities\Product;
+use Core\Shivalik\Entities\SellSheetRow;
+use Core\Shivalik\Managers\SellSheetRowDAOManager;
 use PDO;
 use PDOException;
 use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\DefaultDAOInterface;
 use PHPBackend\Dao\UtilitaireSQL;
 
-class SellSheetIRowDAOManagerImplementation1 extends DefaultDAOInterface implements SellSheetIRowDAOManager {
+class SellSheetRowDAOManagerImplementation1 extends DefaultDAOInterface implements SellSheetRowDAOManager {
 
     /**
-     * @param SellSheetIRow $entity
+     * @param SellSheetRow $entity
      * @param PDO $pdo
      * @return void
      */
@@ -25,9 +27,69 @@ class SellSheetIRowDAOManagerImplementation1 extends DefaultDAOInterface impleme
             'monthlyOrder' => $entity->getMonthlyOrder()->getId(),
             'dateAjout' => $entity->getFormatedDateAjout(),
             'quantity' => $entity->getQuantity(),
-            'unitPrice' => $entity->getUnitPrice()
+            'unitPrice' => $entity->getUnitPrice(),
+            'office' => $entity->getOffice()->getId()
         ]);
         $entity->setId($id);
+    }
+
+    public function countByMember(int $memberId): int
+    {
+        $sql = "SELECT COUNT(*) AS nombre FROM {$this->getTableName()} WHERE monthlyOrder IN(SELECT id FROM MonthlyOrder WHERE member = {$memberId})";
+        $count = 0;
+        try {
+            $statement = UtilitaireSQL::prepareStatement($this->getConnection(), $sql);
+            if($row = $statement->fetch()) {
+                $count = $row['nombre'];
+            }
+            $statement->closeCursor();
+        } catch (PDOException $e) {
+            throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
+        }
+        return $count;
+    }
+
+    public function checkByMember(int $memberId, int $offset = 0): bool
+    {
+        $sql = "SELECT id FROM {$this->getTableName()} WHERE monthlyOrder IN(SELECT id FROM MonthlyOrder WHERE member = {$memberId}) LIMIT 1 OFFSET {$offset}";
+        $check = false;
+        try {
+            $statement = UtilitaireSQL::prepareStatement($this->getConnection(), $sql);
+            if($statement->fetch()) {
+                $check = true;
+            }
+            $statement->closeCursor();
+        } catch (PDOException $e) {
+            throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
+        }
+        return $check;
+    }
+    
+    public function findByMember(int $memberId, ?int $limit = null, int $offset = 0): array
+    {
+        $sql = "SELECT * FROM {$this->getTableName()} WHERE monthlyOrder IN(SELECT id FROM MonthlyOrder WHERE member = {$memberId})".($limit !== null? " LIMIT {$limit} OFFSET {$offset}" : "");
+        $data = [];
+        try {
+            $statement = UtilitaireSQL::prepareStatement($this->getConnection(), $sql);
+            while($row = $statement->fetch()) {
+                $entity = new SellSheetRow($row);
+                $product = $this->getManagerFactory()->getManagerOf(Product::class)->findById($entity->getProduct()->getId());
+                $order = $this->getManagerFactory()->getManagerOf(MonthlyOrder::class)->findById($entity->getMonthlyOrder()->getId());
+                $office = $this->getManagerFactory()->getManagerOf(Office::class)->findById($entity->getOffice()->getId());
+                $entity->setProduct($product);
+                $entity->setMonthlyOrder($order);
+                $entity->setOffice($office);
+                $data[] = $entity;
+            }
+            $statement->closeCursor();
+
+            if(empty($data)) {
+                throw new DAOException('no order on account sell sheet');
+            }
+        } catch (PDOException $e) {
+            throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
+        }
+        return $data;
     }
 
     public function update($entity, $id): void
@@ -115,7 +177,7 @@ class SellSheetIRowDAOManagerImplementation1 extends DefaultDAOInterface impleme
             $sql = "SELECT *FROM {$this->getTableName()} WHERE monthlyOrder IN({$in}) LIMIT 1 OFFSET {$offset}";
             $statement = UtilitaireSQL::prepareStatement($this->getConnection(), $sql);
             while ($row = $statement->fetch()){
-                $return[] = new SellSheetIRow($row);
+                $return[] = new SellSheetRow($row);
             }
             $statement->closeCursor();
 
