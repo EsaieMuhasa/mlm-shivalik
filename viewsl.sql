@@ -78,6 +78,19 @@ CREATE OR REPLACE VIEW V_Command AS
         (SELECT (SUM(V_ProductOrdered.amount)) FROM V_ProductOrdered WHERE Command.id = V_ProductOrdered.command) AS amount
     FROM Command;-- INNER JOIN V_ProductOrdered ON Command.id = V_ProductOrdered.command;
 
+CREATE OR REPLACE VIEW V_SellSheetRow AS 
+    SELECT 
+        SellSheetRow.id AS id,
+        SellSheetRow.quantity AS quantity,
+        SellSheetRow.unitPrice AS unitPrice,
+        SellSheetRow.dateAjout AS dateAjout,
+        SellSheetRow.dateModif AS dateModif,
+        SellSheetRow.product AS product,
+        SellSheetRow.monthlyOrder AS monthlyOrder,
+        SellSheetRow.office AS office,
+        (SELECT SellSheetRow.unitPrice * SellSheetRow.quantity) AS totalPrice
+    FROM SellSheetRow;
+
 CREATE OR REPLACE VIEW V_MonthlyOrder AS 
     SELECT 
         MonthlyOrder.id AS id,
@@ -86,11 +99,12 @@ CREATE OR REPLACE VIEW V_MonthlyOrder AS
         MonthlyOrder.deleted AS deleted,
         MonthlyOrder.disabilityDate AS disabilityDate,
         MonthlyOrder.member AS member,
+        MonthlyOrder.office AS office,
         (
-            SELECT (SUM(GradeMember.product) + SUM(GradeMember.membership) + SUM(GradeMember.officePart))
+            SELECT (SUM(GradeMember.product))
                 FROM GradeMember WHERE GradeMember.monthlyOrder = MonthlyOrder.id
         ) AS used,
-        (SELECT (SUM(V_Command.amount)) FROM V_Command WHERE V_Command.monthlyOrder = MonthlyOrder.id) AS amount
+        (SELECT (SUM(V_SellSheetRow.totalPrice)) FROM V_SellSheetRow WHERE V_SellSheetRow.monthlyOrder = MonthlyOrder.id) AS amount
     FROM MonthlyOrder;-- INNER JOIN Command ON Command.monthlyOrder = MonthlyOrder.id;
 
 CREATE OR REPLACE VIEW V_RequestVirtualMoney AS
