@@ -11,6 +11,7 @@ use Core\Shivalik\Managers\OfficeBonusDAOManager;
 use Core\Shivalik\Managers\OfficeDAOManager;
 use Core\Shivalik\Managers\PointValueDAOManager;
 use Core\Shivalik\Managers\PurchaseBonusDAOManager;
+use Core\Shivalik\Managers\SellSheetRowDAOManager;
 use Core\Shivalik\Managers\WithdrawalDAOManager;
 use Core\Shivalik\Validators\WithdrawalFormValidator;
 use PHPBackend\Application;
@@ -34,6 +35,7 @@ class AccountController extends HTTPController
     const ATT_OFFICES = 'offices';
     const ATT_WITHDRAWEL = 'withdrawal';
     const ATT_WITHDRAWELS = 'withdrawals';
+    const ATT_SELL_SHEETS =  'sellSheets';
     
     const LEFT_CHILDS = 'LEFT';
     const MIDDLE_CHILDS = 'MIDDLE';
@@ -87,6 +89,11 @@ class AccountController extends HTTPController
      * @var OfficeDAOManager
      */
     private $officeDAOManager;
+
+    /**
+     * @var SellSheetRowDAOManager
+     */
+    private $sellSheetRowDAOManager;
     
     
     /**
@@ -286,11 +293,22 @@ class AccountController extends HTTPController
     }
     
     /**
+     * affichage de la fiche de vente d'un membre
      * @param Request $request
      * @param Response $response
      */
-    public function executeTransfer (Request $request, Response $response) : void {
-        
+    public function executeSellSheet (Request $request, Response $response) : void {
+        /**
+         * @var Member $member
+         */
+        $member = $request->getSession()->getAttribute(SessionMemberFilter::MEMBER_CONNECTED_SESSION);
+        if($this->sellSheetRowDAOManager->checkByMember($member->getId())) {
+            $sells =  $this->sellSheetRowDAOManager->findByMember($member->getId());
+        } else {
+            $sells = [];
+        }
+
+        $request->addAttribute(self::ATT_SELL_SHEETS, $sells);
     }
     
     /**
@@ -301,8 +319,7 @@ class AccountController extends HTTPController
         $request->addAttribute(self::ATT_VIEW_TITLE, "Tree");
         $member = $request->getSession()->getAttribute(SessionMemberFilter::MEMBER_CONNECTED_SESSION);
         
-        
-        if ($request->existGET('foot')) {
+        if ($request->existInGET('foot')) {
             //chargement des downlines
             $members = [];
             switch ($request->getDataGET('foot')){
@@ -356,14 +373,14 @@ class AccountController extends HTTPController
     public function executeHistory (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Account history");
         
-        if ($request->existGET('day')) {
+        if ($request->existInGET('day')) {
             $dateMin = new \DateTime("{$request->getDataGET('year')}-{$request->getDataGET('month')}-{$request->getDataGET('day')}");
             $month = new Month(intval($request->getDataGET('month'), 10), intval($request->getDataGET('year'), 10));
             $dateMax = null;
             $month->addSelectedDate($dateMin);
         } else {      
             
-            if ($request->existGET('month')) {
+            if ($request->existInGET('month')) {
                 $month = new Month(intval($request->getDataGET('month'), 10), intval($request->getDataGET('year'), 10));
             }else{            
                 $month = new Month();

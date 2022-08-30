@@ -18,6 +18,8 @@
 		<route action="history" urlPattern="/member/history/([0-9]{1,2})-([0-9]{4})\.html" paramsNames="month,year"/>
 		<route action="history" urlPattern="/member/history/([0-9]{1,2})-([0-9]{1,2})-([0-9]{4})\.html" paramsNames="day,month,year"/>
 	 	
+	 	<route action="sellSheet" urlPattern="/member/sell-sheet/"/>
+	 	<route action="sellSheet" urlPattern="/member/sell-sheet/([0-9]+)-([0-9]+)\.html" paramsNames="limit,offset"/>
 	</module>
 	
 	<module name="Profil">

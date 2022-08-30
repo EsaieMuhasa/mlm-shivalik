@@ -24,7 +24,6 @@ $member = $_SESSION[SessionMemberFilter::MEMBER_CONNECTED_SESSION];
 	</li>
 	<?php endif; ?>
 	
-
 	<li>
 		<a href="/member/">
     		<span class="nav-item-icon">
@@ -49,6 +48,15 @@ $member = $_SESSION[SessionMemberFilter::MEMBER_CONNECTED_SESSION];
         		<span class="fa fa-money"></span>
     		</span>
     		<span class="nav-item-caption">Withdrawal</span>
+		</a>
+	</li>
+	
+	<li>
+		<a href="/member/sell-sheet/">
+    		<span class="nav-item-icon">
+        		<span class="fa fa-book"></span>
+    		</span>
+    		<span class="nav-item-caption">Sell sheet</span>
 		</a>
 	</li>
 	
