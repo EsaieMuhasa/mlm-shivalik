@@ -6,6 +6,7 @@
 	 	<route action="index" urlPattern="/member/"/>
 	 	<route action="downlines" urlPattern="/member/downlines/"/>
 	 	<route action="downlines" urlPattern="/member/downlines/(left|right|middle|all)\.html" paramsNames="foot"/>
+	 	<route action="downlines" urlPattern="/member/downlines/(sponsorized)\.html" paramsNames="option"/>
 	 	
 	 	<route action="tree" urlPattern="/member/tree/"/>
 	 	<route action="tree" urlPattern="/member/tree/(left|right|middle|all)\.(json|html)" paramsNames="foot,ext"/>

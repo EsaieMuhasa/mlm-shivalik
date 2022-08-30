@@ -176,14 +176,20 @@ class AccountController extends HTTPController
             $request->addAttribute(self::ATT_MEMBERS, $members);
         }else {
             
-            //comptage des downlines
-            $left = $this->memberDAOManager->countLeftChild($member->getId());
-            $middle = $this->memberDAOManager->countMiddleChild($member->getId());
-            $right = $this->memberDAOManager->countRightChild($member->getId());
+            if ($request->existInGET('option') && $request->getDataGET('option') == 'sponsorized') {
+                $members = $this->memberDAOManager->findSponsorizedByMember($member->getId());
+                $request->addAttribute(self::ATT_MEMBERS, $members);
+            } else {
+                //comptage des downlines
+                $left = $this->memberDAOManager->countLeftChild($member->getId());
+                $middle = $this->memberDAOManager->countMiddleChild($member->getId());
+                $right = $this->memberDAOManager->countRightChild($member->getId());
+                
+                $request->addAttribute(self::LEFT_CHILDS, $left);
+                $request->addAttribute(self::MIDDLE_CHILDS, $middle);
+                $request->addAttribute(self::RIGHT_CHILDS, $right);
+            }
             
-            $request->addAttribute(self::LEFT_CHILDS, $left);
-            $request->addAttribute(self::MIDDLE_CHILDS, $middle);
-            $request->addAttribute(self::RIGHT_CHILDS, $right);
         }
     }
     
