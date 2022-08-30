@@ -17,11 +17,7 @@ $defaultLimit = isset($_GET['limit'])? $_GET['limit'] : $defaultLimit;
 $offset = isset($_GET['offset'])? $_GET['offset'] : 0;
 ?>
 
-<div class="text-right">
-	<a class="btn btn-primary" href="/office/products/purchase/add.html">
-		<span class="fa fa-plus"></span> New monthly order
-	</a>
-</div>
+<?php require_once "deprecatedManualPurchase.php"; ?>
 
 <?php if(!empty($orders)) : ?>
 <div class="table-responsive">

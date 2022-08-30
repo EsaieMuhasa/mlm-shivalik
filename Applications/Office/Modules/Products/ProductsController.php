@@ -372,8 +372,12 @@ class ProductsController extends HTTPController {
      * adding manual monthly purchase bonus
      * @param Request $request
      * @param Response $response
+     * @deprecated apres intergration de la gestion de la fiche de vente, cette methode est desormais deprecier.
+     * Il est maintenant impossible d'acceder au validateur et au DAO car une redirection est faite pour afficher le message d'erreur
      */
     public function executeAddPurchase (Request $request, Response $response) : void {
+        
+        $request->forward('deprecatedManualPurchase', $this->getModule());
         
         if($request->getMethod() == Request::HTTP_POST) {
             $form = new MonthlyOrderFormValidator($this->getDaoManager());
@@ -388,4 +392,9 @@ class ProductsController extends HTTPController {
         }
     }
     
+    /**
+     * affiche le message de depreciation du bonus de reachat, sans gestion dela fiche de vente
+     * @return void
+     */
+    public function executeDeprecatedManualPurchase () : void {}
 }
