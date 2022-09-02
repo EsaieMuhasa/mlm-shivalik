@@ -208,11 +208,11 @@ class OfficesController extends AdminController {
 		}
 		
 		/**
-		 * @var OfficeSize $office
+		 * @var Office $office
 		 */
 		foreach ($offices as $office) {
 		    if ($this->officeSizeDAOManager->checkByOffice($office->getId())) {
-    		    $office->setSize($this->officeSizeDAOManager->findCurrentByOffice($office->getId()));
+    		    $office->setOfficeSize($this->officeSizeDAOManager->findCurrentByOffice($office->getId()));
 		    }
 		}
 		

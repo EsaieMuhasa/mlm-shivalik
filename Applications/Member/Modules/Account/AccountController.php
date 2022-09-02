@@ -229,7 +229,7 @@ class AccountController extends HTTPController
     public function executeNewWithdrawal (Request $request, Response $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Withdrawal Money");
 
-        $request->forward('alertMatching', $this->getModule());
+        //$request->forward('alertMatching', $this->getModule());
 
         $account = $this->getAccount();
         $request->addAttribute(self::ATT_ACCOUNT, $account);

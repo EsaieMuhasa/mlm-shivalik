@@ -268,7 +268,7 @@ final class UtilitaireSQL
                 $where .= $columnName .'=:'.$columnName. (count($filters) == ($key+1) ? '' : ' AND ');
             }
         }
-        $SQL = "SELECT * FROM {$tableName} {$where} ORDER BY {$columnOrder} ".($deskOrder? "DESC" : "ASCK").($limit!==null ? (' LIMIT '.$limit.' OFFSET '.($offset==0? '0': $offset)) : (''));
+        $SQL = "SELECT * FROM {$tableName} {$where} ORDER BY {$columnOrder} ".($deskOrder? "DESC" : "ASC").($limit!==null ? (' LIMIT '.$limit.' OFFSET '.($offset==0? '0': $offset)) : (''));
         try {
             //die ($SQL);
             $statement = $pdo->prepare($SQL);

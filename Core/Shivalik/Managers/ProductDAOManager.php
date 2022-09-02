@@ -98,5 +98,15 @@ interface ProductDAOManager extends DAOInterface
      * @throws DAOException s'il y a erreur lors de la communication avec le SGBD, ou aucun resultat
      */
     public function findVailableByOffice (int $officeId, ?int $limit = null, int $offset = 0) : array;
+
+    /**
+     * renvoie la colection des produits trier en ordre aphabetique
+     *
+     * @param int|null $limit
+     * @param int $offset
+     * @return Product[]
+     * @throws DAOException s'il y erreur lors dela communication avec le SGBD, soit aucun resultat returner par la requette de selection
+     */
+    public function findSortedByName (?int $limit = null, int $offset = 0) : array;
 }
 

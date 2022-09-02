@@ -49,7 +49,7 @@ $products = $_REQUEST[MembersController::ATT_PRODUCTS];
                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-2">
                     <div class="form-group <?php echo (isset($_REQUEST['errors']['unitPrice'])? 'has-error':'');?>">
                         <label class="form-label" for="unitPrice-field">Unit price<span class="text-danger">*</span></label>
-                        <input type="text" onchange="calculTotal();" onkeyup="calculTotal();" name="unitPrice"  id="unitPrice-field" class="form-control" value="<?php echo htmlspecialchars(isset($_REQUEST['sellSheetRow'])? ($_REQUEST['sellSheetRow']->unitPrice) : $products[0]->getDefaultUnitPrice());?>" autocomplete="off"/>
+                        <input readonly type="text" onchange="calculTotal();" onkeyup="calculTotal();" name="unitPrice"  id="unitPrice-field" class="form-control" value="<?php echo htmlspecialchars(isset($_REQUEST['sellSheetRow'])? ($_REQUEST['sellSheetRow']->unitPrice) : $products[0]->getDefaultUnitPrice());?>" autocomplete="off"/>
                         <?php if (isset($_REQUEST['errors']['unitPrice'])){?>
                             <p class="help-block"><?php echo htmlspecialchars($_REQUEST['errors']['unitPrice']);?></p>
                         <?php }?>

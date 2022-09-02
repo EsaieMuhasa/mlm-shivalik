@@ -1,12 +1,15 @@
 
 ftps14.us.cloudlogin.co
-psw: 798gYxEUz-
-user: shivalik_shivalikherbals.org 
+psw: Shivalibbo85@
+user: shivalik
 
 //DB
 user: shivalik_db1 
 pwd: I45c9cKWv#
 server: localhost
+
+
+
 
 //mail
 webmaister@shivalikherbal.org

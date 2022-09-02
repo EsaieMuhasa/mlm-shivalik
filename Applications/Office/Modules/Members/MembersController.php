@@ -580,7 +580,7 @@ class MembersController extends HTTPController {
 			$form->includeFeedback($request);
 			$request->addAttribute(self::ATT_SELL_SHEET_ROW, $row);
 		}
-		$products = $this->productDAOManager->findAll();
+		$products = $this->productDAOManager->findSortedByName();
 		$request->addAttribute(self::ATT_PRODUCTS, $products);
 	}
 	

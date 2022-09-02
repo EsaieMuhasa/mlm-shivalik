@@ -25,7 +25,7 @@ class DAOManagerFactory
     private $connectionsConfig = array();
     
     /**
-     * @var \PDO
+     * @var \PDO[]
      */
     private $connections = [];
     

@@ -179,4 +179,8 @@ class ProductDAOManagerImplementation1 extends DefaultDAOInterface implements Pr
         return $data;
     }
 
+    public function findSortedByName (?int $limit = null, int $offset = 0) : array {
+        return UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), 'name', false, [], $limit, $offset);
+    }
+
 }
