@@ -1,0 +1,24 @@
+{
+    "name": "trimeur/shivalik-herbals",
+    "description": "une entreprise qui travail dans le domain MLM, pour la vente des produits pharmacietique",
+    "type": "project",
+    "require": {
+        "dompdf/dompdf": "^2.0"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^1.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "PHPBackend\\": "lib/PHPBackend/",
+            "Core\\": "src/Core/",
+            "Applications\\": "src/Applications/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Esaie Muhasa",
+            "email": "esaiemuhasa.dev@gmail.com"
+        }
+    ]
+}

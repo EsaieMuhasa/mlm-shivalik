@@ -10,14 +10,14 @@ RewriteRule ^(users|offices|grades)/(.*)$ Web/data/$1/$2 [L]
 RewriteRule ^favicon.icon$ logo.png [L]
 
 #les applications des utilisateurs authentifiers
-RewriteRule ^(member|office|root|admin)/(.*)$ Web/applications.php?subdomain=$1 [QSA,L]
+RewriteRule ^(member|office|root|admin)/(.*)$ Web/index.php?subdomain=$1 [QSA,L]
 
 #protection des fichiers sources sensible
 RewriteCond %{REQUEST_URI} ^/(Applications|PHPBackend|Core)/.*
-RewriteRule ^(Applications|PHPBackend|Core)(.*)$ Web/applications.php [L]
+RewriteRule ^(Applications|PHPBackend|Core)(.*)$ Web/index.php [L]
 
 #pour tout ce qui n'est pas fichiers publique
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^(.*)$ Web/applications.php [L]
+RewriteRule ^(.*)$ Web/index.php [L]
 
-ErrorDocument 404 Web/applications.php
+ErrorDocument 404 Web/index.php

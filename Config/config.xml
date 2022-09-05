@@ -2,12 +2,12 @@
 <!DOCTYPE config SYSTEM "../PHPbackend/config.dtd" >
 <config webData="Web" webLogger="Web/logger">
 	
-	<applications foldName="Applications">
-		<application name="Common"/>
-		<application name="Member" urlPattern="/member/(.*)"/>
-		<application name="Office" urlPattern="/office/(.*)"/>
-		<application name="Admin" urlPattern="/admin/(.*)"/>
-		<application name="Root" urlPattern="/root/(.*)"/>
+	<applications foldName="src/Applications">
+		<application name="Common" namespace ="\Applications\Common"/>
+		<application name="Member" namespace ="\Applications\Member" urlPattern="/member/(.*)"/>
+		<application name="Office" namespace ="\Applications\Office" urlPattern="/office/(.*)"/>
+		<application name="Admin" namespace ="\Applications\Admin" urlPattern="/admin/(.*)"/>
+		<application name="Root" namespace ="\Applications\Root" urlPattern="/root/(.*)"/>
 	</applications>
 	
 	<filters>
