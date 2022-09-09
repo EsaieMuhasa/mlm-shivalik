@@ -43,6 +43,13 @@ class VirtualMoney extends DBEntity {
 	 * @var float
 	 */
 	private $usedProduct = 0;
+
+    /**
+     * montant utiliser par les membres lors de l'achat des produits
+     *
+     * @var float
+     */
+    private $usedPurchase = 0;
 	
 	/**
 	 * Montant deja utiliser pour le compte afiliation
@@ -285,7 +292,7 @@ class VirtualMoney extends DBEntity {
         if ($this->availableProduct === null) {
             $this->availableProduct = $this->product;
         }
-        return $this->availableProduct;
+        return ($this->availableProduct - ($this->usedPurchase === null? 0 : $this->usedPurchase));
     }
 
     /**
@@ -401,5 +408,25 @@ class VirtualMoney extends DBEntity {
         $this->usedAfiliate = $usedAfiliate !== null? @intval($usedAfiliate, 10): $usedAfiliate;
     }
 
+
+    /**
+     * Get montant utiliser par les membres lors de l'achat des produits
+     *
+     * @return  float
+     */ 
+    public function getUsedPurchase() : ?float
+    {
+        return $this->usedPurchase;
+    }
+
+    /**
+     * Set montant utiliser par les membres lors de l'achat des produits
+     *
+     * @param  float  $usedPurchase  montant utiliser par les membres lors de l'achat des produits
+     */ 
+    public function setUsedPurchase(?float $usedPurchase) : void
+    {
+        $this->usedPurchase = $usedPurchase;
+    }
 }
 

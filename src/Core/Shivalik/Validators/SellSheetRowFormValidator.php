@@ -167,6 +167,14 @@ class SellSheetRowFormValidator extends DefaultFormValidator {
             ->processQuantity($row, $quantity)
             ->processUnitPrice($row, $unitPrice);
 
+        //verification de virtual disponible dans l'office
+        if(!$this->hasError()) {
+            if ($office->getAvailableVirtualMoneyProduct() < $row->getTotalPrice()) {
+                $this->setMessage("impossible to perform this operation because the product account of your office is insufficient: {$office->getAvailableVirtualMoneyProduct()}");
+            }
+        }
+        //==
+
         if (!$this->hasError()) {
             try {
                 $order = $this->monthlyOrderDAOManager->buildByMemberOfMonth($member->getId(), $office);
@@ -174,7 +182,7 @@ class SellSheetRowFormValidator extends DefaultFormValidator {
                 $row->setOffice($office);
                 $this->sellSheetRowDAOManager->create($row);
             } catch (DAOException $e) {
-                $this->setMessage($e->getMessage());
+                $this->setMessage($e->getMessage().": {$office->getAvailableVirtualMoneyProduct()}");
             }
         }
 

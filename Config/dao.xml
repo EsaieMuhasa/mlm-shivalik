@@ -162,6 +162,11 @@
 			name="\Core\Shivalik\Entities\SellSheetRow" 
 			specification="\Core\Shivalik\Managers\SellSheetRowDAOManager" 
 			implementation="\Core\Shivalik\Managers\Implementation\SellSheetRowDAOManagerImplementation1"/>
+
+		<entity 
+			name="\Core\Shivalik\Entities\SellSheetRowVirtualMoney" 
+			specification="\Core\Shivalik\Managers\SellSheetRowVirtualMoneyDAOManager" 
+			implementation="\Core\Shivalik\Managers\Implementation\SellSheetRowVirtualMoneyDAOManagerImplementation1"/>
 			
 	</entities>
 </dao>

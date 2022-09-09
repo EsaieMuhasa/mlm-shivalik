@@ -6,6 +6,8 @@ use Core\Shivalik\Entities\MonthlyOrder;
 use Core\Shivalik\Entities\Office;
 use Core\Shivalik\Entities\Product;
 use Core\Shivalik\Entities\SellSheetRow;
+use Core\Shivalik\Entities\SellSheetRowVirtualMoney;
+use Core\Shivalik\Entities\VirtualMoney;
 use Core\Shivalik\Managers\SellSheetRowDAOManager;
 use PDO;
 use PDOException;
@@ -22,6 +24,11 @@ class SellSheetRowDAOManagerImplementation1 extends DefaultDAOInterface implemen
      */
     public function createInTransaction($entity, PDO $pdo): void
     {
+        /**
+         * @var VirtualMoney[] $virtuals
+         */
+        $virtuals = $this->getManagerFactory()->getManagerOf(VirtualMoney::class)->findByOffice($entity->getOffice()->getId());
+        
         $id = UtilitaireSQL::insert($pdo, $this->getTableName(), [
             'product' => $entity->getProduct()->getId(),
             'monthlyOrder' => $entity->getMonthlyOrder()->getId(),
@@ -31,6 +38,35 @@ class SellSheetRowDAOManagerImplementation1 extends DefaultDAOInterface implemen
             'office' => $entity->getOffice()->getId()
         ]);
         $entity->setId($id);
+
+        $rowMoneys = [];//les virtuels toucher pour l'operation
+        $resteProduct = $entity->getTotalPrice();//
+
+        foreach ($virtuals as $virtual) {
+            $amount = $virtual->getSubstractableToAvailableProduct($resteProduct);
+            $resteProduct -= $amount;
+            
+            if ($amount != 0) {
+                $money = new SellSheetRowVirtualMoney();
+                $money->setAmount($amount);
+                $money->setMoney($virtual);
+                $money->setSheet($entity);
+                $money->setDateAjout($entity->getDateAjout());
+                
+                $rowMoneys[] = $money;
+                $virtual->substract($amount, 0);
+            }
+            
+            if ($resteProduct == 0) {
+                break;
+            }
+        }
+        
+        if (empty($rowMoneys)) {
+            throw new DAOException("You cannot perform this operation because your virtual wallet cannot support this operation");
+        }
+
+        $this->getManagerFactory()->getManagerOf(SellSheetRowVirtualMoney::class)->createAllInTransaction($rowMoneys, $pdo);
     }
 
     public function countByMember(int $memberId): int

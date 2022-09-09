@@ -143,6 +143,9 @@ CREATE OR REPLACE VIEW V_VirtualMoney AS
             SELECT SUM(MoneyGradeMember.product) FROM MoneyGradeMember WHERE MoneyGradeMember.virtualMoney = VirtualMoney.id
         ) AS usedProduct,
         (
+            SELECT SUM(SellSheetRowVirtualMoney.amount) FROM SellSheetRowVirtualMoney WHERE SellSheetRowVirtualMoney.money = VirtualMoney.id
+        ) AS usedPurchase,
+        (
             SELECT SUM(MoneyGradeMember.afiliate) FROM MoneyGradeMember WHERE MoneyGradeMember.virtualMoney = VirtualMoney.id
         ) AS usedAfiliate
     FROM VirtualMoney LEFT OUTER JOIN MoneyGradeMember ON VirtualMoney.id = MoneyGradeMember.virtualMoney;

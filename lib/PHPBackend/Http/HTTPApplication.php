@@ -346,11 +346,11 @@ class HTTPApplication implements Application
      */
     protected function runFilter (FilterConfig $config) : void {
         $name = $config->getName();
-        $fileName = dirname(dirname(__DIR__)).str_replace("\\", DIRECTORY_SEPARATOR, $name).'.php';
+        // $fileName = dirname(dirname(__DIR__)).str_replace("\\", DIRECTORY_SEPARATOR, $name).'.php';
         
-        if (!file_exists($fileName)) {
-            throw new PHPBackendException("Le fichier de definition de la classe {$name} du filtre n'existe pas: {$fileName}");
-        }
+        // if (!file_exists($fileName)) {
+        //     throw new PHPBackendException("Le fichier de definition de la classe {$name} du filtre n'existe pas: {$fileName}");
+        // }
         
         /**
          * @var HTTPFilter $filter

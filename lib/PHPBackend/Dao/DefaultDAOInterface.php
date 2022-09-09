@@ -227,6 +227,31 @@ abstract class DefaultDAOInterface implements DAOInterface
         }
     }
     
+    /**
+     * {@inheritDoc}
+     * @see DAOInterface::update()
+     *
+     * @param DBEntity $entity
+     * @param int|string $id
+     * @return void
+     */
+    public function update($entity, $id): void
+    {
+        try {
+            $pdo = $this->getConnection();
+            if ($pdo->beginTransaction()) {
+                $this->updateInTransaction($entity, $id, $pdo);
+                $pdo->commit();
+                $event = new DAOEvent($this, DAOEvent::TYPE_CREATION, $entity);
+                $this->dispatchEvent($event);
+            }else {
+                throw new DAOException("An error occurred while creating the transaction");
+            }
+        } catch (\PDOException $e) {
+            throw new DAOException("An error occurred in the plain banefice sharing transaction: {$e->getMessage()}", intval($e->getCode()), $e);
+        }
+    }
+    
 
     /**
      * {@inheritDoc}
