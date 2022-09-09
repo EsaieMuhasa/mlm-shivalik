@@ -56,7 +56,7 @@ $rows = $_REQUEST[AccountController::ATT_SELL_SHEETS];
 <div class="alert alert-info">
 	<p>no transaction on your sales sheet</p>
 </div>
-<?php }?>
+<?php } 
 
 
     

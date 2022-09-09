@@ -142,7 +142,7 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
 	 * @see \Core\Shivalik\Managers\GradeMemberDAOManager::findRequestedByMember()
 	 */
     public function findRequestedByMember(int $memberId): GradeMember {
-        if (!$this->hasRequested($memberId)) {
+        if (!$this->checkRequestedByMember($memberId)) {
             throw new DAOException("no current account upgrade request");
         }
         
@@ -902,9 +902,11 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
     /**
      * {@inheritDoc}
      * @see \Core\Shivalik\Managers\GradeMemberDAOManager::hasUnpaid()
+     * @deprecated 
      */
     public function hasUnpaid (?int $officeId) : bool {
-        return $this->hasOperation($officeId, null, false);
+        // return $this->hasOperation($officeId, null, false);
+        return false;
     }
     
     /**
@@ -912,7 +914,8 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
      * @see \Core\Shivalik\Managers\GradeMemberDAOManager::findUnpaid()
      */
     public function findUnpaid (?int $officeId) : array {
-        return $this->findOperations($officeId, null, false);
+        // return $this->findOperations($officeId, null, false);
+        return [];
     }
     
     /**

@@ -85,16 +85,16 @@ class OfficeAdminDAOManagerImplementation1 extends AbstractUserDAOManager implem
      */
     public function update($entity, $id) : void
     {
-        $this->pdo_updateInTable($this->getTableName(), array(
-            'name' => $entity->getName(),
-            'postName' => $entity->getPostName(),
-            'lastName'=> $entity->getLastName(),
-            'email' => $entity->getEmail(),
-            'telephone' => $entity->getTelephone(),
-            'kind' => $entity->getKind(),
-            self::FIELD_DATE_MODIF => $entity->getFormatedDateModif()
-        ), $id);
-        
+		UtilitaireSQL::update($this->getConnection(), $this->getTableName(), [
+			'name' => $entity->getName(),
+			'postName' => $entity->getPostName(),
+			'lastName'=> $entity->getLastName(),
+			'email' => $entity->getEmail(),
+			'telephone' => $entity->getTelephone(),
+			'kind' => $entity->getKind(),
+			self::FIELD_DATE_MODIF => $entity->getFormatedDateModif()
+		], $id);
+		        
         $event = new DAOEvent($this, DAOEvent::TYPE_UPDATION, $entity);
         $this->dispatchEvent($event);
     }

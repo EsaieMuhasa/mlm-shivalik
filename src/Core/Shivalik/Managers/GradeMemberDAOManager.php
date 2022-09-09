@@ -63,6 +63,7 @@ interface GradeMemberDAOManager extends DAOInterface
      * Verifie s'il a des operation dont la rertrocession n'a pas encore eu lieux
      * @param int $officeId
      * @return bool
+     * @deprecated 09/2022
      */
     public function hasUnpaid (?int $officeId) : bool;
     
@@ -72,6 +73,7 @@ interface GradeMemberDAOManager extends DAOInterface
      * @param int $officeId
      * @return GradeMember[]
      * @throws DAOException s'il y a erreur lors de la communication avec la BDD ou aucune operations
+     * @deprecated  09/2022
      */
     public function findUnpaid (?int $officeId) : array;
     
@@ -79,6 +81,7 @@ interface GradeMemberDAOManager extends DAOInterface
      * y-a-il aumoin une operation pour le virtual en parametre??
      * @param int $virtualId
      * @return bool
+     * @deprecated 09/2022
      */
     public function hasDebts (?int $virtualId = null) : bool ;
     
@@ -87,6 +90,7 @@ interface GradeMemberDAOManager extends DAOInterface
      * donc les operation qui ont impacter sur le montant virtual
      * @param int $virtualId
      * @return GradeMember[]
+     * @deprecated 09/2022
      */
     public function findDebts (?int $virtualId = null);
     

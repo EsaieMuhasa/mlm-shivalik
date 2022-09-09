@@ -62,7 +62,5 @@ $rows = $_REQUEST[MembersController::ATT_SELL_SHEET_ROWS];
         </section>
     </div>
 </div>
-<?php endif; ?>
-
-
-    
+<?php endif; 
+  

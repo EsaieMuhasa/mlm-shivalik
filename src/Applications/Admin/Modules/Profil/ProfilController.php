@@ -1,8 +1,8 @@
 <?php
 namespace Applications\Admin\Modules\Profil;
 
+use Applications\Admin\AdminController;
 use Core\Shivalik\Managers\CountryDAOManager;
-use PHPBackend\Http\HTTPController;
 use PHPBackend\Request;
 use PHPBackend\Response;
 use Core\Shivalik\Validators\OfficeAdminFormValidator;
@@ -14,7 +14,7 @@ use Core\Shivalik\Filters\SessionAdminFilter;
  * @author Esaie MHS
  *        
  */
-class ProfilController extends HTTPController
+class ProfilController extends AdminController
 {
     
     const ATT_LOCALISATION = 'localisation';

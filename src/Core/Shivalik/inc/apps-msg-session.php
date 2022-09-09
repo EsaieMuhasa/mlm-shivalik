@@ -30,5 +30,5 @@ use PHPBackend\Text\HtmlFormater;
 		</div>
 	</div>
 </div>
-<?php } ?>
+<?php }
 

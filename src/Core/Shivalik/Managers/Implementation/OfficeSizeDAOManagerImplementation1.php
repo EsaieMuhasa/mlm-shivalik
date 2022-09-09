@@ -32,8 +32,8 @@ class OfficeSizeDAOManagerImplementation1 extends DefaultDAOInterface implements
      */
     public function upgrade(OfficeSize $os): void
     {
+        $pdo = $this->getConnection();
         try {
-            $pdo = $this->getConnection();
             if ($pdo->beginTransaction()) {
                 
                 UtilitaireSQL::update($pdo, $this->getTableName(), [                    
@@ -59,7 +59,7 @@ class OfficeSizeDAOManagerImplementation1 extends DefaultDAOInterface implements
             }
         } catch (\PDOException $e) {
             try {
-                $this->pdo->rollBack();
+                $pdo->rollBack();
             } catch (\Exception $e) {}
             throw new DAOException($e->getMessage(), $e->getCode(), $e);
         }

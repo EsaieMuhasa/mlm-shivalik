@@ -84,5 +84,5 @@ use Applications\Root\Modules\Settings\SettingsController;
 <div class="alert alert-danger">
 	<p>no generation save in the generation configuration</p>
 </div>
-<?php }?>
+<?php }
 

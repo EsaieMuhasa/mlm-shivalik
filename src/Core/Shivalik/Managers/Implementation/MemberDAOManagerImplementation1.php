@@ -540,7 +540,7 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
             
             case Member::RIGHT_FOOT : {//right
                 if ($this->checkRightChild($memberId)) {
-                    $data[] = $this->getRightDownlineStack($memberId);
+                    $data[] = $this->findRightDownlineStack($memberId);
                 }
             }break;
             

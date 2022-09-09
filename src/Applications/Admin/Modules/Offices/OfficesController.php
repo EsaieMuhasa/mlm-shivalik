@@ -628,22 +628,22 @@ class OfficesController extends AdminController {
 	        $withdrawals = array();
 	    }
 	    
-	    //raports
-	    if ($this->raportWithdrawalDAOManager->checkRaportInInterval($dateMin, $dateMax, $this->office->getId())) {
-	        $raports = $this->raportWithdrawalDAOManager->findRaportInInterval($dateMin, $dateMax, $this->office->getId());
-	        foreach ($raports as $raport) {
-	            $raport->setWithdrawals($this->withdrawalDAOManager->findByRapport($raport->getId()));
-	        }
-	    } else {
-	        $raports = array();
-	    }
+	    // //raports
+	    // if ($this->raportWithdrawalDAOManager->checkRaportInInterval($dateMin, $dateMax, $this->office->getId())) {
+	    //     $raports = $this->raportWithdrawalDAOManager->findRaportInInterval($dateMin, $dateMax, $this->office->getId());
+	    //     foreach ($raports as $raport) {
+	    //         $raport->setWithdrawals($this->withdrawalDAOManager->findByRapport($raport->getId()));
+	    //     }
+	    // } else {
+	    //     $raports = array();
+	    // }
 	    
 	    $request->addAttribute(self::ATT_MONTH, $month);
 	    $request->addAttribute(self::ATT_MEMBERS, $members);
 	    $request->addAttribute(self::ATT_VIRTUAL_MONEYS, $virtuals);
 	    $request->addAttribute(self::ATT_GRADES_MEMBERS, $packets);
 	    $request->addAttribute(self::ATT_WITHDRAWALS, $withdrawals);
-	    $request->addAttribute(self::ATT_RAPORTS_WITHDRAWALS, $raports);
+	    // $request->addAttribute(self::ATT_RAPORTS_WITHDRAWALS, $raports);
 	}
 	
 	//gestion de stock
