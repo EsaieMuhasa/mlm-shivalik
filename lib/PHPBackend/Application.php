@@ -20,6 +20,13 @@ interface Application
      * @return Application|NULL
      */
     public function getSource () : ?Application;
+
+    /**
+     * revoie le name space de base de l'application
+     *
+     * @return string
+     */
+    public function getNamespace () : string;
     
     /**
      * Revoie le controller concerner, pour la requette encours

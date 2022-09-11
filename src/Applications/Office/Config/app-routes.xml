@@ -21,7 +21,6 @@
 	 	<route action="index" urlPattern="/office/members/([0-9]+)-([0-9]+)\.html" paramsNames="limit,offset"/>
 	 	<route action="index" urlPattern="/office/members/(table|grid)/([0-9]+)-([0-9]+)\.html" paramsNames="affichage,limit,offset"/>
 	 	<route action="addMember" urlPattern="/office/members/add\.html"/>
-	 	<route action="affiliateMember" urlPattern="/office/members/([0-9]+)/(affiliate)\.html" paramsNames="id,option"/>
 	 	
 	 	<route action="member" urlPattern="/office/members/([0-9]+)/" paramsNames="id"/>
 	 	<route action="upgradeMember" urlPattern="/office/members/([0-9]+)/(upgrade)\.html" paramsNames="id,option"/>
@@ -30,6 +29,10 @@
 	
 	 	<route action="sellSheet" urlPattern="/office/members/([0-9]+)/(sell-sheet)/" paramsNames="id,option"/>
 	 	<route action="addSellSheetRow" urlPattern="/office/members/([0-9]+)/(sell-sheet)/add\.html" paramsNames="id,option"/>
+	 	<!-- afficliation d'un membre. pour un compte ayant des points valeur-->
+		<route action="affiliateMember" urlPattern="/office/members/([0-9]+)/(affiliate)\.html" paramsNames="id,option"/>
+	 	<!-- upgrade d'un compte membre. soit du proprietaire des point valeurs, soit d'un autre membre -->
+		<route action="pvUpgradeMember" urlPattern="/office/members/([0-9]+)/upgrade-(me|other)\.html" paramsNames="id,option"/>
 
 		<route action="withdrawalsMember" urlPattern="/office/members/([0-9]+)/(withdrawals)\.html" paramsNames="id,option"/>
 		<route action="withdrawalsMember" urlPattern="/office/members/([0-9]+)/(withdrawals)/([0-9]+)\.html" paramsNames="id,option,requestId"/>

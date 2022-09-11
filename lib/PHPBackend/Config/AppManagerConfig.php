@@ -2,6 +2,7 @@
 namespace PHPBackend\Config;
 
 use PHPBackend\PHPBackendException;
+use PHPBackend\RouteNotFoundException;
 
 /**
  *
@@ -96,6 +97,24 @@ class AppManagerConfig
         }
         
         return $this->getDefaultApp();
+    }
+
+    /**
+     * renvoie l'aaplication proprietaire du name en parametre.
+     * si aucune application ne correspond au name en parametre, alors un route not found est leve
+     *
+     * @param string $name
+     * @return AppMetadata
+     * @throws RouteNotFoundException
+     */
+    public function findByName (string $name) :AppMetadata {
+        foreach ($this->metadatas as $meta) {
+            if (!$meta->isDefault() && $meta->getName() == $name) {
+                return $meta;
+            }
+        }
+
+        throw new RouteNotFoundException("Aucune application ne nommée {$name}");
     }
     
     /**

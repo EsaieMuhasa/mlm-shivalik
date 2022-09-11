@@ -13,7 +13,14 @@ $member = $_REQUEST[MembersController::ATT_MEMBER];
  */
 $compte = $_REQUEST[MembersController::ATT_COMPTE];
 
+/**
+ * @var Member $parent
+ */
 $parent = $compte->getMember()->getParent();
+
+/**
+ * @var Member $sponsor
+ */
 $sponsor = $compte->getMember()->getSponsor();
 
 

@@ -157,7 +157,7 @@ class MembersController extends HTTPController {
 	/**
 	 * acces aux membres, dont leurs compte ont ete creer par l'office dans la session encours.
 	 * @param Request $request
-	 * @param Request $response
+	 * @param Response $response
 	 */
 	public function executeIndex (Request $request, Response $response) : void {
 		
@@ -209,7 +209,7 @@ class MembersController extends HTTPController {
 	/**
 	 * Adhesion d'un nouveau membre, sur wallet de l'office
 	 * @param Request $request
-	 * @param Request $response
+	 * @param Response $response
 	 */
 	public function executeAddMember (Request $request, Response $response) : void {
 		
@@ -321,12 +321,24 @@ class MembersController extends HTTPController {
 	    $grades = $this->gradeDAOManager->findAll();
 	    $request->addAttribute(self::ATT_GRADES, $grades);
 	}
-	
+
+	/**
+	 * mis en niveau du compte d'un membre en utilisant les PVs de la fiche d'un membre
+	 * pour acceder a cette operation, la fiche du membre doit avoir des points valeurs.
+	 * l'utilisateur peut metre en niveau son compte, ou celui d'un membre de son reseau uniquement
+	 *
+	 * @param Request $request
+	 * @param Response $response
+	 * @return void
+	 */
+	public function executePvUpgradeMember (Request $request, Response $response) : void {
+
+	}	
 	
 	/**
 	 * Dashboard du compte d'un membre
 	 * @param Request $request
-	 * @param Request $response
+	 * @param Response $response
 	 */
 	public function executeMember (Request $request, Response $response) : void {
 		$id = intval($request->getDataGET('id'), 10);
@@ -366,7 +378,7 @@ class MembersController extends HTTPController {
 	/**
 	 * visiualisation des membres du reseau d'un membre
 	 * @param Request $request
-	 * @param Request $response
+	 * @param Response $response
 	 */
 	public function executeDownlines (Request $request, Response $response) : void {
 		
@@ -426,7 +438,7 @@ class MembersController extends HTTPController {
 	 * - visualisation des operations de cashout deja effectuer par le compte d'un utilisateur
 	 * - validation d'une operation pour le compte d'un utilisateur
 	 * @param Request $request
-	 * @param Request $response
+	 * @param Response $response
 	 */
 	public function executeWithdrawalsMember (Request $request, Response $response) : void {
 		$id = intval($request->getDataGET('id'), 10);//identifiant du membre
@@ -439,7 +451,7 @@ class MembersController extends HTTPController {
 		 */
 		$member = $this->memberDAOManager->findById($id);
 		
-		if ($request->existGET('requestId')) {//dans le cas où on doit accepte le cashout
+		if ($request->existInGET('requestId')) {//dans le cas où on doit accepte le cashout
 		    
 		    /**
 		     * @var Withdrawal $cashout
@@ -483,7 +495,7 @@ class MembersController extends HTTPController {
 	/**
 	 * Mise en jours du packet d'un membre
 	 * @param Request $request
-	 * @param Request $response
+	 * @param Response $response
 	 */
 	public function executeUpgradeMember (Request $request, Response $response) : void {
 		$id = intval($request->getDataGET('id'), 10);

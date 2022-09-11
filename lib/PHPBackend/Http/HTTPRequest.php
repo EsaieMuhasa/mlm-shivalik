@@ -1,9 +1,12 @@
 <?php
 namespace PHPBackend\Http;
 
+use PHPBackend\AppConfig;
 use PHPBackend\Request;
 use PHPBackend\File\UploadedFile;
 use PHPBackend\Application;
+use PHPBackend\Config\AppManagerConfig;
+use PHPBackend\Config\AppMetadata;
 use PHPBackend\Session;
 
 
@@ -277,7 +280,7 @@ final class HTTPRequest implements Request
     public function forward(string $action, ?string $module=null, ?string $applicationName=null) : void
     {
         if ($applicationName==null) {
-            $controllerClass = "{$this->getApplication()->getContainer()}\\{$this->getApplication()->getName()}\\Modules\\{$module}\\{$module}Controller";
+            $controllerClass = "{$this->getApplication()->getNamespace()}\\Modules\\{$module}\\{$module}Controller";
             /**
              * @var HTTPController $constrollerInstance
              */
@@ -287,9 +290,11 @@ final class HTTPRequest implements Request
             $this->getApplication()->getResponse()->send();
             return;
         }
+
+        $meta = AppManagerConfig::getInstance()->findByName($applicationName);
         
-        $applicationInstance = new HTTPApplication($applicationName, $this->getApplication()->getContainer(), $this->getApplication());
-        $controllerClass = "\\{$applicationInstance->getContainer()}\\{$applicationInstance->getName()}\\Modules\\{$module}\\{$module}Controller";
+        $applicationInstance = new HTTPApplication($meta->getName(), $meta->getNamespace(), $this->getApplication()->getContainer(), $this->getApplication());
+        $controllerClass = "{$meta->getNamespace()}\\\Modules\\{$module}\\{$module}Controller";
         
         $controllerInstance = new $controllerClass($applicationInstance, $module, $action);
         $controllerInstance->execute();

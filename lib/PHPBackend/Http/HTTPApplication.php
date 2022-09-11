@@ -4,7 +4,6 @@ namespace PHPBackend\Http;
 
 use PHPBackend\Config\FilterRoute;
 use PHPBackend\Config\FilterConfig;
-use PHPBackend\Config;
 use PHPBackend\RouteNotFoundException;
 use PHPBackend\PHPBackendException;
 use PHPBackend\Route;
@@ -14,7 +13,6 @@ use PHPBackend\Request;
 use PHPBackend\Response;
 use PHPBackend\AppConfig;
 use PHPBackend\Config\GlobalConfig;
-use ReflectionClass;
 
 /**
  *
@@ -51,7 +49,7 @@ class HTTPApplication implements Application
     protected $httpResponse;
     
     /**
-     * @var Config
+     * @var AppConfig
      */
     protected $config;
     
@@ -229,7 +227,7 @@ class HTTPApplication implements Application
             
             for ($i = 0; $i < $filters->length; $i++) {//pour chaque filtre
                 /**
-                 * @var \DOMNodeList $filter
+                 * @var \DOMElement $filter
                  */
                 $filter = $filters->item($i);
                 
@@ -360,5 +358,14 @@ class HTTPApplication implements Application
     }
  
 
+
+    /**
+     * {@inheritDoc}
+     * @return  string
+     */ 
+    public function getNamespace() : string
+    {
+        return $this->namespace;
+    }
 }
 

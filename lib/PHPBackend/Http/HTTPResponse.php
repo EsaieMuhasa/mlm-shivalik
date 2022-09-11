@@ -86,7 +86,7 @@ final class HTTPResponse implements Response
      */
     public function sendError(?string $message=null, int $code=self::ERROR_NOT_FOUND) : void
     {
-        if($this->getApplication()->getHttpRequest()->getExtensionURI()!='pdf'){
+        if($this->getApplication()->getRequest()->getExtensionURI()!='pdf'){
             header('HTTP/1.0 404 Not Found');
         }
             
@@ -97,7 +97,7 @@ final class HTTPResponse implements Response
         }else {
             $this->page->setViewFile(dirname(__DIR__).DIRECTORY_SEPARATOR."DefaultLayouts".DIRECTORY_SEPARATOR."404");
         }
-        $this->getApplication()->getRequest()->addAttribute('message', ($message==null? "Désolez! Aucune réssource ne correspond à l\'URL '{$this->getApplication()->getHttpRequest()->getURI()}' dans l'application '{$this->getApplication()->getName()}'": $message));
+        $this->getApplication()->getRequest()->addAttribute('message', ($message==null? "Désolez! Aucune réssource ne correspond à l\'URL '{$this->getApplication()->getRequest()->getURI()}' dans l'application '{$this->getApplication()->getName()}'": $message));
         $this->getApplication()->getRequest()->addAttribute('code', $code);
         $this->send();
     }
@@ -111,7 +111,7 @@ final class HTTPResponse implements Response
 //         var_dump($exception);exit();
         //$this->getApplication()->logger($exception);
         
-        if($this->getApplication()->getHttpRequest()->getExtensionURI()!='pdf'){
+        if($this->getApplication()->getRequest()->getExtensionURI()!='pdf'){
             header('HTTP/1.0 404 Not Found');
         }
         
@@ -146,7 +146,7 @@ final class HTTPResponse implements Response
      */
     public function send() : void
     {
-        if($this->getApplication()->getHttpRequest()->getExtensionURI()=='pdf'){//pour les fichier PDF
+        if($this->getApplication()->getRequest()->getExtensionURI()=='pdf'){//pour les fichier PDF
             $this->sendPDF();
         }else{//par defaut (pour tout les reste des page page)
             exit($this->page->getGeneratedPage());
@@ -160,8 +160,6 @@ final class HTTPResponse implements Response
      * @param string $size
      */
     public function sendPDF(?string $fileName = null, string $orientation='portrait', string $size = 'A4'){
-        
-        require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'dompdf'.DIRECTORY_SEPARATOR.'autoload.inc.php';
         
         //def("DOMPDF_ENABLE_REMOTE", false);
         $pdf = new Dompdf();
