@@ -27,6 +27,8 @@ $rows = $_REQUEST[MembersController::ATT_SELL_SHEET_ROWS];
     <hr/>
 </div>
 
+<?php require_once dirname(__DIR__).DIRECTORY_SEPARATOR."Templates".DIRECTORY_SEPARATOR."monthly.php"; ?>
+
 <?php if (!empty($rows)) : ?>
 <div class="row">
     <div class="col-md-12">

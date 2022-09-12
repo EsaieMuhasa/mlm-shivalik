@@ -32,7 +32,7 @@ class GradeMember extends DBEntity
     private $product;
     
     /**
-     * @var number
+     * @var float
      */
     private $officePart;
     

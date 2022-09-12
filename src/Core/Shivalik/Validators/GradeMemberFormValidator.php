@@ -13,9 +13,11 @@ use PHPBackend\Validator\DefaultFormValidator;
 use PHPBackend\Validator\IllegalFormValueException;
 use Core\Shivalik\Managers\MonthlyOrderDAOManager;
 use Applications\Office\Modules\Members\MembersController;
+use Core\Shivalik\Entities\Grade;
 use Core\Shivalik\Entities\MonthlyOrder;
 use Core\Shivalik\Entities\Office;
 use Core\Shivalik\Managers\OfficeDAOManager;
+use DateTime;
 
 /**
  *
@@ -107,8 +109,46 @@ class GradeMemberFormValidator extends DefaultFormValidator
     }
     
     /**
+     * validation du matricule d'un membre
+     *
+     * @param string $member
+     * @return void
+     * @throws IllegalFormValueException
+     */
+    private function validationMatriculMember (?string $member) : void {
+        if ($member == null) {
+            throw new IllegalFormValueException("the reference of the member concerned is mandatory");
+        }
+        
+        try {
+            if (!$this->memberDAOManager->checkByMatricule($member)) {
+                throw new IllegalFormValueException("the referemce of member is invalid");
+            }
+        } catch (DAOException $e) {
+            throw new IllegalFormValueException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+
+    /**
+     * processuce de validation et traitement du matricule d'un membre
+     *
+     * @param GradeMember $gm
+     * @param string $matricul
+     * @return void
+     * @throws IllegalFormValueException
+     */
+    private function processingMatriculMember (GradeMember $gm, $matricul) : void {
+        try {
+            $this->validationMatriculMember($matricul);
+            $gm->setMember($this->memberDAOManager->findByMatricule($matricul));
+        } catch (IllegalFormValueException $e) {
+            $this->addMessage(self::FIELD_MEMBER, $e->getMessage());
+        }
+    }
+    
+    /**
      * validation du montant d'adhesion, payer par le membre du syndicat
-     * @param number $membership
+     * @param float $membership
      * @throws IllegalFormValueException
      */
     private function validationMembership ($membership) : void {
@@ -121,7 +161,7 @@ class GradeMemberFormValidator extends DefaultFormValidator
     
     /**
      * validation du montant considerer comme achat produit lors de l'adhesion d'un membre
-     * @param number $product
+     * @param float $product
      * @throws IllegalFormValueException
      */
     private function validationProduct ($product) : void {
@@ -293,6 +333,9 @@ class GradeMemberFormValidator extends DefaultFormValidator
                 $member = $this->memberDAOManager->findById(intval($memberId, 10));
                 $old = $this->gradeMemberDAOManager->findCurrentByMember($member->getId());
                 
+                /**
+                 * @var Grade $require
+                 */
                 $require = $this->gradeDAOManager->findById($gradeId);
                 
                 $product = $require->getAmount() - $old->getGrade()->getAmount();
@@ -426,6 +469,96 @@ class GradeMemberFormValidator extends DefaultFormValidator
     public function updateAfterValidation(Request $request) {
         throw new PHPBackendException("You not have permission to perfom this operation");
     }
+
+    /**
+     * mis en niveau d'un compte, en utilisant le montant deja enregistrer sur la fichhe de vente du compte 
+     * d'un membre.
+     * lors dela mis en niveau, on peut uniquement metre en niveau son compte, ou un des compte de downline,
+     * directement parainer
+     *
+     * @param Request $request
+     * @return GradeMember
+     */
+    public function pvUpgradeAfterValidation (Request $request) : GradeMember {
+        $gm = new GradeMember();
+
+        $grade = $request->getDataPOST(self::FIELD_GRADE);//le packet que demande le membre
+        $member = $request->getDataPOST(self::FIELD_MEMBER);//le compte du membre
+        
+        $this->processingGrade($gm, $grade);
+        $this->processingMatriculMember($gm, $member);
+        
+        if(!$this->hasError()) {
+            
+            /**
+             * le membre proprietaire du compte qui doit etre facturer
+             * @var Member $owner
+             */
+            $owner = $request->getAttribute(self::FIELD_MEMBER);
+            
+            /**
+             * @var MonthlyOrder $monthly
+             */
+            $monthly = $request->getAttribute(MembersController::ATT_MONTHLY_ORDER_FOR_ACCOUNT);
+            $office = $request->getAttribute(self::FIELD_OFFICE_ADMIN)->getOffice();
+
+            $sponsor = $this->memberDAOManager->findSponsor($gm->getMember()->getId());
+            $old = $this->gradeMemberDAOManager->findCurrentByMember($gm->getMember()->getId());
+                
+            /**
+             * @var Grade $require
+             */
+            $require = $this->gradeDAOManager->findById($gm->getGrade()->getId());
+            $product = $require->getAmount() - $old->getGrade()->getAmount();
+            
+            $this->processingProduct($gm, $product);
+            $gm->setMembership(0);
+            $gm->setOfficePart(0);
+            
+            if ($old->getGrade()->getAmount() >= $require->getAmount()) {
+                $this->setMessage("take the higher grade than '{$old->getGrade()->getName()}'");
+            } else {
+                
+                if($sponsor->getId() != $owner->getId() && $gm->getMember()->getId() != $owner->getId()) {
+                    $this->setMessage("Unable to perform this operation because this account does not directly sponsor the account you want to upgrade");
+                } else {
+
+                    // --verification de la monais virtuel
+                    $product = $gm->getProduct();
+                    
+                    if ($product > $monthly->getAvailable()) {
+                        $message = "impossible to perform this operation because the member wallet is insufficient. requered product money: {$product} {$request->getApplication()->getConfig()->get('devise')}, ";
+                        $message .= "requered membership money: 0 {$request->getApplication()->getConfig()->get('devise')}, ";
+                        $message .= "your product wallet: {$monthly->getAvailable()} {$request->getApplication()->getConfig()->get('devise')}";
+                        $this->setMessage($message);
+                    }
+                	// \\--
+
+                    $old->setCloseDate(new DateTime());
+                    $gm->setInitDate(new DateTime());
+                    $gm->setOld($old);
+                    $gm->setOffice($office);
+                    $gm->setMonthlyOrder($monthly);
+
+                }
+                
+            }
+            
+        }
+        
+        if (!$this->hasError()) {
+            try {
+                $this->officeDAOManager->load($office);
+                $this->gradeMemberDAOManager->upgrade($gm);
+                $this->officeDAOManager->load($office);
+            } catch (DAOException $e) {
+                $this->setMessage($e->getMessage());
+            }
+        }
+
+        $this->setResult("operation done successfully", "Failed to execute operation");
+        return $gm;
+    }
     
     /**
      * activation d'un packet
@@ -440,6 +573,9 @@ class GradeMemberFormValidator extends DefaultFormValidator
         
         if (!$this->hasError()) {
             try {
+                /**
+                 * @var GradeMember $inDatabase
+                 */
                 $inDatabase = $this->gradeMemberDAOManager->findById(intval($id), 10);
                 $inDatabase->setInitDate(new \DateTime());
                 $this->gradeMemberDAOManager->enable($inDatabase);

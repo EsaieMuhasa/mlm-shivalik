@@ -121,7 +121,7 @@ class Grade extends DBEntity
     
     
     /**
-     * @return number
+     * @return float
      */
     public function getAmount()
     {

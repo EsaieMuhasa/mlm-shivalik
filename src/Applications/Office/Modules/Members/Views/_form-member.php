@@ -36,7 +36,7 @@ $monthly = isset($_REQUEST[MembersController::ATT_MONTHLY_ORDER_FOR_ACCOUNT])? $
     		</div>
     		<?php }?>
     		<fieldset>
-    			<legend>Parents nodes</legend>
+    			<legend>Upline accounts</legend>
     			<div class="row">
         			<div class="col-md-6">
                 		<div class="form-group <?php echo (isset($_REQUEST[MemberFormValidator::MEMBER_FEEDBACK]->errorSponsor)? 'has-error':'');?>">

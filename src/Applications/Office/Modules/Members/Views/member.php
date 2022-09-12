@@ -35,6 +35,7 @@ if (isset($_REQUEST[MembersController::ATT_GRADE_MEMBER])) {
 }
 $requestedGradeMember = isset($_REQUEST[MembersController::ATT_REQUESTED_GRADE_MEMBER])? $_REQUEST[MembersController::ATT_REQUESTED_GRADE_MEMBER]:null;
 
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR."Templates".DIRECTORY_SEPARATOR."monthly.php";
 ?>
 
 <div class="row">

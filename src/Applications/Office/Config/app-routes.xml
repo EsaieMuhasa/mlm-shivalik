@@ -32,7 +32,7 @@
 	 	<!-- afficliation d'un membre. pour un compte ayant des points valeur-->
 		<route action="affiliateMember" urlPattern="/office/members/([0-9]+)/(affiliate)\.html" paramsNames="id,option"/>
 	 	<!-- upgrade d'un compte membre. soit du proprietaire des point valeurs, soit d'un autre membre -->
-		<route action="pvUpgradeMember" urlPattern="/office/members/([0-9]+)/upgrade-(me|other)\.html" paramsNames="id,option"/>
+		<route action="pvUpgradeMember" urlPattern="/office/members/([0-9]+)/pv-upgrade\.html" paramsNames="id"/>
 
 		<route action="withdrawalsMember" urlPattern="/office/members/([0-9]+)/(withdrawals)\.html" paramsNames="id,option"/>
 		<route action="withdrawalsMember" urlPattern="/office/members/([0-9]+)/(withdrawals)/([0-9]+)\.html" paramsNames="id,option,requestId"/>

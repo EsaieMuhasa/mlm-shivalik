@@ -1,6 +1,7 @@
 <?php
 namespace PHPBackend;
 
+use DOMElement;
 use PHPBackend\Config\AppManagerConfig;
 use PHPBackend\Config\VarList;
 use PHPBackend\Config\VarDefine;
@@ -71,7 +72,6 @@ class AppConfig
             //================================================
             $appConfig = AppManagerConfig::getInstance();
             $xmlFile = "{$_SERVER['DOCUMENT_ROOT']}/{$appConfig->getContainer()}/{$this->appName}/Config/app-config.xml";
-            
             $readFile = $xml->load($xmlFile);
             
             if ($readFile===false) {
@@ -109,7 +109,7 @@ class AppConfig
         if (empty($this->users)) {
             $xml = new \DOMDocument();
             $appConfig = AppManagerConfig::getInstance();
-            $xmlFile = "{$appConfig->getContainer()}/".$this->appName.'/Config/app-config.xml';
+            $xmlFile = "{$_SERVER['DOCUMENT_ROOT']}/{$appConfig->getContainer()}/{$this->appName}/Config/app-config.xml";
             
             if (!file_exists($xmlFile)) {
                 throw new PHPBackendException('Le fichier de configuration de l\'application "'.$this->appName.'" n\'existe pas sur le serveur. =>'.$xmlFile);
@@ -154,6 +154,10 @@ class AppConfig
         
         $childrens = $element->childNodes;
         for ($i = 0; $i < $childrens->length; $i++) {
+
+            /**
+             * @var DOMElement $child
+             */
             $child = $childrens->item($i);
             if ($child->nodeName === 'item') {
                 $item = null;

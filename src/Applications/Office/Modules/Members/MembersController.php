@@ -120,29 +120,31 @@ class MembersController extends HTTPController {
 	 */
 	private $sellSheetRowDAOManager;
 	
+	
 	/**
 	 * {@inheritDoc}
-	 * @see HTTPController::__construct()
+	 *
+	 * @param Request $request
+	 * @param Response $response
+	 * @return void
 	 */
-	public function __construct(Application $application, string $module, string $action)
-	{
-		parent::__construct($application, $module, $action);
+	protected function init (Request $request, Response $response) : void {
 		$nombre = $this->memberDAOManager->countAll();
-		$application->getRequest()->addAttribute(self::PARAM_MEMBER_COUNT, $nombre);
+		$request->addAttribute(self::PARAM_MEMBER_COUNT, $nombre);
 		
-		if ($application->getRequest()->existInGET('id')) {//
-			$id = intval($application->getRequest()->getDataGET('id'), 10);
+		if ($request->existInGET('id')) {//
+			$id = intval($request->getDataGET('id'), 10);
 			/**
 			 * @var Member $member
 			 */
 			$member = $this->memberDAOManager->findById($id);
 			$account = $this->getAccount($member);
 			
-			$application->getRequest()->addAttribute(self::ATT_COMPTE, $account);
-			$application->getRequest()->addAttribute(self::ATT_MEMBER, $member);
-			$application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, $member->getNames());
+			$request->addAttribute(self::ATT_COMPTE, $account);
+			$request->addAttribute(self::ATT_MEMBER, $member);
+			$request->addAttribute(self::ATT_VIEW_TITLE, $member->getNames());
 		} else {
-			$application->getRequest()->addAttribute(self::ATT_VIEW_TITLE, "Union members");
+			$request->addAttribute(self::ATT_VIEW_TITLE, "Union members");
 		}
 	}
 	
@@ -332,7 +334,57 @@ class MembersController extends HTTPController {
 	 * @return void
 	 */
 	public function executePvUpgradeMember (Request $request, Response $response) : void {
+		$id = intval($request->getDataGET('id'), 10);
+		if (!$this->memberDAOManager->checkById($id)) {
+			$response->sendError();
+		}
+		
+		if ($this->gradeMemberDAOManager->checkRequestedByMember($id)) {
+			$response->sendRedirect("/office/members/{$id}/");
+		}
+		
+		$office = $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice();
+		
+		if ($this->gradeMemberDAOManager->checkByOffice($office->getId())) {
+			$office->setOperations($this->gradeMemberDAOManager->findByOffice($office->getId()));
+		}
+		
+		if ($this->virtualMoneyDAOManager->checkByOffice($office->getId())) {
+			$office->setVirtualMoneys($this->virtualMoneyDAOManager->findByOffice($office->getId()));
+		}
+		
+		/**
+		 * @var Member $member
+		 */
+		$member = $this->memberDAOManager->findById($id);
+		$gradeMember = $this->gradeMemberDAOManager->findCurrentByMember($id);
+		$gradeMember->setMember($member);
 
+		
+		if($this->monthlyOrderDAOManager->checkByMemberOfMonth($member->getId())){
+			$monthly = $this->monthlyOrderDAOManager->findByMemberOfMonth($member->getId());
+			$request->addAttribute(self::ATT_MONTHLY_ORDER_FOR_ACCOUNT, $monthly);
+		} else {
+			$response->sendError("Route not found");
+		}
+		
+		if ($request->getMethod() == Request::HTTP_POST) {
+			$form = new GradeMemberFormValidator($this->getDaoManager());
+			$request->addAttribute(GradeMemberFormValidator::FIELD_OFFICE_ADMIN, $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION));
+			$request->addAttribute($form::FIELD_MEMBER, $member);
+			$form->pvUpgradeAfterValidation($request);
+			
+			if (!$form->hasError()) {
+				$response->sendRedirect("/office/members/{$id}/");
+			}
+			
+			$form->includeFeedback($request);
+		}
+		
+		$request->addAttribute(self::ATT_MEMBER, $member);
+		$request->addAttribute(self::ATT_GRADE_MEMBER, $gradeMember);
+		$grades = $this->gradeDAOManager->findAll();
+		$request->addAttribute(self::ATT_GRADES, $grades);
 	}	
 	
 	/**
@@ -564,6 +616,11 @@ class MembersController extends HTTPController {
 			$rows = $this->sellSheetRowDAOManager->findByMember($id, $limit, $offset);
 		} else {
 			$rows = [];
+		}
+
+		if($this->monthlyOrderDAOManager->checkByMemberOfMonth($member->getId())){//affichage du montant valide
+			$monthly = $this->monthlyOrderDAOManager->findByMemberOfMonth($member->getId());
+			$request->addAttribute(self::ATT_MONTHLY_ORDER_FOR_ACCOUNT, $monthly);
 		}
 
 		$request->addAttribute(self::ATT_SELL_SHEET_ROWS, $rows);

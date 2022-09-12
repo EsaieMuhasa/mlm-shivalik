@@ -655,7 +655,7 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
             $gm->setId($id);
             $this->dispatchBonusAndPointValues($gm, $pdo);
             
-            if ($gm->getMonthlyOrder() == null) {
+            if ($gm->getMonthlyOrder() == null) {//on coupe les virtuel du compte de l'office
                 /**
                  * @var VirtualMoney[] $virtuals
                  */
