@@ -109,7 +109,7 @@ class AppManagerConfig
      */
     public function findByName (string $name) :AppMetadata {
         foreach ($this->metadatas as $meta) {
-            if (!$meta->isDefault() && $meta->getName() == $name) {
+            if ($meta->getName() == $name) {
                 return $meta;
             }
         }

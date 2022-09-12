@@ -294,7 +294,7 @@ final class HTTPRequest implements Request
         $meta = AppManagerConfig::getInstance()->findByName($applicationName);
         
         $applicationInstance = new HTTPApplication($meta->getName(), $meta->getNamespace(), $this->getApplication()->getContainer(), $this->getApplication());
-        $controllerClass = "{$meta->getNamespace()}\\\Modules\\{$module}\\{$module}Controller";
+        $controllerClass = "{$meta->getNamespace()}\\Modules\\{$module}\\{$module}Controller";
         
         $controllerInstance = new $controllerClass($applicationInstance, $module, $action);
         $controllerInstance->execute();

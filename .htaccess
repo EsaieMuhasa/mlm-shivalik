@@ -13,8 +13,8 @@ RewriteRule ^favicon.icon$ logo.png [L]
 RewriteRule ^(member|office|root|admin)/(.*)$ Web/index.php?subdomain=$1 [QSA,L]
 
 #protection des fichiers sources sensible
-RewriteCond %{REQUEST_URI} ^/(Applications|PHPBackend|Core)/.*
-RewriteRule ^(Applications|PHPBackend|Core)(.*)$ Web/index.php [L]
+RewriteCond %{REQUEST_URI} ^/(lib|src)/.*
+RewriteRule ^(lib|src)(.*)$ Web/index.php [L]
 
 #pour tout ce qui n'est pas fichiers publique
 RewriteCond %{REQUEST_FILENAME} !-f
