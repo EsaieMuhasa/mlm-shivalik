@@ -427,22 +427,19 @@ class MonthlyOrderDAOManagerImplementation1 extends AbstractOperationDAOManager 
         $now = ($entity->getDateAjout() == null)? new DateTime() : $entity->getDateAjout();
         $month = intval($now->format('m'), 10);
         $year = intval($now->format('Y'), 10);
-        if ($this->checkByMemberOfMonth($entity->getMember()->getId(), null, $month, $year)){
+        if ($this->checkByMemberOfMonth($entity->getMember()->getId(), false, $month, $year)){
             $message = "Impossible to perform this operation. the same member account cannot obtain 2 repurchase bonuses for the same month. ";
             $message .= "This operation could be carried out the following month. Thank you for the confidence you have in favor of the Shivalick company.";
             throw new DAOException($message);
         }
 
-        if (!$this->checkByMemberOfMonth($entity->getMember()->getId(), null,
-            intval($entity->getDateAjout()->format('m'), 10), intval($entity->getDateAjout()->format('Y'), 10))) {
-            $id = UtilitaireSQL::insert($pdo, $this->getTableName(), [
-                'member' => $entity->getMember()->getId(),
-                'manualAmount' => $entity->getManualAmount(),
-                'office' => $entity->getOffice()->getId(),
-                self::FIELD_DATE_AJOUT => $entity->getFormatedDateAjout()
-            ]);
-            $entity->setId($id);
-        }
+        $id = UtilitaireSQL::insert($pdo, $this->getTableName(), [
+            'member' => $entity->getMember()->getId(),
+            'manualAmount' => $entity->getManualAmount(),
+            'office' => $entity->getOffice()->getId(),
+            self::FIELD_DATE_AJOUT => $entity->getFormatedDateAjout()
+        ]);
+        $entity->setId($id);
     }
 
     public function buildByMemberOfMonth (int $memberId, ?Office $office = null) : MonthlyOrder {

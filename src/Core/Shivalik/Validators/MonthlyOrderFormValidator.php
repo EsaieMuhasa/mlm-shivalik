@@ -12,7 +12,9 @@ use Core\Shivalik\Entities\Member;
 /**
  *
  * @author Esaie MUHASA
- *        
+ * @deprecated 12/09/2022
+ * pour des raisons de gestion la fiche de vente pour chaque membres dans le systeme, il est maintenant decoseiller de 
+ * passer par cette classe pour enregistrer le bonus de reachat    
  */
 class MonthlyOrderFormValidator extends AbstractOperationFormValidator {
     

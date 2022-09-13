@@ -182,7 +182,7 @@ class SellSheetRowFormValidator extends DefaultFormValidator {
                 $row->setOffice($office);
                 $this->sellSheetRowDAOManager->create($row);
             } catch (DAOException $e) {
-                $this->setMessage($e->getMessage().": {$office->getAvailableVirtualMoneyProduct()}");
+                $this->setMessage($e->getMessage());
             }
         }
 

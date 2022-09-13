@@ -89,11 +89,9 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
 					<h3><?php echo $_REQUEST[DashboardController::ATT_PURCHASE]; ?> $</h3>
 				</div>
 			</div>
-			<?php if ($_REQUEST[DashboardController::ATT_DISPTCH_PURCHASE]) : ?>
 			<div class="panel-footer">
 				<a href="/admin/dispatch-purchase-of-month.html" class="btn btn-danger">Dispatch</a>
 			</div>
-			<?php endif; ?>
 		</div>
 		<?php endif; ?>
 	</div>

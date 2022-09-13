@@ -689,6 +689,8 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
                 }
                 
                 $this->getManagerFactory()->getManagerOf(MoneyGradeMember::class)->createAllInTransaction($moneyGrades, $pdo);            
+            }  else {
+                
             }
             $pdo->commit();
         } catch (\PDOException $e) {
@@ -753,7 +755,7 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
         $entity->setId($id);
 
         /**
-         * dansle cas de l'affilisation sur le PV inscrit sur la fiche d'un membre, alors on
+         * dans le cas de l'affilisation sur le PV inscrit sur la fiche d'un membre, alors on
          * ne doit plus soustraire ce montant sur le compte produit de l'office
          */
         $moneyGrades = [];//les virtuels toucher pour l'operation

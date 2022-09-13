@@ -32,7 +32,7 @@ if (isset($_REQUEST[MembersController::ATT_MONTHLY_ORDER_FOR_ACCOUNT]) &&  !isse
 				</tfoot>
 			</table>
 			<?php if($monthly->getAvailable() >= 50) : ?>
-			<a class="btn btn-primary" href="affiliate.html">
+			<a class="btn btn-primary" href="<?php echo "/office/members/{$monthly->member->id}/affiliate.html"; ?>">
 				Affiliate a new member
 			</a>
 			<a class="btn btn-info" href="<?php echo "/office/members/{$monthly->member->id}/pv-upgrade.html"; ?>">
