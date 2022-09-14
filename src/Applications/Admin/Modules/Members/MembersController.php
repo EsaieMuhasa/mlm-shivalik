@@ -409,7 +409,7 @@ class MembersController extends AdminController
             $request->addAttribute(self::ATT_MEMBERS, $childs);
             
             $member->setChilds($childs);
-            $member->setParent(null);
+            // $member->setParent(null);
             
             $formater = new TreeFormatter($member);
             $request->addAttribute(self::ATT_TREE_FORMATTER, $formater);  
@@ -430,8 +430,6 @@ class MembersController extends AdminController
         $request->addAttribute(self::ATT_COMPTE, $account);
         $request->addAttribute(self::ATT_MEMBER, $member);
     }
-    
-    
     
     /**
      * @param Request $request

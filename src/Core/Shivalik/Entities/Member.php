@@ -100,7 +100,7 @@ class Member extends User implements TernaryNode
 
     /**
      * {@inheritDoc}
-     * @see \PHPBackend\Image2D\Mlm\Node::getSponsor()
+     * @return Member
      */
     public function getSponsor() : ?Node
     {
@@ -116,7 +116,7 @@ class Member extends User implements TernaryNode
     }
 
     /**
-     * @param Member $parent
+     * @param Member|int $parent
      */
     public function setParent($parent) : void
     {
@@ -130,7 +130,7 @@ class Member extends User implements TernaryNode
     }
 
     /**
-     * @param Member $sponsor
+     * @param Member"int $sponsor
      */
     public function setSponsor($sponsor) : void
     {
@@ -247,7 +247,7 @@ class Member extends User implements TernaryNode
 
     /**
      * {@inheritDoc}
-     * @see \PHPBackend\Image2D\Mlm\Node::getParent()
+     * @return Member
      */
     public function getParent () : ?Node
     {

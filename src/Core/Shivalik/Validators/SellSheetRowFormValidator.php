@@ -82,8 +82,8 @@ class SellSheetRowFormValidator extends DefaultFormValidator {
     private function validationUnitPrice ($unitPrice) : void {
         if($unitPrice == null || $unitPrice === 0) {
             throw new IllegalFormValueException('this field is required');
-        } else if (!preg_match(self::RGX_INT_POSITIF, $unitPrice)) {
-            throw new IllegalFormValueException('quantity must be a positive numeric value');
+        } else if (!preg_match(self::RGX_NUMERIC_POSITIF, $unitPrice)) {
+            throw new IllegalFormValueException('unit price must be a positive numeric value');
         }
     }
 
