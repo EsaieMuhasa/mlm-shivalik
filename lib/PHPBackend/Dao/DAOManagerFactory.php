@@ -75,7 +75,7 @@ class DAOManagerFactory
     protected function loadConfig () : void{
         $configConnection = [];
         $xml = new \DOMDocument();
-        $xmlFile = $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.'Config'.DIRECTORY_SEPARATOR.'dao.xml';
+        $xmlFile = dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'Config'.DIRECTORY_SEPARATOR.'dao.xml';
         
         if (!file_exists($xmlFile)) {
             throw new DAOException("Le fichier de configuration global n'exixte pas. {$xmlFile}");

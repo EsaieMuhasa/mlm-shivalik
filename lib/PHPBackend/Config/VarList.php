@@ -30,7 +30,7 @@ class VarList extends VarDefine implements \Countable
      * {@inheritDoc}
      * @see \Countable::count()
      */
-    public function count()
+    public function count() : int
     {
         return count($this->getItems());
     }
@@ -99,7 +99,7 @@ class VarList extends VarDefine implements \Countable
      * {@inheritDoc}
      * @see \PHPBackend\Config\VarDefine::__toString()
      */
-    public function __toString(): ?string
+    public function __toString(): string
     {
         return $this->label;
     }

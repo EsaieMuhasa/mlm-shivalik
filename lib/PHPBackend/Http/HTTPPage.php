@@ -90,33 +90,33 @@ class HTTPPage implements Page
         $layoutModule = null;
         $defaultLayout = dirname(__DIR__).DIRECTORY_SEPARATOR."DefaultLayouts".DIRECTORY_SEPARATOR."layout";
         
-        $extension = $this->getApplication()->getHttpRequest()->getExtensionURI();
+        $extension = $this->getApplication()->getRequest()->getExtensionURI();
         if ($extension == 'json' || $extension == 'xml' || $extension == 'htm') {//pour les vues specifiques
             if ($extension == 'json' || $extension == 'xml') {
-                $this->getApplication()->getHttpResponse()->addHeader('Content-Type: application/'.$extension.'; charset=UTF-8');
+                $this->getApplication()->getResponse()->addHeader('Content-Type: application/'.$extension.'; charset=UTF-8');
                 $vue = $this->viewFile.'.'.$extension.'.php';
             }else {                
                 $vue = $this->viewFile.'.php';
             }
             
             if ($this->module != null) {
-                $layoutModule = $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.$this->getApplication()->getContainer().DIRECTORY_SEPARATOR.$this->getApplication()->getName().DIRECTORY_SEPARATOR.'Modules'.DIRECTORY_SEPARATOR.$this->module.DIRECTORY_SEPARATOR.'Templates'.DIRECTORY_SEPARATOR.'layout.'.$extension.'.php';
+                $layoutModule = dirname(__DIR__, 3).DIRECTORY_SEPARATOR.$this->getApplication()->getContainer().DIRECTORY_SEPARATOR.$this->getApplication()->getName().DIRECTORY_SEPARATOR.'Modules'.DIRECTORY_SEPARATOR.$this->module.DIRECTORY_SEPARATOR.'Templates'.DIRECTORY_SEPARATOR.'layout.'.$extension.'.php';
                 if (!file_exists($layoutModule)) {
                     $layoutModule = null;
                 }
             }
             $defaultLayout .= "{$extension}.php";
-            $layout = $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.$this->getApplication()->getContainer().DIRECTORY_SEPARATOR.$this->getApplication()->getName().DIRECTORY_SEPARATOR.'Templates'.DIRECTORY_SEPARATOR.'layout.'.$extension.'.php';
+            $layout = dirname(__DIR__, 3).DIRECTORY_SEPARATOR.$this->getApplication()->getContainer().DIRECTORY_SEPARATOR.$this->getApplication()->getName().DIRECTORY_SEPARATOR.'Templates'.DIRECTORY_SEPARATOR.'layout.'.$extension.'.php';
         }else {
             $vue = $this->viewFile.'.php';
             
             if ($this->module != null) {
-                $layoutModule = $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.$this->getApplication()->getContainer().DIRECTORY_SEPARATOR.$this->getApplication()->getName().DIRECTORY_SEPARATOR.'Modules'.DIRECTORY_SEPARATOR.$this->module.DIRECTORY_SEPARATOR.'Templates'.DIRECTORY_SEPARATOR.'layout.php';
+                $layoutModule = dirname(__DIR__, 3).DIRECTORY_SEPARATOR.$this->getApplication()->getContainer().DIRECTORY_SEPARATOR.$this->getApplication()->getName().DIRECTORY_SEPARATOR.'Modules'.DIRECTORY_SEPARATOR.$this->module.DIRECTORY_SEPARATOR.'Templates'.DIRECTORY_SEPARATOR.'layout.php';
                 if (!file_exists($layoutModule)) {
                     $layoutModule = null;
                 }
             }
-            $layout = $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.$this->getApplication()->getContainer().DIRECTORY_SEPARATOR.$this->getApplication()->getName().DIRECTORY_SEPARATOR.'Templates'.DIRECTORY_SEPARATOR.'layout.php';
+            $layout = dirname(__DIR__, 3).DIRECTORY_SEPARATOR.$this->getApplication()->getContainer().DIRECTORY_SEPARATOR.$this->getApplication()->getName().DIRECTORY_SEPARATOR.'Templates'.DIRECTORY_SEPARATOR.'layout.php';
             $defaultLayout .= ".php";
         }
         
@@ -148,7 +148,7 @@ class HTTPPage implements Page
      */
     public function getGeneratedPDF () : string{
         $vue = $this->viewFile.'.pdf.php';
-        $layout = dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR.$this->getApplication()->getContainer().DIRECTORY_SEPARATOR.$this->getApplication()->getName().DIRECTORY_SEPARATOR.'Templates'.DIRECTORY_SEPARATOR.'layout.pdf.php';
+        $layout = dirname(__DIR__, 2).DIRECTORY_SEPARATOR.$this->getApplication()->getContainer().DIRECTORY_SEPARATOR.$this->getApplication()->getName().DIRECTORY_SEPARATOR.'Templates'.DIRECTORY_SEPARATOR.'layout.pdf.php';
         $defaultLayout = dirname(__DIR__).DIRECTORY_SEPARATOR."DefaultLayouts".DIRECTORY_SEPARATOR."layout.pdf.php";
         
         if (!file_exists($vue)) {
@@ -157,7 +157,7 @@ class HTTPPage implements Page
         
         ob_start();
         require_once $vue;
-        $this->getApplication()->getHttpRequest()->addAttribute(self::ATT_VIEW, ob_get_clean());
+        $this->getApplication()->getRequest()->addAttribute(self::ATT_VIEW, ob_get_clean());
         
         ob_start();
         file_exists($layout)? require_once $layout : require_once $defaultLayout;
@@ -172,7 +172,7 @@ class HTTPPage implements Page
      */
     public function getGeneratedMail () : string{
         $vue = $this->viewFile.'.php';
-        $layout = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.$this->getApplication()->getContainer().DIRECTORY_SEPARATOR.$this->getApplication()->getName().DIRECTORY_SEPARATOR.'Templates'.DIRECTORY_SEPARATOR.'layout.mail.php';
+        $layout = dirname(__DIR__, 2).DIRECTORY_SEPARATOR.$this->getApplication()->getContainer().DIRECTORY_SEPARATOR.$this->getApplication()->getName().DIRECTORY_SEPARATOR.'Templates'.DIRECTORY_SEPARATOR.'layout.mail.php';
         $defaultLayout = dirname(__DIR__).DIRECTORY_SEPARATOR."DefaultLayouts".DIRECTORY_SEPARATOR."layout";
         
         if (!file_exists($vue)) {
@@ -182,7 +182,7 @@ class HTTPPage implements Page
         
         ob_start();
         require_once $vue;
-        $this->getApplication()->getHttpRequest()->addAttribute(self::ATT_VIEW, ob_get_clean());
+        $this->getApplication()->getRequest()->addAttribute(self::ATT_VIEW, ob_get_clean());
         
         ob_start();
         file_exists($layout)? require_once $layout : require_once $defaultLayout;

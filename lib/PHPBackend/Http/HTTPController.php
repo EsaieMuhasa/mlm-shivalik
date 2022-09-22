@@ -177,7 +177,7 @@ abstract class HTTPController implements Controller
     protected function setView(string $view) : void
     {
         $this->view = $view;
-        $viewFile = $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.$this->getApplication()->getContainer().DIRECTORY_SEPARATOR.$this->getApplication()->getName().DIRECTORY_SEPARATOR.'Modules'.DIRECTORY_SEPARATOR.$this->getModule().DIRECTORY_SEPARATOR.'Views'.DIRECTORY_SEPARATOR.$view;
+        $viewFile = dirname(__DIR__, 3).DIRECTORY_SEPARATOR.$this->getApplication()->getContainer().DIRECTORY_SEPARATOR.$this->getApplication()->getName().DIRECTORY_SEPARATOR.'Modules'.DIRECTORY_SEPARATOR.$this->getModule().DIRECTORY_SEPARATOR.'Views'.DIRECTORY_SEPARATOR.$view;
         $this->page->setViewFile($viewFile);
     }
 }

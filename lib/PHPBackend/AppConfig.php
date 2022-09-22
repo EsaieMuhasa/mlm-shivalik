@@ -71,7 +71,7 @@ class AppConfig
             //Lecture des parametre specifique a l'application
             //================================================
             $appConfig = AppManagerConfig::getInstance();
-            $xmlFile = "{$_SERVER['DOCUMENT_ROOT']}/{$appConfig->getContainer()}/{$this->appName}/Config/app-config.xml";
+            $xmlFile = dirname(__DIR__, 2).DIRECTORY_SEPARATOR."{$appConfig->getContainer()}/{$this->appName}/Config/app-config.xml";
             $readFile = $xml->load($xmlFile);
             
             if ($readFile===false) {
@@ -109,7 +109,7 @@ class AppConfig
         if (empty($this->users)) {
             $xml = new \DOMDocument();
             $appConfig = AppManagerConfig::getInstance();
-            $xmlFile = "{$_SERVER['DOCUMENT_ROOT']}/{$appConfig->getContainer()}/{$this->appName}/Config/app-config.xml";
+            $xmlFile = dirname(__DIR__, 2).DIRECTORY_SEPARATOR."{$appConfig->getContainer()}/{$this->appName}/Config/app-config.xml";
             
             if (!file_exists($xmlFile)) {
                 throw new PHPBackendException('Le fichier de configuration de l\'application "'.$this->appName.'" n\'existe pas sur le serveur. =>'.$xmlFile);

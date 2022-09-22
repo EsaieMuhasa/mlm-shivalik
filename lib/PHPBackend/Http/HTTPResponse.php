@@ -116,10 +116,10 @@ final class HTTPResponse implements Response
         }
         
         $this->page = new HTTPPage($this->getApplication());
-        $filename = dirname(__DIR__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'Errors'.DIRECTORY_SEPARATOR.'exception.php';
+        $filename = dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'Errors'.DIRECTORY_SEPARATOR.'exception.php';
         
         if (file_exists($filename)) {
-            $this->page->setViewFile(dirname(__DIR__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'Errors'.DIRECTORY_SEPARATOR.'exception');
+            $this->page->setViewFile(dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'Errors'.DIRECTORY_SEPARATOR.'exception');
         }else {
             $this->page->setViewFile(dirname(__DIR__).DIRECTORY_SEPARATOR."DefaultLayouts".DIRECTORY_SEPARATOR."exception");
         }

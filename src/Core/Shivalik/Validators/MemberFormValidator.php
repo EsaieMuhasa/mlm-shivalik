@@ -457,6 +457,9 @@ class MemberFormValidator extends UserFormValidator
         
         if (!$this->hasError()) {
             try {
+                /**
+                 * @var Member $user
+                 */
                 $user = $this->memberDAOManager->findById($request->getSession()->getAttribute(SessionMemberFilter::MEMBER_CONNECTED_SESSION)->getId());
                 if ($user->getPassword() != sha1($old)) {
                     $this->addError('old', "invalid password");
@@ -705,7 +708,7 @@ class MemberFormValidator extends UserFormValidator
                 }
             }
             try {
-                $searchData = $this->memberDAOManager->search(count($selectedIndex) != 0? $selectedIndex : $value);
+                $searchData = $this->memberDAOManager->search(count($selectedIndex) > 1? $selectedIndex : $value);
                 $count = count($searchData);
             } catch (DAOException $e) {
                 $this->setMessage($e->getMessage());

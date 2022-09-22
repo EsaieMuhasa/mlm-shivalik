@@ -1,6 +1,7 @@
 <?php
 namespace PHPBackend\Config;
 
+use DOMElement;
 use PHPBackend\PHPBackendException;
 
 /**
@@ -97,17 +98,19 @@ class GlobalConfig
     protected function loadConfig () : void {
         $this->definitions = [];
         $xml = new \DOMDocument();
-        $xmlFile = $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.'Config'.DIRECTORY_SEPARATOR.'config.xml';
+        $xmlFile = dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'Config'.DIRECTORY_SEPARATOR.'config.xml';
         
         /**
          * @var \DOMDocument $readFile
          */
         $readFile = $xml->load($xmlFile);
         if ($readFile === false) {
-            throw new PHPBackendException('Impossible de parser le fichier de configuration globale "'.$this->getApplication()->getName().'" => ('.$xmlFile.')');
+            throw new PHPBackendException('Impossible de parser le fichier de configuration globale => ('.$xmlFile.')');
         }
 
-        
+        /**
+         * @var DOMElement
+         */
         $root = $xml->getElementsByTagName("config")->item(0);
         $this->publicDirectory = $root->getAttribute('webData');
         $this->loggDirectory = $root->getAttribute('webLogger');
@@ -146,6 +149,9 @@ class GlobalConfig
         
         $childrens = $element->childNodes;
         for ($i = 0; $i < $childrens->length; $i++) {
+            /**
+             * @var DOMElement
+             */
             $child = $childrens->item($i);
             if ($child->nodeName === 'item') {
                 $item = null;

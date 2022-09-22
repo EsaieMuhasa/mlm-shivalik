@@ -204,7 +204,7 @@ class HTTPApplication implements Application
     {
         //charge config general
         $xmlGeneral = new \DOMDocument();
-        $xmlUploadedFileGeneral = $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.'Config'.DIRECTORY_SEPARATOR.'config.xml';
+        $xmlUploadedFileGeneral = dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'Config'.DIRECTORY_SEPARATOR.'config.xml';
         if (!file_exists($xmlUploadedFileGeneral)) {
             throw new PHPBackendException("Le fichier de configuration global n'existe pas: {$xmlUploadedFileGeneral}");
         }
@@ -278,7 +278,7 @@ class HTTPApplication implements Application
         
         $router = new \PHPBackend\Router();
         $xml = new \DOMDocument();
-        $appRoutes = $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.$this->getContainer().DIRECTORY_SEPARATOR.$this->getName().DIRECTORY_SEPARATOR.'Config'.DIRECTORY_SEPARATOR.'app-routes.xml';
+        $appRoutes = dirname(__DIR__, 3).DIRECTORY_SEPARATOR.$this->getContainer().DIRECTORY_SEPARATOR.$this->getName().DIRECTORY_SEPARATOR.'Config'.DIRECTORY_SEPARATOR.'app-routes.xml';
         
         if (!file_exists($appRoutes)) {
             throw new PHPBackendException('Le fichier de configuration de l\'application "'.$this->getName().'" n\'existe pas >>> '.$appRoutes.'.');
@@ -327,7 +327,7 @@ class HTTPApplication implements Application
         
         $_GET = array_merge($_GET, $matchRoute->getParams());
         
-        $controllerUploadedFile = $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.$this->getContainer().DIRECTORY_SEPARATOR.$this->getName().DIRECTORY_SEPARATOR.'Modules'.DIRECTORY_SEPARATOR.$matchRoute->getModule().DIRECTORY_SEPARATOR.$matchRoute->getModule().'Controller.php';
+        $controllerUploadedFile = dirname(__DIR__, 3).DIRECTORY_SEPARATOR.$this->getContainer().DIRECTORY_SEPARATOR.$this->getName().DIRECTORY_SEPARATOR.'Modules'.DIRECTORY_SEPARATOR.$matchRoute->getModule().DIRECTORY_SEPARATOR.$matchRoute->getModule().'Controller.php';
         if (!file_exists($controllerUploadedFile)) {
             throw new PHPBackendException('Le fichier de définition de la classe du controlleur est inaccessible. =>'.$controllerUploadedFile, 500);
         }
