@@ -76,13 +76,18 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
      */
     public function changeParentByMember(int $id, int $newParent): void {
         /**
-         * @var Member $member
-         * @var Member $parent
          * @var Member $oldParent
          */
-        
         $oldParent = $this->findParent($id);
+
+        /**
+         * @var Member $parent
+         */
         $parent = $this->findById($newParent);
+
+        /**
+         * @var Member $member
+         */
         $member = $this->findById($id);
         
         if (!$this->isUplineOf($member->getSponsor()->getId(), $newParent) || $oldParent->getId() == $newParent
@@ -243,6 +248,42 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
         } catch (\PDOException $e) {
             throw  new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param Account $node
+     * @param Account $newParent
+     * @param int|null $foot
+     * @return void
+     * @throws DAOException
+     */
+    public function migrateToNetwork(Account $node, Account $newParent, ?int $foot = null): void
+    {
+        throw new DAOException("No implementation of member network migration algorithms");
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return boolean
+     * @throws DAOException
+     */
+    public function checkUpTree(): bool
+    {
+        throw new DAOException("no implementation of whole network tree verification algorithms");
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return void
+     * @throws DAOException
+     */
+    public function makeTreeSafy(): void
+    {
+        throw new DAOException("no implementation of whole network tree correction algorithms");
     }
 
     /**

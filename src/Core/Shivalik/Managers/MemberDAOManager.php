@@ -41,6 +41,50 @@ interface MemberDAOManager extends UserDAOManager
 	 * @throws DAOException si une erreur surviens dans la transaction
 	 */
 	public function insertBelow (Account $newAccount, Account $existAcount) : void;
+
+    /**
+     * migration d'un compte dans un autre reseau.
+     * consiste anger de le parent du compte, tout en maintenant le meme sponsor.
+     * 
+     * Cette methode effectue une validation tre poussee pour garder l'integrite des donnees intacte.
+     * Les points valeurs des compte consernee sont re-calculer
+     *
+     * @param Account $node le compte que vous voulez deplacer
+     * @param Account $newParent le compte qui doit maintenant parainer le compte $node
+     * @param int $foot la proposition du peid sur le quel on va acricher le compte.
+     * si $foot == null , alors on cherche le pied disponible. dans le cas ou tout pieds sont deja occupee,
+     * alors un exception sera levee
+     * @return void
+     * @throws DAOException cette exception peut-etre leve dans le cas ci-dessous:
+     * <ul>
+     * <li>le compte $parentNode n'est pas dans le reseua du sponsor du compte $none</li>
+     * <li>le foot proposee est deja occupee par un autre membre</li>
+     * <li>Une erreur surviens dans le processuce de communication avec la Base de donnee</li>
+     * </ul>
+     */
+    public function migrateToNetwork (Account $node, Account $newParent, ?int $foot = null) : void;
+
+    /**
+     * methode magique de verification de la validite de l'arbre.
+     * la validation de l'arbre ce base sur deux elements:
+     * <ul>
+     * <li>Verifie s'il n'y a pas de compte qui sont hors du reseau parain/sponsort</li>
+     * <li>Verifie le points valeur de chaque compte</li>
+     * </ul>
+     *
+     * @return boolean
+     * @throws DAOException si une erreur surviens lors de la communication avec le SGBD lors de la validation
+     */
+    public function checkUpTree () : bool;
+
+    /**
+     * methode magique de correction de l'arbre.
+     * cette methode detecete le eventuel proble possible dans l'arbre, et corrige ceux-ci directement
+     *
+     * @return void
+     * @throws DAOException si une erreur surviens dans le processuce communication avec la BDD
+     */
+    public function makeTreeSafy () : void;
 	
 	/**
 	 * Comptage des enfants directe d'un membre 

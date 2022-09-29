@@ -112,11 +112,15 @@ class DashboardController extends AdminController {
 		
 	}
 
-	
-   /***
-    * visualisation de l'etat actuel du systeme
-    * @param Request $request
-    */
+    /**
+     * visualisation des etat tres importate du systeme
+     *
+     * @param Request $request
+     * @return void
+     * @deprecated  15/09/2022
+     * pour des rainson de performante, cette action est desonamin obsolette, et sera ssupprimer dans le versions envnir
+     * utilize plutot l'action main pour juire de nouvelle performance des element du tabeau d board
+     */
     public function executeIndex (Request $request) : void{
         
         //virtualMoney
@@ -204,6 +208,16 @@ class DashboardController extends AdminController {
             ->addAttribute(self::ATT_SOLDE_WITHDRAWALS_SERVED, $served)
             ->addAttribute(self::PARAM_UPGRADES_COUNT, $this->gradeMemberDAOManager->countUpgrades())
             ->addAttribute(self::PARAM_MEMBER_COUNT, $this->memberDAOManager->countAll());
+    }
+
+    /**
+     * nouveau dashboard de l'administration centrale
+     *
+     * @param Request $request
+     * @return void
+     */
+    public function executeMain (Request $request) : void {
+
     }
     
     /**
