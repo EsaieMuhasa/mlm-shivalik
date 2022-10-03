@@ -3,7 +3,7 @@ Web/logger
 Web/*.xml
 Web/*.json
 Web/*txt
-Web/node_modules
+Web/node_modules/
 Web/data/
 Web/img/products/
 index.html

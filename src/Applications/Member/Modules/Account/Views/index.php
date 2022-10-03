@@ -142,6 +142,22 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
                 <!--/.info-box-->
             </div>
             <?php endif; ?>
+
+            <!-- mobilisator -->
+            <?php if ($member->getMatricule() == 'F9' || $member->getMatricule() == 'Y3' || 
+                        $member->getMatricule() == 'K894' || $member->getMatricule() == 'K497' || 
+                        $member->getMatricule() == 'P31' || $member->getMatricule() == 'M4' || 
+                        $member->getMatricule() == 'O27' || $member->getMatricule() == 'K17' || 
+                        $member->getMatricule() == 'B279' ) : ?>
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                <div class="info-box blue-bg">
+                    <i class="fa fa-leaf"></i>
+                    <div class="count"><?php echo ("0 {$config->get("devise")}"); ?></div>
+                    <div class="title">mobilisator</div>
+                </div>
+            </div>
+            <?php endif; ?>
+            <!-- // -->
         </div>
 	    
 	</div>
