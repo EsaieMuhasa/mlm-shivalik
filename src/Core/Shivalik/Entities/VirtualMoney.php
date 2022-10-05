@@ -93,6 +93,13 @@ class VirtualMoney extends DBEntity {
 	 * @var OfficeBonus
 	 */
 	private $bonus;
+
+    /**
+     * la cofiguration de la repartition du budget auquel ce montant est liee
+     *
+     * @var BudgetConfig|null
+     */
+    private $config;
 	
 	
 	/**
@@ -427,6 +434,29 @@ class VirtualMoney extends DBEntity {
     public function setUsedPurchase(?float $usedPurchase) : void
     {
         $this->usedPurchase = $usedPurchase;
+    }
+
+    /**
+     * @return  BudgetConfig|null
+     */ 
+    public function getConfig() : ?BudgetConfig
+    {
+        return $this->config;
+    }
+
+    /**
+     * @param  BudgetConfig|null  $config
+     */ 
+    public function setConfig($config) : void
+    {
+        if($config instanceof BudgetConfig || $config == null) {
+            $this->config = $config;
+        } else if (self::isInt($config)) {
+            $this->config = new BudgetConfig(['id' => $config]);
+        } else {
+            throw new PHPBackendException('invalide arguement type in setConfig() : void method ');
+        }
+        
     }
 }
 
