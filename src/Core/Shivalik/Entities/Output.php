@@ -5,7 +5,8 @@ namespace Core\Shivalik\Entities;
 use PHPBackend\DBEntity;
 
 /**
- * retrait de l'arget sur une rubrique budgetaire
+ * retrait de l'arget sur une rubrique budgetaire.
+ * Pour les rubrique liee aux comptes des membres, la transaction se fait vers le compte du dit membre.
  */
 class Output extends DBEntity {
 

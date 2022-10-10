@@ -27,6 +27,29 @@ class BudgetRubric extends DBEntity {
      */
     private $category;
 
+    //resultat calculs de montants recu
+    /**
+     * resultat du calcul pour la repartition globale
+     *
+     * @var float
+     */
+    private $globalPart = 0;
+
+    /**
+     * resultat de calculs, pour le sous-rubriques budgetaires
+     *
+     * @var float
+     */
+    private $specificPart = 0;
+    //==
+
+    /**
+     * somme des montants deja retirer, pour ladite rubrique
+     *
+     * @var float
+     */
+    private $sumOutlays = 0;
+
 
     /**
      * Get the value of label
@@ -118,5 +141,65 @@ class BudgetRubric extends DBEntity {
         } else {
             throw new PHPBackendException('invalid arguement type in setCategory method');
         }
+    }
+
+    /**
+     * Get resultat du calcul pour la repartition globale
+     *
+     * @return  float
+     */ 
+    public function getGlobalPart() : float
+    {
+        return $this->globalPart;
+    }
+
+    /**
+     * Set resultat du calcul pour la repartition globale
+     *
+     * @param  float  $globalPart  resultat du calcul pour la repartition globale
+     */ 
+    public function setGlobalPart(float $globalPart) : void
+    {
+        $this->globalPart = $globalPart;
+    }
+
+    /**
+     * Get resultat de calculs, pour le sous-rubriques budgetaires
+     *
+     * @return  float
+     */ 
+    public function getSpecificPart() : float
+    {
+        return $this->specificPart;
+    }
+
+    /**
+     * Set resultat de calculs, pour le sous-rubriques budgetaires
+     *
+     * @param  float  $specificPart  resultat de calculs, pour le sous-rubriques budgetaires
+     */ 
+    public function setSpecificPart(float $specificPart) : void
+    {
+        $this->specificPart = $specificPart;
+    }
+
+    /**
+     * Get somme des montants deja retirer, pour ladite rubrique
+     *
+     * @return  float
+     */ 
+    public function getSumOutlays() : float
+    {
+        return $this->sumOutlays;
+    }
+
+    /**
+     * Set somme des montants deja retirer, pour ladite rubrique
+     *
+     * @param  float  $sumOutlays  somme des montants deja retirer, pour ladite rubrique
+     */ 
+    public function setSumOutlays(float $sumOutlays) : void
+    {
+        $this->sumOutlays = $sumOutlays;
     }
 }
