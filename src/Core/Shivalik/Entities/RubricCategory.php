@@ -66,7 +66,7 @@ class RubricCategory extends DBEntity {
      *
      * @return  boolean
      */ 
-    public function getOwnable() : bool
+    public function isOwnable() : bool
     {
         return $this->ownable;
     }

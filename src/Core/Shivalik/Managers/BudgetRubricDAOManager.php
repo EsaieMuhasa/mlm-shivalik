@@ -41,5 +41,22 @@ interface BudgetRubricDAOManager extends DAOInterface {
      * @throws DAOException si une erreur surviens dans le processuce de communication avec le SGBD
      */
     public function checkUnowned () : bool;
+
+    /**
+     * verifie s'il ya de rubrique qui sont binder aux compte des membres
+     *
+     * @return boolean
+     * @throws DAOException s une erreur seurviens dans le processuce de communication avec le serveur
+     */
+    public function checkOwned () : bool;
+
+    /**
+     * collecte tout les rubirques qui sont liee au compte des membres du syndicat
+     *
+     * @return BudgetRubric[]
+     * @throws DAOException si une erreur surviens dans le processuce de selection,
+     *  soit aucun resultat n'est renvoyer par la requette de selection
+     */
+    public function findOwned () : array;
     
 }

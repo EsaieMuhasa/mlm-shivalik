@@ -2,7 +2,9 @@
 
 namespace Core\Shivalik\Entities;
 
+use PHPBackend\Dao\DAOException;
 use PHPBackend\DBEntity;
+use PHPBackend\PHPBackendException;
 
 /**
  * retrait de l'arget sur une rubrique budgetaire.
@@ -19,6 +21,13 @@ class Output extends DBEntity {
      * @var string|null
      */
     private $description;
+
+    /**
+     * la rubrique toucher par ladite operation
+     *
+     * @var BudgetRubric
+     */
+    private  $rubric;
 
     /**
      * Get the value of amount
@@ -58,5 +67,27 @@ class Output extends DBEntity {
     public function setDescription($description) : void
     {
         $this->description = $description;
+    }
+
+    /**
+     * @return  BudgetRubric
+     */ 
+    public function getRubric() : ?BudgetRubric
+    {
+        return $this->rubric;
+    }
+
+    /**
+     * @param  BudgetRubric  $rubric  la rubrique toucher par ladite operation
+     */ 
+    public function setRubric($rubric) : void
+    {
+        if($rubric == null || $rubric instanceof BudgetRubric){
+            $this->rubric = $rubric;
+        } else if(self::isInt($rubric)) {
+            $this->rubric = new BudgetRubric(['id' => $rubric]);
+        } else {
+            throw new PHPBackendException('invalid arguement value in setRubric method');
+        }
     }
 }
