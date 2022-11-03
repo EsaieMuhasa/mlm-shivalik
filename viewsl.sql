@@ -238,15 +238,15 @@ CREATE OR REPLACE VIEW V_Account AS
         (
             SELECT SUM(BonusGeneration.amount) FROM BonusGeneration
                 WHERE BonusGeneration.member = Member.id
-        )AS soldeGenration,
+        )AS soldGeneration,
         (
             SELECT SUM(PurchaseBonus.amount) FROM PurchaseBonus
                 WHERE PurchaseBonus.member = Member.id
-        )AS purchaseBunus,
+        )AS purchaseBonus,
         (
             SELECT SUM(OfficeBonus.amount) FROM OfficeBonus
                 WHERE OfficeBonus.member = Member.id
-        )AS soldeOfficeBonus
+        )AS soldOfficeBonus
         -- //bonus
 
     FROM Member;

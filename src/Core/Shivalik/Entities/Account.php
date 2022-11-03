@@ -8,7 +8,9 @@ use PHPBackend\Serialisation\XMLSerialize;
 /**
  *
  * @author Esaie MHS
- *        
+ * @deprecated 1.0: le chargement de donnees dans cette classe prend du temps.
+ * il est mieux de d'utiliser directement la classe Member car le donnee qui y sont sont calculer 
+ * par le serveur de BDD    
  */
 class Account
 {

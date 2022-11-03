@@ -9,63 +9,135 @@ use PHPBackend\Image2D\Mlm\Node;
 /**
  *
  * @author Esaie MHS
- *        
+ *
  */
 class Member extends User implements TernaryNode
 {
-    
+
     const LEFT_FOOT = 1;
     const MIDDEL_FOOT = 2;
     const RIGHT_FOOT = 3;
-    
+
     /**
      * @var string
      */
     private $matricule;
-    
+
     /**
      * @var Member
      */
     private $parent;
-    
+
     /**
      * @var Member
      */
     private $sponsor;
-    
+
     /**
      * @var int
      */
     private $foot;
-    
+
     /**
      * @var OfficeAdmin
      */
     private $admin;
-    
+
     /**
      * @var Office
      */
     private $office;
-    
+
     /**
      * Pour les utilisateurs qui ont des offices
      * @var Office
      */
     private $officeAccount;
-    
+
     /**
      * contiens l'actuel packet de l'utilisateur
      * @var GradeMember
      */
     private $packet;
-    
+
     /**
      * @var Member[]
      */
     private $childs = [];
-    
-    
+
+    //etats du compte du membre
+    /**
+     * @var double
+     */
+    private $withdrawals;
+
+    /**
+     * @var double
+     */
+    private $withdrawalsRequest;
+
+    /**
+     * Le solde bonus office pour ceux qui en ont
+     * @var float
+     */
+    private $soldOfficeBonus;
+
+    /**
+     * Solde du compte principale (parainage)
+     * @var float
+     */
+    private $soldGeneration;
+
+    /**
+     * @var float
+     */
+    private $purchaseBonus;//bonus de reachat
+
+    /**
+     * @var float
+     */
+    private $leftMembershipPv;
+
+    /**
+     * @var float
+     */
+    private $rightMembershipPv;
+
+    /**
+     * @var float
+     */
+    private $middleMembershipPv;
+
+    /**
+     * efforts peronnels pour le re-acat
+     *
+     * @var float
+     */
+    private $personalMembershipPv;
+
+    /**
+     * @var float
+     */
+    private $leftProductPv;
+
+    /**
+     * @var float
+     */
+    private $rightProductPv;
+
+    /**
+     * @var float
+     */
+    private $middleProductPv;
+
+    /**
+     * effort personnel lors d'achat des produits
+     * @var number
+     */
+    private $personalProductPv;
+    //==
+
+
     /**
      * @return GradeMember
      */
@@ -86,8 +158,6 @@ class Member extends User implements TernaryNode
         } else {
             throw new PHPBackendException("invalide param valeur in setPacket method");
         }
-        
-        //if($this->packet != null) $this->packet->setMember($this);
     }
 
     /**
@@ -126,7 +196,7 @@ class Member extends User implements TernaryNode
             $this->parent = $parent;
         }else {
             throw new PHPBackendException("invalid param value");
-        } 
+        }
     }
 
     /**
@@ -193,7 +263,7 @@ class Member extends User implements TernaryNode
             throw new PHPBackendException("invalid value in param of method setOffice");
         }
     }
-    
+
     /**
      * @return Office
      */
@@ -223,7 +293,7 @@ class Member extends User implements TernaryNode
         if ($this->getName() == null || $this->getLastName() == null) {
             return null;
         }
-        
+
         $matricule = strtoupper(substr($this->getName(), 0, 1)).$this->id;//.strtoupper(substr($this->getLastName(), 0, 1));
         $this->setMatricule($matricule);
         return $matricule;
@@ -262,7 +332,7 @@ class Member extends User implements TernaryNode
     {
         return $this->childs;
     }
-    
+
     /**
      * {@inheritDoc}
      * @see \PHPBackend\Image2D\Mlm\Ternary\TernaryNode::getLeftChild()
@@ -337,7 +407,7 @@ class Member extends User implements TernaryNode
                 return $child;
             }
         }
-        
+
         throw new PHPBackendException("no child node at foot {$foot} in {$this->getNodeName()} node");
     }
 
@@ -417,7 +487,7 @@ class Member extends User implements TernaryNode
     {
         return !$this->hasParent();
     }
-    
+
     /**
      * {@inheritDoc}
      * @see \PHPBackend\Image2D\Mlm\Ternary\TernaryNode::isLeftChild()
@@ -444,7 +514,7 @@ class Member extends User implements TernaryNode
     {
         return (($node instanceof Member) && $this->hasRightChild() && $node->getId() == $this->getRightChild()->getId());
     }
-    
+
     /**
      * {@inheritDoc}
      * @see \PHPBackend\Image2D\Mlm\Node::hasSponsor()
@@ -454,5 +524,170 @@ class Member extends User implements TernaryNode
         return $this->sponsor != null;
     }
 
-}
+    //getters des PVs
+    public function getLeftMembershipPv () : ?float {
+        return $this->leftMembershipPv;
+    }
 
+    public function getRightMembershipPv () : ?float {
+        return $this->rightMembershipPv;
+    }
+
+    public function getMiddleMembershipPv () : ?float {
+        return $this->middleMembershipPv;
+    }
+
+    public function getLeftProductPv () : ?float {
+        return $this->leftProductPv;
+    }
+
+    public function getRightProductPv () : ?float {
+        return $this->rightProductPv;
+    }
+
+    public function getMiddleProductPv () : ?float {
+        return $this->middleProductPv;
+    }
+
+    public function getTotalPv () : ?float {
+        return array_sum([
+            $this->leftMembershipPv,
+            $this->middleMembershipPv,
+            $this->rightMembershipPv,
+            $this->leftProductPv,
+            $this->middleProductPv,
+            $this->rightProductPv
+        ]);
+    }
+    
+    /**
+     * renvoie le total des points valeurs generationnel
+     *
+     * @return float|null
+     */
+    public function getTotalMembershipPv () : ?float {
+        return array_sum([
+            $this->leftMembershipPv,
+            $this->middleMembershipPv,
+            $this->rightMembershipPv
+        ]);
+    } 
+
+    /**
+     * renvoie la sommes points valeurs sur les PVs de re-achat des produits
+     *
+     * @return float|null
+     */
+    public function getTotalProductPv () : ?float {
+        return array_sum([
+            $this->leftProductPv,
+            $this->middleProductPv,
+            $this->rightProductPv
+        ]);
+    }
+
+    //==
+
+    /**
+     * renvoie le montant total deja retier par le membre proprietaire du compte
+     *
+     * @return float|null
+     */
+    public function getWithdrawals ()  : ?float {
+        return $this->withdrawals;
+    }
+
+    /**
+     * renvoie le montant demander par le membre
+     *
+     * @return float|null
+     */
+    public function getWithdrawalsRequst () : ?float {
+        return $this->withdrawalsRequest;
+    }
+
+    public function getSoldGeneration () : ?float {
+        return $this->soldGeneration;
+    }
+
+    public function getSoldOfficeBonus () : ?float {
+        return $this->soldOfficeBonus;
+    }
+
+    public function getPurchaseBonus () : ?float {
+        return $this->purchaseBonus;
+    }
+
+    /**
+     * renvoie le montant retirable possible pour le compte du membre.
+     * 
+     * par defaut le montant renvoyer ne prend pas en compte les demandes non qui ne sont pas encore valider.
+     * dans ce cas utiliser pluto la methode, getAvailableCashMoney en mode structe
+     * 
+     * @param bool $structMode
+     * @return float
+     */
+    public function getAvailableCashMoney (bool $structMode = false) : float {
+        $amount = 0;
+
+        $amount += $this->getSoldGeneration() + $this->getSoldOfficeBonus() + $this->getPurchaseBonus();
+
+        if($amount !== null) {
+            $amount -= $this->getWithdrawals();
+        }
+
+        if ($structMode) {
+            $amount -= $this->getWithdrawalsRequst();
+        }
+
+        return $amount;
+    }
+
+    //setter de PVs
+    public function setLeftMembershipPv (?float $leftMembershipPv) : void {
+        $this->leftMembershipPv = $leftMembershipPv;
+    }
+    
+    public function setRightMembershipPv (?float $rightMembershipPv) : void  {
+        $this->rightMembershipPv = $rightMembershipPv;
+    }
+
+    public function setMiddelMembershipPv (?float $middleMembershipPv) : void {
+        $this->middleMembershipPv = $middleMembershipPv;
+    }
+
+    public function setLeftProductPv (?float $leftProductPv) : void {
+        $this->leftProductPv = $leftProductPv;
+    }
+
+    public function setMiddelProductPv (?float $middleProductPv) : void {
+        $this->middleProductPv = $middleProductPv;
+    }
+
+    public function setRightProductPv (?float $rightProductPv) : void {
+        $this->rightProductPv = $rightProductPv;
+    }
+
+    //===
+
+    public function setWithdrawals (?float $withdrawals) : void {
+        $this->withdrawals = $withdrawals;
+    }
+
+    public function setWithdrawalsRequest (?float $withdrawalsRequest) : void {
+        $this->withdrawalsRequest = $withdrawalsRequest;
+    }
+
+    public function setSoldOfficeBonus (?float $soldOfficeBonus) : void {
+        $this->soldOfficeBonus = $soldOfficeBonus;
+    }
+
+    public function setSoldGeneration (?float $soldGeneration) : void {
+        $this->soldGeneration = $soldGeneration;
+    }
+
+    public function setPurchaseBonus (?float $purchaseBonus) : void {
+        $this->purchaseBonus = $purchaseBonus;
+    }
+
+}
