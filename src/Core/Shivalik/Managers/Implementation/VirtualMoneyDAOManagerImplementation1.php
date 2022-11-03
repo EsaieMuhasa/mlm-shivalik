@@ -29,6 +29,48 @@ class VirtualMoneyDAOManagerImplementation1 extends DefaultDAOInterface implemen
 	protected function hasView(): bool {
 	    return true;
 	}
+
+    public function checkInputByBudget(?int $configId = null): bool
+    {
+        if ($configId == null) {
+            $return = false;
+            try {
+                $statement = UtilitaireSQL::prepareStatement($this->getConnection(), "SELECT id FROM {$this->getTableName()} WHERE config IS NULL");
+                if($statement->fetch()) {
+                    $return = true;
+                }
+                $statement->closeCursor();
+            } catch (\PDOException $e) {
+                throw new DAOException($e->getMessage(), $e);
+            }
+
+            return $return;
+        }
+        return UtilitaireSQL::checkAll($this->getConnection(), $this->getTableName(), [
+            'config' => $configId
+        ]);
+    }
+
+    public function findInputByBudget(?int $configId = null) : array {
+        if ($configId == null) {
+            $return = [];
+            try {
+                $statement = UtilitaireSQL::prepareStatement($this->getConnection(), "SELECT * FROM {$this->getTableName()} WHERE config IS NULL");
+                while($row = $statement->fetch()) {
+                    $return[] = new VirtualMoney($row);
+                }
+                $statement->closeCursor();
+            } catch (\PDOException $e) {
+                throw new DAOException($e->getMessage(), $e);
+            }
+            return $return;
+        }
+
+        return UtilitaireSQL::findAll(
+            $this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), 
+            self::FIELD_DATE_AJOUT, true, ['config' => $configId ]
+        );
+    }
 	
 	
     /**

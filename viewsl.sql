@@ -169,3 +169,84 @@ CREATE OR REPLACE VIEW V_Office AS
         ) AS availableAfiliate
             
     FROM Office LEFT JOIN V_VirtualMoney ON Office.id = V_VirtualMoney.office;
+    
+CREATE OR REPLACE VIEW V_Account AS 
+    SELECT DISTINCT
+        Member.id AS id,
+        Member.dateAjout AS dateAjout,
+        Member.dateModif AS dateModif,
+        Member.name AS `name`,
+        Member.postName AS postName,
+        Member.lastName AS lastName,
+        Member.kind AS kind,
+        Member.pseudo AS pseudo,
+        Member.password AS `password`,
+        Member.telephone AS telephone,
+        Member.email AS email,
+        Member.photo AS photo,
+        Member.enable AS `enable`,
+        Member.matricule AS matricule,
+        Member.parent AS parent,
+        Member.sponsor AS sponsor,
+        Member.foot AS foot,
+        Member.admin AS `admin`,
+        Member.office AS `officeAdmin`,
+        -- Member.packet AS packet,
+
+        -- ============ PV ==============
+        -- pv affiliations
+        (
+            SELECT SUM(PointValue.value) FROM PointValue 
+                WHERE PointValue.member = Member.id AND PointValue.foot = 1 AND PointValue.monthlyOrder IS NULL
+        ) AS leftMembershipPv,
+        (
+            SELECT SUM(PointValue.value) FROM PointValue 
+                WHERE PointValue.member = Member.id AND PointValue.foot = 2 AND PointValue.monthlyOrder IS NULL
+        ) AS middleMembershipPv,
+        (
+            SELECT SUM(PointValue.value) FROM PointValue 
+                WHERE PointValue.member = Member.id AND PointValue.foot = 3 AND PointValue.monthlyOrder IS NULL
+        ) AS rightMembershipPv,
+
+        -- pv reachat =================
+        (
+            SELECT SUM(PointValue.value) FROM PointValue 
+                WHERE PointValue.member = Member.id AND PointValue.foot = 1 AND PointValue.monthlyOrder IS NOT NULL
+        ) AS leftProductPv,
+        (
+            SELECT SUM(PointValue.value) FROM PointValue 
+                WHERE PointValue.member = Member.id AND PointValue.foot = 2 AND PointValue.monthlyOrder IS NOT NULL
+        ) AS middleProductPv,
+        (
+            SELECT SUM(PointValue.value) FROM PointValue 
+                WHERE PointValue.member = Member.id AND PointValue.foot = 3 AND PointValue.monthlyOrder IS NOT NULL
+        ) AS rightProductPv,
+        -- ===================== AND PV =============
+
+        -- retrait du frick
+        (
+            SELECT SUM(Withdrawal.amount) FROM Withdrawal
+                WHERE Withdrawal.member = Member.id AND Withdrawal.admin IS NOT NULL
+        )AS withdrawal,
+        (
+            SELECT SUM(Withdrawal.amount) FROM Withdrawal
+                WHERE Withdrawal.member = Member.id AND Withdrawal.admin IS NULL
+        ) AS withdrawalsRequest,
+        -- // retrait du frick
+
+        -- bonus
+        (
+            SELECT SUM(BonusGeneration.amount) FROM BonusGeneration
+                WHERE BonusGeneration.member = Member.id
+        )AS soldeGenration,
+        (
+            SELECT SUM(PurchaseBonus.amount) FROM PurchaseBonus
+                WHERE PurchaseBonus.member = Member.id
+        )AS purchaseBunus,
+        (
+            SELECT SUM(OfficeBonus.amount) FROM OfficeBonus
+                WHERE OfficeBonus.member = Member.id
+        )AS soldeOfficeBonus
+        -- //bonus
+
+    FROM Member;
