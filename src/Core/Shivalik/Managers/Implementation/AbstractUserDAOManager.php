@@ -1,6 +1,7 @@
 <?php
 namespace Core\Shivalik\Managers\Implementation;
 
+use Core\Shivalik\Entities\User;
 use Core\Shivalik\Managers\LocalisationDAOManager;
 use Core\Shivalik\Managers\UserDAOManager;
 use PHPBackend\Dao\DefaultDAOInterface;
@@ -43,6 +44,9 @@ abstract class AbstractUserDAOManager extends DefaultDAOInterface implements Use
      */
     public function findByColumnName (string $columnName, $value, bool $forward = true)
     {
+        /**
+         * @var User
+         */
         $user =parent::findByColumnName($columnName, $value, $forward);
         if ($user->getLocalisation() != null) {
             $user->setLocalisation($this->localisationDAOManager->findById($user->getLocalisation()->getId()));

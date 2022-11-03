@@ -223,5 +223,37 @@ class WithdrawalDAOManagerImplementation1 extends AbstractOperationDAOManager im
         return UtilitaireSQL::findCreationHistory($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, $dateMin, $dateMax, ['office' => $officeId], $limit, $offset);
     }
 
+    public function getSumAllRequested(?int $officeKey = null): float
+    {
+        $sql = "SELECT SUM(amount) AS amount FROM {$this->getTableName()} WHERE `admin` IS NULL ".($officeKey != null? " AND office={$officeKey}" : "");
+        $amount = 0;
+        try {
+            $statement = UtilitaireSQL::prepareStatement($this->getConnection(), $sql, []);
+            if($row = $statement->fetch()) {
+                $amount = $row['amount'];
+            }
+            $statement->closeCursor();
+        } catch (\PDOException $e) {
+            throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
+        }
+        return $amount;
+    }
+
+    public function getSumAllServed(?int $officeKey = null): float
+    {
+        $sql = "SELECT SUM(amount) AS amount FROM {$this->getTableName()} WHERE `admin` IS NOT NULL ".($officeKey != null? " AND office={$officeKey}" : "");
+        $amount = 0;
+        try {
+            $statement = UtilitaireSQL::prepareStatement($this->getConnection(), $sql, []);
+            if($row = $statement->fetch()) {
+                $amount = $row['amount'];
+            }
+            $statement->closeCursor();
+        } catch (\PDOException $e) {
+            throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
+        }
+        return $amount;
+    }
+
 }
 

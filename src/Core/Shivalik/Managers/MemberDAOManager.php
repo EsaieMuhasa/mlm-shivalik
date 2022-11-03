@@ -16,6 +16,8 @@ interface MemberDAOManager extends UserDAOManager
 	 * @param Member|int $member 
 	 * @param bool $calcul
 	 * @return Account
+     * @deprecated 2.0: pour de raisons de performance, le serveur de BDD doit calculer les stats du compte d'un membre
+     * pour les versions avenirs, cette methode seras supprimer
 	 */
 	public function loadAccount ($member, bool $calcul = true) : Account;
 	
@@ -417,6 +419,21 @@ interface MemberDAOManager extends UserDAOManager
 	 * @throws DAOException
 	 */
 	public function search ($index) : array;
+
+    //=========================================================\\
+    // ETATS DES COMPTES (OPERATIONS FAITES PAR COMPTE/MEMBRE) \\
+    //=========================================================\\
+
+    /**
+     * Renvoie la somme des montants valide pour tout les comptes des memebres
+     *
+     * @param bool $structMode
+     * @return float
+     */
+    public function getSumAllAllAvailable(bool $structMode = false) : float;
+    //==========================================================\\
+    //                       ===END===                          \\
+    //==========================================================\\
 	
 }
 

@@ -99,4 +99,28 @@ interface WithdrawalDAOManager extends OperationDAOManager
      */
     public function redirect (Withdrawal $with) : void;
 
+    /**
+     * renvoie la somme des montant demnager par les membres.
+     * par defaut cette methode renvoie la somme total pour tout les offices.
+     * 
+     * en renseignant le parametre $officeKey, la somme est ceux des operations qui font reference a celle-ci
+     *
+     * @param integer|null $officeKey
+     * @return float
+     * @throws DAOException en cas d'erreur lors de la communication avec le SGBD
+     */
+    public function getSumAllRequested (?int $officeKey = null) : float;
+
+    /**
+     * renvoie la somme des montants deja servie pour tout le monde.
+     * par defaut, la somme renvoyer est celle de tout les membres du systemes.
+     * 
+     * en specifiant le parametre $officeKey, la somme est faite uniquement pour les operations qui font reference
+     * au dit office
+     *
+     * @param integer|null $officeKey
+     * @return float
+     */
+    public function getSumAllServed (?int $officeKey = null) : float;
+
 }

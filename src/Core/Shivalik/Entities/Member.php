@@ -65,7 +65,9 @@ class Member extends User implements TernaryNode
      */
     private $childs = [];
 
-    //etats du compte du membre
+    //==================================\\
+    //      etats du compte du compte   \\
+    //==================================\\
     /**
      * @var double
      */
@@ -135,7 +137,9 @@ class Member extends User implements TernaryNode
      * @var number
      */
     private $personalProductPv;
-    //==
+    //===========================\\
+    //============||=============\\
+    //===========================\\
 
 
     /**

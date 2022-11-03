@@ -227,7 +227,7 @@ CREATE OR REPLACE VIEW V_Account AS
         (
             SELECT SUM(Withdrawal.amount) FROM Withdrawal
                 WHERE Withdrawal.member = Member.id AND Withdrawal.admin IS NOT NULL
-        )AS withdrawal,
+        )AS withdrawals,
         (
             SELECT SUM(Withdrawal.amount) FROM Withdrawal
                 WHERE Withdrawal.member = Member.id AND Withdrawal.admin IS NULL

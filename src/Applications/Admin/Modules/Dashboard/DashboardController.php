@@ -150,29 +150,12 @@ class DashboardController extends AdminController {
         
         $members = $this->memberDAOManager->findAll();
         
-        $solde = 0;
-        $withdrawal = 0;
-        $served = 0;
-        
-        foreach ($members as $member) {
-            $account = $this->memberDAOManager->loadAccount($member);
-            $solde += $account->getSolde();
-            $withdrawal += $account->getWithdrawRequest();
-        }
+        $solde = $this->memberDAOManager->getSumAllAllAvailable();
+        $withdrawal = $this->withdrawalDAOManager->getSumAllRequested();
+        $served = $this->withdrawalDAOManager->getSumAllServed();
         
         $request->addAttribute(self::ATT_SOLDE, $solde);
         $request->addAttribute(self::ATT_SOLDE_WITHDRAWALS, $withdrawal);
-        
-        /**
-         * @var Withdrawal[] $allWithdrawals
-         * @var Withdrawal $withd
-         */
-        $allWithdrawals = $this->withdrawalDAOManager->findAll();
-        foreach ($allWithdrawals as $withd) {
-            if ($withd->getAdmin() != null && $withd->getRaport()==null && $withd->getOffice()->getId() != $this->getConnectedAdmin()->getOffice()->getId()) {
-                $served += $withd->getAmount();
-            }
-        }
         
         if ($this->withdrawalDAOManager->checkByOffice($this->getConnectedAdmin()->getOffice()->getId())) {
             $all = $this->withdrawalDAOManager->findByOffice($this->getConnectedAdmin()->getOffice()->getId());

@@ -26,7 +26,7 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
     const OPERATIONS_ENTITIES = [PointValue::class, BonusGeneration::class, OfficeBonus::class, Withdrawal::class, PurchaseBonus::class];
     /**
      * {@inheritDoc}
-     * @see \Core\Shivalik\Managers\MemberDAOManager::loadAccount()
+     * @deprecated 2.0
      */
     public function loadAccount ($member, bool $calcul = true) : Account {
         $account = new Account(($member instanceof Member)? $member : $this->findById($member));
@@ -707,7 +707,7 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
      * @see \Core\Shivalik\Managers\MemberDAOManager::findChilds()
      */
     public function findChilds (int $memberId) : array{
-        return UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), "foot", true, ['parent' => $memberId]);
+        return UtilitaireSQL::findAll($this->getConnection(), $this->getViewName(), $this->getMetadata()->getName(), "foot", true, ['parent' => $memberId]);
     }
     
     /**
@@ -789,7 +789,7 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
     public function findChild(int $memberId, ?int $foot=null): Member {
         $child = null;
         try {
-            $statement = $this->getConnection()->prepare("SELECT * FROM {$this->getTableName()} WHERE parent=:parent AND foot=:foot");
+            $statement = $this->getConnection()->prepare("SELECT * FROM {$this->getViewName()} WHERE parent=:parent AND foot=:foot");
             if($statement->execute(array('parent' => $memberId, 'foot' => $foot))){
                 if($row = $statement->fetch()){
                     $child = new Member($row);
@@ -1090,7 +1090,7 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
      * @see \Core\Shivalik\Managers\MemberDAOManager::findSponsorizedByMember()
      */
     public function findSponsorizedByMember(int $id, ?int $limit = null, int $offset = 0): array {
-        return UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), 
+        return UtilitaireSQL::findAll($this->getConnection(), $this->getViewName(), 
             $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, ['sponsor' => $id], $limit, $offset);
     }
 
@@ -1136,9 +1136,40 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
         
         return false;
     }
-    
-    
-    
+
+    protected function hasView(): bool
+    {
+        return true;
+    }
+
+    protected function getViewName(): string
+    {
+        return "V_Account";
+    } 
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getSumAllAllAvailable(bool $structMode = false): float
+    {
+        if($structMode){
+            $struct = "- SUM(withdrawalsRequest)";
+        } else {
+            $struct = "";
+        }
+        $sql = "SELECT (SUM(soldOfficeBonus) + SUM(soldGeneration) + SUM(purchaseBonus) - SUM(withdrawals)) {$struct} AS amount FROM {$this->getViewName()}";
+        $amount = 0;
+        try {
+            $statement = UtilitaireSQL::prepareStatement($this->getConnection(), $sql, []);
+            if($row = $statement->fetch()) {
+                $amount = $row['amount'];
+            }
+            $statement->closeCursor();
+        } catch (\PDOException $e) {
+            throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
+        }
+        return $amount;
+    }
 
 }
 
