@@ -157,6 +157,9 @@ abstract class DefaultDAOInterface implements DAOInterface
      * @return string
      */
     protected  function getViewName () : string {
+        if(!$this->hasView()) {
+            return $this->getTableName();
+        }
         return "V_{$this->getTableName()}";
     }
     

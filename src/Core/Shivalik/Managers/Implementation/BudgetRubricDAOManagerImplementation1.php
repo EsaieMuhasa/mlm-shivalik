@@ -12,8 +12,8 @@ use PHPBackend\Dao\UtilitaireSQL;
 /**
  * implementation par defaut de la table de entitee qui represante la description d'une rubrique budgetaire
  */
-class BudgetRubricDAOManagerImplementtion1 extends DefaultDAOInterface implements BudgetRubricDAOManager {
-    
+class BudgetRubricDAOManagerImplementation1 extends DefaultDAOInterface implements BudgetRubricDAOManager {
+
     /**
      * sauvegarde d'une nouvelle rubrique
      * {@inheritDoc}

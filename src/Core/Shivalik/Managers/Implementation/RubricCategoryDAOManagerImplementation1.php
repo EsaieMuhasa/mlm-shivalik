@@ -10,8 +10,8 @@ use PHPBackend\Dao\UtilitaireSQL;
 /**
  * implementation par defaut de la table de categorisation des rubrique budgetaire
  */
-class RubricCategoryDAOManagerImpementation1  extends DefaultDAOInterface implements RubricCategoryDAOManager {
-    
+class RubricCategoryDAOManagerImplementation1  extends DefaultDAOInterface implements RubricCategoryDAOManager {
+
     /**
      * sauvegarde la classification des rubrique budgetaire dans la base de donnee
      *

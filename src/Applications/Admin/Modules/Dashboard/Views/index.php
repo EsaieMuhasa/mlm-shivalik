@@ -9,13 +9,9 @@ use PHPBackend\Request;
 $config = $_REQUEST[Request::ATT_APP_CONFIG];
 ?>
 
-<div class="row">
-    <div class="col-lg-12">
-    	<h3 class="page-header">
-    		<i class="fa fa-laptop"></i> <?php echo ($_REQUEST[DashboardController::ATT_VIEW_TITLE]); ?>
-    	</h3>
-    </div>
-</div>
+<h3 class="page-header">
+	<i class="fa fa-laptop"></i> <?php echo ($_REQUEST[DashboardController::ATT_VIEW_TITLE]); ?>
+</h3>
 <hr/>
 <div class="row">
 	<div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">

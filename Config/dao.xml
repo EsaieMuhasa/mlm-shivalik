@@ -3,170 +3,187 @@
 <dao>
 	<dbconnections>
 		<connection user="muhasa" password="esaiemuhasa" name="first" dsn="mysql:host=localhost;dbname=shivalik_db1"/>
-		<!-- 
+		<!--
 		<connection user="shivalik_db1" password="I45c9cKWv#" name="shivalik" dsn="mysql:host=localhost;dbname=shivalik_db1"/>
 		 -->
 	</dbconnections>
-	
+
 	<entities>
-		<entity 
-			name="\Core\Shivalik\Entities\BonusGeneration" 
+		<entity
+			name="\Core\Shivalik\Entities\BonusGeneration"
 			specification="\Core\Shivalik\Managers\BonusGenerationDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\BonusGenerationDAOManagerImplementation1"/>
 
-		<entity 
+		<entity
 			name="\Core\Shivalik\Entities\Country"
-			specification="\Core\Shivalik\Managers\CountryDAOManager" 
+			specification="\Core\Shivalik\Managers\CountryDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\CountryDAOManagerImplementation1"/>
-			
-		<entity 
+
+		<entity
 			name="\Core\Shivalik\Entities\Generation"
 			specification="\Core\Shivalik\Managers\GenerationDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\GenerationDAOManagerImplementation1"/>
-		<entity 
-			name="\Core\Shivalik\Entities\GradeMember" 
-			specification="\Core\Shivalik\Managers\GradeMemberDAOManager" 
+		<entity
+			name="\Core\Shivalik\Entities\GradeMember"
+			specification="\Core\Shivalik\Managers\GradeMemberDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\GradeMemberDAOManagerImplementation1"/>
-			
-		<entity 
-			name="\Core\Shivalik\Entities\Grade" 
-			specification="\Core\Shivalik\Managers\GradeDAOManager" 
+
+		<entity
+			name="\Core\Shivalik\Entities\Grade"
+			specification="\Core\Shivalik\Managers\GradeDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\GradeDAOManagerImplementation1"/>
-			
-		<entity 
-			name="\Core\Shivalik\Entities\Localisation" 
-			specification="\Core\Shivalik\Managers\LocalisationDAOManager" 
+
+		<entity
+			name="\Core\Shivalik\Entities\Localisation"
+			specification="\Core\Shivalik\Managers\LocalisationDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\LocalisationDAOManagerImplementation1"/>
-			
-		<entity 
+
+		<entity
 			name="\Core\Shivalik\Entities\Member"
 			specification="\Core\Shivalik\Managers\MemberDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\MemberDAOManagerImplementation1"/>
-			
+
 		<entity
 			name="\Core\Shivalik\Entities\VirtualMoney"
 			specification="\Core\Shivalik\Managers\VirtualMoneyDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\VirtualMoneyDAOManagerImplementation1"/>
-		
+
 		<entity
 			name="\Core\Shivalik\Entities\MoneyGradeMember"
 			specification="\Core\Shivalik\Managers\MoneyGradeMemberDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\MoneyGradeMemberDAOManagerImplementation1"/>
-				
-		<entity 
+
+		<entity
 			name="\Core\Shivalik\Entities\RequestVirtualMoney"
 			specification="\Core\Shivalik\Managers\RequestVirtualMoneyDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\RequestVirtualMoneyDAOManagerImplementation1"/>
-			
-		<entity 
+
+		<entity
 			name="\Core\Shivalik\Entities\Office"
 			specification="\Core\Shivalik\Managers\OfficeDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\OfficeDAOManagerImplementation1"/>
-			
-		<entity 
-			name="\Core\Shivalik\Entities\OfficeBonus" 
-			specification="\Core\Shivalik\Managers\OfficeBonusDAOManager" 
+
+		<entity
+			name="\Core\Shivalik\Entities\OfficeBonus"
+			specification="\Core\Shivalik\Managers\OfficeBonusDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\OfficeBonusDAOManagerImplementation1"/>
-			
-		<entity 
-			name="\Core\Shivalik\Entities\Size" 
-			specification="\Core\Shivalik\Managers\SizeDAOManager" 
+
+		<entity
+			name="\Core\Shivalik\Entities\Size"
+			specification="\Core\Shivalik\Managers\SizeDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\SizeDAOManagerImplementation1"/>
-			
-		<entity 
-			name="\Core\Shivalik\Entities\OfficeSize" 
-			specification="\Core\Shivalik\Managers\OfficeSizeDAOManager" 
+
+		<entity
+			name="\Core\Shivalik\Entities\OfficeSize"
+			specification="\Core\Shivalik\Managers\OfficeSizeDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\OfficeSizeDAOManagerImplementation1"/>
-			
-		<entity 
-			name="\Core\Shivalik\Entities\OfficeAdmin" 
-			specification="\Core\Shivalik\Managers\OfficeAdminDAOManager" 
+
+		<entity
+			name="\Core\Shivalik\Entities\OfficeAdmin"
+			specification="\Core\Shivalik\Managers\OfficeAdminDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\OfficeAdminDAOManagerImplementation1"/>
-			
-		<entity 
-			name="\Core\Shivalik\Entities\PointValue" 
-			specification="\Core\Shivalik\Managers\PointValueDAOManager" 
+
+		<entity
+			name="\Core\Shivalik\Entities\PointValue"
+			specification="\Core\Shivalik\Managers\PointValueDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\PointValueDAOManagerImplementation1"/>
-		
-		<entity 
-			name="\Core\Shivalik\Entities\Category" 
-			specification="\Core\Shivalik\Managers\CategoryDAOManager" 
+
+		<entity
+			name="\Core\Shivalik\Entities\Category"
+			specification="\Core\Shivalik\Managers\CategoryDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\CategoryDAOManagerImplementation1"/>
-				
-		<entity 
-			name="\Core\Shivalik\Entities\Product" 
-			specification="\Core\Shivalik\Managers\ProductDAOManager" 
+
+		<entity
+			name="\Core\Shivalik\Entities\Product"
+			specification="\Core\Shivalik\Managers\ProductDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\ProductDAOManagerImplementation1"/>
-			
-		<entity 
-			name="\Core\Shivalik\Entities\Stock" 
-			specification="\Core\Shivalik\Managers\StockDAOManager" 
+
+		<entity
+			name="\Core\Shivalik\Entities\Stock"
+			specification="\Core\Shivalik\Managers\StockDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\StockDAOManagerImplementation1"/>
-			
-		<entity 
-			name="\Core\Shivalik\Entities\AuxiliaryStock" 
-			specification="\Core\Shivalik\Managers\AuxiliaryStockDAOManager" 
+
+		<entity
+			name="\Core\Shivalik\Entities\AuxiliaryStock"
+			specification="\Core\Shivalik\Managers\AuxiliaryStockDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\AuxiliaryStockDAOManagerImplementation1"/>
-		
-		<entity 
-			name="\Core\Shivalik\Entities\Command" 
-			specification="\Core\Shivalik\Managers\CommandDAOManager" 
+
+		<entity
+			name="\Core\Shivalik\Entities\Command"
+			specification="\Core\Shivalik\Managers\CommandDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\CommandDAOManagerImplementation1"/>
-			
-		<entity 
-			name="\Core\Shivalik\Entities\ProductOrdered" 
-			specification="\Core\Shivalik\Managers\ProductOrderedDAOManager" 
+
+		<entity
+			name="\Core\Shivalik\Entities\ProductOrdered"
+			specification="\Core\Shivalik\Managers\ProductOrderedDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\ProductOrderedDAOManagerImplementation1"/>
-		
-		<entity 
-			name="\Core\Shivalik\Entities\MonthlyOrder" 
-			specification="\Core\Shivalik\Managers\MonthlyOrderDAOManager" 
+
+		<entity
+			name="\Core\Shivalik\Entities\MonthlyOrder"
+			specification="\Core\Shivalik\Managers\MonthlyOrderDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\MonthlyOrderDAOManagerImplementation1"/>
-				
-		<entity 
-			name="\Core\Shivalik\Entities\PurchaseBonus" 
-			specification="\Core\Shivalik\Managers\PurchaseBonusDAOManager" 
+
+		<entity
+			name="\Core\Shivalik\Entities\PurchaseBonus"
+			specification="\Core\Shivalik\Managers\PurchaseBonusDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\PurchaseBonusDAOManagerImplementation1"/>
-			
-		<entity 
-			name="\Core\Shivalik\Entities\Notification" 
-			specification="\Core\Shivalik\Managers\NotificationDAOManager" 
+
+		<entity
+			name="\Core\Shivalik\Entities\Notification"
+			specification="\Core\Shivalik\Managers\NotificationDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\NotificationDAOManagerImplementation1"/>
-			
-		<entity 
-			name="\Core\Shivalik\Entities\NotificationReceiver" 
-			specification="\Core\Shivalik\Managers\NotificationReceiverDAOManager" 
+
+		<entity
+			name="\Core\Shivalik\Entities\NotificationReceiver"
+			specification="\Core\Shivalik\Managers\NotificationReceiverDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\NotificationReceiverDAOManagerImplementation1"/>
-			
-		<entity 
-			name="\Core\Shivalik\Entities\NotifiableComponent" 
-			specification="\Core\Shivalik\Managers\NotifiableComponentDAOManager" 
+
+		<entity
+			name="\Core\Shivalik\Entities\NotifiableComponent"
+			specification="\Core\Shivalik\Managers\NotifiableComponentDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\NotifiableComponentDAOManagerImplementation1"/>
-			
-		<entity 
-			name="\Core\Shivalik\Entities\Withdrawal" 
-			specification="\Core\Shivalik\Managers\WithdrawalDAOManager" 
+
+		<entity
+			name="\Core\Shivalik\Entities\Withdrawal"
+			specification="\Core\Shivalik\Managers\WithdrawalDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\WithdrawalDAOManagerImplementation1"/>
-			
-		<entity 
-			name="\Core\Shivalik\Entities\RaportWithdrawal" 
-			specification="\Core\Shivalik\Managers\RaportWithdrawalDAOManager" 
+
+		<entity
+			name="\Core\Shivalik\Entities\RaportWithdrawal"
+			specification="\Core\Shivalik\Managers\RaportWithdrawalDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\RaportWithdrawalDAOManagerImplementation1"/>
-			
-		<entity 
-			name="\Core\Shivalik\Entities\Transfer" 
-			specification="\Core\Shivalik\Managers\TransferDAOManager" 
+
+		<entity
+			name="\Core\Shivalik\Entities\Transfer"
+			specification="\Core\Shivalik\Managers\TransferDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\TransferDAOManagerImplementation1"/>
 
-		<entity 
-			name="\Core\Shivalik\Entities\SellSheetRow" 
-			specification="\Core\Shivalik\Managers\SellSheetRowDAOManager" 
+		<entity
+			name="\Core\Shivalik\Entities\SellSheetRow"
+			specification="\Core\Shivalik\Managers\SellSheetRowDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\SellSheetRowDAOManagerImplementation1"/>
 
-		<entity 
-			name="\Core\Shivalik\Entities\SellSheetRowVirtualMoney" 
-			specification="\Core\Shivalik\Managers\SellSheetRowVirtualMoneyDAOManager" 
+		<entity
+			name="\Core\Shivalik\Entities\SellSheetRowVirtualMoney"
+			specification="\Core\Shivalik\Managers\SellSheetRowVirtualMoneyDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\SellSheetRowVirtualMoneyDAOManagerImplementation1"/>
-			
+
+		<!-- CONFIG REPARTITON RECETTE -->
+		<entity
+			name="\Core\Shivalik\Entities\RubricCategory"
+			specification="\Core\Shivalik\Managers\RubricCategoryDAOManager"
+			implementation="\Core\Shivalik\Managers\Implementation\RubricCategoryDAOManagerImplementation1"/>
+
+		<entity
+			name="\Core\Shivalik\Entities\BudgetRubric"
+			specification="\Core\Shivalik\Managers\BudgetRubricDAOManager"
+			implementation="\Core\Shivalik\Managers\Implementation\BudgetRubricDAOManagerImplementation1"/>
+
+		<entity
+			name="\Core\Shivalik\Entities\BudgetConfig"
+			specification="\Core\Shivalik\Managers\BudgetConfigDAOManager"
+			implementation="\Core\Shivalik\Managers\Implementation\BudgetConfigDAOManagerImplementation1"/>
+		<!-- // -->
+
 	</entities>
 </dao>
