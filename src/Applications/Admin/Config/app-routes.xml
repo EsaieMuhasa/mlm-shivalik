@@ -144,7 +144,9 @@
 	<!-- configuration du budget -->
 	<module name="Budget">
 		<route action="index" urlPattern="/admin/budget/"/>
+		<route action="index" urlPattern="/admin/budget/(categories)" paramsNames="affichage"/>
 		<route action="newRubric" urlPattern="/admin/budget/new-rubric\.html"/>
+		<route action="newCategory" urlPattern="/admin/budget/new-category\.html"/>
 	</module>
 	<!-- //== -->
 	

@@ -28,7 +28,7 @@ class BudgetRubricDAOManagerImplementation1 extends DefaultDAOInterface implemen
             'label' => $entity->getLabel(),
             'description' => $entity->getDescription(),
             '`owner`' => ($entity->getOwner() != null? $entity->getOwner()->getId() : null),
-            'category' => $entity->getCategory()
+            'category' => $entity->getCategory()->getId()
         ]);
         $entity->setId($id);
     }

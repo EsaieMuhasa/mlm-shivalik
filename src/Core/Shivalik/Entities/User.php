@@ -300,6 +300,9 @@ abstract class User extends DBEntity implements Notifiable
     }
     
     
+    public function getFullName () : string {
+        return "{$this->name} {$this->postName} {$this->lastName}";
+    }
  
 }
 

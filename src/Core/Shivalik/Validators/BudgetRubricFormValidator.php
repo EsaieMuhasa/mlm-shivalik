@@ -2,6 +2,7 @@
 namespace Core\Shivalik\Validators;
 
 use Core\Shivalik\Entities\BudgetRubric;
+use Core\Shivalik\Entities\Member;
 use Core\Shivalik\Managers\BudgetRubricDAOManager;
 use Core\Shivalik\Managers\MemberDAOManager;
 use Core\Shivalik\Managers\RubricCategoryDAOManager;
@@ -33,7 +34,7 @@ class BudgetRubricFormValidator extends DefaultFormValidator {
 
 
     /**
-     * insertion d'une tubirque budgetaire apres valdiation 
+     * insertion d'une tubirque budgetaire apres valdiation
      * des donnees envoyer via le formulaire
      *
      * @param Request $request
@@ -56,7 +57,7 @@ class BudgetRubricFormValidator extends DefaultFormValidator {
             if($rubric->getCategory()->isOwnable() && $rubric->getOwner() == null){
                 $this->addError(self::FIELD_OWNER, "for the chosen category, the owner account is mandatory");
             }
-            if(!$rubric->getCategory()->isOwnable() && $rubric->getOwner() == null){
+            if(!$rubric->getCategory()->isOwnable() && $rubric->getOwner() != null){
                 $this->addError(self::FIELD_OWNER, "for the chosen category, the owner account must be empty");
             }
         }
@@ -92,7 +93,7 @@ class BudgetRubricFormValidator extends DefaultFormValidator {
             throw new IllegalFormValueException("label cannot be empty");
         } else if(strlen($label) > 255) {
             throw new IllegalFormValueException("label must not exceeed 255 characteres");
-        } 
+        }
     }
 
     /**
@@ -123,7 +124,7 @@ class BudgetRubricFormValidator extends DefaultFormValidator {
             throw new IllegalFormValueException("please select item category");
         } else if (!preg_match(self::RGX_INT_POSITIF, $categoryKey) || !$this->rubricCategoryDAOManager->checkById($categoryKey)) {
             throw new IllegalFormValueException("invalid reference");
-        } 
+        }
     }
 
     /**
@@ -158,6 +159,7 @@ class BudgetRubricFormValidator extends DefaultFormValidator {
             }
         } catch (IllegalFormValueException $e) {
             $this->addError(self::FIELD_OWNER, $e->getMessage());
+            $rubric->setOwner(new Member(['matricule' => $ownerKey ]));
         }
     }
 
