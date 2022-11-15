@@ -2,6 +2,7 @@
 namespace Core\Shivalik\Managers\Implementation;
 
 use Core\Shivalik\Entities\BudgetConfig;
+use Core\Shivalik\Entities\ConfigElement;
 use Core\Shivalik\Managers\BudgetConfigDAOManager;
 use PDO;
 use PHPBackend\Dao\DefaultDAOInterface;
@@ -31,6 +32,13 @@ class BudgetConfigDAOManagerImplementation1 extends DefaultDAOInterface implemen
         $id = UtilitaireSQL::insert($pdo, $this->getTableName(), [
             self::FIELD_DATE_AJOUT => $entity->getFormatedDateAjout()
         ]);
+        $entity->setId($id);
+
+        //item de la configuration
+        foreach ($entity->getElements() as $item){
+            $this->getManagerFactory()->getManagerOf(ConfigElement::class)->createInTransaction($item, $pdo);
+        }
+        //==
         $entity->setId($id);
     }
 

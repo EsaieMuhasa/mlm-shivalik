@@ -183,6 +183,16 @@
 			name="\Core\Shivalik\Entities\BudgetConfig"
 			specification="\Core\Shivalik\Managers\BudgetConfigDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\BudgetConfigDAOManagerImplementation1"/>
+		
+		<entity
+			name="\Core\Shivalik\Entities\ConfigElement"
+			specification="\Core\Shivalik\Managers\ConfigElementDAOManager"
+			implementation="\Core\Shivalik\Managers\Implementation\ConfigElementDAOManagerImplementation1"/>
+		
+		<entity
+			name="\Core\Shivalik\Entities\SubConfigElement"
+			specification="\Core\Shivalik\Managers\SubConfigElementDAOManager"
+			implementation="\Core\Shivalik\Managers\Implementation\SubConfigElementDAOManagerImplementation1"/>
 		<!-- // -->
 
 	</entities>

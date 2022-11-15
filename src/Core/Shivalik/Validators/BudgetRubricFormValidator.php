@@ -7,6 +7,7 @@ use Core\Shivalik\Managers\BudgetRubricDAOManager;
 use Core\Shivalik\Managers\MemberDAOManager;
 use Core\Shivalik\Managers\RubricCategoryDAOManager;
 use DateTime;
+use PHPBackend\Dao\DAOException;
 use PHPBackend\Request;
 use PHPBackend\Validator\DefaultFormValidator;
 use PHPBackend\Validator\IllegalFormValueException;
@@ -31,6 +32,32 @@ class BudgetRubricFormValidator extends DefaultFormValidator {
      * @var MemberDAOManager
      */
     private $memberDAOManager;
+
+    /**
+     * verification des elements selectionnr.
+     * cette methode trouve son sens lors de la selection des elements a associer 
+     * a une configuration
+     *
+     * @param Request $request
+     * @return BudgetRubric[]
+     */
+    public function handleRequest (Request $request) : array {
+        $elements = [];
+        $items = $request->getDataPOST('elements');
+        if(empty($items)) {
+            $this->setMessage("Select one or more items");
+        } else {
+            try{
+                foreach($items as $item) {
+                    $elements[] = $this->budgetRubricDAOManager->findById($item);
+                }
+            } catch (DAOException $e) {
+                $this->setMessage($e->getMessage());
+            }
+        }
+        $this->setResult("Operation Execution Success", "Failed to execute operation");
+        return $elements;
+    }
 
 
     /**

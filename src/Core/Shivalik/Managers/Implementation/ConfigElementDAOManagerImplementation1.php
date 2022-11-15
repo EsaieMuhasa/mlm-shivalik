@@ -1,13 +1,14 @@
 <?php
 namespace Core\Shivalik\Managers\Implementation;
 
+use Core\Shivalik\Entities\BudgetRubric;
 use Core\Shivalik\Entities\ConfigElement;
 use Core\Shivalik\Managers\ConfigElementDAOManager;
 use PDO;
 use PHPBackend\Dao\DefaultDAOInterface;
 use PHPBackend\Dao\UtilitaireSQL;
 
-class ConfigElementDAOManagerImplementtion1 extends DefaultDAOInterface implements ConfigElementDAOManager {
+class ConfigElementDAOManagerImplementation1 extends DefaultDAOInterface implements ConfigElementDAOManager {
 
     /**
      * {@inheritDoc}
@@ -34,6 +35,10 @@ class ConfigElementDAOManagerImplementtion1 extends DefaultDAOInterface implemen
 
     public function findByConfig(int $configId): array
     {
-        return $this->findAllByColumName('config', $configId);
+        $elements = $this->findAllByColumName('config', $configId);
+        foreach ($elements as $element) {
+            $element->setRubric($this->getManagerFactory()->getManagerOf(BudgetRubric::class)->findById($element->getRubric()->getId()));
+        }
+        return $elements;
     }
 }

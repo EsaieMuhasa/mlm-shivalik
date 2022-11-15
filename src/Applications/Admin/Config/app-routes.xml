@@ -144,7 +144,12 @@
 	<!-- configuration du budget -->
 	<module name="Budget">
 		<route action="index" urlPattern="/admin/budget/"/>
-		<route action="index" urlPattern="/admin/budget/(categories)" paramsNames="affichage"/>
+		<route action="configElement" urlPattern="/admin/budget/element-config"/>
+		<route action="configCatalogue" urlPattern="/admin/budget/config-(\d+)\.json" paramsNames="id"/>
+		<route action="configElement" urlPattern="/admin/budget/element-config-(categories)" paramsNames="affichage"/>
+		<route action="selectConfigElements" urlPattern="/admin/budget/new/select-element-config"/>
+		<route action="newConfigElement" urlPattern="/admin/budget/new/validate-element-config"/>
+		<route action="cancelConfigElement" urlPattern="/admin/budget/new/cancel-element-config"/>
 		<route action="newRubric" urlPattern="/admin/budget/new-rubric\.html"/>
 		<route action="newCategory" urlPattern="/admin/budget/new-category\.html"/>
 	</module>
