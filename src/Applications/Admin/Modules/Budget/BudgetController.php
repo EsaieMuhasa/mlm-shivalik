@@ -241,6 +241,11 @@ class BudgetController extends HTTPController {
         $element = $this->configElementDAOManager->findById($request->getDataGET('id'));
         $element->setRubric($this->budgetRubricDAOManager->findById($element->getRubric()->getId()));
 
+        $elements = $this->configElementDAOManager->findByConfig($element->getConfig()->getId());
+        foreach ($elements as $item) {
+            $item->setRubric($this->budgetRubricDAOManager->findById($item->getRubric()->getId()));
+        }
+
         if($this->subConfigElementDAOManager->checkByElement($element->getId())) {
             $items = $this->subConfigElementDAOManager->findByElement($element->getId());
             foreach ($items as $item) {
@@ -250,6 +255,7 @@ class BudgetController extends HTTPController {
             $items = [];
         }
 
+        $request->addAttribute('elements', $elements);
         $request->addAttribute('element', $element);
         $request->addAttribute('items', $items);
     }
