@@ -144,12 +144,24 @@
 	<!-- configuration du budget -->
 	<module name="Budget">
 		<route action="index" urlPattern="/admin/budget/"/>
-		<route action="configElement" urlPattern="/admin/budget/element-config"/>
+
+		<!-- configuration principale -->
 		<route action="configCatalogue" urlPattern="/admin/budget/config-(\d+)\.json" paramsNames="id"/>
-		<route action="configElement" urlPattern="/admin/budget/element-config-(categories)" paramsNames="affichage"/>
 		<route action="selectConfigElements" urlPattern="/admin/budget/new/select-element-config"/>
 		<route action="newConfigElement" urlPattern="/admin/budget/new/validate-element-config"/>
 		<route action="cancelConfigElement" urlPattern="/admin/budget/new/cancel-element-config"/>
+		<!-- // -->
+
+		<!-- configuration secondaire -->
+		<route action="subConfigShow" urlPattern="/admin/budget/sub-config/(\d+)/" paramsNames="id"/>
+		<route action="subConfigCatalogue" urlPattern="/admin/budget/sub-config/(\d+)/catalogue\.json" paramsNames="id"/>
+		<route action="subConfigSelectConfigElements" urlPattern="/admin/budget/sub-config/(\d+)/new/select-element-config" paramsNames="id"/>
+		<route action="subNewConfigElement" urlPattern="/admin/budget/sub-config/(\d+)/new/validate-element-config" paramsNames="id"/>
+		<route action="cancelSubConfigElement" urlPattern="/admin/budget/sub-config/(\d+)/new/cancel-element-config" paramsNames="id"/>
+		<!-- // -->
+
+		<route action="configElement" urlPattern="/admin/budget/element-config"/>
+		<route action="configElement" urlPattern="/admin/budget/element-config-(categories)" paramsNames="affichage"/>
 		<route action="newRubric" urlPattern="/admin/budget/new-rubric\.html"/>
 		<route action="newCategory" urlPattern="/admin/budget/new-category\.html"/>
 	</module>

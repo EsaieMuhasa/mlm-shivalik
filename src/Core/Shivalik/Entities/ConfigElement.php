@@ -24,6 +24,13 @@ class ConfigElement extends DBEntity {
      */
     private $rubric;
 
+    /**
+     * element de repatiton de la sous configuration
+     *
+     * @var SubConfigElement[]
+     */
+    private $elements = [];
+
 
     /**
      * Get the value of percent
@@ -95,5 +102,29 @@ class ConfigElement extends DBEntity {
         } else {
             throw new PHPBackendException('invalide arguement type in setRubric method');
         }
+    }
+
+    /**
+     * ajout d'un elememnt, comme sous configuration de la configuration globale
+     *
+     * @param SubConfigElement $element
+     * @return self
+     */
+    public function addElement (SubConfigElement $element) : self {
+        $this->elements[] = $element;
+        return $this;
+    }
+
+    /**
+     * renvoie la somme  des pourcentages des element constitualt la rubrique du budget gobale
+     *
+     * @return float
+     */
+    public function getSumOfElements () : float {
+        $sum = 0;
+        foreach ($this->elements as $element) {
+            $sum += $element->getPercent();
+        }
+        return $sum;
     }
 }

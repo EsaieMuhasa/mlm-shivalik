@@ -4,6 +4,8 @@ namespace Core\Shivalik\Managers\Implementation;
 use Core\Shivalik\Entities\SubConfigElement;
 use Core\Shivalik\Managers\SubConfigElementDAOManager;
 use PDO;
+use PDOException;
+use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\DefaultDAOInterface;
 use PHPBackend\Dao\UtilitaireSQL;
 
@@ -26,20 +28,46 @@ class SubConfigElementDAOManagerImplementation1 extends DefaultDAOInterface impl
         $id = UtilitaireSQL::insert($pdo, $this->getTableName(), [
             'percent' => $entity->getPercent(),
             self::FIELD_DATE_AJOUT => $entity->getFormatedDateAjout(),
-            'element' => $entity->getRubric()->getId(),
+            'config' => $entity->getConfig()->getId(),
             'rubric' => $entity->getRubric()->getId()
         ]);
         $entity->setId($id);
     }
 
+    public function createAll(array $entities): void
+    {
+        try {
+            $pdo = $this->getConnection();
+            if(!$pdo->beginTransaction()) {
+                throw new DAOException("Error on start stransation");
+            }
+
+            /** @var SubConfigElement */
+            foreach ($entities as $entity) {
+                $id = UtilitaireSQL::insert($pdo, $this->getTableName(), [
+                    'percent' => $entity->getPercent(),
+                    self::FIELD_DATE_AJOUT => $entity->getFormatedDateAjout(),
+                    'config' => $entity->getConfig()->getId(),
+                    'rubric' => $entity->getRubric()->getId()
+                ]);
+                $entity->setId($id);
+            }
+
+            $pdo->commit();
+
+        } catch (PDOException $e) {
+            throw new DAOException("Error occurend in transation: {$e->getMessage()}", 500, $e);
+        }
+    }
+
     public function checkByElement(int $elementId): bool
     {
-        return $this->checkByColumnName('element', $elementId);
+        return $this->checkByColumnName('config', $elementId);
     }
 
     public function findByElement(int $elementId): array
     {
-        return $this->findAllByColumName('element', $elementId);
+        return $this->findAllByColumName('config', $elementId);
     }
 
 }
