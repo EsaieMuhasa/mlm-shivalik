@@ -33,6 +33,11 @@ class BudgetRubricDAOManagerImplementation1 extends DefaultDAOInterface implemen
         $entity->setId($id);
     }
 
+    protected function hasView(): bool
+    {
+        return true;
+    }
+
     /**
      * mise en jour d'une rubrique budgetaire
      *

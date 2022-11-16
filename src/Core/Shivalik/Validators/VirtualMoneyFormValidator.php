@@ -4,6 +4,7 @@ namespace Core\Shivalik\Validators;
 
 use Core\Shivalik\Entities\OfficeBonus;
 use Core\Shivalik\Entities\VirtualMoney;
+use Core\Shivalik\Managers\BudgetConfigDAOManager;
 use Core\Shivalik\Managers\GradeMemberDAOManager;
 use Core\Shivalik\Managers\OfficeSizeDAOManager;
 use Core\Shivalik\Managers\VirtualMoneyDAOManager;
@@ -30,11 +31,11 @@ class VirtualMoneyFormValidator extends DefaultFormValidator {
 	 * @var VirtualMoneyDAOManager
 	 */
 	private $virtualMoneyDAOManager;
-	
+
 	/**
-	 * @var GradeMemberDAOManager
+	 * @var BudgetConfigDAOManager
 	 */
-	private $gradeMemberDAOManager;
+	private $budgetConfigDAOManager;
 	
 	/**
 	 * @var OfficeSizeDAOManager
@@ -129,6 +130,9 @@ class VirtualMoneyFormValidator extends DefaultFormValidator {
 			    
 			    $money->setBonus($bonus);
 			    $money->setRequest($request->getAttribute(self::FIELD_REQUEST_MONEY));
+				if($this->budgetConfigDAOManager->checkAvailable()) {
+					$money->setConfig($this->budgetConfigDAOManager->findAvailable());
+				}
 				$this->virtualMoneyDAOManager->create($money);
 			} catch (DAOException $e) {
 				$this->setMessage($e->getMessage());

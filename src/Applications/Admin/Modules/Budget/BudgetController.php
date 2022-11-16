@@ -3,17 +3,22 @@
 namespace Applications\Admin\Modules\Budget;
 
 use Core\Charts\BudgetConfigChartBuilder;
+use Core\Shivalik\Entities\BudgetRubric;
 use Core\Shivalik\Entities\ConfigElement;
+use Core\Shivalik\Entities\Output;
 use Core\Shivalik\Managers\BudgetConfigDAOManager;
 use Core\Shivalik\Managers\BudgetRubricDAOManager;
 use Core\Shivalik\Managers\ConfigElementDAOManager;
 use Core\Shivalik\Managers\MemberDAOManager;
+use Core\Shivalik\Managers\OutputDAOManager;
 use Core\Shivalik\Managers\RubricCategoryDAOManager;
 use Core\Shivalik\Managers\SubConfigElementDAOManager;
 use Core\Shivalik\Validators\BudgetConfigFormValidator;
 use Core\Shivalik\Validators\BudgetRubricFormValidator;
+use Core\Shivalik\Validators\OutputFormValidator;
 use Core\Shivalik\Validators\RubricCategoryFormValidator;
 use Core\Shivalik\Validators\SubConfigElementFormValidator;
+use DateTime;
 use PHPBackend\Graphics\ChartJS\ChartConfig;
 use PHPBackend\Http\HTTPController;
 use PHPBackend\Request;
@@ -38,6 +43,11 @@ class BudgetController extends HTTPController {
      * @var BudgetConfigDAOManager
      */
     private $budgetConfigDAOManager;
+
+    /**
+     * @var OutputDAOManager
+     */
+    private $outputDAOManager;
 
     /**
      * @var ConfigElementDAOManager
@@ -339,6 +349,56 @@ class BudgetController extends HTTPController {
     public function executeCancelSubConfigElement (Request $request, Response $response) : void {
         $request->getSession()->removeAttribute(self::ATTR_SESSION_BUDGET_SUB_CONFIG_ELEMENTS);
         $response->sendRedirect("/admin/budget/sub-config/{$request->getDataGET('id')}/");
+    }
+
+    //=============================||=========================\\
+    //=============================||=========================\\
+
+    public function executeCashOut (Request $request) : void  {
+        $request->addAttribute('config_nav', 'cash');
+        /** @var BudgetRubric[] */
+        $accounts = $this->budgetRubricDAOManager->findAll();
+        foreach ($accounts as $account) {
+            if($account->getOwner() != null){
+                $account->setOwner($this->memberDAOManager->findById($account->getOwner()->getId()));
+            }
+        }
+        $request->addAttribute('accounts', $accounts);
+    }
+
+    /**
+     * retrait d'un montant a une subrique X.
+     * si la rubtrique est associer a un compte d'un membre, alors le montant sera directement transferer dans le compte du membre
+     *
+     * @param Request $request
+     * @param Response $response
+     * @return void
+     */
+    public function executeNewCashOut (Request $request, Response $response): void
+    {
+        /** @var BudgetRubric */
+        $rubric = $this->budgetRubricDAOManager->findById($request->getDataGET('id'));
+        if($rubric->getOwner() != null) {
+            $out = new Output();
+            $out->setAmount($rubric->getAvailable());
+            if($out->getAmount() > 0) {
+                $out->setDateAjout(new DateTime());
+                $out->setRubric($rubric);
+                $this->outputDAOManager->create($out);
+            }
+            $response->sendRedirect("/admin/budget/cash-out/");
+        }
+        if ($request->getMethod() == Request::HTTP_POST) {
+            $form = new OutputFormValidator($this->getDaoManager());
+            $out = $form->createAfterValidation($request, $rubric);
+            if(!$form->hasError()) {
+                $response->sendRedirect("/admin/budget/cash-out/");
+            }
+
+            $form->includeFeedback($request);
+        }
+
+        $request->addAttribute('max', $rubric->getAvailable());
     }
 
 }

@@ -82,6 +82,7 @@ class VirtualMoneyDAOManagerImplementation1 extends DefaultDAOInterface implemen
     {
         $id = UtilitaireSQL::insert($pdo, $this->getTableName(), [
             'product' => $entity->getProduct(),
+            'config' => $entity->getConfig() != null ? $entity->getConfig()->getId() : null,
             'afiliate' => $entity->getAfiliate(),
 			'office' => $entity->getOffice()->getId(),
 			'request' => $entity->getRequest() != null? $entity->getRequest()->getId() : null,

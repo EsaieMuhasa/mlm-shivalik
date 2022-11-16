@@ -10,7 +10,7 @@ use PHPBackend\Dao\UtilitaireSQL;
 /**
  * implementation par defaut pour l'interfacage ave la table qui sauvegrde les sorties en caisse
  */
-class OutputDAOManagerImplementtion1 extends DefaultDAOInterface implements OutputDAOManager {
+class OutputDAOManagerImplementation1 extends DefaultDAOInterface implements OutputDAOManager {
 
     /**
      * sauvegarde d'une sortie

@@ -36,6 +36,13 @@ use PHPBackend\Page;
             			<span class="fa fa-list"></span> Config elements
             		</a>
 	        	</li> 
+
+				<li class="<?php echo ($_REQUEST['config_nav'] == 'cash'? 'active' : ''); ?>">
+					<a href="/admin/budget/cash-out/" title="">
+						<span class="fa fa-money"></span> Cash out
+					</a>
+				</li> 
+			
 			</ul>
 			
 		</div><!-- /.navbar-collapse -->

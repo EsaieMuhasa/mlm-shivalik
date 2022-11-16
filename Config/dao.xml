@@ -193,6 +193,11 @@
 			name="\Core\Shivalik\Entities\SubConfigElement"
 			specification="\Core\Shivalik\Managers\SubConfigElementDAOManager"
 			implementation="\Core\Shivalik\Managers\Implementation\SubConfigElementDAOManagerImplementation1"/>
+		
+		<entity
+			name="\Core\Shivalik\Entities\Output"
+			specification="\Core\Shivalik\Managers\OutputDAOManager"
+			implementation="\Core\Shivalik\Managers\Implementation\OutputDAOManagerImplementation1"/>
 		<!-- // -->
 
 	</entities>

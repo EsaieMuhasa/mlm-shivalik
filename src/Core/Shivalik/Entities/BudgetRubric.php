@@ -148,8 +148,11 @@ class BudgetRubric extends DBEntity {
      *
      * @return  float
      */ 
-    public function getGlobalPart() : float
+    public function getGlobalPart() : ?float
     {
+        if ($this->globalPart === null) {
+            return 0.0;
+        }
         return $this->globalPart;
     }
 
@@ -158,7 +161,7 @@ class BudgetRubric extends DBEntity {
      *
      * @param  float  $globalPart  resultat du calcul pour la repartition globale
      */ 
-    public function setGlobalPart(float $globalPart) : void
+    public function setGlobalPart(?float $globalPart) : void
     {
         $this->globalPart = $globalPart;
     }
@@ -168,8 +171,11 @@ class BudgetRubric extends DBEntity {
      *
      * @return  float
      */ 
-    public function getSpecificPart() : float
+    public function getSpecificPart() : ?float
     {
+        if ($this->specificPart === null) {
+            return 0.0;
+        }
         return $this->specificPart;
     }
 
@@ -178,7 +184,7 @@ class BudgetRubric extends DBEntity {
      *
      * @param  float  $specificPart  resultat de calculs, pour le sous-rubriques budgetaires
      */ 
-    public function setSpecificPart(float $specificPart) : void
+    public function setSpecificPart(?float $specificPart) : void
     {
         $this->specificPart = $specificPart;
     }
@@ -188,8 +194,11 @@ class BudgetRubric extends DBEntity {
      *
      * @return  float
      */ 
-    public function getSumOutlays() : float
+    public function getSumOutlays() : ?float
     {
+        if ($this->sumOutlays === null) {
+            return 0.0;
+        }
         return $this->sumOutlays;
     }
 
@@ -198,8 +207,13 @@ class BudgetRubric extends DBEntity {
      *
      * @param  float  $sumOutlays  somme des montants deja retirer, pour ladite rubrique
      */ 
-    public function setSumOutlays(float $sumOutlays) : void
+    public function setSumOutlays(?float $sumOutlays) : void
     {
         $this->sumOutlays = $sumOutlays;
+    }
+
+    public function getAvailable () : float {
+        $amount = $this->getSpecificPart() + $this->getGlobalPart() - $this->getSumOutlays();
+        return $amount;
     }
 }
