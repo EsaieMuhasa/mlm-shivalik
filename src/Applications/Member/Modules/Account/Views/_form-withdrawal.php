@@ -42,7 +42,7 @@ $account = $_REQUEST[AccountController::ATT_ACCOUNT];
                 			<input type="text" name="amount" <?php echo (isset($_GET['id'])? 'readonly="readonly"':''); ?>  value="<?php echo htmlspecialchars(isset($_REQUEST['withdrawal'])? $_REQUEST['withdrawal']->amount:'');?>" id="amount-office" class="form-control" autocomplete="off"/>
             				<?php if(!isset($_GET['id'])) :  ?>
             				<span class="input-group-addon">
-            					<span class="text-danger"><?php echo "Max: {$account->getSolde()} {$config->get('devise')}"; ?></span>
+            					<span class="text-danger"><?php echo "Max: {$account->getMember()->getAvailableCashMoney()} {$config->get('devise')}"; ?></span>
         					</span>
         					<?php endif; ?>
             			</div>

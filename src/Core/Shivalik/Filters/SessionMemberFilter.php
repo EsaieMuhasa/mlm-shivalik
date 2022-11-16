@@ -5,6 +5,7 @@ use PHPBackend\Http\HTTPFilter;
 use PHPBackend\Request;
 use PHPBackend\Response;
 use Core\Shivalik\Entities\Member;
+use Core\Shivalik\Managers\MemberDAOManager;
 use Core\Shivalik\Managers\MonthlyOrderDAOManager;
 
 /**
@@ -23,6 +24,11 @@ class SessionMemberFilter extends HTTPFilter
     private $monthlyOrderDAOManager;
 
     /**
+     * @var MemberDAOManager
+     */
+    private $memberDAOManager;
+
+    /**
      * {@inheritDoc}
      * @see \PHPBackend\Filter::doFilter()
      */
@@ -33,6 +39,10 @@ class SessionMemberFilter extends HTTPFilter
              * @var Member $member
              */
             $member = $request->getSession()->getAttribute(self::MEMBER_CONNECTED_SESSION);
+
+            /** @var Member */
+            $member = $this->memberDAOManager->findById($member->getId());
+            $request->getSession()->addAttribute(self::MEMBER_CONNECTED_SESSION, $member);
             
             if ($member->isEnable()) {
                 

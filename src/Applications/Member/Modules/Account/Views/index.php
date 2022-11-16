@@ -36,7 +36,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
             <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                 <div class="info-box blue-bg">
                     <i class="fa fa-tag"></i>
-                    <div class="count"><?php echo ($compte->getLeftMembershipPv()); ?></div>
+                    <div class="count"><?php echo ($member->getLeftMembershipPv()); ?></div>
                     <div class="title">Left PV</div>
                 </div>
                 <!--/.info-box-->
@@ -45,7 +45,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
             <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                 <div class="info-box blue-bg">
                     <i class="fa fa-tag"></i>
-                    <div class="count"><?php echo ($compte->getMiddleMembershipPv()); ?></div>
+                    <div class="count"><?php echo ($member->getMiddleMembershipPv()); ?></div>
                     <div class="title">MIDDLE PV</div>
                 </div>
                 <!--/.info-box-->
@@ -54,7 +54,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                 <div class="info-box blue-bg">
                     <i class="fa fa-tag"></i>
-                    <div class="count"><?php echo ($compte->getRightMembershipPv()); ?></div>
+                    <div class="count"><?php echo ($member->getRightMembershipPv()); ?></div>
                     <div class="title">Right PV</div>
                 </div>
                 <!--/.info-box-->
@@ -66,7 +66,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
         	<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <div class="info-box blue-bg">
                     <i class="fa fa-tag"></i>
-                    <div class="count"><?php echo ($compte->getProductPv()); ?></div>
+                    <div class="count"><?php echo ($member->getProductPv()); ?></div>
                     <div class="title">Purchase PV</div>
                 </div>
                 <!--/.info-box-->
@@ -74,7 +74,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <div class="info-box dark-bg">
                     <i class="fa fa-tags"></i>
-                    <div class="count"><?php echo ($compte->getMembershipPv() + $compte->getProductPv()); ?></div>
+                    <div class="count"><?php echo ($member->getMembershipPv() + $member->getProductPv()); ?></div>
                     <div class="title">TOTAL PV</div>
                 </div>
                 <!--/.info-box-->
@@ -93,7 +93,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <div class="info-box dark-bg">
                     <i class="fa fa-money"></i>
-                    <div class="count"><?php echo ("{$compte->getSolde()} {$config->get("devise")}"); ?></div>
+                    <div class="count"><?php echo ("{$member->getAvailableCashMoney(true)} {$config->get("devise")}"); ?></div>
                     <div class="title">Sold</div>
                 </div>
                 <!--/.info-box-->
@@ -102,7 +102,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <div class="info-box red-bg">
                     <i class="fa fa-trash-o"></i>
-                    <div class="count"><?php echo ("{$compte->getWithdrawals()}  {$config->get("devise")}"); ?></div>
+                    <div class="count"><?php echo ("{$member->getWithdrawals()}  {$config->get("devise")}"); ?></div>
                     <div class="title">Transh</div>
                 </div>
                 <!--/.info-box-->
@@ -115,7 +115,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
             <div class="<?php echo ($hasOffice? 'col-lg-4 col-md-4':'col-lg-6 col-md-6'); ?> col-lg-4 col-md-4 col-sm-6 col-xs-12">
                 <div class="info-box blue-bg">
                     <i class="fa fa-users"></i>
-                    <div class="count"><?php echo ("{$compte->getSoldeGenration()} {$config->get("devise")}"); ?></div>
+                    <div class="count"><?php echo ("{$member->getSoldGeneration()} {$config->get("devise")}"); ?></div>
                     <div class="title">generationnel bonus</div>
                 </div>
                 <!--/.info-box-->
@@ -125,7 +125,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
             <div class="<?php echo ($hasOffice? 'col-lg-4 col-md-4':'col-lg-6 col-md-6'); ?> col-sm-6 col-xs-12">
                 <div class="info-box blue-bg">
                     <i class="glyphicon glyphicon-shopping-cart"></i>
-                    <div class="count"><?php echo ("{$compte->getPurchaseBunus()} {$config->get("devise")}"); ?></div>
+                    <div class="count"><?php echo ("{$member->getPurchaseBonus()} {$config->get("devise")}"); ?></div>
                     <div class="title">Purchase bonus</div>
                 </div>
                 <!--/.info-box-->
@@ -136,7 +136,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
             <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                 <div class="info-box blue-bg">
                     <i class="fa fa-laptop"></i>
-                    <div class="count"><?php echo ("{$compte->getSoldeOfficeBonus()} {$config->get("devise")}"); ?></div>
+                    <div class="count"><?php echo ("{$member->getSoldOfficeBonus()} {$config->get("devise")}"); ?></div>
                     <div class="title">Office bonus</div>
                 </div>
                 <!--/.info-box-->
@@ -144,16 +144,12 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
             <?php endif; ?>
 
             <!-- mobilisator -->
-            <?php if ($member->getMatricule() == 'F9' || $member->getMatricule() == 'Y3' || 
-                        $member->getMatricule() == 'K894' || $member->getMatricule() == 'K497' || 
-                        $member->getMatricule() == 'P31' || $member->getMatricule() == 'M4' || 
-                        $member->getMatricule() == 'O27' || $member->getMatricule() == 'K17' || 
-                        $member->getMatricule() == 'B279' ) : ?>
-            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+            <?php if ($member->hasParticularOperation()) : ?>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <div class="info-box blue-bg">
                     <i class="fa fa-leaf"></i>
-                    <div class="count"><?php echo ("0 {$config->get("devise")}"); ?></div>
-                    <div class="title">mobilisator</div>
+                    <div class="count"><?php echo ("{$member->getParticularBonus()} {$config->get("devise")}"); ?></div>
+                    <div class="title">Mobilisator</div>
                 </div>
             </div>
             <?php endif; ?>

@@ -33,7 +33,7 @@ class WithdrawalFormValidator extends AbstractOperationFormValidator
     private $withdrawalDAOManager;
     
     /**
-     * @param number $office
+     * @param string|int $office
      * @throws IllegalFormValueException
      */
     private function validationOffice ($office) : void {
@@ -156,7 +156,7 @@ class WithdrawalFormValidator extends AbstractOperationFormValidator
         $withdrawal->setMember($account->getMember());   
         
         $this->processingPassword($account->getMember(), $password);
-        if ($account->getSolde() <= $withdrawal->getAmount()) {
+        if ($account->getMember()->getAvailableCashMoney() <= $withdrawal->getAmount()) {
             $this->addError(self::FIELD_AMOUNT, "amount greater than the maximum withdrawable amount");
         } 
         

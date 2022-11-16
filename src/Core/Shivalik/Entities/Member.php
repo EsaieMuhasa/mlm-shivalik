@@ -21,49 +21,49 @@ class Member extends User implements TernaryNode
     /**
      * @var string
      */
-    private $matricule;
+    protected $matricule;
 
     /**
      * @var Member
      */
-    private $parent;
+    protected $parent;
 
     /**
      * @var Member
      */
-    private $sponsor;
+    protected $sponsor;
 
     /**
      * @var int
      */
-    private $foot;
+    protected $foot;
 
     /**
      * @var OfficeAdmin
      */
-    private $admin;
+    protected $admin;
 
     /**
      * @var Office
      */
-    private $office;
+    protected $office;
 
     /**
      * Pour les utilisateurs qui ont des offices
      * @var Office
      */
-    private $officeAccount;
+    protected $officeAccount;
 
     /**
      * contiens l'actuel packet de l'utilisateur
      * @var GradeMember
      */
-    private $packet;
+    protected $packet;
 
     /**
      * @var Member[]
      */
-    private $childs = [];
+    protected $childs = [];
 
     //==================================\\
     //      etats du compte du compte   \\
@@ -71,76 +71,85 @@ class Member extends User implements TernaryNode
     /**
      * @var double
      */
-    private $withdrawals;
+    protected $withdrawals;
 
     /**
      * @var double
      */
-    private $withdrawalsRequest;
+    protected $withdrawalsRequest;
 
     /**
      * Le solde bonus office pour ceux qui en ont
      * @var float
      */
-    private $soldOfficeBonus;
+    protected $soldOfficeBonus;
 
     /**
      * Solde du compte principale (parainage)
      * @var float
      */
-    private $soldGeneration;
+    protected $soldGeneration;
 
     /**
      * @var float
      */
-    private $purchaseBonus;//bonus de reachat
+    protected $purchaseBonus;//bonus de reachat
 
     /**
      * @var float
      */
-    private $leftMembershipPv;
+    protected $particularBonus;//bonus de sensibilisateurs
+
+    /**
+     * @var boolean
+     */
+    protected $particularOperation;//le compte doit-elle avoir des operations partitculer??
 
     /**
      * @var float
      */
-    private $rightMembershipPv;
+    protected $leftMembershipPv;
 
     /**
      * @var float
      */
-    private $middleMembershipPv;
+    protected $rightMembershipPv;
+
+    /**
+     * @var float
+     */
+    protected $middleMembershipPv;
 
     /**
      * efforts peronnels pour le re-acat
      *
      * @var float
      */
-    private $personalMembershipPv;
+    protected $personalMembershipPv;
 
     /**
      * @var float
      */
-    private $leftProductPv;
+    protected $leftProductPv;
 
     /**
      * @var float
      */
-    private $rightProductPv;
+    protected $rightProductPv;
 
     /**
      * @var float
      */
-    private $middleProductPv;
+    protected $middleProductPv;
 
     /**
      * effort personnel lors d'achat des produits
      * @var number
      */
-    private $personalProductPv;
+    protected $personalProductPv;
     //===========================\\
     //============||=============\\
     //===========================\\
-
 
     /**
      * @return GradeMember
@@ -563,6 +572,13 @@ class Member extends User implements TernaryNode
             $this->rightProductPv
         ]);
     }
+
+    public function getProductPv () : float {
+        return $this->getLeftProductPv() + $this->getRightProductPv() + $this->getMiddleProductPv();
+    }
+    public function getMembershipPv () : float {
+        return $this->getLeftMembershipPv() + $this->getRightMembershipPv() + $this->getMiddleMembershipPv();
+    }
     
     /**
      * renvoie le total des points valeurs generationnel
@@ -606,7 +622,7 @@ class Member extends User implements TernaryNode
      *
      * @return float|null
      */
-    public function getWithdrawalsRequst () : ?float {
+    public function getWithdrawalsRequest () : ?float {
         return $this->withdrawalsRequest;
     }
 
@@ -625,7 +641,7 @@ class Member extends User implements TernaryNode
     /**
      * renvoie le montant retirable possible pour le compte du membre.
      * 
-     * par defaut le montant renvoyer ne prend pas en compte les demandes non qui ne sont pas encore valider.
+     * par defaut le montant renvoyer ne prend pas en compte les demandes qui ne sont pas encore valider.
      * dans ce cas utiliser pluto la methode, getAvailableCashMoney en mode structe
      * 
      * @param bool $structMode
@@ -634,14 +650,14 @@ class Member extends User implements TernaryNode
     public function getAvailableCashMoney (bool $structMode = false) : float {
         $amount = 0;
 
-        $amount += $this->getSoldGeneration() + $this->getSoldOfficeBonus() + $this->getPurchaseBonus();
+        $amount += $this->getSoldGeneration() + $this->getSoldOfficeBonus() + $this->getPurchaseBonus() + $this->getParticularBonus();;
 
         if($amount !== null) {
             $amount -= $this->getWithdrawals();
         }
 
         if ($structMode) {
-            $amount -= $this->getWithdrawalsRequst();
+            $amount -= $this->getWithdrawalsRequest();
         }
 
         return $amount;
@@ -656,7 +672,7 @@ class Member extends User implements TernaryNode
         $this->rightMembershipPv = $rightMembershipPv;
     }
 
-    public function setMiddelMembershipPv (?float $middleMembershipPv) : void {
+    public function setMiddleMembershipPv (?float $middleMembershipPv) : void {
         $this->middleMembershipPv = $middleMembershipPv;
     }
 
@@ -694,4 +710,52 @@ class Member extends User implements TernaryNode
         $this->purchaseBonus = $purchaseBonus;
     }
 
+
+    /**
+     * Get the value of particularBonus
+     *
+     * @return  float
+     */ 
+    public function getParticularBonus()
+    {
+        return $this->particularBonus;
+    }
+
+    /**
+     * Set the value of particularBonus
+     *
+     * @param  float  $particularBonus
+     *
+     * @return  self
+     */ 
+    public function setParticularBonus(?float $particularBonus)
+    {
+        $this->particularBonus = $particularBonus;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of particularOperation
+     *
+     * @return  boolean
+     */ 
+    public function hasParticularOperation()
+    {
+        return $this->particularOperation;
+    }
+
+    /**
+     * Set the value of particularOperation
+     *
+     * @param  boolean  $particularOperation
+     *
+     * @return  self
+     */ 
+    public function setParticularOperation($particularOperation)
+    {
+        $this->particularOperation = $this->isTrue($particularOperation);
+
+        return $this;
+    }
 }

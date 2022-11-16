@@ -5,6 +5,7 @@ use Core\Shivalik\Entities\Account;
 use Core\Shivalik\Entities\Member;
 use Core\Shivalik\Filters\SessionMemberFilter;
 use Core\Shivalik\Managers\BonusGenerationDAOManager;
+use Core\Shivalik\Managers\BudgetRubricDAOManager;
 use Core\Shivalik\Managers\GradeMemberDAOManager;
 use Core\Shivalik\Managers\MemberDAOManager;
 use Core\Shivalik\Managers\OfficeBonusDAOManager;
@@ -94,6 +95,11 @@ class AccountController extends HTTPController
      * @var SellSheetRowDAOManager
      */
     private $sellSheetRowDAOManager;
+
+    /**
+     * @var BudgetRubricDAOManager
+     */
+    private $budgetRubricDAOManager;
     
     
     /**
@@ -128,8 +134,8 @@ class AccountController extends HTTPController
         $member = $request->getSession()->getAttribute(SessionMemberFilter::MEMBER_CONNECTED_SESSION);
         $gradeMember = $this->gradeMemberDAOManager->findCurrentByMember($member->getId());
         $gradeMember->setMember($member);
+        $member->setParticularOperation($this->budgetRubricDAOManager->checkOwnedByMember($member->getId()));
         
-
         $compte = $this->getAccount();
         
         $compte->calcul();

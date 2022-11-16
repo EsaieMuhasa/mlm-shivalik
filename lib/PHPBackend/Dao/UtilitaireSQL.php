@@ -226,11 +226,11 @@ final class UtilitaireSQL
     public static function columnValueExist(\PDO $pdo, string $tableName, string $columnName, $columnValue, $id = null) : bool {
         $return = false;
         try {
-            $result = $pdo->prepare('SELECT '.$columnName.' FROM '.$tableName.' WHERE '.$columnName.'=:'.$columnName.($id !== null ? ' AND id!='.$id : '').' LIMIT 1 OFFSET 0');
+            $result = $pdo->prepare('SELECT '.$columnName.' FROM '.$tableName.' WHERE '.$columnName.'=:value'.($id !== null ? ' AND id!='.$id : '').' LIMIT 1 OFFSET 0');
             if ($result == false){
                 throw new DAOException('Echec de préparation de la requête.');
             }
-            $status = $result->execute(array($columnName => $columnValue));
+            $status = $result->execute(array('value' => $columnValue));
             
             if(!$status){
                 $result->closeCursor();
