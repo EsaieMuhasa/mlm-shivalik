@@ -828,8 +828,8 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
     public function countUpgrades(?int $officeId = null): int {
         $return = 0;
         try {
-            $statement = $this->getConnection()->prepare("SELECT COUNT(*) AS nombre FROM {$this->getTableName()} WHERE old IS NOT NULL ".($officeId === null? "":(" AND office=:office")));
-            if($statement->execute(array('office' => $officeId))){
+            $statement = $this->getConnection()->prepare("SELECT COUNT(*) AS nombre FROM {$this->getTableName()} WHERE old IS NOT NULL ".($officeId === null? "":(" AND office=".$officeId)));
+            if($statement->execute()){
                 if ($row = $statement->fetch()) {
                     $return = intval($row['nombre']);
                 }

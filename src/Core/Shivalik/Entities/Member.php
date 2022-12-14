@@ -448,7 +448,7 @@ class Member extends User implements TernaryNode
      */
     public function getNodeName(): string
     {
-        return $this->getLastName();
+        return $this->getFullName();
     }
 
     /**

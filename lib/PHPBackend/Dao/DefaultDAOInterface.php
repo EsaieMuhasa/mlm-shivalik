@@ -98,7 +98,7 @@ abstract class DefaultDAOInterface implements DAOInterface
      * @param array $ids
      * @return array
      */
-    public function deleteAllInTransaction(\PDO $pdo, array $ids = array()): array
+    public function deleteAllInTransaction(\PDO $pdo, array $ids = array()): void
     {
         UtilitaireSQL::deleteAll($pdo, $this->getTableName(), $ids);
     }

@@ -187,7 +187,7 @@ final class UtilitaireSQL
      * @throws DAOException
      * @return number le nombre d'occurence suprimer dans la base de donnees
      */
-    public static function deleteAll(\PDO $pdo, string $tableName, ?array $ids = array()){
+    public static function deleteAll(\PDO $pdo, string $tableName, ?array $ids = []){
         $SQL_REQUE = '';
         if ($ids!=null && count($ids) != 0) {
             $SQL_REQUE .= "DELETE FROM {$tableName} WHERE id IN (";
@@ -207,7 +207,8 @@ final class UtilitaireSQL
             $statut = $pdo->exec($SQL_REQUE);
             if ($statut==0) {
                 throw new DAOException('Aucune occurence n\'a été suprimée définitivement');
-            }else return $statut;
+            }
+            return $statut;
         } catch (\Exception $e) {
             throw new DAOException($e->getMessage(), DAOException::ERROR_CODE, $e);
         }

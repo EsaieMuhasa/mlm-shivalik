@@ -1,6 +1,7 @@
 <?php
 namespace Core\Shivalik\Managers;
 
+use Core\Shivalik\Entities\Operation;
 use PHPBackend\Dao\DAOInterface;
 
 /**
@@ -29,7 +30,7 @@ interface OperationDAOManager extends DAOInterface
      * @param int $memberId
      * @param int $limit
      * @param int $offset
-     * @return array
+     * @return Operation[]
      */
     public function findByMember (int $memberId, ?int $limit = null, int $offset = 0) : array;
     
@@ -51,7 +52,7 @@ interface OperationDAOManager extends DAOInterface
      * @param \DateTime $dateMax
      * @param int $limit
      * @param int $offset
-     * @return array
+     * @return Operation[]
      */
     public function findHistoryByMember (int $memberId, \DateTime $dateMin, \DateTime $dateMax = null, ?int $limit = null, int $offset= 0) : array ;
 

@@ -60,10 +60,10 @@ ALTER TABLE `ConfigElement`
 ADD
     CONSTRAINT `fk_ConfigElement_config` FOREIGN KEY (`config`) REFERENCES `BudgetConfig`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
     
-ALTER TABLE `virtualmoney`
+ALTER TABLE `Virtualmoney`
 ADD
-    CONSTRAINT `fk_VirualMoney_config` FOREIGN KEY (`config`) REFERENCES `budgetconfig`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+    CONSTRAINT `fk_VirualMoney_config` FOREIGN KEY (`config`) REFERENCES `BudgetConfig`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE `output`
+ALTER TABLE `Output`
 ADD
-    CONSTRAINT `fk_Output_rubric` FOREIGN KEY (`rubric`) REFERENCES `budgetrubric`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+    CONSTRAINT `fk_Output_rubric` FOREIGN KEY (`rubric`) REFERENCES `BudgetRubric`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;

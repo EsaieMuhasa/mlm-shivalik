@@ -11,7 +11,11 @@ use Core\Shivalik\Entities\OfficeBonus;
 use Core\Shivalik\Entities\PointValue;
 use Core\Shivalik\Entities\PurchaseBonus;
 use Core\Shivalik\Entities\Withdrawal;
+use Core\Shivalik\Managers\GradeMemberDAOManager;
 use Core\Shivalik\Managers\MemberDAOManager;
+use Core\Shivalik\Managers\PointValueDAOManager;
+use DateTime;
+use PDOException;
 use PHPBackend\Dao\DAOEvent;
 use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\UtilitaireSQL;
@@ -250,18 +254,156 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @param Account $node
-     * @param Account $newParent
-     * @param int|null $foot
-     * @return void
-     * @throws DAOException
-     */
-    public function migrateToNetwork(Account $node, Account $newParent, ?int $foot = null): void
+    public function migrateToNetwork(Member $node, Member $newParent, ?Member $newSponsor = null): void
     {
-        throw new DAOException("No implementation of member network migration algorithms");
+        try {
+            /**
+             * Dans le cas où le sponsor est renseiger, on cherche le troue le plus 
+             * proche dans le reseau du sponsor.
+             */
+            
+            if ($newSponsor != null) {
+                //recherche du nouveau parent
+                /** @var Member $parent */
+                $parent = $newSponsor;
+                while ($this->countDirectChilds($parent->getId()) == 3) {
+                    $childs = $this->findChilds($parent->getId());
+    
+                    $breack = false;
+    
+                    //pour chaque noeud du parent, on cherche un vide.
+                    foreach ($childs as $child) {
+    
+                        $count = $this->countDirectChilds($child->getId());
+                        if ($count != 3) {
+                            //verification du pied disponible
+                            $parent = $child;
+                            $breack = true;
+                            break;
+                        }
+    
+                        $parent = $child;
+                    }
+    
+                    if ($breack) {
+                        break;
+                    }
+                }            
+                //==
+    
+                $pdo = $this->getConnection();
+                if(!$pdo->beginTransaction()) {
+                    throw new DAOException("Une erreur est survenue lors du demarrage de la transaction", 500);
+                }
+
+                $now = new DateTime();
+    
+                //suppression des point valeurs
+                //-------------------------------
+    
+                /** @var PointValueDAOManagerImplementation1 $pointDao */
+                $pointDao = $this->getManagerFactory()->getManagerOf(PointValue::class);
+                /** @var GradeMemberDAOManager $packetDao */
+                $packetDao = $this->getManagerFactory()->getManagerOf(GradeMember::class);
+
+                /** @var PointValue[] $points */
+                $points = $pointDao->findByMember($node->getId());
+                $deletablePoints = [];
+                foreach ($points as $point) {
+                    $byGenerator = $pointDao->findByGenerator($point->getGenerator()->getId());
+                    foreach ($byGenerator as $p) {
+                        if ($p->getId() != $point->getId()) {
+                            $deletablePoints[] = $p->getId();
+                        }
+                    }
+                }
+
+                $packerts = $packetDao->findByMember($node->getId());
+                $otherPoints = [];//le point de surplus au upline du compte $node
+                
+                foreach ($packerts as $pack) {
+                    $additionnalPoints = $pointDao->findByGenerator($pack->getId());
+                    foreach ($additionnalPoints as $p) {
+                        $deletablePoints[] = $p->getId();
+                    }
+                    $otherPoints[] = $additionnalPoints[0];
+                }
+
+                $pointDao->deleteAllInTransaction($pdo, $deletablePoints);//suppression definitive des autres points
+
+                $parentNode = $parent;
+                do {
+                    foreach ($points as $point) {
+                        $copy = clone $point;
+                        $copy->setDateAjout($now);
+                        $copy->setMember($parentNode);
+                        $pointDao->createInTransaction($point, $pdo);
+                    }
+                    
+                    //plus les points du compte $node
+                    foreach ($otherPoints as $point) {
+                        $point->setMember($parentNode);
+                        $point->setDateAjout($now);
+                        $pointDao->createInTransaction($point, $pdo);
+                    }
+                    $parentNode = $this->checkParent($parentNode->getId()) ? $this->findParent($parentNode->getId()) : null;
+                    
+                } while ($parentNode  != null);
+                //==
+    
+                //recherche du pied disponible
+                $foot = $this->findAvailableFoot($parent->getId());
+                $node->setFoot($foot);
+                $node->setParent($parent);
+                $node->setSponsor($newSponsor);
+                UtilitaireSQL::update($pdo, $this->getTableName(), [
+                    'parent' => $node->getParent()->getId(),
+                    'sponsor' => $node->getSponsor()->getId(),
+                    self::FIELD_DATE_MODIF => $node->getDateModif()->format('Y-m-d H:i:s')
+                ], $node->getId());
+                //==
+
+                if  (!$pdo->commit()) {
+                    throw new DAOException("Une erreur est survenue lors du commit de la transaction ");
+                }
+            } else {
+                throw new DAOException("Operation non pris en charge");
+            }
+        } catch (PDOException $e) {
+            throw new DAOException("une erreur est survenue lors de la migration du compte: {$e->getMessage()}", 500, $e);
+        }
+    }
+
+    public function findAvailableFoot(int $memeberId): ?int
+    {
+        $childs = $this->checkChilds($memeberId) ? $this->findChilds($memeberId) : null; 
+        $foot = null;
+        if ($childs == null) {
+            $foot = Member::LEFT_FOOT;
+        } else  {
+            $left = false;
+            $right = false;
+            $middle = false;
+
+            foreach ($childs as $child) {
+                if ($child->getFoot() == Member::LEFT_FOOT) {
+                    $left = true;
+                }else if ($child->getFoot() == Member::MIDDEL_FOOT) {
+                    $middle = true;
+                } else if ($child->getFoot() == Member::RIGHT_FOOT) {
+                    $right = true;
+                }
+            }
+
+            if (!$left) {
+                $foot = Member::LEFT_FOOT;
+            } else if (!$middle) {
+                $foot = Member::MIDDEL_FOOT;
+            } else if (!$right) {
+                $foot = Member::RIGHT_FOOT;
+            }
+        }
+        return $foot;
     }
 
     /**
@@ -704,7 +846,7 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
     
     /**
      * {@inheritDoc}
-     * @see \Core\Shivalik\Managers\MemberDAOManager::findChilds()
+     * @return Member[]
      */
     public function findChilds (int $memberId) : array{
         return UtilitaireSQL::findAll($this->getConnection(), $this->getViewName(), $this->getMetadata()->getName(), "foot", true, ['parent' => $memberId]);

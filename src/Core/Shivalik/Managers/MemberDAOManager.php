@@ -46,25 +46,24 @@ interface MemberDAOManager extends UserDAOManager
 
     /**
      * migration d'un compte dans un autre reseau.
-     * consiste anger de le parent du compte, tout en maintenant le meme sponsor.
+     * consiste anger de le parent du compte, soit en maintenant le meme sponsor, soit en changant egalement
+     * les sponsor
      * 
      * Cette methode effectue une validation tre poussee pour garder l'integrite des donnees intacte.
-     * Les points valeurs des compte consernee sont re-calculer
+     * Les points valeurs des compte consernee sont re-calculer.
      *
-     * @param Account $node le compte que vous voulez deplacer
-     * @param Account $newParent le compte qui doit maintenant parainer le compte $node
-     * @param int $foot la proposition du peid sur le quel on va acricher le compte.
-     * si $foot == null , alors on cherche le pied disponible. dans le cas ou tout pieds sont deja occupee,
-     * alors un exception sera levee
+     * @param Member $node le compte que vous voulez deplacer
+     * @param Member $newParent le compte qui doit maintenant parainer le compte $node
+     * @param Member|null $newSponsor le compte du nouveau sponsor
      * @return void
      * @throws DAOException cette exception peut-etre leve dans le cas ci-dessous:
      * <ul>
-     * <li>le compte $parentNode n'est pas dans le reseua du sponsor du compte $none</li>
-     * <li>le foot proposee est deja occupee par un autre membre</li>
+     * <li>le compte $parentNode n'est pas dans le reseau du sponsor du compte $none</li>
+     * <li>Il y aumoin un compte du reseau, sponsoriser par un upline</li>
      * <li>Une erreur surviens dans le processuce de communication avec la Base de donnee</li>
      * </ul>
      */
-    public function migrateToNetwork (Account $node, Account $newParent, ?int $foot = null) : void;
+    public function migrateToNetwork (Member $node, Member $newParent, ?Member $newSPonsor = null) : void;
 
     /**
      * methode magique de verification de la validite de l'arbre.
@@ -173,6 +172,14 @@ interface MemberDAOManager extends UserDAOManager
      * @throws DAOException
      */
     public function checkSponsor (int $memberId) : bool;
+
+    /**
+     * recherche du pied disponible pour le compte d'un membre.
+     *
+     * @param integer $memeberId
+     * @return integer|null
+     */
+    public function findAvailableFoot (int $memeberId) : ?int ;
     
     /**
      * @param int $memberId

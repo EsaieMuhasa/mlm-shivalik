@@ -170,6 +170,53 @@ CREATE OR REPLACE VIEW V_Office AS
         ) AS availableAfiliate
             
     FROM Office LEFT JOIN V_VirtualMoney ON Office.id = V_VirtualMoney.office;
+
+   
+-- rubrique budgetaire
+CREATE OR REPLACE VIEW V_ConfigElement AS
+    SELECT 
+        ConfigElement.id AS id,
+        ConfigElement.percent AS percent,
+        ConfigElement.config AS config,
+        ConfigElement.rubric AS rubric,
+        VirtualMoney.product AS inputAmount,
+        (SELECT (inputAmount / 100.0 ) * percent ) AS amount
+    FROM ConfigElement
+    INNER JOIN VirtualMoney ON VirtualMoney.config = ConfigElement.config;
+
+CREATE OR REPLACE VIEW V_SubConfigElement AS
+    SELECT 
+        SubConfigElement.id AS id,
+        SubConfigElement.percent AS percent,
+        SubConfigElement.config AS config,
+        SubConfigElement.rubric AS rubric,
+        V_ConfigElement.amount AS inputAmount,
+        (SELECT (V_ConfigElement.amount / 100.0 ) * SubConfigElement.percent ) AS amount
+    FROM SubConfigElement
+    INNER JOIN V_ConfigElement ON V_ConfigElement.id = SubConfigElement.config;
+
+CREATE OR REPLACE VIEW V_BudgetRubric AS
+    SELECT DISTINCT
+        BudgetRubric.id AS id,
+        BudgetRubric.`dateAjout` AS `dateAjout`,
+        BudgetRubric.`dateModif` AS `dateModif`,
+        BudgetRubric.deleted AS deleted,
+        BudgetRubric.description AS `description`,
+        BudgetRubric.label AS label,
+        BudgetRubric.category AS category, 
+        BudgetRubric.owner AS `owner`,
+        (
+            SELECT SUM(`Output`.amount) FROM `Output` WHERE `Output`.rubric = BudgetRubric.id
+        ) AS sumOutlays,
+        (
+            SELECT SUM(V_ConfigElement.amount) FROM `V_ConfigElement` WHERE `V_ConfigElement`.rubric = BudgetRubric.id
+        ) AS globalPart,
+        (
+            SELECT SUM(V_SubConfigElement.amount) FROM `V_SubConfigElement` WHERE `V_SubConfigElement`.rubric = BudgetRubric.id
+        ) AS specificPart
+    FROM BudgetRubric 
+    INNER JOIN V_ConfigElement ON V_ConfigElement.rubric = BudgetRubric.id
+    INNER JOIN V_SubConfigElement ON V_SubConfigElement.rubric = BudgetRubric.id;
     
 CREATE OR REPLACE VIEW V_Account AS 
     SELECT DISTINCT
@@ -256,49 +303,4 @@ CREATE OR REPLACE VIEW V_Account AS
 
     FROM Member;
 
-    
--- rubrique budgetaire
-CREATE OR REPLACE VIEW V_ConfigElement AS
-    SELECT 
-        ConfigElement.id AS id,
-        ConfigElement.percent AS percent,
-        ConfigElement.config AS config,
-        ConfigElement.rubric AS rubric,
-        VirtualMoney.product AS inputAmount,
-        (SELECT (inputAmount / 100.0 ) * percent ) AS amount
-    FROM ConfigElement
-    INNER JOIN VirtualMoney ON VirtualMoney.config = ConfigElement.config;
-
-CREATE OR REPLACE VIEW V_SubConfigElement AS
-    SELECT 
-        SubConfigElement.id AS id,
-        SubConfigElement.percent AS percent,
-        SubConfigElement.config AS config,
-        SubConfigElement.rubric AS rubric,
-        V_ConfigElement.amount AS inputAmount,
-        (SELECT (V_ConfigElement.amount / 100.0 ) * SubConfigElement.percent ) AS amount
-    FROM SubConfigElement
-    INNER JOIN V_ConfigElement ON V_ConfigElement.id = SubConfigElement.config;
-
-CREATE OR REPLACE VIEW V_BudgetRubric AS
-    SELECT DISTINCT
-        BudgetRubric.id AS id,
-        BudgetRubric.`dateAjout` AS `dateAjout`,
-        BudgetRubric.`dateModif` AS `dateModif`,
-        BudgetRubric.deleted AS deleted,
-        BudgetRubric.description AS `description`,
-        BudgetRubric.label AS label,
-        BudgetRubric.category AS category, 
-        BudgetRubric.owner AS `owner`,
-        (
-            SELECT SUM(`Output`.amount) FROM `Output` WHERE `Output`.rubric = BudgetRubric.id
-        ) AS sumOutlays,
-        (
-            SELECT SUM(V_ConfigElement.amount) FROM `V_ConfigElement` WHERE `V_ConfigElement`.rubric = BudgetRubric.id
-        ) AS globalPart,
-        (
-            SELECT SUM(V_SubConfigElement.amount) FROM `V_SubConfigElement` WHERE `V_SubConfigElement`.rubric = BudgetRubric.id
-        ) AS specificPart
-    FROM BudgetRubric 
-    INNER JOIN V_ConfigElement ON V_ConfigElement.rubric = BudgetRubric.id
-    INNER JOIN V_SubConfigElement ON V_SubConfigElement.rubric = BudgetRubric.id;
+ 
