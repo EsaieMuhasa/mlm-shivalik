@@ -218,6 +218,31 @@ class SettingsController extends HTTPController
         $grades = $this->gradeDAOManager->findAll();
         $request->addAttribute(self::ATT_GRADES, $grades);
     }
+
+
+    /**
+     * migration d'un compte d'un membre, d'un reseau A a un reseau B
+     *
+     * @param Request $request
+     * @param Response $response
+     * @return void
+     */
+    public function executeMigrateToNetwork (Request $request, Response $response) : void {
+
+        // $response->sendError("Reserved to Ing Esaie MUHASA only");
+
+        $nodeId = @intval($request->getDataGET('nodeId'), 10);
+        $sponsorId = @intval($request->getDataGET('sponsorId'), 10);
+
+        $node = $this->memberDAOManager->findById($nodeId);
+        $sponsor = $this->memberDAOManager->findById($sponsorId);
+
+        $this->memberDAOManager->migrateToNetwork($node, $sponsor, $sponsor);
+
+
+        $response->sendRedirect('/root/');
+
+    }
     
     /**
      * 

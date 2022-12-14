@@ -144,7 +144,8 @@ class TreeFormatter extends TreeBuilder
             $html .= "<img style=\"width: 25px; border-radius: 50%;\" src=\"/{$node->getIcon()->getDefault()}\"/>";
             $html .= "<strong>{$node->getNodeName()}</strong>";
             if ($node->getFoot() != null) {
-                $html .= " <span class=\"badge\"> ID: {$node->id}</span>";
+                $html .= " <span class=\"badge\"> foot: {$node->getFoot()}</span>";
+                $html .= " <span class=\"badge\"> ID: {$node->getId()}</span>";
                 $html .= " <span class=\"badge\"> Sponsor: {$node->getSponsor()->getId()}</span>";
                 $html .= " <span class=\"badge\"> Parent: {$node->getParent()->getId()}</span>";
             }

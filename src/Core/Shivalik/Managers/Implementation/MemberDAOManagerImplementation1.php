@@ -356,9 +356,11 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
                 $node->setFoot($foot);
                 $node->setParent($parent);
                 $node->setSponsor($newSponsor);
+                $node->setDateModif($now);
                 UtilitaireSQL::update($pdo, $this->getTableName(), [
                     'parent' => $node->getParent()->getId(),
                     'sponsor' => $node->getSponsor()->getId(),
+                    'foot' => $node->getFoot(),
                     self::FIELD_DATE_MODIF => $node->getDateModif()->format('Y-m-d H:i:s')
                 ], $node->getId());
                 //==
@@ -374,9 +376,9 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
         }
     }
 
-    public function findAvailableFoot(int $memeberId): ?int
+    public function findAvailableFoot(int $memberId): ?int
     {
-        $childs = $this->checkChilds($memeberId) ? $this->findChilds($memeberId) : null; 
+        $childs = $this->checkChilds($memberId) ? $this->findChilds($memberId) : null; 
         $foot = null;
         if ($childs == null) {
             $foot = Member::LEFT_FOOT;

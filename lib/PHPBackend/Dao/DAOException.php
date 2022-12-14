@@ -24,7 +24,7 @@ class DAOException extends PHPBackendException
      */
     public function __construct($message, $code = null, $previous = null)
     {
-        parent::__construct($message, $code, $previous);
+        parent::__construct($message, $code == null? 500 : $code, $previous);
     }
 }
 
