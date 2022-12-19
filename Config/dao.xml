@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE dao SYSTEM "../PHPBackend/config.dtd" >
+<!DOCTYPE dao SYSTEM "../lib/PHPBackend/config.dtd" >
 <dao>
 	<dbconnections>
 		<connection user="muhasa" password="esaiemuhasa" name="first" dsn="mysql:host=localhost;dbname=shivalik_db1"/>
 		<!--
 		<connection user="shivalik_db1" password="I45c9cKWv#" name="shivalik" dsn="mysql:host=localhost;dbname=shivalik_db1"/>
+		<connection user="shivalik_db1" password="I45c9cKWv#" name="shivalik" dsn="mysql:host=localhost;dbname=newversion_db1"/>
 		 -->
 	</dbconnections>
 

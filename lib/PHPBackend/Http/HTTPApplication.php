@@ -84,6 +84,11 @@ class HTTPApplication implements Application
         $this->httpResponse = new HTTPResponse($this);
         $this->source = $source;
         //HTTPSessionHandler::getSessions();
+
+        // echo '<pre>';
+        // var_dump($this);
+        // echo '</pre>';
+        // exit();
     }
     
     /**

@@ -38,7 +38,7 @@
 		<define name="icone_paypal" value="/img/paypal.jpg"/>
 		<define name="icone_crypto" value="/img/crypto.jpg"/>
 		
-		<define name="designerName" value="Ing. EMM"/>
+		<define name="designerName" value="Shivalik herbals Webmaster"/>
 		<define name="designerEmail" value="webmaster@shivalikherbals.org"/>
 		<define name="devise" value="$"/>
 		<define name="minWithdrawal" value="10"/><!-- La plus petite valeur retirable en dolar -->
