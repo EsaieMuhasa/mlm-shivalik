@@ -329,30 +329,37 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
                     $otherPoints[] = $additionnalPoints[0];
                 }
 
+                //recherche du pied disponible
+                $foot = $this->findAvailableFoot($parent->getId());
+                $node->setFoot($foot);
+
                 $pointDao->deleteAllInTransaction($pdo, $deletablePoints);//suppression definitive des autres points
 
                 $parentNode = $parent;
+                $childNode = $node;
                 do {
                     foreach ($points as $point) {
                         $copy = clone $point;
+                        $copy->setFoot($childNode->getFoot());
                         $copy->setDateAjout($now);
                         $copy->setMember($parentNode);
-                        $pointDao->createInTransaction($point, $pdo);
+                        $pointDao->createInTransaction($copy, $pdo);
                     }
                     
                     //plus les points du compte $node
                     foreach ($otherPoints as $point) {
-                        $point->setMember($parentNode);
-                        $point->setDateAjout($now);
-                        $pointDao->createInTransaction($point, $pdo);
+                        $copy = clone $point;
+                        $copy->setMember($parentNode);
+                        $copy->setFoot($childNode->getFoot());
+                        $copy->setDateAjout($now);
+                        $pointDao->createInTransaction($copy, $pdo);
                     }
+                    $childNode = $parentNode;
                     $parentNode = $this->checkParent($parentNode->getId()) ? $this->findParent($parentNode->getId()) : null;
                     
                 } while ($parentNode  != null);
                 //==
     
-                //recherche du pied disponible
-                $foot = $this->findAvailableFoot($parent->getId());
                 $node->setFoot($foot);
                 $node->setParent($parent);
                 $node->setSponsor($newSponsor);
