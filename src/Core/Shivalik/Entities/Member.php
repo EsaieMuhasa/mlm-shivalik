@@ -321,7 +321,7 @@ class Member extends User implements TernaryNode
     }
 
     /**
-     * @return number
+     * @return int
      */
     public function getFoot() : ?int
     {

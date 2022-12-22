@@ -56,18 +56,28 @@ class PointValueDAOManagerImplementation1 extends AbstractBonusDAOManager implem
 
     /**
      * {@inheritDoc}
+     * @return boolean
      */
-    public function checkByGenerator(int $gradMember, ?int $limit = null, int $offset = 0): bool
+    public function checkByGenerator(int $gradMember, ?int $memberId = null, ?int $limit = null, int $offset = 0): bool
     {
-        return UtilitaireSQL::checkAll($this->getConnection(), $this->getTableName(), ['generator' => $gradMember], $limit, $offset);
+        $parames = ['generator' => $gradMember];
+        if ($memberId !== null) {
+            $parames['member'] = $memberId;
+        }
+        return UtilitaireSQL::checkAll($this->getConnection(), $this->getTableName(), $parames , $limit, $offset);
     }
 
     /**
      * {@inheritDoc}
+     * @return PointValue[]
      */
-    public function findByGenerator(int $gradMember, ?int $limit = null, int $offset = 0): array{
+    public function findByGenerator(int $gradMember, ?int $memberId = null, ?int $limit = null, int $offset = 0): array{
+        $parames = ['generator' => $gradMember];
+        if ($memberId !== null) {
+            $parames['member'] = $memberId;
+        }
         return UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(),
-            $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, ['generator' => $gradMember], $limit, $offset);
+            $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, $parames, $limit, $offset);
     }
 
     /**

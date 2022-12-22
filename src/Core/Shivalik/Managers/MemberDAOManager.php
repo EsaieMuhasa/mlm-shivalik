@@ -66,6 +66,29 @@ interface MemberDAOManager extends UserDAOManager
     public function migrateToNetwork (Member $node, Member $newParent, ?Member $newSPonsor = null) : void;
 
     /**
+     * demande re regeneration des points valeurs des noeud affant du compte en parametre.
+     * 
+     * Cette methode fut implementer pour corriger les erreurs introluits par la methode migrateToNetowork,
+     * avait supprimer est points valeur des touts downline du compte N1028.
+     * dans cette optique, la regeration des points des noeuds enfants d'un compte, doit etre au rendez-vous.
+     *
+     * @param Member $node
+     * @return void
+     */
+    public function regeneratePointsByDownlines (Member $node) : void ;
+
+    /**
+     * Renvoie le numero du pieds auquel le compte proprietaire de l'ID $nodeKey dans le reseau du compte $parentKey.
+     *
+     * @param int $nodeKey
+     * @param int $parentKey
+     * @return int
+     * @throws DAOException si une erreur surviens dans le processuce de communication avec la BDD, ou le compte $nodeKey 
+     * n'est pas dans le reseau du compte $parentKey
+     */
+    public function findBindingFoot (int $nodeKey, int $parentKey) : int;
+
+    /**
      * methode magique de verification de la validite de l'arbre.
      * la validation de l'arbre ce base sur deux elements:
      * <ul>

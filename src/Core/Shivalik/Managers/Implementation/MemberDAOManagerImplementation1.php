@@ -383,6 +383,79 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
         }
     }
 
+    public function regeneratePointsByDownlines(Member $node): void
+    {
+        /** @var GradeMemberDAOManager */
+        $packetDao = $this->getManagerFactory()->getManagerOf(GradeMember::class);
+        /** @var PointValueDAOManagerImplementation1 */
+        $pointDao = $this->getManagerFactory()->getManagerOf(PointValue::class);
+
+        /** @var Member[] */
+        $downlines = $this->findDownlinesChilds($node->getId());
+
+        $now = new DateTime();
+        try {
+            $pdo = $this->getConnection();
+            if (!$pdo->beginTransaction()) {
+                throw new DAOException("Une erreur est survenue lors du demarrage de la transaction");
+            }
+
+            foreach ($downlines as $downline) {
+                $childs = $this->findDownlinesChilds($downline->getId());
+                foreach ($childs as $child) {
+                    $packerts = $packetDao->findByMember($child->getId());
+    
+                    foreach ($packerts as $packert) {
+                        if (!$pointDao->checkByGenerator($packert->getId(), $downline->getId())) {//si les points n'existe pas, alors on le cree
+                            $point = new PointValue();
+                            $point->setMember($downline);
+                            $point->setAmount($packert->getProduct() / 2);
+                            $point->setGenerator($packert);
+                            $point->setDateAjout($now);
+                            $point->setFoot($this->findBindingFoot($child->getId(), $downline->getId()));
+                            $pointDao->createInTransaction($point, $pdo);
+                        }
+                    }
+                }
+            }
+
+            if (!$pdo->commit()) {
+                throw new DAOException("Une erreur est survenue lors de la validation de la transaction");
+            }
+        } catch (\PDOException $e) {
+            throw new DAOException("Une erreur est survenue lors de la regenreation des PVs des comptes downline du {$node->getMatricule()}: {$e->getMessage()}", 500, $e);
+        }
+
+    }
+
+    public function findBindingFoot(int $nodeKey, int $parentKey): int
+    {
+        $parent = $this->findById($parentKey);
+
+        //on verifie si $nodeKey ne fais pas partie des noeud directes.
+        if ($this->checkChilds($parentKey)) {
+
+            $childs  = $this->findChilds($parentKey);
+            foreach ($childs as $child) {
+                if ($child->getId() == $nodeKey) {
+                    return $child->getFoot();
+                }
+            }
+
+            $node = $this->findById($nodeKey);
+            $parentNode = $node;
+    
+            while ($this->checkParent($parentNode->getId())) {
+                $parentNode = $this->findParent($parentNode->getId());
+                if ($parentNode->getParent()->getId() == $parent->getId()) {
+                    return $parentNode->getFoot();
+                }
+            }
+        }
+
+        throw new DAOException("Le compte {$nodeKey} n'est pas dans le meme reseau que le compte {$parentKey}");
+    }
+
     public function findAvailableFoot(int $memberId): ?int
     {
         $childs = $this->checkChilds($memberId) ? $this->findChilds($memberId) : null; 

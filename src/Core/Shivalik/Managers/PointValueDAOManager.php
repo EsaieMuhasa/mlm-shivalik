@@ -105,24 +105,30 @@ interface PointValueDAOManager extends BonusDAOManager
     public function findMiddleByMember (int $memberId, ?bool $product = null) : array;
     
     /**
-     * verification des points valeurs generer par le generateur en parametre
+     * verification des points valeurs generer par le generateur en parametre.
+     * 
+     * Dans le cas ou le parametre memberId != null, alors on check uniquement dans le compte du membre proprietaire du dit ID.
      * @param int $gradMember
+     * @param int $memberId
      * @param int $limit
      * @param int $offset
      * @return bool
      * @throws DAOException 
      */
-    public function checkByGenerator (int $gradMember, ?int $limit = null, int $offset = 0) : bool;
+    public function checkByGenerator (int $gradMember, ?int $memberId, ?int $limit = null, int $offset = 0) : bool;
     
     /**
-     * renvoie la collection des points valeurs generer par le generateur en parametre
+     * renvoie la collection des points valeurs generer par le generateur en parametre.
+     * dans le cas ou le deuxieme parametre (ID du compte d'un membre), alors on verifie uniquement dans le compte du membre.
+     * 
      * @param int $gradMember
+     * @param int $memberId
      * @param int $limit
      * @param int $offset
      * @return PointValue[]
      * @throws DAOException
      */
-    public function findByGenerator (int $gradMember, ?int $limit = null, int $offset = 0) : array;
+    public function findByGenerator (int $gradMember, ?int $memberId=null, ?int $limit = null, int $offset = 0) : array;
     
 }
 

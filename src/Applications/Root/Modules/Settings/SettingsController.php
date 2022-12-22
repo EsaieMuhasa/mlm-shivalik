@@ -243,6 +243,23 @@ class SettingsController extends HTTPController
         $response->sendRedirect('/root/');
 
     }
+
+
+    /**
+     * action de regeneration des points valeurs des downlines d'une compte X
+     *
+     * @param Request $request
+     * @param Response $response
+     * @return void
+     */
+    public function executeRegeneratePointsByDownlines(Request $request, Response $response): void
+    {
+        $nodeKey = $request->getDataGET('id');
+        $member = $this->memberDAOManager->findById(intval($nodeKey));
+        $this->memberDAOManager->regeneratePointsByDownlines($member);
+        
+        $response->sendRedirect('/root/');
+    }
     
     /**
      * 

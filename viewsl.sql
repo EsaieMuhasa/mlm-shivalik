@@ -118,8 +118,7 @@ CREATE OR REPLACE VIEW V_RequestVirtualMoney AS
         RequestVirtualMoney.product AS product,
         RequestVirtualMoney.affiliation AS affiliation,
         RequestVirtualMoney.office AS office,
-        (SELECT VirtualMoney.id FROM VirtualMoney WHERE VirtualMoney.request = RequestVirtualMoney.id) AS `virtual`,
-        (SELECT COUNT(id) As nombre FROM Withdrawal WHERE Withdrawal.raport = RequestVirtualMoney.id) AS withdrawalsCount
+        (SELECT COUNT(Withdrawal.id) FROM Withdrawal WHERE RequestVirtualMoney.id = Withdrawal.raport) AS withdrawalsCount
     FROM RequestVirtualMoney;
 
 CREATE OR REPLACE VIEW V_VirtualMoney AS
@@ -239,6 +238,9 @@ CREATE OR REPLACE VIEW V_Account AS
         Member.foot AS foot,
         Member.admin AS `admin`,
         Member.office AS `officeAdmin`,
+        (
+            SELECT Office.id FROM Office WHERE Office.member = Member.id
+        ) AS `officeAccount`,
         -- Member.packet AS packet,
 
         -- ============ PV ==============
