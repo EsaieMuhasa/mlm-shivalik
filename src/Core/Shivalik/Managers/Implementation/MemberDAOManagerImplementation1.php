@@ -13,7 +13,6 @@ use Core\Shivalik\Entities\PurchaseBonus;
 use Core\Shivalik\Entities\Withdrawal;
 use Core\Shivalik\Managers\GradeMemberDAOManager;
 use Core\Shivalik\Managers\MemberDAOManager;
-use Core\Shivalik\Managers\PointValueDAOManager;
 use DateTime;
 use PDOException;
 use PHPBackend\Dao\DAOEvent;
@@ -486,6 +485,23 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
             }
         }
         return $foot;
+    }
+
+    public function findSuspectAccounts (?int $limit  = null, int $offset = 0) : array {
+        $data = [];
+
+        return $data;
+    }
+
+    public function countSuspectAccounts () : int {
+        $count = 0;
+        try{
+            $sql = "SELECT COUNT(*) AS nombre FROM V_Account WHERE (soldGeneration + purchaseBonus + soldOfficeBonus) <= (withdrawals + withdrawalsRequest)";
+            $statement = UtilitaireSQL::prepareStatement($this->getConnection(), $sql);
+        } catch (PDOException $e) {
+            throw new DAOException($e->getMessage(), 500, $e);
+        }
+        return $count;
     }
 
     /**

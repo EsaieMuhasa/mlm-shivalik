@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE app-routes SYSTEM "../../../PHPBackend/config.dtd" >
+<!DOCTYPE app-routes SYSTEM "../../../../lib/PHPBackend/config.dtd" >
 <app-routes>
 
 	<module name="Account">

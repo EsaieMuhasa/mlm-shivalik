@@ -78,6 +78,25 @@ interface MemberDAOManager extends UserDAOManager
     public function regeneratePointsByDownlines (Member $node) : void ;
 
     /**
+     * Renvoie la liste de compte suspecter. le compte dont leurs etats comptable n'est pas confirme.
+     * Ex: un compte la somme des sorties est superieur a la somme des entree
+     *
+     * @param int|null $limit
+     * @param int $offset
+     * @return Member[]
+     * @throws DAOException si une erreur surviens dans le processuce de communication avec le SGBD
+     */
+    public function findSuspectAccounts (?int $limit  = null, int $offset = 0) : array;
+
+    /**
+     * compte de le nombre des compte qui ne sont pas conforme dans le cadre de comptabilitee.
+     * Pour essayer de compte s'il y a eux des eventuels pirrates.
+     *
+     * @return int
+     */
+    public function countSuspectAccounts () : int;
+
+    /**
      * Renvoie le numero du pieds auquel le compte proprietaire de l'ID $nodeKey dans le reseau du compte $parentKey.
      *
      * @param int $nodeKey

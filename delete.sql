@@ -39,3 +39,11 @@ DELETE FROM MoneyGradeMember WHERE gradeMember = 1396;
 DELETE FROM GradeMember WHERE id = 1396;
 DELETE FROM Member WHERE id = 1125;
 -- ==
+
+-- == M1591
+DELETE FROM PointValue WHERE generator = 1967;
+DELETE FROM BonusGeneration WHERE generator = 1967;
+DELETE FROM MoneyGradeMember WHERE gradeMember = 1967;
+DELETE FROM GradeMember WHERE id = 1967;
+DELETE FROM Member WHERE id = 1591;
+-- ==

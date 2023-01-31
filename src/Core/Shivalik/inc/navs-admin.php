@@ -42,6 +42,15 @@ $admin = $_SESSION[SessionAdminFilter::ADMIN_CONNECTED_SESSION];
     		<span class="nav-item-caption">Members</span>
 		</a>
 	</li>
+
+	<li>
+		<a href="/admin/check-members/">
+    		<span class="nav-item-icon">
+        		<span class="fa fa-question-circle"></span>
+    		</span>
+    		<span class="nav-item-caption">Check Members</span>
+		</a>
+	</li>
 	
 	<li>
 		<a href="/admin/offices/">

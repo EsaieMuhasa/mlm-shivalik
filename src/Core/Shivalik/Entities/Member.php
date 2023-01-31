@@ -650,7 +650,7 @@ class Member extends User implements TernaryNode
     public function getAvailableCashMoney (bool $structMode = false) : float {
         $amount = 0;
 
-        $amount += $this->getSoldGeneration() + $this->getSoldOfficeBonus() + $this->getPurchaseBonus() + $this->getParticularBonus();;
+        $amount = $this->getSoldGeneration() + $this->getSoldOfficeBonus() + $this->getPurchaseBonus() + $this->getParticularBonus();
 
         if($amount !== null) {
             $amount -= $this->getWithdrawals();
@@ -660,7 +660,29 @@ class Member extends User implements TernaryNode
             $amount -= $this->getWithdrawalsRequest();
         }
 
+        // if ($amount < 0) {
+        //     $amount = 0;
+        // }
+
         return $amount;
+    }
+
+    /**
+     * renvoie la somme totale des inputs
+     *
+     * @return float
+     */
+    public function getSumInputs () : float {
+       return ($this->getSoldGeneration() + $this->getSoldOfficeBonus() + $this->getPurchaseBonus() + $this->getParticularBonus());
+    }
+
+    /**
+     * Renvoie la somme des etats de sorties du compte
+     *
+     * @return float
+     */
+    public function getSumOutputs () : float {
+        return ($this->getWithdrawals() + $this->getWithdrawalsRequest());
     }
 
     //setter de PVs
@@ -691,22 +713,37 @@ class Member extends User implements TernaryNode
     //===
 
     public function setWithdrawals (?float $withdrawals) : void {
+        if ($withdrawals == null) {
+            $withdrawals = 0;
+        }
         $this->withdrawals = $withdrawals;
     }
 
     public function setWithdrawalsRequest (?float $withdrawalsRequest) : void {
+        if ($withdrawalsRequest == null) {
+            $withdrawalsRequest = 0;
+        }
         $this->withdrawalsRequest = $withdrawalsRequest;
     }
 
     public function setSoldOfficeBonus (?float $soldOfficeBonus) : void {
+        if ($soldOfficeBonus == null) {
+            $soldOfficeBonus = 0;
+        }
         $this->soldOfficeBonus = $soldOfficeBonus;
     }
 
     public function setSoldGeneration (?float $soldGeneration) : void {
+        if ($soldGeneration == null) {
+            $soldGeneration = 0;
+        }
         $this->soldGeneration = $soldGeneration;
     }
 
     public function setPurchaseBonus (?float $purchaseBonus) : void {
+        if ($purchaseBonus == null) {
+            $purchaseBonus = 0;
+        }
         $this->purchaseBonus = $purchaseBonus;
     }
 

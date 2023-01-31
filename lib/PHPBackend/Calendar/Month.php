@@ -171,7 +171,7 @@ class Month
         
         $this->year = $year;
         $this->month = $month;
-        $this->maxDays = $this->getWeeks() * 7;
+        // $this->maxDays = $this->getWeeks() * 7;
         $this->setLocal($local);
     }
     
@@ -656,7 +656,7 @@ class Month
     
     /**
      * Renvoie le e numero de l'annee actuel (l'annee du mois encours)
-     * @return number
+     * @return int
      */
     public function getYear() : int
     {
@@ -830,7 +830,7 @@ class Month
      * @return string
      */
     public function toXML() : string{
-        $xml = "<month name=\"".self::MONTHS[$this->month-1]."\" number = \"{$this->month}\" year = \"{$this->year}\">";
+        $xml = "<month name=\"".self::MONTHS_NAMES[$this->month-1]."\" number = \"{$this->month}\" year = \"{$this->year}\">";
         $xml .= '<metadatas>';
         
         $xml .= ' <metadata name="dayNames" value="';
@@ -879,7 +879,7 @@ class Month
     public function toJSON() : string{
         
         //Start convertion of calendar month to JSON
-        $json = '{"name":"'.self::MONTHS[$this->month-1].'", "number":'.$this->month.', "year" :'.$this->year.',';
+        $json = '{"name":"'.self::MONTHS_NAMES[$this->month-1].'", "number":'.$this->month.', "year" :'.$this->year.',';
         $json .= '"metadatas" : {';//Start metadata
         
         $json .= '"dayNames": [';

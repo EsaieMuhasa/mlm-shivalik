@@ -126,7 +126,8 @@ class MembersController extends AdminController
         }
     }
 
-    /** consulter la liste des membres du systeme
+    /** 
+     * consulter la liste des membres du systeme
      * @param Request $request
      * @param Response $response
      */
@@ -576,6 +577,22 @@ class MembersController extends AdminController
         $this->member->setParent($this->memberDAOManager->findById($this->member->getParent()->getId()));
         $this->member->getParent()->setPacket($this->gradeMemberDAOManager->findCurrentByMember($this->member->getParent()->getId()));
         
+    }
+
+    public function executeSuspectAccount (Request $request, Response $response): void
+    {
+        /** @var Member[] */
+        $data = $this->memberDAOManager->findAll();
+
+        $suspects = [];
+
+        foreach ($data as $item) {
+            if ($item->getSumOutputs() > $item->getSumInputs()) {
+                $suspects [] = $item;
+            }
+        }
+
+        $request->addAttribute('members', $suspects);
     }
 }
 

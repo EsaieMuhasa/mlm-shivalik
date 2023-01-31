@@ -235,6 +235,7 @@ CREATE OR REPLACE VIEW V_Account AS
         Member.matricule AS matricule,
         Member.parent AS parent,
         Member.sponsor AS sponsor,
+        Member.localisation AS localisation,
         Member.foot AS foot,
         Member.admin AS `admin`,
         Member.office AS `officeAdmin`,

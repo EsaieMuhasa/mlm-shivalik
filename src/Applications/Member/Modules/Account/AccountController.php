@@ -239,6 +239,10 @@ class AccountController extends HTTPController
 
         $account = $this->getAccount();
         $request->addAttribute(self::ATT_ACCOUNT, $account);
+
+        if ($account->getMember()->getWithdrawalsRequest() != 0) {
+            $response->sendRedirect('/member/withdrawals/');
+        }
         
         if ($request->getMethod() == Request::HTTP_POST) {
             $form = new WithdrawalFormValidator($this->getDaoManager());

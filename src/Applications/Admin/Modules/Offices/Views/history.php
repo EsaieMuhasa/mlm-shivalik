@@ -211,8 +211,8 @@ $raports = $_REQUEST[OfficesController::ATT_RAPORTS_WITHDRAWALS];
         		<thead class="panel-heading">
         			<tr>
         				<th>N°</th>
-        				<th>Expected</th>
-        				<th>Amount</th>
+        				<th>Products</th>
+        				<th>Affiliation</th>
         				<th>date and time</th>
         			</tr>
         		</thead>
@@ -221,8 +221,8 @@ $raports = $_REQUEST[OfficesController::ATT_RAPORTS_WITHDRAWALS];
 					<?php foreach ($virtuals as $virtual): ?>
     					<tr>
     						<td><?php  $num++; echo ($num);?> </td>
-    						<td><?php echo ("{$virtual->getExpected()} {$config->get('devise')}");?></td>
-    						<td><?php echo ("{$virtual->getAmount()} {$config->get('devise')}");?></td>
+    						<td><?php echo ("{$virtual->getProduct()} {$config->get('devise')}");?></td>
+    						<td><?php echo ("{$virtual->getAfiliate()} {$config->get('devise')}");?></td>
     						<td><?php echo ($virtual->dateAjout->format('d/m/Y \a\t H\h:i'));?></td>
     					</tr>
 					<?php endforeach; ?>
