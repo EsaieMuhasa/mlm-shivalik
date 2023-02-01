@@ -358,7 +358,7 @@ interface MemberDAOManager extends UserDAOManager
     /**
      * renvoie le parent du membre en parmatre
      * @param int $memberId
-     * @return bool
+     * @return Member
      * @throws DAOException
      */
     public function findParent (int $memberId) : Member;

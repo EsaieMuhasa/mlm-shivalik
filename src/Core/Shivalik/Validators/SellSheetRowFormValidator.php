@@ -177,7 +177,7 @@ class SellSheetRowFormValidator extends DefaultFormValidator {
 
         if (!$this->hasError()) {
             try {
-                $order = $this->monthlyOrderDAOManager->buildByMemberOfMonth($member->getId(), $office);
+                $order = $this->monthlyOrderDAOManager->findAvailableByMember($member, $office);
                 $row->setMonthlyOrder($order);
                 $row->setOffice($office);
                 $this->sellSheetRowDAOManager->create($row);

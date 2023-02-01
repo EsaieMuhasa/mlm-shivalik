@@ -282,15 +282,12 @@ class MembersController extends HTTPController {
 	     */
 	    $member = $this->memberDAOManager->findById($id);
 	    
-	    if ($this->monthlyOrderDAOManager->checkByMemberOfMonth($member->getId())) {
-	        $monthly = $this->monthlyOrderDAOManager->findByMemberOfMonth($member->getId());
-			if($monthly->getAvailable() < 50) {
-				$response->sendRedirect("/office/members/{$id}/");
-			}
-	        $request->addAttribute(self::ATT_MONTHLY_ORDER_FOR_ACCOUNT, $monthly);
-	    } else {
-	        $response->sendRedirect("/office/members/{$id}/");
-	    }
+		$monthly = $this->monthlyOrderDAOManager->findAvailableByMember($member, $office, false);
+		if($monthly == null || $monthly->getAvailable() < 50) {
+			$response->sendRedirect("/office/members/{$id}/");
+		}
+
+		$request->addAttribute(self::ATT_MONTHLY_ORDER_FOR_ACCOUNT, $monthly);
 	    $request->addAttribute(MemberFormValidator::FIELD_SPONSOR, $member);
 	    $request->addAttribute(self::ATT_SPONSOR, $member);
 	    $request->addAttribute(self::ATT_MEMBER, null);
@@ -617,8 +614,8 @@ class MembersController extends HTTPController {
 			$rows = [];
 		}
 
-		if($this->monthlyOrderDAOManager->checkByMemberOfMonth($member->getId())){//affichage du montant valide
-			$monthly = $this->monthlyOrderDAOManager->findByMemberOfMonth($member->getId());
+		$monthly = $this->monthlyOrderDAOManager->findAvailableByMember($member, null, false);
+		if($monthly != null){//affichage du montant valide
 			$request->addAttribute(self::ATT_MONTHLY_ORDER_FOR_ACCOUNT, $monthly);
 		}
 

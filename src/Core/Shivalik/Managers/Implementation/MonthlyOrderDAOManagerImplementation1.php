@@ -3,6 +3,7 @@ namespace Core\Shivalik\Managers\Implementation;
 
 use Core\Shivalik\Entities\Generation;
 use Core\Shivalik\Entities\GradeMember;
+use Core\Shivalik\Entities\Member;
 use Core\Shivalik\Entities\MonthlyOrder;
 use Core\Shivalik\Entities\NotificationReceiver;
 use Core\Shivalik\Entities\Office;
@@ -41,12 +42,8 @@ class MonthlyOrderDAOManagerImplementation1 extends AbstractOperationDAOManager 
      */
     public function dispatchPurchaseBonus(): void {
         $date  = new \DateTime();
-        $befor = (clone $date)->modify('-1 month');
         
-        $dateMin = "{$befor->format('T-m')}-28 01:00:00";
-        $dateMax = "{$date->format('Y-m')}-28 23:59:59";
-        
-        $SQL = "SELECT * FROM {$this->getViewName()} WHERE (dateAjout BETWEEN  :dateMin AND :dateMax) AND disabilityDate IS NULL";
+        $SQL = "SELECT * FROM {$this->getViewName()} WHERE disabilityDate IS NULL";
         
         $mothlyOrders = [];
         $pdo = $this->getConnection();
@@ -56,7 +53,7 @@ class MonthlyOrderDAOManagerImplementation1 extends AbstractOperationDAOManager 
                 throw new DAOException("Impossible to perform this operation because an error occured in starting transaction process");
             }
             
-            $statement = UtilitaireSQL::prepareStatement($pdo, $SQL, ['dateMin' => $dateMin, 'dateMax' => $dateMax]);
+            $statement = UtilitaireSQL::prepareStatement($pdo, $SQL);
             while ($row = $statement->fetch()) {
                 $order = new MonthlyOrder($row);
                 $order->setMember($this->memberDAOManager->findById($order->getMember()->getId()));
@@ -64,6 +61,7 @@ class MonthlyOrderDAOManagerImplementation1 extends AbstractOperationDAOManager 
             }
             $statement->closeCursor();
         
+            /** @var MonthlyOrder $order */
             foreach ($mothlyOrders as $order) {
                 
                 if($order->getAvailable() == 0 || $order->getDisabilityDate() != null){
@@ -178,12 +176,16 @@ class MonthlyOrderDAOManagerImplementation1 extends AbstractOperationDAOManager 
             }
 
             //check if user has other monthly bonus
-            $month = intval($now->format('m'), 10);
-            $year = intval($now->format('Y'), 10);
-            if ($this->checkByMemberOfMonth($order->getMember()->getId(), null, $month, $year)){
-                $message = "Impossible to perform this operation. the same member account cannot obtain 2 repurchase bonuses for the same month. ";
-                $message .= "This operation could be carried out the following month. Thank you for the confidence you have in favor of the Shivalick company.";
-                throw new DAOException($message);
+            // $month = intval($now->format('m'), 10);
+            // $year = intval($now->format('Y'), 10);
+            // if ($this->checkByMemberOfMonth($order->getMember()->getId(), null, $month, $year)){
+            //     $message = "Impossible to perform this operation. the same member account cannot obtain 2 repurchase bonuses for the same month. ";
+            //     $message .= "This operation could be carried out the following month. Thank you for the confidence you have in favor of the Shivalick company.";
+            //     throw new DAOException($message);
+            // }
+
+            if ($order->getDisabilityDate() != null) {
+                throw new DAOException("We canot perform this operation because monthly bonus has been dispatched");
             }
             
             //insert monthly order in database
@@ -462,6 +464,30 @@ class MonthlyOrderDAOManagerImplementation1 extends AbstractOperationDAOManager 
 
         $this->createInTransaction($order, $this->getConnection());
         return $order;
+    }
+
+    public function findAvailableByMember (Member $member, ?Office $office =  null, bool $buildIfNotExists = true) : MonthlyOrder {
+        try {
+            $statement = UtilitaireSQL::prepareStatement($this->getConnection(), "SELECT * FROM {$this->getViewName()} WHERE disabilityDate IS NULL AND `member` = {$member->getId()}");
+            if($row = $statement->fetch()) {
+                $monthly =  new MonthlyOrder($row);
+                $monthly->setMember($member);
+                $statement->closeCursor();
+                return $monthly;
+            }
+        } catch (\PDOException $e) {
+            throw new DAOException("error: {$e->getMessage()}", 500, $e);
+        }
+
+        if ($buildIfNotExists) {
+            if ($office == null) {
+                throw new DAOException("Impossible to perform this operation: cause: Non available data match SQL query in Database", 500);
+            }
+            return $this->buildByMemberOfMonth($member->getId(), $office);
+        }
+
+        return null;
+
     }
 
     /**

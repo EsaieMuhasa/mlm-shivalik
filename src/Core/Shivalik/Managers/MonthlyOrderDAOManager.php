@@ -1,6 +1,7 @@
 <?php
 namespace Core\Shivalik\Managers;
 
+use Core\Shivalik\Entities\Member;
 use Core\Shivalik\Entities\MonthlyOrder;
 use Core\Shivalik\Entities\Office;
 use PHPBackend\Dao\DAOException;
@@ -111,6 +112,17 @@ interface MonthlyOrderDAOManager extends OperationDAOManager {
      * @throws DAOException s'il y a erreur dans e processuce de communication avec la SGBD
      */
     public function buildByMemberOfMonth (int $memberId, ?Office $office = null) : MonthlyOrder;
+
+    /**
+     * Utilitaire de recuperation des commandes des produits du compte d'un membre.
+     *
+     * @param Member $member
+     * @param Office|null $office : l'office createur de l'operation
+     * @param bool $buildIfNotExists : doit-t-on creer une occurence si ce bonus n'existe pas?
+     * @return MonthlyOrder
+     * @throws DAOException si une erreur surviens dans le processuce de communication avec le SGBD
+     */
+    public function findAvailableByMember (Member $member, ?Office $office =  null, bool $buildIfNotExists = true) : MonthlyOrder;
 
     /**
      * renvoie le compte mensuel de commandes du membre
