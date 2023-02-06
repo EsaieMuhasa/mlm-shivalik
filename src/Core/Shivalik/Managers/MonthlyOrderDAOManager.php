@@ -119,10 +119,10 @@ interface MonthlyOrderDAOManager extends OperationDAOManager {
      * @param Member $member
      * @param Office|null $office : l'office createur de l'operation
      * @param bool $buildIfNotExists : doit-t-on creer une occurence si ce bonus n'existe pas?
-     * @return MonthlyOrder
+     * @return MonthlyOrder|null
      * @throws DAOException si une erreur surviens dans le processuce de communication avec le SGBD
      */
-    public function findAvailableByMember (Member $member, ?Office $office =  null, bool $buildIfNotExists = true) : MonthlyOrder;
+    public function findAvailableByMember (Member $member, ?Office $office =  null, bool $buildIfNotExists = true) : ?MonthlyOrder;
 
     /**
      * renvoie le compte mensuel de commandes du membre

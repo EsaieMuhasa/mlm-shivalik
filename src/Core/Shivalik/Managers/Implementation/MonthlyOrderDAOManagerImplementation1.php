@@ -466,7 +466,7 @@ class MonthlyOrderDAOManagerImplementation1 extends AbstractOperationDAOManager 
         return $order;
     }
 
-    public function findAvailableByMember (Member $member, ?Office $office =  null, bool $buildIfNotExists = true) : MonthlyOrder {
+    public function findAvailableByMember (Member $member, ?Office $office =  null, bool $buildIfNotExists = true) : ?MonthlyOrder {
         try {
             $statement = UtilitaireSQL::prepareStatement($this->getConnection(), "SELECT * FROM {$this->getViewName()} WHERE disabilityDate IS NULL AND `member` = {$member->getId()}");
             if($row = $statement->fetch()) {

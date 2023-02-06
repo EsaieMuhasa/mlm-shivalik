@@ -303,11 +303,12 @@ class Member extends User implements TernaryNode
      * @return string|NULL
      */
     public function generateMatricule () : ?string{
-        if ($this->getName() == null || $this->getLastName() == null) {
+        $name = $this->getName() != null ? $this->getName() : ($this->getPostName() != null ? $this->getPostName() : $this->getLastName());
+        if ($name == null) {
             return null;
         }
 
-        $matricule = strtoupper(substr($this->getName(), 0, 1)).$this->id;//.strtoupper(substr($this->getLastName(), 0, 1));
+        $matricule = strtoupper(substr(trim($name), 0, 1)).$this->id;//.strtoupper(substr($this->getLastName(), 0, 1));
         $this->setMatricule($matricule);
         return $matricule;
     }
