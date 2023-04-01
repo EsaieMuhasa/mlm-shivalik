@@ -10,7 +10,7 @@ RewriteRule ^(users|offices|grades)/(.*)$ Web/data/$1/$2 [L]
 RewriteRule ^favicon.icon$ Web/logo-75x75.png [L]
 
 #les applications des utilisateurs authentifiers
-RewriteRule ^(member|office|root|admin)/(.*)$ index.php?subdomain=$1 [QSA,L]
+RewriteRule ^(member|office|root|admin)/(.*)$ Web/index.php?subdomain=$1 [QSA,L]
 
 #pour tout ce qui n'est pas fichiers publique
 RewriteCond %{REQUEST_FILENAME} !-f
