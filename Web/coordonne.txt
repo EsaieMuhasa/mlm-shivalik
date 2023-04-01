@@ -8,6 +8,8 @@ user: shivalik_db1
 pwd: I45c9cKWv#
 server: localhost
 
+ssh pwd: Esaie+01056
+
 
 
 

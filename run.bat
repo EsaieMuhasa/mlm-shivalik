@@ -1,1 +1,1 @@
-php -S localhost:9898 -t ./Web/ ./Web/server.php
+php7.4 -S localhost:9898 -t ./Web/ ./Web/server.php

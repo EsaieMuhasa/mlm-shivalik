@@ -73,6 +73,10 @@ class Office extends DBEntity
      * @var OfficeSize
      */
     private $officeSize;
+
+	//montant mise en case ou recuperer depuis une vue materiel dans la BDD
+	/** @var float */ // sommes de demande de matching dans l'office
+	private $amountWithdrawals;
     
     
     /**
