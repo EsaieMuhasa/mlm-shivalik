@@ -178,12 +178,12 @@ class GradeMemberDAOManagerImplementation1 extends DefaultDAOInterface implement
 			if($statement->execute(array('office' => $officeId))){
 				if ($row = $statement->fetch()) {
 					$ob = new GradeMember($row);
-					$this->load($ob);
+					// $this->load($ob);
 					$return[] = $ob;
 					
 					while ($row = $statement->fetch()) {
 						$ob = new GradeMember($row);
-						$this->load($ob);
+						// $this->load($ob);
 						$return[] = $ob;
 					}
 					

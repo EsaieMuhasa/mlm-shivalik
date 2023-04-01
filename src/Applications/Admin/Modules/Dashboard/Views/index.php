@@ -116,10 +116,10 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
     					<tr>
     						<td><?php echo (++$num);?></td>
     						<td style="width: 30px;">
-    							<img style="width: 30px;" src="/<?php echo ($withdrowal->member->photo);?>">
+    							<img style="width: 30px;" src="/<?php echo ($withdrowal->memberPhoto);?>">
     						</td>
-    						<td><?php echo htmlspecialchars($withdrowal->member->names);?></td>
-    						<td><?php echo ($withdrowal->member->matricule);?></td>
+    						<td><?php echo htmlspecialchars($withdrowal->memberNames);?></td>
+    						<td><?php echo ($withdrowal->memberMatricule);?></td>
     						<td><?php echo ($withdrowal->telephone);?></td>
     						<td><?php echo ($withdrowal->amount);?> $</td>
     						<td>

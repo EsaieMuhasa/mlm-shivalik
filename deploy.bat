@@ -1,1 +1,1 @@
-rsync -e "ssh -p2222" -av ./ shivalik@ssh.web14.us.cloudlogin.co:~/www/tmp.shivalikherbals.org/ --include=.htaccess --include=Web/data --exclude-from=.gitignore --exclude=deploy.bat --exclude=remote.bat --exclude=run.bat --exclude=migrations --exclude=".*"
+rsync -e "ssh -p2222" -av ./ shivalik@ssh.web14.us.cloudlogin.co:~/www/tmp.shivalikherbals.org/ --exclude-from=.gitignore --exclude=deploy.bat --exclude=remote.bat --exclude=run.bat --exclude=Web --exclude=Config --exclude=migrations --exclude=".*"

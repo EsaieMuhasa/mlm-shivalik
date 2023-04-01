@@ -159,19 +159,28 @@ CREATE OR REPLACE VIEW V_Office AS
         Office.`name` AS `name`,
         Office.photo AS photo,
         Office.localisation AS localisation,
-        Office.member AS member,
-        Office.visible AS visible,
+        Office.member AS `member`,
+        Office.visible AS `visible`,
         (
             SELECT SUM(V_VirtualMoney.availableProduct) FROM V_VirtualMoney WHERE V_VirtualMoney.office = Office.id
         ) AS availableProduct,
         (
             SELECT SUM(V_VirtualMoney.availableAfiliate) FROM V_VirtualMoney WHERE V_VirtualMoney.office = Office.id
-        ) AS availableAfiliate
+        ) AS availableAfiliate,
         (
-            SELECT SUM(Withdrawals.amount) FROM Withdrawals WHERE Withdrawals.office = Office.id
+            SELECT SUM(Withdrawal.amount) FROM Withdrawal WHERE Withdrawal.office = Office.id
         ) AS amountWithdrawals,
+        (
+            SELECT SUM(GradeMember.membership) FROM GradeMember WHERE GradeMember.office = Office.id
+        ) AS amountUsedMembership,
+        (
+            SELECT SUM(GradeMember.product) FROM GradeMember WHERE (GradeMember.office = Office.id AND GradeMember.monthlyOrder Is NULL)
+        ) AS amountUsedProduct
             
-    FROM Office LEFT JOIN V_VirtualMoney ON Office.id = V_VirtualMoney.office;
+    FROM Office 
+        LEFT JOIN V_VirtualMoney ON Office.id = V_VirtualMoney.office  
+        JOIN Withdrawal ON Office.id = Withdrawal.office  
+        JOIN GradeMember ON Office.id = GradeMember.office;
 
    
 -- rubrique budgetaire
@@ -225,12 +234,12 @@ CREATE OR REPLACE VIEW V_Account AS
         Member.id AS id,
         Member.dateAjout AS dateAjout,
         Member.dateModif AS dateModif,
-        Member.name AS `name`,
+        Member.`name` AS `name`,
         Member.postName AS postName,
         Member.lastName AS lastName,
         Member.kind AS kind,
         Member.pseudo AS pseudo,
-        Member.password AS `password`,
+        Member.`password` AS `password`,
         Member.telephone AS telephone,
         Member.email AS email,
         Member.photo AS photo,
@@ -309,4 +318,23 @@ CREATE OR REPLACE VIEW V_Account AS
 
     FROM Member;
 
+CREATE OR REPLACE VIEW V_Withdrawal AS
+    SELECT 
+        Withdrawal.id AS `id`,
+        Withdrawal.dateAjout AS dateAjout,
+        Withdrawal.dateModif AS dateModif,
+        Withdrawal.amount AS amout,
+        Withdrawal.office AS office,
+        Withdrawal.admin AS `admin`,
+        Withdrawal.member AS `member`,
+        Withdrawal.raport AS raport,
+        Withdrawal.telephone AS telephone,
+        Withdrawal.deleted AS deleted,
+
+        Member.`name` AS `memberName`,
+        Member.postName AS memberPostName,
+        Member.lastName AS memberLastName,
+        Member.photo AS memberPhoto,
+        Member.matricule AS memberMatricule
+    FROM Withdrawal INNER JOIN Member ON Member.id = Withdrawal.member;
  

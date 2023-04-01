@@ -41,6 +41,11 @@ class WithdrawalDAOManagerImplementation1 extends AbstractOperationDAOManager im
         $this->dispatchEvent($event);
     }
 
+    protected function hasView(): bool
+    {
+        return true;
+    }
+
     /**
      * {@inheritDoc}
      * @see \PHPBackend\Dao\DAOInterface::createInTransaction()
@@ -119,20 +124,20 @@ class WithdrawalDAOManagerImplementation1 extends AbstractOperationDAOManager im
     {
         $return = array();
         try {
-            $statement = $this->getConnection()->prepare("SELECT * FROM {$this->getTableName()} WHERE office={$officeId} ".(($state !== null)? ("AND admin IS ".($state? 'NOT':'')." NULL") : ("")).(($sended !== null)? (" AND raport IS ".($sended? 'NOT':'')." NULL") : ("")).' ORDER BY dateAjout DESC'.($limit !== null? " LIMIT {$limit} OFFSET {$offset}":''));
+            $statement = $this->getConnection()->prepare("SELECT * FROM {$this->getViewName()} WHERE office={$officeId} ".(($state !== null)? ("AND admin IS ".($state? 'NOT':'')." NULL") : ("")).(($sended !== null)? (" AND raport IS ".($sended? 'NOT':'')." NULL") : ("")).' ORDER BY dateAjout DESC'.($limit !== null? " LIMIT {$limit} OFFSET {$offset}":''));
             $statement->execute();
             if ($row = $statement->fetch()) {
                 $w = new Withdrawal($row);
                 
-                $w->setMember($this->memberDAOManager->findById($w->getMember()->getId()));
-                $w->setOffice($this->officeDAOManager->findById($w->getOffice()->getId()));
+                // $w->setMember($this->memberDAOManager->findById($w->getMember()->getId()));
+                //$w->setOffice($this->officeDAOManager->findById($w->getOffice()->getId()));
                 $return[] = $w;
                 
                 while ($row = $statement->fetch()) {
                     $w = new Withdrawal($row);
                     
-                    $w->setMember($this->memberDAOManager->findById($w->getMember()->getId()));
-                    $w->setOffice($this->officeDAOManager->findById($w->getOffice()->getId()));
+                    // $w->setMember($this->memberDAOManager->findById($w->getMember()->getId()));
+                    //$w->setOffice($this->officeDAOManager->findById($w->getOffice()->getId()));
                     $return[] = $w;
                 }
             }
@@ -174,7 +179,7 @@ class WithdrawalDAOManagerImplementation1 extends AbstractOperationDAOManager im
         /**
          * @var Withdrawal[] $raports
          */
-        $raports = UtilitaireSQL::findAll($this->getConnection(), $this->getTableName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, array('raport' => $raportId), $limit, $offset);
+        $raports = UtilitaireSQL::findAll($this->getConnection(), $this->getViewName(), $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, array('raport' => $raportId), $limit, $offset);
         foreach ($raports as $raport) {
             $raport->setMember($this->memberDAOManager->findById($raport->getMember()->getId(), false));
         }
