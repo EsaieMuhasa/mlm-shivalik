@@ -55,3 +55,7 @@ DELETE FROM MoneyGradeMember WHERE gradeMember = (SELECT id FROM GradeMember WHE
 DELETE FROM GradeMember WHERE id = (SELECT id FROM GradeMember WHERE member = 1684);
 DELETE FROM Member WHERE id = 1591;
 -- ==============
+
+-- suppresion virual
+DELETE FROM OfficeBonus WHERE virtualMoney = 257;
+DELETE FROM VirtualMoney WHERE id = 257;
