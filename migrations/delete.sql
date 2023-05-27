@@ -59,3 +59,69 @@ DELETE FROM Member WHERE id = 1591;
 -- suppresion virual
 DELETE FROM OfficeBonus WHERE virtualMoney = 257;
 DELETE FROM VirtualMoney WHERE id = 257;
+
+-- suppression des comptes
+-- ----------------------------------
+
+-- K2543
+DELETE FROM PointValue WHERE generator = (SELECT id FROM GradeMember WHERE member = 2543);
+DELETE FROM BonusGeneration WHERE generator = (SELECT id FROM GradeMember WHERE member = 2543);
+DELETE FROM MoneyGradeMember WHERE gradeMember = (SELECT id FROM GradeMember WHERE member = 2543);
+DELETE FROM GradeMember WHERE member = 2543;
+DELETE FROM Member WHERE id = 2543;
+
+-- M2544
+DELETE FROM PointValue WHERE generator = (SELECT id FROM GradeMember WHERE member = 2544);
+DELETE FROM BonusGeneration WHERE generator = (SELECT id FROM GradeMember WHERE member = 2544);
+DELETE FROM MoneyGradeMember WHERE gradeMember = (SELECT id FROM GradeMember WHERE member = 2544);
+DELETE FROM GradeMember WHERE member = 2544;
+DELETE FROM Member WHERE id = 2544;
+
+-- K2545
+DELETE FROM PointValue WHERE generator = (SELECT id FROM GradeMember WHERE member = 2545);
+DELETE FROM BonusGeneration WHERE generator = (SELECT id FROM GradeMember WHERE member = 2545);
+DELETE FROM MoneyGradeMember WHERE gradeMember = (SELECT id FROM GradeMember WHERE member = 2545);
+DELETE FROM GradeMember WHERE member = 2545;
+DELETE FROM Member WHERE id = 2545;
+
+-- N2546
+DELETE FROM PointValue WHERE generator = (SELECT id FROM GradeMember WHERE member = 2546);
+DELETE FROM BonusGeneration WHERE generator = (SELECT id FROM GradeMember WHERE member = 2546);
+DELETE FROM MoneyGradeMember WHERE gradeMember = (SELECT id FROM GradeMember WHERE member = 2546);
+DELETE FROM GradeMember WHERE member = 2546;
+DELETE FROM Member WHERE id = 2546;
+
+-- K2547
+DELETE FROM PointValue WHERE generator = (SELECT id FROM GradeMember WHERE member = 2547);
+DELETE FROM BonusGeneration WHERE generator = (SELECT id FROM GradeMember WHERE member = 2547);
+DELETE FROM MoneyGradeMember WHERE gradeMember = (SELECT id FROM GradeMember WHERE member = 2547);
+DELETE FROM GradeMember WHERE member = 2547;
+DELETE FROM Member WHERE id = 2547;
+
+-- K2548
+DELETE FROM PointValue WHERE generator = (SELECT id FROM GradeMember WHERE member = 2548);
+DELETE FROM BonusGeneration WHERE generator = (SELECT id FROM GradeMember WHERE member = 2548);
+DELETE FROM MoneyGradeMember WHERE gradeMember = (SELECT id FROM GradeMember WHERE member = 2548);
+DELETE FROM GradeMember WHERE member = 2548;
+DELETE FROM Member WHERE id = 2548;
+
+-- K2549
+DELETE FROM PointValue WHERE generator = (SELECT id FROM GradeMember WHERE member = 2549);
+DELETE FROM BonusGeneration WHERE generator = (SELECT id FROM GradeMember WHERE member = 2549);
+DELETE FROM MoneyGradeMember WHERE gradeMember = (SELECT id FROM GradeMember WHERE member = 2549);
+DELETE FROM GradeMember WHERE member = 2549;
+DELETE FROM Member WHERE id = 2549;
+
+-- K2550
+DELETE FROM PointValue WHERE generator = (SELECT id FROM GradeMember WHERE member = 2550);
+DELETE FROM BonusGeneration WHERE generator = (SELECT id FROM GradeMember WHERE member = 2550);
+DELETE FROM MoneyGradeMember WHERE gradeMember = (SELECT id FROM GradeMember WHERE member = 2550);
+DELETE FROM GradeMember WHERE member = 2550;
+DELETE FROM Member WHERE id = 2550;
+
+-- K2551
+DELETE FROM PointValue WHERE generator = (SELECT id FROM GradeMember WHERE member = 2551);
+DELETE FROM BonusGeneration WHERE generator = (SELECT id FROM GradeMember WHERE member = 2551);
+DELETE FROM MoneyGradeMember WHERE gradeMember = (SELECT id FROM GradeMember WHERE member = 2551);
+DELETE FROM GradeMember WHERE member = 2551;
+DELETE FROM Member WHERE id = 2551;
