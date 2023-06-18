@@ -2,6 +2,7 @@
 
 namespace Applications\Office\Modules\Dashboard;
 
+use Core\Shivalik\Entities\Office;
 use Core\Shivalik\Managers\GradeMemberDAOManager;
 use Core\Shivalik\Managers\MemberDAOManager;
 use Core\Shivalik\Managers\RequestVirtualMoneyDAOManager;
@@ -11,6 +12,9 @@ use PHPBackend\Application;
 use PHPBackend\Request;
 use PHPBackend\Http\HTTPController;
 use Core\Shivalik\Filters\SessionOfficeFilter;
+use Core\Shivalik\Managers\MoneyGradeMemberDAOManager;
+use DateTime;
+use PHPBackend\Calendar\Month;
 use PHPBackend\Response;
 
 
@@ -25,6 +29,7 @@ class DashboardController extends HTTPController {
 	const ATT_SOLDE_WITHDRAWALS = 'soldeWithdrawals';
 	const ATT_WITHDRAWALS = 'withdrawals';
 	const PARAM_MEMBER_COUNT = 'countOfficeMembers';
+	const ATT_MONTH = 'month';
 	
 	/**
 	 * @var WithdrawalDAOManager
@@ -50,6 +55,11 @@ class DashboardController extends HTTPController {
 	 * @var VirtualMoneyDAOManager
 	 */
 	private $virtualMoneyDAOManager;
+
+	/**
+	 * @var MoneyGradeMemberDAOManager
+	 */
+	private $moneyGradeMemberDAOManager;
 	
 	/**
 	 * {@inheritDoc}
@@ -145,6 +155,34 @@ class DashboardController extends HTTPController {
     public function executeRequestVirtualMoney (Request $request, Request $response) : void {
         $request->addAttribute(self::ATT_VIEW_TITLE, "Send request of virtual money");
     }
+
+	public function executeVirtualMoneyHistory (Request $request) : void
+	{
+		$dayDate = $request->getDataGET('date');
+		/**
+		 * @var Office $office
+		 */
+		$office = $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice();
+		
+		if ($dayDate == null) {
+			$date = new DateTime($request->getDataGET('date') ? $request->getDataGET('date') :  'now');
+			$mIndex = $request->getDataGET('monthIndex') ? $request->getDataGET('monthIndex') : intval($date->format('m'), 10);
+			$yIndex = $request->getDataGET('yearIndex') ? $request->getDataGET('yearIndex') : intval($date->format('Y'), 10);
+
+			$month = new Month($mIndex, $yIndex);
+			$operations = $this->moneyGradeMemberDAOManager->findByOffice($office, $month->getFirstDay(), $month->getLastDay());
+		} else  {
+			$date = new DateTime($dayDate);
+			$month = new Month(intval($date->format('m'), 10), intval($date->format('Y'), 10));
+			$month->addSelectedDate($date);
+			$operations = $this->moneyGradeMemberDAOManager->findByOffice($office, $date);
+		}
+
+
+		
+		$request->addAttribute('moneys', $operations);
+		$request->addAttribute(self::ATT_MONTH, $month);
+	}
 
 }
 

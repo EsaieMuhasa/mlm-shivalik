@@ -50,6 +50,15 @@ $admin = $_SESSION[SessionOfficeFilter::OFFICE_CONNECTED_SESSION];
     		<span class="nav-item-caption">Virtual money</span>
 		</a>
 	</li>
+
+	<li>
+		<a href="/office/virtualmoney/history.html">
+    		<span class="nav-item-icon">
+        		<span class="fa fa-calendar"></span>
+    		</span>
+    		<span class="nav-item-caption">Virtual money History</span>
+		</a>
+	</li>
 	
 	<li>
 		<a href="/logout.html">

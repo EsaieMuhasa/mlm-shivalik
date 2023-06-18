@@ -125,3 +125,19 @@ DELETE FROM BonusGeneration WHERE generator = (SELECT id FROM GradeMember WHERE 
 DELETE FROM MoneyGradeMember WHERE gradeMember = (SELECT id FROM GradeMember WHERE member = 2551);
 DELETE FROM GradeMember WHERE member = 2551;
 DELETE FROM Member WHERE id = 2551;
+
+
+-- ===============================================================================================
+SELECT * FROM `MonthlyOrder` WHERE member = 334;-- 155
+SELECT * FROM `SellSheetRow` WHERE monthlyOrder = 155;
+DELETE FROM `SellSheetRowVirtualMoney` WHERE `sheet` = 3414;
+DELETE FROM `SellSheetRow` WHERE `id` = 3414;
+DELETE FROM `SellSheetRowVirtualMoney` WHERE `sheet` = 3413;
+DELETE FROM `SellSheetRow` WHERE `id` = 3413;
+-- SellSheetRowVirtualMoney
+-- ===============================================================================================
+SELECT * FROM `Member` WHERE id = 2738;
+SELECT * FROM `GradeMember` WHERE member = 2738;-- 3436
+SELECT * FROM `MoneyGradeMember` WHERE gradeMember = 3436;
+SELECT * FROM `Office` WHERE `id` = 6;-- member: 576
+SELECT * FROM `MoneyGradeMember` WHERE virtualMoney IN (SELECT id FROM VirtualMoney WHERE office = 6) ORDER BY dateAjout DESC;

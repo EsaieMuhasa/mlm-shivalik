@@ -5,6 +5,8 @@ use Core\Shivalik\Managers\MoneyGradeMemberDAOManager;
 use PHPBackend\Dao\DefaultDAOInterface;
 use PHPBackend\Dao\DAOException;
 use Core\Shivalik\Entities\MoneyGradeMember;
+use Core\Shivalik\Entities\Office;
+use DateTimeInterface;
 use PHPBackend\Dao\UtilitaireSQL;
 
 /**
@@ -60,6 +62,44 @@ class MoneyGradeMemberDAOManagerImplementation1 extends DefaultDAOInterface impl
      */
     public function findByVirtualMoney(int $virtualMoney, ?int $limit = null, int $offset = 0): array {
         return $this->findAllByColumName('virtualMoney', $virtualMoney, $limit, $offset);
+    }
+
+    public function findByOffice (Office $office, ?DateTimeInterface $date = null, ?DateTimeInterface $max = null) : array {
+        $data = [];
+
+        $sql = "SELECT * FROM {$this->getViewName()} WHERE virtualMoney IN (SELECT `id` FROM VirtualMoney WHERE office = :office)";
+
+        $params = [
+            'office' => $office->getId()
+        ];
+
+        if ($date != null) {
+            $sql .= " AND ( dateAjout BETWEEN :min AND :max )";
+
+            $params['min'] = "{$date->format('Y-m-d')} 00:00:00";
+
+            if ($max == null) {
+                $params['max'] = "{$date->format('Y-m-d')} 23:59:59";
+            } else {
+                $params['max'] = "{$max->format('Y-m-d')} 23:59:59";
+            }
+        }
+
+        $sql .= " ORDER BY dateAjout DESC";
+
+        // var_dump($sql);
+
+        
+        try {
+            $statement = UtilitaireSQL::prepareStatement($this->getConnection(), $sql, $params);
+            while ($row = $statement->fetch()) {
+                $data[] = new MoneyGradeMember($row);
+            }
+        } catch (\Exception $e) {
+            throw new DAOException($e->getMessage(), 500, $e);
+        }
+
+        return $data;
     }
 
     /**

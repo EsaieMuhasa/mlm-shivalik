@@ -6,6 +6,9 @@
 	 	<route action="index" urlPattern="/office/"/>
 	 	<route action="virtualMoney" urlPattern="/office/virtualmoney/"/>
 	 	<route action="requestVirtualMoney" urlPattern="/office/virtualmoney/request\.html"/>
+		<route action="virtualMoneyHistory" urlPattern="/office/virtualmoney/history\.html"/>
+		<route action="virtualMoneyHistory" urlPattern="/office/virtualmoney/(\d{1,2}-\d{1,2}-\d{4})\.html" paramsNames="date"/>
+		<route action="virtualMoneyHistory" urlPattern="/office/virtualmoney/(\d{1,2})-(\d{4})\.html" paramsNames="monthIndex,yearIndex"/>
 	</module>
 	 
 	<module name="Profil">

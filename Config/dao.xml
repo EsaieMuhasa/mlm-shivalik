@@ -2,7 +2,7 @@
 <!DOCTYPE dao SYSTEM "../lib/PHPBackend/config.dtd" >
 <dao>
 	<dbconnections>
-		<connection user="muhasa" password="esaiemuhasa" name="first" dsn="mysql:host=localhost;dbname=shivalik_db2"/>
+		<connection user="muhasa" password="esaiemuhasa" name="first" dsn="mysql:host=localhost;dbname=shivalik_db1"/>
 		<!--
 		<connection user="shivalik_db1" password="I45c9cKWv#" name="shivalik" dsn="mysql:host=localhost;dbname=shivalik_db1"/>
 		<connection user="shivalik_db1" password="I45c9cKWv#" name="shivalik" dsn="mysql:host=localhost;dbname=newversion_db1"/>

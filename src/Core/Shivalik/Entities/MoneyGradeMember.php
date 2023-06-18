@@ -13,13 +13,13 @@ class MoneyGradeMember extends DBEntity
 {
     /**
      * Montant d'afiliation
-     * @var number
+     * @var float
      */
     private $afiliate = 0;
     
     /**
      * montant allouer aux produits
-     * @var number
+     * @var float
      */
     private $product = 0;
     
@@ -35,17 +35,17 @@ class MoneyGradeMember extends DBEntity
      */
     private $gradeMember;
     /**
-     * @return number
+     * @return float
      */
     public function getAfiliate() : float {
-        return $this->afiliate;
+        return abs($this->afiliate);
     }
 
     /**
-     * @return number
+     * @return float
      */
     public function getProduct() : float{
-        return $this->product;
+        return abs($this->product);
     }
 
     /**
@@ -81,9 +81,9 @@ class MoneyGradeMember extends DBEntity
      */
     public function setVirtualMoney($virtual) : void {
         if ($virtual == null || $virtual instanceof VirtualMoney) {
-            $this->virtialMoney = $virtual;
+            $this->virtualMoney = $virtual;
         } elseif (self::isInt($virtual)) {
-            $this->virtialMoney = new VirtualMoney(['id' => $virtual]);
+            $this->virtualMoney = new VirtualMoney(['id' => $virtual]);
         } else {
             throw  new PHPBackendException("Ivalid arguement value in setVirtual() method parameter");
         }

@@ -4,6 +4,8 @@ namespace Core\Shivalik\Managers;
 use PHPBackend\Dao\DAOException;
 use PHPBackend\Dao\DAOInterface;
 use Core\Shivalik\Entities\MoneyGradeMember;
+use Core\Shivalik\Entities\Office;
+use DateTimeInterface;
 
 /**
  *
@@ -46,5 +48,14 @@ interface MoneyGradeMemberDAOManager extends DAOInterface{
      * @return MoneyGradeMember[]
      */
     public function findByVirtualMoney (int $virtualMoney, ?int $limit = null, int $offset = 0) : array;
+
+    /**
+     * Selection des operations faite pour un office (tous sans restruction ou en une date).
+     * @param Office $office
+     * @param DateTimeInterface|null $date
+     * @param DateTimeInterface|null $max
+     * @return MoneyGradeMember[]
+     */
+    public function findByOffice (Office $office, ?DateTimeInterface $date = null, ?DateTimeInterface $max = null) : array;
 }
 
