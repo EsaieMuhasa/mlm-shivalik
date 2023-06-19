@@ -147,7 +147,7 @@ class DashboardController extends HTTPController {
     }
     
     
-    /***
+    /**
      * Evoie d'une requette de demande de matching
      * @param Request $request
      * @param Request $response

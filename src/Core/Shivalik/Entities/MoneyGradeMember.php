@@ -52,7 +52,7 @@ class MoneyGradeMember extends DBEntity
      * @return \Core\Shivalik\Entities\VirtualMoney
      */
     public function getVirtualMoney() : ?VirtualMoney{
-        return $this->virtialMoney;
+        return $this->virtualMoney;
     }
 
     /**
