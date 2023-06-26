@@ -33,9 +33,25 @@ class Grade extends DBEntity
     private $maxGeneration;
     
     /**
+     * @deprecated
      * @var float
      */
     private $amount;
+
+    /**
+     * @var float
+     */
+    private $productAmount;
+
+    /**
+     * @var float
+     */
+    private $membershipAmount;
+
+    /**
+     * @var float
+     */
+    private $officeAmount;
 
     
     /**
@@ -121,6 +137,7 @@ class Grade extends DBEntity
     
     
     /**
+     * @deprecated
      * @return float
      */
     public function getAmount()
@@ -129,6 +146,7 @@ class Grade extends DBEntity
     }
 
     /**
+     * @deprecated
      * @param number $amount
      */
     public function setAmount($amount)
@@ -138,5 +156,81 @@ class Grade extends DBEntity
 
 
 
+
+    /**
+     * Get the value of officeAmount
+     *
+     * @return  float
+     */ 
+    public function getOfficeAmount()
+    {
+        return $this->officeAmount;
+    }
+
+    /**
+     * Set the value of officeAmount
+     *
+     * @param  float  $officeAmount
+     *
+     * @return  self
+     */ 
+    public function setOfficeAmount(float $officeAmount)
+    {
+        $this->officeAmount = $officeAmount;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of membershipAmount
+     *
+     * @return  float
+     */ 
+    public function getMembershipAmount()
+    {
+        return $this->membershipAmount;
+    }
+
+    /**
+     * Set the value of membershipAmount
+     *
+     * @param  float  $membershipAmount
+     *
+     * @return  self
+     */ 
+    public function setMembershipAmount(float $membershipAmount)
+    {
+        $this->membershipAmount = $membershipAmount;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of productAmount
+     *
+     * @return  float
+     */ 
+    public function getProductAmount()
+    {
+        return $this->productAmount;
+    }
+
+    /**
+     * Set the value of productAmount
+     *
+     * @param  float  $productAmount
+     *
+     * @return  self
+     */ 
+    public function setProductAmount(float $productAmount)
+    {
+        $this->productAmount = $productAmount;
+
+        return $this;
+    }
+
+    public function getSumAmount() {
+        return ($this->getProductAmount() + $this->getOfficeAmount() + $this->getMembershipAmount());
+    }
 }
 

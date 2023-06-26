@@ -67,9 +67,9 @@ $monthly = isset($_REQUEST[MembersController::ATT_MONTHLY_ORDER_FOR_ACCOUNT])? $
                     			<?php  foreach ($_REQUEST[MembersController::ATT_GRADES] as $grade) : ?>
                 					
                 					<?php
-                					$membership = 20;
-                					$officePart = 10;
-                					$product = $grade->amount - $membership - $officePart;
+                					$membership = $grade->getMembershipAmount();
+                					$officePart = $grade->getOfficeAmount();
+                					$product = $grade->getProductAmount();
                 					?>
                     			
                     			<?php if ($monthly != null && $monthly->getAvailable() < $product) {
@@ -82,11 +82,6 @@ $monthly = isset($_REQUEST[MembersController::ATT_MONTHLY_ORDER_FOR_ACCOUNT])? $
                     					<input type="radio" name="grade" value="<?php echo $grade->id; ?>" id="grade-<?php echo $grade->id;?>" <?php echo (isset($_POST['grade']) && $grade->id == $_POST['grade'])? ' checked="checked"':''; ?>/>
                     					<strong><?php echo htmlspecialchars($grade->name); ?></strong>
                     					<img alt="" class="img-responsive" src="/<?php echo ($grade->icon); ?>">
-                    					<span style="display: block;">
-                        					<span class="label label-info">
-                        						<?php echo ("{$grade->amount} {$config->get('devise')}"); ?>
-                        					</span>
-                    					</span>
                     					
                     					<span style="display: block;">
                         					<span class="label label-default">
@@ -104,6 +99,12 @@ $monthly = isset($_REQUEST[MembersController::ATT_MONTHLY_ORDER_FOR_ACCOUNT])? $
                         					<span class="label label-primary">
                         						<?php echo ("Product: {$product} {$config->get('devise')}"); ?>
                         					</span>
+                    					</span>
+
+										<span style="display: block;padding-top:20px;">
+                        					<h2 class="label label-info" style="font-size: 1.8rem;">
+                        						<?php echo ("{$grade->getSumAmount()} {$config->get('devise')}"); ?>
+											</h2>
                     					</span>
                     				</span>
                     			</label>

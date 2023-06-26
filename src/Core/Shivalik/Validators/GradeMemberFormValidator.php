@@ -273,12 +273,12 @@ class GradeMemberFormValidator extends DefaultFormValidator
             $gm->getMember()->setOffice($gm->getMember()->getAdmin()->getOffice());
             $gm->setOffice($gm->getMember()->getAdmin()->getOffice());
             $gm->setGrade($this->gradeDAOManager->findById($gm->getGrade()->getId()));
-            $this->processingProduct($gm, $gm->getGrade()->getAmount()-30);
-            $this->processingMembership($gm, 20, 10);
+            $this->processingProduct($gm, $gm->getGrade()->getProductAmount());
+            $this->processingMembership($gm, $gm->getGrade()->getMembershipAmount(), $gm->getGrade()->getOfficeAmount());
             
             // --verification de la monais virtuel
             $product = $gm->getProduct();
-            $membership = 0;
+            $membership = $gm->getGrade()->getMembershipAmount();
             
             if ($product > $member->getOffice()->getAvailableVirtualMoneyProduct() || $membership >  $member->getOffice()->getAvailableVirualMoneyAfiliate()) {
                 $message = "impossible to perform this operation because the office wallet is insufficient. requered product money: {$product} {$request->getApplication()->getConfig()->get('devise')}, ";
@@ -338,13 +338,13 @@ class GradeMemberFormValidator extends DefaultFormValidator
                  */
                 $require = $this->gradeDAOManager->findById($gradeId);
                 
-                $product = $require->getAmount() - $old->getGrade()->getAmount();
+                $product = $require->getProductAmount() - $old->getGrade()->getProductAmount();
                 
                 $this->processingProduct($gm, $product);
                 $gm->setMembership(0);
                 $gm->setOfficePart(0);
                 
-                if ($old->getGrade()->getAmount() >= $require->getAmount()) {
+                if ($old->getGrade()->getProductAmount() >= $require->getProductAmount()) {
                     $this->setMessage("take the higher grade than '{$old->getGrade()->getName()}'");
                 } else {
                 	/**
@@ -430,11 +430,12 @@ class GradeMemberFormValidator extends DefaultFormValidator
             $gm->getMember()->setOffice($gm->getMember()->getAdmin()->getOffice());
             $gm->setOffice($gm->getMember()->getAdmin()->getOffice());
             $gm->setGrade($this->gradeDAOManager->findById($gm->getGrade()->getId()));
-            $this->processingProduct($gm, $gm->getGrade()->getAmount()-30);
-            $this->processingMembership($gm, 20, 10);
+            $this->processingProduct($gm, $gm->getGrade()->getProductAmount());
+            $this->processingMembership($gm, $gm->getGrade()->getMembershipAmount(), $gm->getGrade()->getOfficeAmount());
             
             // --verification de la monais virtuel
-            $money = (($gm->getMembership()/3)*2);
+            $money = $gm->getGrade()->getMembershipAmount();
+            
             if ($money > $member->getOffice()->getAvailableVirualMoneyAfiliate()) {
                 $this->setMessage("impossible to perform this operation because the office wallet is insufficient. requered money: {$money} {$request->getApplication()->getConfig()->get('devise')}, your membership wallet: {$member->getOffice()->getAvailableVirualMoneyAfiliate()} {$request->getApplication()->getConfig()->get('devise')}");
             } else if ($gm->getProduct() > $monthly->getAvailable()) {
