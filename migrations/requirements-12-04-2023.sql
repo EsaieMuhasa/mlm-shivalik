@@ -13,3 +13,5 @@ SELECT * FROM SellSheetRow WHERE monthlyOrder IN (393, 366)
 SELECT * FROM `GradeMember` WHERE monthlyOrder IN (393, 366)
 -- 366 => 1465
 -- 393 => 1537
+
+-- /root/migrate-1388-to-1387

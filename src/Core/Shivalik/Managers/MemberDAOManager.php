@@ -46,7 +46,7 @@ interface MemberDAOManager extends UserDAOManager
 
     /**
      * migration d'un compte dans un autre reseau.
-     * consiste anger de le parent du compte, soit en maintenant le meme sponsor, soit en changant egalement
+     * consiste a changer de le parent du compte, soit en maintenant le meme sponsor, soit en changant egalement
      * les sponsor
      * 
      * Cette methode effectue une validation tre poussee pour garder l'integrite des donnees intacte.

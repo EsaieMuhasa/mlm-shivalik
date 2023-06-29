@@ -36,7 +36,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
             <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                 <div class="info-box blue-bg">
                     <i class="fa fa-tag"></i>
-                    <div class="count"><?php echo ($member->getLeftMembershipPv()); ?></div>
+                    <div class="count"><?php echo empty($member->getLeftMembershipPv()) ? '0' : ($member->getLeftMembershipPv()); ?></div>
                     <div class="title">Left PV</div>
                 </div>
                 <!--/.info-box-->
@@ -45,7 +45,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
             <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                 <div class="info-box blue-bg">
                     <i class="fa fa-tag"></i>
-                    <div class="count"><?php echo ($member->getMiddleMembershipPv()); ?></div>
+                    <div class="count"><?php echo empty($member->getMiddleMembershipPv())? '0' : $member->getMiddleMembershipPv(); ?></div>
                     <div class="title">MIDDLE PV</div>
                 </div>
                 <!--/.info-box-->
@@ -54,7 +54,7 @@ $config = $_REQUEST[Request::ATT_APP_CONFIG];
             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                 <div class="info-box blue-bg">
                     <i class="fa fa-tag"></i>
-                    <div class="count"><?php echo ($member->getRightMembershipPv()); ?></div>
+                    <div class="count"><?php echo empty($member->getRightMembershipPv())? '0' : $member->getRightMembershipPv(); ?></div>
                     <div class="title">Right PV</div>
                 </div>
                 <!--/.info-box-->

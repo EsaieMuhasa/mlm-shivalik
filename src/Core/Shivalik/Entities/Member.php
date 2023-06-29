@@ -108,39 +108,39 @@ class Member extends User implements TernaryNode
     /**
      * @var float
      */
-    protected $leftMembershipPv;
+    protected $leftMembershipPv = 0;
 
     /**
      * @var float
      */
-    protected $rightMembershipPv;
+    protected $rightMembershipPv = 0;
 
     /**
      * @var float
      */
-    protected $middleMembershipPv;
+    protected $middleMembershipPv = 0;
 
     /**
      * efforts peronnels pour le re-acat
      *
      * @var float
      */
-    protected $personalMembershipPv;
+    protected $personalMembershipPv = 0;
 
     /**
      * @var float
      */
-    protected $leftProductPv;
+    protected $leftProductPv = 0;
 
     /**
      * @var float
      */
-    protected $rightProductPv;
+    protected $rightProductPv = 0;
 
     /**
      * @var float
      */
-    protected $middleProductPv;
+    protected $middleProductPv = 0;
 
     /**
      * effort personnel lors d'achat des produits

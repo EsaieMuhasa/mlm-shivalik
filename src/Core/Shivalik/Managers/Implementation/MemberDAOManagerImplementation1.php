@@ -258,7 +258,7 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
         try {
             /**
              * Dans le cas où le sponsor est renseiger, on cherche le troue le plus 
-             * proche dans le reseau du sponsor.
+             * proche dans le reseau du sponsor, pour determiner le parent.
              */
             
             if ($newSponsor != null) {

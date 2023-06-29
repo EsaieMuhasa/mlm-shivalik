@@ -141,3 +141,12 @@ SELECT * FROM `GradeMember` WHERE member = 2738;-- 3436
 SELECT * FROM `MoneyGradeMember` WHERE gradeMember = 3436;
 SELECT * FROM `Office` WHERE `id` = 6;-- member: 576
 SELECT * FROM `MoneyGradeMember` WHERE virtualMoney IN (SELECT id FROM VirtualMoney WHERE office = 6) ORDER BY dateAjout DESC;
+
+
+DELETE FROM `SellSheetRow` WHERE monthlyOrder = 757;
+DELETE FROM `SellSheetRowVirtualMoney` WHERE `sheet` = 757;
+DELETE FROM `MonthlyOrder` WHERE member = 2341;
+-- ============
+SELECT * FROM `MonthlyOrder` WHERE member = 2341;
+DELETE FROM `SellSheetRow` WHERE monthlyOrder = 757;
+DELETE FROM `SellSheetRowVirtualMoney` WHERE `sheet` = 757;
