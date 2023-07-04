@@ -71,7 +71,15 @@ abstract class DBEntity implements ArrayAccess
         $class = new \ReflectionClass($this);
         
         foreach ($data as $attr => $value) {
-            $method = 'set'.ucfirst(trim($attr));
+            $key = $attr;
+            $matches = [];
+
+            if (preg_match('#^`(.+)`$#', $attr, $matches)) {
+                $key = $matches[1];
+            }
+
+            $method = 'set'.ucfirst(trim($key));
+
             if (is_callable(array($this, $method))) {
                 $refMethode = $class->getMethod($method);
                 if (count($refMethode->getParameters())==2 && $encrypted==true) {//Si les donnees sont cryptable

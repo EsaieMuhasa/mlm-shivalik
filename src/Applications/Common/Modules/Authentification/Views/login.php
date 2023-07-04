@@ -20,7 +20,7 @@
                     <span class="input-group-addon" id="basic-addon1">
                         <span class="fa fa-user"></span>
                     </span>
-                    <input name="pseudo" type="text" class="form-control input-lg" placeholder="username" aria-describedby="basic-addon1">
+                    <input name="pseudo" type="text" value="<?php echo isset($_POST['pseudo'])? $_POST['pseudo'] : ''; ?>" class="form-control input-lg" placeholder="username" aria-describedby="basic-addon1">
                 </div>
                 <?php if (isset($_REQUEST['errors']['pseudo'])) { ?>
             	<p class="text-danger"><?php echo ($_REQUEST['errors']['pseudo']); ?></p>

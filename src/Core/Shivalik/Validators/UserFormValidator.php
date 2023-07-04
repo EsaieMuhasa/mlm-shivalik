@@ -2,6 +2,7 @@
 namespace Core\Shivalik\Validators;
 
 use Core\Shivalik\Entities\Member;
+use Core\Shivalik\Entities\OfficeAdmin;
 use Core\Shivalik\Entities\User;
 use Core\Shivalik\Managers\MemberDAOManager;
 use Core\Shivalik\Managers\OfficeAdminDAOManager;
@@ -297,18 +298,31 @@ abstract class UserFormValidator extends DefaultFormValidator
         
         if (!$this->hasError()) {
             try {
+                // echo '<pre>';
+
+                // var_dump('pseudo', $pseudo);
                 
                 /**
                  * @var User $u
                  */
                 $u = null;
-                if ($this->memberDAOManager->checkByPseudo($pseudo)) {//est-ce un membre
-                    $u = $this->memberDAOManager->findByPseudo($pseudo, true);
-                }elseif ($this->officeAdminDAOManager->checkByEmail($pseudo)){//est-ce un administrateur d'un bureau
+                if (!preg_match(self::RGX_EMAIL, $pseudo)) {
+                    if ($this->memberDAOManager->checkByPseudo($pseudo)) {//est-ce un membre
+                        /** @var Member $u */
+                        $u = $this->memberDAOManager->findByPseudo($pseudo, true);
+                        // var_dump('member account', $u->getEmail(), $u->getMatricule(), $u->getPassword());
+                    }
+                } elseif ($this->officeAdminDAOManager->checkByEmail($pseudo)){//est-ce un administrateur d'un bureau
+                    /** @var OfficeAdmin $u */
                     $u = $this->officeAdminDAOManager->findByEmail($pseudo, true);
-                }else {
+                    // var_dump('admin account', $u->getEmail(), $u->getPassword());
+                }
+                
+                if ($u == null){
                     $this->addError(self::FIELD_PSEUDO, "unknown user in the system");
                 }
+
+                // var_dump($user);
                 
                 $user->setPseudo($pseudo);
                 
@@ -321,6 +335,8 @@ abstract class UserFormValidator extends DefaultFormValidator
                         return $u;
                     }
                 }
+
+                // echo '</pre>';
             } catch (DAOException $e) {
                 $this->setMessage($e->getMessage());
             }
