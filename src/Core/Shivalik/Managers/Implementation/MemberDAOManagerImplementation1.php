@@ -118,6 +118,9 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
                 'foot' => $member->getFoot(),
                 'parent' => $parent->getId()
             ], $id);
+
+            $member->setParent($parent);
+            $now = new DateTime();
             
             /**
              * @var GradeMember[] $packets
@@ -139,7 +142,7 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
                 
                 $count = UtilitaireSQL::deleteAll($pdo, "PointValue", $ids);
                 if($count == 0){
-                    throw new DAOException("imposible to perform this operation because ");
+                    throw new DAOException("imposible to perform this operation because we canot delete old points values");
                 }
                 
                 $child = $member;
@@ -151,6 +154,7 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
                     $pv->setMember($child);
                     $pv->setGenerator($pack);
                     $pv->setFoot($foot);
+                    $pv->setDateAjout($now);
                     
                     $value = round(($pack->getProduct()/2), 0);
                     $pv->setValue($value);
@@ -375,7 +379,7 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
                     throw new DAOException("Une erreur est survenue lors du commit de la transaction ");
                 }
             } else {
-                throw new DAOException("Operation non pris en charge");
+                throw new DAOException("Operation non pris en charge: migration du sponsor");
             }
         } catch (PDOException $e) {
             throw new DAOException("une erreur est survenue lors de la migration du compte: {$e->getMessage()}", 500, $e);

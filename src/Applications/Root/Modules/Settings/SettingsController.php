@@ -232,12 +232,29 @@ class SettingsController extends HTTPController
         // $response->sendError("Reserved to Ing Esaie MUHASA only");
 
         $nodeId = @intval($request->getDataGET('nodeId'), 10);
-        $sponsorId = @intval($request->getDataGET('sponsorId'), 10);
+        $parentId = @intval($request->getDataGET('parentId'), 10);
 
         $node = $this->memberDAOManager->findById($nodeId);
-        $sponsor = $this->memberDAOManager->findById($sponsorId);
+        $parent = $this->memberDAOManager->findById($parentId);
 
-        $this->memberDAOManager->migrateToNetwork($node, $sponsor, $sponsor);
+        $this->memberDAOManager->migrateToNetwork($node, $parent);
+
+
+        $response->sendRedirect('/root/');
+
+    }
+
+    /**
+     * Action de change du parent d'un compte.
+     * Cette operation n'est possible que si le nouveau parent ce trouve dans le meme 
+     * reseau que le sponsor du compte.
+     */
+    public function executeChangeParent (Request $request, Response $response) : void {
+
+        $nodeId = @intval($request->getDataGET('id'), 10);
+        $parentId = @intval($request->getDataGET('parentId'), 10);
+
+        $this->memberDAOManager->changeParentByMember($nodeId, $parentId);
 
 
         $response->sendRedirect('/root/');
