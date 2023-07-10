@@ -5,7 +5,6 @@ namespace Applications\Admin\Modules\Offices;
 use Applications\Admin\AdminController;
 use Core\Shivalik\Entities\Office;
 use Core\Shivalik\Entities\OfficeAdmin;
-use Core\Shivalik\Entities\OfficeSize;
 use Core\Shivalik\Entities\RequestVirtualMoney;
 use Core\Shivalik\Entities\VirtualMoney;
 use Core\Shivalik\Entities\Withdrawal;
@@ -72,6 +71,7 @@ class OfficesController extends AdminController {
 	//pour les monais virtuels
 	const ATT_VIRTUAL_MONEY = 'virtualMoney';
 	const ATT_VIRTUAL_MONEYS = 'virtualMoneys';
+	const ATT_ALL_VIRTUAL_MONEYS = 'allVirtualMoneys';
 	const ATT_REQUEST_VIRTUAL_MONEY = 'requestVirtualMoney';
 	const ATT_RAPORTS_WITHDRAWALS = 'raportWithdrawals';
 	const ATT_COUNT_WITHDRAWALS = 'count_withdrawals_occurences';//nombre d'occurence des retrait deja fait dans un  office
@@ -466,8 +466,14 @@ class OfficesController extends AdminController {
 		}else {
 		    $requests = array();
 		}
+
+		$virtuals =  [];
+		if ($this->virtualMoneyDAOManager->checkByOffice($this->office->getId())) {
+			$virtuals =  $this->virtualMoneyDAOManager->findByOffice($this->office->getId());
+		}
 		
 		$request->addAttribute(self::ATT_VIRTUAL_MONEYS, $requests);
+		$request->addAttribute(self::ATT_ALL_VIRTUAL_MONEYS, $virtuals);
 	}
 	
 	/**

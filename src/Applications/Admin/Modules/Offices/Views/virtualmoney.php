@@ -95,3 +95,31 @@ $requests = $_REQUEST[OfficesController::ATT_VIRTUAL_MONEYS];
         </div>
 	</div>
 </div>
+
+<?php if (!empty($_REQUEST[OfficesController::ATT_ALL_VIRTUAL_MONEYS])) : ?>
+<div class="row">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="table-responsive">
+			<table class="table table-bordered table-condenced panel panel-default">
+    			<caption class="panel-title text-center">Offices virtual moneys rapports</caption>
+				<thead class="panel-heading">
+					<tr>
+						<th>Date</th>
+						<th>Afilliation</th>
+						<th>Product</th>
+					</tr>
+				</thead>
+				<tbody class="panel-body">
+					<?php foreach ($_REQUEST[OfficesController::ATT_ALL_VIRTUAL_MONEYS] as $raport) : ?>
+					<tr>
+						<td><?php echo $raport->dateAjout->format('D, d M Y \a\t H:i'); ?></td>
+						<td><?php echo "{$raport->afiliate} {$config->get('devise')}"; ?></td>
+						<td><?php echo "{$raport->product} {$config->get('devise')}"; ?></td>
+					</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<?php endif; ?>
