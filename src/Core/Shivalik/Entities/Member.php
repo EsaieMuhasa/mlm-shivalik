@@ -227,7 +227,7 @@ class Member extends User implements TernaryNode
     }
 
     /**
-     * @param number $foot
+     * @param int|null $foot
      */
     public function setFoot($foot) : void
     {

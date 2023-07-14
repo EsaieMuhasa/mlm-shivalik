@@ -1,6 +1,7 @@
 <?php
 namespace Applications\Root\Modules\Settings;
 
+use Core\Shivalik\Entities\Member;
 use Core\Shivalik\Filters\SessionRootFilter;
 use Core\Shivalik\Managers\CountryDAOManager;
 use Core\Shivalik\Managers\GenerationDAOManager;
@@ -233,11 +234,16 @@ class SettingsController extends HTTPController
 
         $nodeId = @intval($request->getDataGET('nodeId'), 10);
         $parentId = @intval($request->getDataGET('parentId'), 10);
+        $sponsorId = @intval($request->getDataGET('sponsorId'), 10);
 
+        /** @var Member $node */
         $node = $this->memberDAOManager->findById($nodeId);
+        /** @var Member $parent */
         $parent = $this->memberDAOManager->findById($parentId);
+        /** @var Member $sponsor */
+        $sponsor = $this->memberDAOManager->findById($sponsorId);
 
-        $this->memberDAOManager->migrateToNetwork($node, $parent);
+        $this->memberDAOManager->migrateToNetwork($node, $parent, $sponsor);
 
 
         $response->sendRedirect('/root/');

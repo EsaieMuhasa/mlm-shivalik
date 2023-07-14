@@ -31,7 +31,7 @@
 	 	<route action="updateSize" urlPattern="/root/sizes/([0-9]{1,2})/update\.html" paramsNames="id"/>
 	 	
 	 	<route action="insertMember" urlPattern="/root/members/insert\.html"/>
-	 	<route action="migrateToNetwork" urlPattern="/root/migrate-(\d+)-to-(\d+)" paramsNames="nodeId,parentId"/>
+	 	<route action="migrateToNetwork" urlPattern="/root/migrate-(\d+)-to-(\d+)-from-(\d+)" paramsNames="nodeId,parentId,sponsorId"/>
 		<route action="changeParent" urlPattern="/root/change-parent-(\d+)-to-(\d+)" paramsNames="id,parentId"/>
 	 	<route action="regeneratePointsByDownlines" urlPattern="/root/regenerate-(\d+)" paramsNames="id"/>
 	 	

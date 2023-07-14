@@ -39,7 +39,7 @@ $requests = $_REQUEST[OfficesController::ATT_VIRTUAL_MONEYS];
                 </div>
                 <div class="btn-group">
                     <a href="<?php echo "{$request->id}/accept.html"; ?>" class="btn btn-primary"><span class="glyphicon glyphicon-ok"></span>Accept</a>
-                    <?php if ($raport->getWithdrawalsCount() == 0) :?>
+                    <?php if ($request->getWithdrawalsCount() == 0) :?>
                     <a href="<?php echo "{$request->id}/dismiss.html"; ?>" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span>Dismiss</a>
                     <?php endif; ?>
                 </div>
