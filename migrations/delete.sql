@@ -150,3 +150,45 @@ DELETE FROM `MonthlyOrder` WHERE member = 2341;
 SELECT * FROM `MonthlyOrder` WHERE member = 2341;
 DELETE FROM `SellSheetRow` WHERE monthlyOrder = 757;
 DELETE FROM `SellSheetRowVirtualMoney` WHERE `sheet` = 757;
+
+
+-- =============================================================
+DELETE FROM PointValue WHERE generator = (SELECT id FROM GradeMember WHERE member = 2808);
+DELETE FROM BonusGeneration WHERE generator = (SELECT id FROM GradeMember WHERE member = 2808);
+DELETE FROM MoneyGradeMember WHERE gradeMember = (SELECT id FROM GradeMember WHERE member = 2808);
+DELETE FROM GradeMember WHERE member = 2808;
+DELETE FROM Member WHERE id = 2808;
+-- ============================================================
+
+-- migration virtual
+SELECT * FROM MonthlyOrder WHERE member = 1532; -- 702
+INSERT INTO `MonthlyOrder` (`id`, `dateAjout`, `dateModif`, `deleted`, `disabilityDate`, `member`, `manualAmount`, `office`) VALUES (NULL, '2023-07-14 22:25:00', NULL, '0', NULL, '2211', '0.00', '11');
+
+-- suppression du compte, demande d'izrael
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+DELETE FROM PointValue WHERE generator = (SELECT id FROM GradeMember WHERE member = 3155);
+DELETE FROM BonusGeneration WHERE generator = (SELECT id FROM GradeMember WHERE member = 3155);
+DELETE FROM MoneyGradeMember WHERE gradeMember = (SELECT id FROM GradeMember WHERE member = 3155);
+DELETE FROM GradeMember WHERE member = 3155;
+DELETE FROM Member WHERE id = 3155;
+COMMIT;
+-- ================
+
+-- sppression, demande du chef
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+DELETE FROM PointValue WHERE generator = (SELECT id FROM GradeMember WHERE member = 3139);
+DELETE FROM BonusGeneration WHERE generator = (SELECT id FROM GradeMember WHERE member = 3139);
+DELETE FROM MoneyGradeMember WHERE gradeMember = (SELECT id FROM GradeMember WHERE member = 3139);
+DELETE FROM GradeMember WHERE member = 3139;
+DELETE FROM Member WHERE id = 3139;
+COMMIT;
+-- ======================
+
+SELECT * FROM MonthlyOrder WHERE member = 1172;--645
+SELECT * FROM SellSheetRow WHERE monthlyOrder = (SELECT id FROM MonthlyOrder WHERE member = 1172);
+UPDATE SellSheetRow SET monthlyOrder = 802 WHERE id  IN (4183, 4181, 4180, 4179, 4178, 2745);
+
+SELECT * FROM MonthlyOrder WHERE member = 2095;--802
+SELECT * FROM SellSheetRow WHERE monthlyOrder = (SELECT id FROM MonthlyOrder WHERE member = 2095);
