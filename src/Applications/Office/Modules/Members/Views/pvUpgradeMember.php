@@ -60,6 +60,19 @@ $monthly = $_REQUEST[MembersController::ATT_MONTHLY_ORDER_FOR_ACCOUNT];
         				<div class="form-group <?php echo (isset($_REQUEST['errors']['grade'])? 'has-error':'');?>">                			
                 			<div class="row">
                     			<?php  foreach ($_REQUEST[MembersController::ATT_GRADES] as $grade) : ?>
+
+									<?php
+										$membership = 20;
+										$officePart = 10;
+										$product = $grade->amount - $membership - $officePart;
+									?>
+
+									<?php 
+										// if ($monthly != null && $monthly->getAvailable() < $product) {
+                    			    	// 	continue;
+                    					// }
+									?>
+
                                     <label class="col-lg-2 col-md-3 col-sm-4 col-xs-6" for="grade-<?php echo $grade->id;?>" style="padding-bottom: 30px;">
                                         <span class="thumbnail">
                                             <input type="radio" name="grade" value="<?php echo $grade->id; ?>" id="grade-<?php echo $grade->id;?>" <?php echo (isset($_POST['grade']) && $grade->id == $_POST['grade'])? ' checked="checked"':''; ?>/>
@@ -70,12 +83,7 @@ $monthly = $_REQUEST[MembersController::ATT_MONTHLY_ORDER_FOR_ACCOUNT];
                                                     <?php echo ("{$grade->amount} {$config->get('devise')}"); ?>
                                                 </span>
                                             </span>
-                                            
-                                            <?php
-                                            $membership = 20;
-                                            $officePart = 10;
-                                            $product = $grade->amount - $membership - $officePart;
-                                            ?>
+                                    
                                             
                                             <span style="display: block;">
                                                 <span class="label label-default">

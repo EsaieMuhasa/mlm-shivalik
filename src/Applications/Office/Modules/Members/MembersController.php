@@ -356,13 +356,12 @@ class MembersController extends HTTPController {
 		$gradeMember = $this->gradeMemberDAOManager->findCurrentByMember($id);
 		$gradeMember->setMember($member);
 
+		$monthly = $this->monthlyOrderDAOManager->findAvailableByMember($member, $office, false);
+		$request->addAttribute(self::ATT_MONTHLY_ORDER_FOR_ACCOUNT, $monthly);
 		
-		if($this->monthlyOrderDAOManager->checkByMemberOfMonth($member->getId())){
-			$monthly = $this->monthlyOrderDAOManager->findByMemberOfMonth($member->getId());
-			$request->addAttribute(self::ATT_MONTHLY_ORDER_FOR_ACCOUNT, $monthly);
-		} else {
-			$response->sendError("Route not found");
-		}
+		if($monthly == null || $monthly->getAvailable() < 50 ){
+			$response->sendRedirect("/office/members/{$id}/");
+		} 
 		
 		if ($request->getMethod() == Request::HTTP_POST) {
 			$form = new GradeMemberFormValidator($this->getDaoManager());

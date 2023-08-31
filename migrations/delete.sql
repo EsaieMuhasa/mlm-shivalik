@@ -188,7 +188,42 @@ COMMIT;
 
 SELECT * FROM MonthlyOrder WHERE member = 1172;--645
 SELECT * FROM SellSheetRow WHERE monthlyOrder = (SELECT id FROM MonthlyOrder WHERE member = 1172);
-UPDATE SellSheetRow SET monthlyOrder = 802 WHERE id  IN (4183, 4181, 4180, 4179, 4178, 2745);
 
 SELECT * FROM MonthlyOrder WHERE member = 2095;--802
 SELECT * FROM SellSheetRow WHERE monthlyOrder = (SELECT id FROM MonthlyOrder WHERE member = 2095);
+
+
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+DELETE FROM PointValue WHERE generator = (SELECT id FROM GradeMember WHERE member = 3167);
+DELETE FROM BonusGeneration WHERE generator = (SELECT id FROM GradeMember WHERE member = 3167);
+DELETE FROM MoneyGradeMember WHERE gradeMember = (SELECT id FROM GradeMember WHERE member = 3167);
+DELETE FROM GradeMember WHERE member = 3167;
+DELETE FROM Member WHERE id = 3167;
+COMMIT;
+
+
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+DELETE FROM `SellSheetRowVirtualMoney` WHERE `sheet` IN(3772, 3763, 4337);
+DELETE FROM `SellSheetRow` WHERE id IN(3772, 3763, 4337);
+COMMIT;
+
+
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+DELETE FROM PointValue WHERE generator = (SELECT id FROM GradeMember WHERE member = 3585);
+DELETE FROM BonusGeneration WHERE generator = (SELECT id FROM GradeMember WHERE member = 3585);
+DELETE FROM MoneyGradeMember WHERE gradeMember = (SELECT id FROM GradeMember WHERE member = 3585);
+DELETE FROM GradeMember WHERE member = 3585;
+DELETE FROM Member WHERE id = 3585;
+COMMIT;
+
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+DELETE FROM PointValue WHERE generator = (SELECT id FROM GradeMember WHERE member = 3033);
+DELETE FROM BonusGeneration WHERE generator = (SELECT id FROM GradeMember WHERE member = 3033);
+DELETE FROM MoneyGradeMember WHERE gradeMember = (SELECT id FROM GradeMember WHERE member = 3033);
+DELETE FROM GradeMember WHERE member = 3033;
+DELETE FROM Member WHERE id = 3033;
+COMMIT;
