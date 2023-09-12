@@ -1,3 +1,4 @@
+-- Active: 1686405938442@@127.0.0.1@3306@shivalik_db1
 
 SELECT PointValue WHERE member IS NULL;
 SELECT BonusGeneration WHERE member IS NULL;
@@ -226,4 +227,42 @@ DELETE FROM BonusGeneration WHERE generator = (SELECT id FROM GradeMember WHERE 
 DELETE FROM MoneyGradeMember WHERE gradeMember = (SELECT id FROM GradeMember WHERE member = 3033);
 DELETE FROM GradeMember WHERE member = 3033;
 DELETE FROM Member WHERE id = 3033;
+COMMIT;
+
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+DELETE FROM PointValue WHERE generator = (SELECT id FROM GradeMember WHERE member = 3590);
+DELETE FROM BonusGeneration WHERE generator = (SELECT id FROM GradeMember WHERE member = 3590);
+DELETE FROM MoneyGradeMember WHERE gradeMember = (SELECT id FROM GradeMember WHERE member = 3590);
+DELETE FROM GradeMember WHERE member = 3590;
+DELETE FROM Member WHERE id = 3590;
+COMMIT;
+
+
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+
+-- K138
+-- GradeMember 135 AND 2923 ruby
+
+UPDATE `GradeMember` SET `closeDate` = NOW(), `enable` = 0, `dateModif` = NOW() WHERE member = 138 AND `closeDate` IS NULL;
+INSERT INTO GradeMember (`initDate`, `product`, `membership`, `dateAjout`, `old`, `member`, `grade`, `office`, `enable`) 
+VALUES(NOW(), 600, 0, NOW(), 2923, 138, 5, 1, 1);
+
+-- ================================
+-- K153
+-- GradeMember 149 AND 521 rudy
+UPDATE `GradeMember` SET `closeDate` = NOW(), `enable` = 0, `dateModif` = NOW() WHERE member = 153 AND `closeDate` IS NULL;
+INSERT INTO GradeMember (`initDate`, `product`, `membership`, `dateAjout`, `old`, `member`, `grade`, `office`, `enable`) 
+VALUES(NOW(), 600, 0, NOW(), 521, 153, 5, 1, 1);
+
+
+-- ================================
+-- K1060
+-- GradeMember 1315 royal
+UPDATE `GradeMember` SET `closeDate` = NOW(), `enable` = 0, `dateModif` = NOW() WHERE member = 1060 AND `closeDate` IS NULL;
+INSERT INTO GradeMember (`initDate`, `product`, `membership`, `dateAjout`, `old`, `member`, `grade`, `office`, `enable`) 
+VALUES(NOW(), 700, 0, NOW(), 1315, 1060, 5, 1, 1);
+
+SELECT * FROM `GradeMember` WHERE `member` IN (138, 153, 1060) ORDER BY `member`;
 COMMIT;
