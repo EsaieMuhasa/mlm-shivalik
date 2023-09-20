@@ -266,3 +266,25 @@ VALUES(NOW(), 700, 0, NOW(), 1315, 1060, 5, 1, 1);
 
 SELECT * FROM `GradeMember` WHERE `member` IN (138, 153, 1060) ORDER BY `member`;
 COMMIT;
+
+
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+
+-- M2482
+-- GradeMember 3104 AND 3110 ruby
+
+UPDATE `GradeMember` SET `closeDate` = NOW(), `enable` = 0, `dateModif` = NOW() WHERE member = 2482 AND `closeDate` IS NULL;
+INSERT INTO GradeMember (`initDate`, `product`, `membership`, `dateAjout`, `old`, `member`, `grade`, `office`, `enable`) 
+VALUES(NOW(), 400, 0, NOW(), 3110, 2482, 5, 1, 1);
+SELECT * FROM `GradeMember` WHERE `member` = 2482;
+COMMIT;
+
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+DELETE FROM PointValue WHERE generator = (SELECT id FROM GradeMember WHERE member = 3934);
+DELETE FROM BonusGeneration WHERE generator = (SELECT id FROM GradeMember WHERE member = 3934);
+DELETE FROM MoneyGradeMember WHERE gradeMember = (SELECT id FROM GradeMember WHERE member = 3934);
+DELETE FROM GradeMember WHERE member = 3934;
+DELETE FROM Member WHERE id = 3934;
+COMMIT;
