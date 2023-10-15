@@ -243,7 +243,9 @@ class SettingsController extends HTTPController
         /** @var Member $sponsor */
         $sponsor = $this->memberDAOManager->findById($sponsorId);
 
-        $this->memberDAOManager->migrateToNetwork($node, $parent, $sponsor);
+        if ($node->getParent()->getId() != $parent->getId() || $node->getSponsor()->getId() != $sponsor->getId()) {
+            $this->memberDAOManager->migrateToNetwork($node, $parent, $sponsor);
+        }
 
 
         $response->sendRedirect('/root/');

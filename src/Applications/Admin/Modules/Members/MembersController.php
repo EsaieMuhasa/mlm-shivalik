@@ -2,6 +2,7 @@
 namespace Applications\Admin\Modules\Members;
 
 use Applications\Admin\AdminController;
+use Applications\Member\Modules\Account\AccountController;
 use Core\Shivalik\Entities\GradeMember;
 use Core\Shivalik\Entities\Member;
 use Core\Shivalik\Managers\CountryDAOManager;
@@ -16,6 +17,8 @@ use PHPBackend\ToastMessage;
 use PHPBackend\Image2D\Mlm\TreeFormatter;
 use Core\Shivalik\Managers\MonthlyOrderDAOManager;
 use Core\Shivalik\Filters\SessionMemberFilter;
+use DateTime;
+use PHPBackend\Calendar\Month;
 
 /**
  *
@@ -28,6 +31,7 @@ class MembersController extends AdminController
     const ATT_ITEM_MENU_DASHBORAD = 'ITEM_MENU_DASHBORAD';
     const ATT_ITEM_MENU_WITHDRAWALS = 'ITEM_MENU_WITHDRAWALS';
     const ATT_ITEM_MENU_DOWNLINES = 'ITEM_MENU_DOWNLINES';
+    const ATT_ITEM_MENU_PROMOTION = 'ITEM_MENU_PROMOTION';
     
     const CONFIG_MAX_MEMBER_VIEW_STEP = 'maxMembers';
     const PARAM_DOWNLINE_COUNT = 'PARAM_DOWNLINE_COUNT';
@@ -525,6 +529,36 @@ class MembersController extends AdminController
         $request->addAttribute(self::ATT_GRADE_MEMBER, $gradeMember);
         $grades = $this->gradeDAOManager->findAll();
         $request->addAttribute(self::ATT_GRADES, $grades);
+    }
+
+    public function executePromotion(Request $request, Response $response) : void {
+        $min = $request->getDataGET('min');
+        $max = $request->getDataGET('max');
+
+        if ($request->getMethod() == Request::HTTP_POST) {
+
+            $min = new DateTime($request->getDataPOST('min'));
+            $max = new DateTime($request->getDataPOST('max'));
+            $id = $request->getDataPOST('id');
+            $id = substr($id, 1, strlen($id));
+
+            $response->sendRedirect("/admin/members/{$id}/sponsoring-at-{$min->format('d-m-Y')}-to-{$max->format('d-m-Y')}.html");
+        }
+
+        if (empty($min) || empty($max)) {
+            $month = new Month();
+            $min = $month->getFirstDay();
+            $max = $month->getLastDay();
+        } else {
+            $min = new DateTime($min);
+            $max = new DateTime($max);
+        }
+
+        $members = $this->member != null ? $this->memberDAOManager->findSponsorizedByMemberAt($this->member->getId(), $min, $max) : [];
+
+        $request->addAttribute(AccountController::ATT_MEMBERS, $members);
+        $request->addAttribute('min', $min);
+        $request->addAttribute('max', $max);
     }
     
     

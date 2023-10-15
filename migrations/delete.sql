@@ -288,3 +288,12 @@ DELETE FROM MoneyGradeMember WHERE gradeMember = (SELECT id FROM GradeMember WHE
 DELETE FROM GradeMember WHERE member = 3934;
 DELETE FROM Member WHERE id = 3934;
 COMMIT;
+
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+DELETE FROM PointValue WHERE generator = (SELECT id FROM GradeMember WHERE member = 4043);
+DELETE FROM BonusGeneration WHERE generator = (SELECT id FROM GradeMember WHERE member = 4043);
+DELETE FROM MoneyGradeMember WHERE gradeMember = (SELECT id FROM GradeMember WHERE member = 4043);
+DELETE FROM GradeMember WHERE member = 4043;
+DELETE FROM Member WHERE id = 4043;
+COMMIT;

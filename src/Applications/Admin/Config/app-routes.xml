@@ -44,6 +44,9 @@
 		
 		<route action="withdrawalsMember" urlPattern="/admin/members/([0-9]+)/(withdrawals)\.html" paramsNames="id,option"/>
 		<route action="withdrawalsMember" urlPattern="/admin/members/([0-9]+)/(withdrawals)/([0-9]+)\.html" paramsNames="id,option,requestId"/>
+
+	 	<route action="promotion" urlPattern="/admin/members/promotion\.html" paramsNames="id"/>
+	 	<route action="promotion" urlPattern="/admin/members/([0-9]+)/sponsoring-at-(\d{1,2}-\d{1,2}-\d{4})-to-(\d{1,2}-\d{1,2}-\d{4})\.(html|pdf)" paramsNames="id,min,max"/>
 	</module>
  	
 	<!-- controle des offices -->

@@ -3,6 +3,7 @@ namespace Core\Shivalik\Managers;
 
 use Core\Shivalik\Entities\Account;
 use Core\Shivalik\Entities\Member;
+use DateTime;
 use PHPBackend\Dao\DAOException;
 
 /**
@@ -173,6 +174,12 @@ interface MemberDAOManager extends UserDAOManager
 	 * @return array
 	 */
 	public function findSponsorizedByMember (int $id, ?int $limit = null, int $offset = 0) : array;
+
+    /**
+     * Recuperation de la liste des comptes sponsorisee par un membre, pour une periode
+     * @return array<Member>
+     */
+	public function findSponsorizedByMemberAt (int $id, DateTime $min, DateTime $max) : array;
     
 	/**
 	 * revoie le nombre de compte deja creer par un office

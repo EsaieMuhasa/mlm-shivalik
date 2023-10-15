@@ -269,8 +269,14 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
                 $newSponsor = $node->getSponsor();
             }
 
-            if (!$this->isUplineOf($newSponsor->getId(), $newParent->getId()) || $this->countDirectChilds($node->getId()) != 0) {
+            if (!$this->isUplineOf($newSponsor->getId(), $newParent->getId())) {
                 throw new DAOException("impossible de poursuivre le traitement car les uplines ne sont pas dans le meme reseau");
+            }
+
+        
+
+            if ($this->countDirectChilds($node->getId()) != 0) {
+                throw new DAOException("Impossible de poursuivre les traitement car le compte {$node->getMatricule()} a des enfant");
             }
 
             $pdo = $this->getConnection();
@@ -1323,6 +1329,31 @@ class MemberDAOManagerImplementation1 extends AbstractUserDAOManager implements 
         return UtilitaireSQL::findAll($this->getConnection(), $this->getViewName(), 
             $this->getMetadata()->getName(), self::FIELD_DATE_AJOUT, true, ['sponsor' => $id], $limit, $offset);
     }
+
+    public function findSponsorizedByMemberAt (int $id, DateTime $min, DateTime $max) : array {
+        $pdo = $this->getConnection();
+        $statement = UtilitaireSQL::prepareStatement(
+            $pdo,
+            "SELECT * FROM {$this->getTableName()} WHERE `sponsor` = :sponsor AND (dateAjout BETWEEN :min AND :max)",
+            [
+                'sponsor' => $id,
+                'min' => "{$min->format('Y-m-d')}T00:00:00",
+                'max' => "{$max->format('Y-m-d')}T23:59:59"
+            ]
+        );
+
+        $data = [];
+
+        while ($row = $statement->fetch()) {
+            $member = new Member($row);
+            $member->setPacket($this->getManagerFactory()->getManagerOf(GradeMember::class)->findCurrentByMember($member->getId()));
+
+            $data[] = $member;
+        }
+
+        return $data;
+    }
+
 
     /**
      * {@inheritDoc}

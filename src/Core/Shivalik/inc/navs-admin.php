@@ -26,11 +26,11 @@ $admin = $_SESSION[SessionAdminFilter::ADMIN_CONNECTED_SESSION];
 	</li>
 
 	<li>
-		<a href="/admin/raports/">
+		<a href="/admin/members/promotion.html">
     		<span class="nav-item-icon">
         		<span class="fa fa-book"></span>
     		</span>
-    		<span class="nav-item-caption">Raports</span>
+    		<span class="nav-item-caption">Promotions</span>
 		</a>
 	</li>
 	
