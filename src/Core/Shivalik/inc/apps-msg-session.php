@@ -7,6 +7,15 @@ use PHPBackend\Text\HtmlFormater;
  */
 ?>
 
+<div class="alert alert-info">
+	<strong>
+		<span class="fa fa-info-circle"></span> Info
+	</strong> : 
+	We inform you that an update is in progress. In a few days we will see major changes in the presentation of the SHIVALIK platform.
+	In the new version of the shivalik platform, we have taken into consideration all the comments that members have proposed, all while improving the user experience.
+	<br/>Thank you for your trust in the SHIVALIK company.
+</div>
+
 <?php if (isset($_SESSION[Request::ATT_TOAST_MESSAGES]) && !empty($_SESSION[Request::ATT_TOAST_MESSAGES])) { ?>
 <div class="modal fade" data-backdrop="false" id="modal-session-message">
 	<div class="modal-dialog modal-lg" style="margin: auto;position: inherit;">

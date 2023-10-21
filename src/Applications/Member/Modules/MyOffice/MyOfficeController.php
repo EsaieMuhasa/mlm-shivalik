@@ -172,7 +172,7 @@ class MyOfficeController extends HTTPController
      * @param Response $response
      */
     public function executeRequestVirtualmoney(Request $request, Response $response) : void {
-        // $response->sendRedirect("/member/office/virtualmoney/");
+        $response->sendRedirect("/member/office/virtualmoney/");
         
         if ($request->getMethod() == Request::HTTP_POST) {
             $form = new RequestVirtualMoneyFormValidator($this->getDaoManager());

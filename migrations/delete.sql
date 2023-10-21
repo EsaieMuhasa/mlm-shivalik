@@ -297,3 +297,22 @@ DELETE FROM MoneyGradeMember WHERE gradeMember = (SELECT id FROM GradeMember WHE
 DELETE FROM GradeMember WHERE member = 4043;
 DELETE FROM Member WHERE id = 4043;
 COMMIT;
+
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+DELETE FROM PointValue WHERE generator = (SELECT id FROM GradeMember WHERE member = 4485);
+DELETE FROM BonusGeneration WHERE generator = (SELECT id FROM GradeMember WHERE member = 4485);
+DELETE FROM MoneyGradeMember WHERE gradeMember = (SELECT id FROM GradeMember WHERE member = 4485);
+DELETE FROM GradeMember WHERE member = 4485;
+DELETE FROM Member WHERE id = 4485;
+COMMIT;
+
+
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+
+SELECT * FROM `SellSheetRow` WHERE monthlyOrder = 1148;
+DELETE FROM `SellSheetRowVirtualMoney` WHERE sheet IN (6494, 6495, 6496);
+DELETE FROM `SellSheetRow` WHERE id IN (6494, 6495, 6496);
+
+COMMIT;

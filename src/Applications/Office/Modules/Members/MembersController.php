@@ -213,6 +213,8 @@ class MembersController extends HTTPController {
 	 * @param Response $response
 	 */
 	public function executeAddMember (Request $request, Response $response) : void {
+
+		$response->sendRedirect("/office/members/");
 		
 		$office = $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice();
 		
@@ -261,21 +263,23 @@ class MembersController extends HTTPController {
 	 * @param Response $response
 	 */
 	public function executeAffiliateMember (Request $request, Response $response) : void {
-	    
-	    $office = $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice();
+
+		
+		$office = $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice();
 	    
 	    if ($this->gradeMemberDAOManager->checkByOffice($office->getId())) {
-	        $office->setOperations($this->gradeMemberDAOManager->findByOffice($office->getId()));
+			$office->setOperations($this->gradeMemberDAOManager->findByOffice($office->getId()));
 	    }
 	    
 	    if ($this->virtualMoneyDAOManager->checkByOffice($office->getId())) {
-	        $office->setVirtualMoneys($this->virtualMoneyDAOManager->findByOffice($office->getId()));
+			$office->setVirtualMoneys($this->virtualMoneyDAOManager->findByOffice($office->getId()));
 	    }
 	    
 	    $id = intval($request->getDataGET('id'), 10);
 	    if (!$this->memberDAOManager->checkById($id)) {
-	        $response->sendError();
+			$response->sendError();
 	    }
+		$response->sendRedirect("/office/members/{$id}/");
 	    
 	    /**
 	     * @var Member $member
@@ -334,6 +338,8 @@ class MembersController extends HTTPController {
 		if (!$this->memberDAOManager->checkById($id)) {
 			$response->sendError();
 		}
+
+		$response->sendRedirect("/office/members/{$id}/");
 		
 		if ($this->gradeMemberDAOManager->checkRequestedByMember($id)) {
 			$response->sendRedirect("/office/members/{$id}/");
@@ -549,6 +555,8 @@ class MembersController extends HTTPController {
 		if (!$this->memberDAOManager->checkById($id)) {
 			$response->sendError();
 		}
+
+		$response->sendRedirect("/office/members/{$id}/");
 		
 		if ($this->gradeMemberDAOManager->checkRequestedByMember($id)) {
 			$response->sendRedirect("/office/members/{$id}/");
@@ -629,8 +637,11 @@ class MembersController extends HTTPController {
 	 */
 	public function executeAddSellSheetRow (Request $request, Response $response ) : void {
 
+		$id = $request->getDataGET('id');
+		$response->sendRedirect("/office/members/{$id}/");
+
 		if ($request->getMethod() == Request::HTTP_POST) {
-			$member = new Member(['id' => $request->getDataGET('id')]);
+			$member = new Member(['id' => $id]);
 			$form = new SellSheetRowFormValidator($this->getDaoManager());
 			$request
 				->addAttribute($form::ATT_OFFICE, $request->getSession()->getAttribute(SessionOfficeFilter::OFFICE_CONNECTED_SESSION)->getOffice())
